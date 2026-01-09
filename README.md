@@ -1,0 +1,2 @@
+# PaySick
+The Paysick project
