@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections Management - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF4757;
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            color: #1A1A1A;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #8A8A8A;
+            font-size: 16px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-label {
+            color: #8A8A8A;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .stat-value.warning {
+            color: #FF9F40;
+        }
+
+        .stat-value.danger {
+            color: #FF4757;
+        }
+
+        .stat-description {
+            color: #4A4A4A;
+            font-size: 14px;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            color: #4A4A4A;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 12px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #FF4757;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Collections Table */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            color: #1A1A1A;
+        }
+
+        .btn-secondary:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #FAFAFA;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #4A4A4A;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #F0F0F0;
+            color: #1A1A1A;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-overdue {
+            background: #FFE5E8;
+            color: #FF4757;
+        }
+
+        .status-late {
+            background: #FFF4E6;
+            color: #FF9F40;
+        }
+
+        .status-collections {
+            background: #FFE5E8;
+            color: #E01E37;
+        }
+
+        /* Priority Badge */
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .priority-high {
+            background: #FFE5E8;
+            color: #FF4757;
+        }
+
+        .priority-medium {
+            background: #FFF4E6;
+            color: #FF9F40;
+        }
+
+        .priority-low {
+            background: #F0F0F0;
+            color: #4A4A4A;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #E5E5E5;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+            border: none;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Timeline */
+        .timeline {
+            margin-top: 12px;
+            padding-left: 16px;
+            border-left: 2px solid #E5E5E5;
+        }
+
+        .timeline-item {
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #8A8A8A;
+        }
+
+        .timeline-item .date {
+            font-weight: 600;
+            color: #4A4A4A;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: #1A1A1A;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #8A8A8A;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: scroll;
+            }
+
+            table {
+                min-width: 900px;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo" onclick="goBack()">PaySick</div>
+            <div class="header-actions">
+                <a href="admin-dashboard.html" class="back-btn">← Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-header">
+            <h1>Collections Management 📊</h1>
+            <p>Monitor and manage overdue accounts and payment collections</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Overdue</div>
+                <div class="stat-value danger">R483,200</div>
+                <div class="stat-description">Across 34 accounts</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Critical Cases</div>
+                <div class="stat-value danger">12</div>
+                <div class="stat-description">60+ days overdue</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">In Collections</div>
+                <div class="stat-value warning">8</div>
+                <div class="stat-description">Active collection cases</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Recovery Rate</div>
+                <div class="stat-value">73.5%</div>
+                <div class="stat-description">Last 90 days</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Search Account</label>
+                    <input type="text" placeholder="Name, User ID, Email..." id="searchInput">
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="late">Late</option>
+                        <option value="collections">In Collections</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Days Overdue</label>
+                    <select id="daysFilter">
+                        <option value="">All</option>
+                        <option value="1-15">1-15 days</option>
+                        <option value="16-30">16-30 days</option>
+                        <option value="31-60">31-60 days</option>
+                        <option value="60+">60+ days</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Priority</label>
+                    <select id="priorityFilter">
+                        <option value="">All</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn" onclick="applyFilters()">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collections Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h2 class="table-title">Overdue Accounts</h2>
+                <div class="table-actions">
+                    <button class="btn btn-secondary">Export CSV</button>
+                    <button class="btn btn-secondary">Bulk Actions</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="collectionsTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>User ID</th>
+                            <th>Amount Due</th>
+                            <th>Days Overdue</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Last Contact</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Lerato Nkosi</strong><br>
+                                <small style="color: #8A8A8A;">l.nkosi@email.com</small>
+                            </td>
+                            <td>USR1245</td>
+                            <td><strong style="color: #FF4757;">R8,900</strong></td>
+                            <td>67 days</td>
+                            <td><span class="status-badge status-collections">Collections</span></td>
+                            <td><span class="priority-badge priority-high">High</span></td>
+                            <td>Jan 10, 2026</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="contactUser('USR1245')">Contact</button>
+                                    <button class="action-btn" onclick="viewDetails('USR1245')">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Sipho Khumalo</strong><br>
+                                <small style="color: #8A8A8A;">s.khumalo@email.com</small>
+                            </td>
+                            <td>USR1198</td>
+                            <td><strong style="color: #FF4757;">R21,500</strong></td>
+                            <td>82 days</td>
+                            <td><span class="status-badge status-collections">Collections</span></td>
+                            <td><span class="priority-badge priority-high">High</span></td>
+                            <td>Jan 8, 2026</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="contactUser('USR1198')">Contact</button>
+                                    <button class="action-btn" onclick="viewDetails('USR1198')">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Nomvula Dube</strong><br>
+                                <small style="color: #8A8A8A;">n.dube@email.com</small>
+                            </td>
+                            <td>USR1203</td>
+                            <td><strong style="color: #FF9F40;">R4,500</strong></td>
+                            <td>42 days</td>
+                            <td><span class="status-badge status-overdue">Overdue</span></td>
+                            <td><span class="priority-badge priority-high">High</span></td>
+                            <td>Jan 12, 2026</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="contactUser('USR1203')">Contact</button>
+                                    <button class="action-btn" onclick="viewDetails('USR1203')">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Mandla Sithole</strong><br>
+                                <small style="color: #8A8A8A;">m.sithole@email.com</small>
+                            </td>
+                            <td>USR1189</td>
+                            <td><strong style="color: #FF9F40;">R6,750</strong></td>
+                            <td>38 days</td>
+                            <td><span class="status-badge status-overdue">Overdue</span></td>
+                            <td><span class="priority-badge priority-medium">Medium</span></td>
+                            <td>Jan 11, 2026</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="contactUser('USR1189')">Contact</button>
+                                    <button class="action-btn" onclick="viewDetails('USR1189')">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Busisiwe Ndlovu</strong><br>
+                                <small style="color: #8A8A8A;">b.ndlovu@email.com</small>
+                            </td>
+                            <td>USR1214</td>
+                            <td><strong style="color: #FF9F40;">R3,200</strong></td>
+                            <td>28 days</td>
+                            <td><span class="status-badge status-late">Late</span></td>
+                            <td><span class="priority-badge priority-medium">Medium</span></td>
+                            <td>Jan 13, 2026</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="contactUser('USR1214')">Contact</button>
+                                    <button class="action-btn" onclick="viewDetails('USR1214')">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Thembinkosi Zulu</strong><br>
+                                <small style="color: #8A8A8A;">t.zulu@email.com</small>
+                            </td>
+                            <td>USR1227</td>
+                            <td><strong style="color: #FF9F40;">R5,500</strong></td>
+                            <td>19 days</td>
+                            <td><span class="status-badge status-late">Late</span></td>
+                            <td><span class="priority-badge priority-low">Low</span></td>
+                            <td>Jan 13, 2026</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="contactUser('USR1227')">Contact</button>
+                                    <button class="action-btn" onclick="viewDetails('USR1227')">View</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('paysick_user') || 'null');
+            const token = localStorage.getItem('paysick_auth_token');
+
+            if (!user || !token || user.role !== 'admin') {
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            return user;
+        }
+
+        // Initialize
+        window.addEventListener('load', function() {
+            checkAuth();
+        });
+
+        // Go back
+        function goBack() {
+            window.location.href = 'admin-dashboard.html';
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const days = document.getElementById('daysFilter').value;
+            const priority = document.getElementById('priorityFilter').value;
+
+            const rows = document.querySelectorAll('#collectionsTable tbody tr');
+
+            rows.forEach(row => {
+                let showRow = true;
+
+                // Search filter
+                if (search) {
+                    const text = row.textContent.toLowerCase();
+                    if (!text.includes(search)) {
+                        showRow = false;
+                    }
+                }
+
+                // Status filter
+                if (status && showRow) {
+                    const statusBadge = row.querySelector('.status-badge');
+                    if (statusBadge && !statusBadge.classList.contains('status-' + status)) {
+                        showRow = false;
+                    }
+                }
+
+                // Priority filter
+                if (priority && showRow) {
+                    const priorityBadge = row.querySelector('.priority-badge');
+                    if (priorityBadge && !priorityBadge.classList.contains('priority-' + priority)) {
+                        showRow = false;
+                    }
+                }
+
+                // Days filter
+                if (days && showRow) {
+                    const daysCell = row.cells[3].textContent;
+                    const daysOverdue = parseInt(daysCell);
+
+                    switch(days) {
+                        case '1-15':
+                            if (daysOverdue < 1 || daysOverdue > 15) showRow = false;
+                            break;
+                        case '16-30':
+                            if (daysOverdue < 16 || daysOverdue > 30) showRow = false;
+                            break;
+                        case '31-60':
+                            if (daysOverdue < 31 || daysOverdue > 60) showRow = false;
+                            break;
+                        case '60+':
+                            if (daysOverdue < 60) showRow = false;
+                            break;
+                    }
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+
+        // Contact user
+        function contactUser(userId) {
+            alert(`Opening communication channel for user ${userId}...\n\nFeatures:\n- Send email reminder\n- Send SMS notification\n- Schedule follow-up call\n- Create payment arrangement`);
+        }
+
+        // View details
+        function viewDetails(userId) {
+            alert(`Loading detailed information for user ${userId}...\n\nThis would show:\n- Complete payment history\n- Contact attempts log\n- Account notes\n- Payment arrangement options`);
+        }
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+    </script>
+</body>
+</html>

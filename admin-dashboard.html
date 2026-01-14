@@ -36,16 +36,28 @@
             align-items: center;
         }
 
-        .logo {
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
         }
 
         .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: #FF4757;
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
         }
 
         .admin-badge {
@@ -101,6 +113,148 @@
         .logout-btn:hover {
             background: #FF4757;
             color: white;
+        }
+
+        /* Hamburger Menu */
+        .menu-toggle {
+            display: block !important;
+            background: none;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #1A1A1A;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            color: #FF4757;
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .menu-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #8A8A8A;
+            padding: 8px;
+        }
+
+        .menu-close:hover {
+            color: #FF4757;
+        }
+
+        .menu-user-info {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-user-details {
+            flex: 1;
+        }
+
+        .menu-user-name {
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .menu-user-email {
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        .menu-nav {
+            padding: 16px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: #1A1A1A;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #FAFAFA;
+            color: #FF4757;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .menu-item-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #E5E5E5;
+            margin: 8px 0;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
         }
 
         /* Main Content */
@@ -429,6 +583,14 @@
                 display: none;
             }
 
+            .logout-btn {
+                display: none;
+            }
+
+            .admin-badge {
+                display: none;
+            }
+
             .welcome-section h1 {
                 font-size: 24px;
             }
@@ -444,12 +606,113 @@
     </style>
 </head>
 <body>
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <div class="menu-logo">PaySick <span style="font-size: 12px; color: #8A8A8A;">Admin</span></div>
+            <button class="menu-close" onclick="toggleMenu()">✕</button>
+        </div>
+
+        <div class="menu-user-info">
+            <div class="avatar" id="menuAvatar">AU</div>
+            <div class="menu-user-details">
+                <div class="menu-user-name" id="menuUserName">Admin User</div>
+                <div class="menu-user-email" id="menuUserEmail">admin@paysick.com</div>
+            </div>
+        </div>
+
+        <nav class="menu-nav">
+            <a href="admin-dashboard.html" class="menu-item">
+                <span class="icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">👥</span>
+                <span class="menu-item-text">User Management</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">💳</span>
+                <span class="menu-item-text">Payment Plans</span>
+            </a>
+            <a href="collections.html" class="menu-item">
+                <span class="icon">📊</span>
+                <span class="menu-item-text">Collections</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">🏥</span>
+                <span class="menu-item-text">Provider Network</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="index.html" class="menu-item">
+                <span class="icon">🌐</span>
+                <span class="menu-item-text">Main Site</span>
+            </a>
+            <a href="index.html#how-it-works" class="menu-item">
+                <span class="icon">❓</span>
+                <span class="menu-item-text">How It Works</span>
+            </a>
+            <a href="index.html#features" class="menu-item">
+                <span class="icon">✨</span>
+                <span class="menu-item-text">Features</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item">
+                <span class="icon">📈</span>
+                <span class="menu-item-text">Analytics</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">⚙️</span>
+                <span class="menu-item-text">System Settings</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item" onclick="logout(); return false;">
+                <span class="icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+            </a>
+        </nav>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <div class="logo">
-                <div class="logo-text">PaySick</div>
-                <span class="admin-badge">Admin</span>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="logo-container">
+                        <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <radialGradient id="adminCrossGradient" cx="40%" cy="40%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </radialGradient>
+                                <radialGradient id="adminBgCircle" cx="50%" cy="50%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                    <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                                </radialGradient>
+                            </defs>
+                            <circle cx="50" cy="50" r="40" fill="url(#adminBgCircle)"/>
+                            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#adminCrossGradient)"/>
+                            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#adminCrossGradient)"/>
+                            <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                            <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                        </svg>
+                        <div class="logo-text">Pay<span>Sick</span></div>
+                    </div>
+                    <span class="admin-badge">Admin</span>
+                </div>
             </div>
             <div class="user-menu">
                 <div class="user-info">
@@ -488,7 +751,7 @@
                     <div class="stat-icon green">💰</div>
                 </div>
                 <div class="stat-value">
-                    $486K
+                    R4.86M
                     <span class="stat-trend up">↑ 23%</span>
                 </div>
                 <div class="stat-description">This month</div>
@@ -563,7 +826,7 @@
                             </td>
                             <td>USR1247</td>
                             <td>4</td>
-                            <td>$2,350</td>
+                            <td>R23,500</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>Jan 10, 2026</td>
                             <td>
@@ -576,16 +839,16 @@
                         <tr>
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar">MJ</div>
+                                    <div class="user-avatar">TM</div>
                                     <div class="user-details">
-                                        <span class="user-name-cell">Michael Johnson</span>
-                                        <span class="user-email">m.johnson@email.com</span>
+                                        <span class="user-name-cell">Thabo Mokoena</span>
+                                        <span class="user-email">t.mokoena@email.com</span>
                                     </div>
                                 </div>
                             </td>
                             <td>USR1246</td>
                             <td>2</td>
-                            <td>$1,200</td>
+                            <td>R12,000</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>Jan 9, 2026</td>
                             <td>
@@ -598,16 +861,16 @@
                         <tr>
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar">ED</div>
+                                    <div class="user-avatar">LN</div>
                                     <div class="user-details">
-                                        <span class="user-name-cell">Emily Davis</span>
-                                        <span class="user-email">emily.d@email.com</span>
+                                        <span class="user-name-cell">Lerato Nkosi</span>
+                                        <span class="user-email">l.nkosi@email.com</span>
                                     </div>
                                 </div>
                             </td>
                             <td>USR1245</td>
                             <td>3</td>
-                            <td>$890</td>
+                            <td>R8,900</td>
                             <td><span class="status-badge status-overdue">Overdue</span></td>
                             <td>Jan 8, 2026</td>
                             <td>
@@ -620,16 +883,16 @@
                         <tr>
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar">JB</div>
+                                    <div class="user-avatar">KD</div>
                                     <div class="user-details">
-                                        <span class="user-name-cell">James Brown</span>
-                                        <span class="user-email">j.brown@email.com</span>
+                                        <span class="user-name-cell">Kagiso Dlamini</span>
+                                        <span class="user-email">k.dlamini@email.com</span>
                                     </div>
                                 </div>
                             </td>
                             <td>USR1244</td>
                             <td>1</td>
-                            <td>$450</td>
+                            <td>R4,500</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>Jan 7, 2026</td>
                             <td>
@@ -642,16 +905,16 @@
                         <tr>
                             <td>
                                 <div class="user-cell">
-                                    <div class="user-avatar">LW</div>
+                                    <div class="user-avatar">ZM</div>
                                     <div class="user-details">
-                                        <span class="user-name-cell">Lisa Wilson</span>
-                                        <span class="user-email">lisa.w@email.com</span>
+                                        <span class="user-name-cell">Zanele Mthembu</span>
+                                        <span class="user-email">z.mthembu@email.com</span>
                                     </div>
                                 </div>
                             </td>
                             <td>USR1243</td>
                             <td>5</td>
-                            <td>$3,120</td>
+                            <td>R31,200</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>Jan 6, 2026</td>
                             <td>
@@ -688,37 +951,37 @@
                 <div class="activity-item">
                     <div class="activity-time">2 minutes ago</div>
                     <div class="activity-description">
-                        <span class="activity-user">Sarah Miller</span> made a payment of $500
+                        <span class="activity-user">Sarah Miller</span> made a payment of R5,000
                     </div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-time">15 minutes ago</div>
                     <div class="activity-description">
-                        <span class="activity-user">Michael Johnson</span> created a new payment plan
+                        <span class="activity-user">Thabo Mokoena</span> created a new payment plan
                     </div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-time">1 hour ago</div>
                     <div class="activity-description">
-                        <span class="activity-user">Emily Davis</span> payment reminder sent
+                        <span class="activity-user">Lerato Nkosi</span> payment reminder sent
                     </div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-time">2 hours ago</div>
                     <div class="activity-description">
-                        <span class="activity-user">James Brown</span> registered a new account
+                        <span class="activity-user">Kagiso Dlamini</span> registered a new account
                     </div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-time">3 hours ago</div>
                     <div class="activity-description">
-                        <span class="activity-user">Lisa Wilson</span> completed payment plan #12345
+                        <span class="activity-user">Zanele Mthembu</span> completed payment plan #12345
                     </div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-time">4 hours ago</div>
                     <div class="activity-description">
-                        New provider <span class="activity-user">City Medical Center</span> joined network
+                        New provider <span class="activity-user">Life Healthcare Glynnwood</span> joined network
                     </div>
                 </div>
             </div>
@@ -751,9 +1014,9 @@
                         <tr>
                             <td>#PLN8921</td>
                             <td>Sarah Miller</td>
-                            <td>City General Hospital</td>
-                            <td>$2,500</td>
-                            <td>$1,667</td>
+                            <td>Netcare Milpark Hospital</td>
+                            <td>R25,000</td>
+                            <td>R16,670</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>Jan 20, 2026</td>
                             <td>
@@ -765,10 +1028,10 @@
                         </tr>
                         <tr>
                             <td>#PLN8920</td>
-                            <td>Michael Johnson</td>
-                            <td>Dental Care Plus</td>
-                            <td>$900</td>
-                            <td>$600</td>
+                            <td>Thabo Mokoena</td>
+                            <td>Cape Town Dental Studio</td>
+                            <td>R9,000</td>
+                            <td>R6,000</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>Jan 18, 2026</td>
                             <td>
@@ -780,10 +1043,10 @@
                         </tr>
                         <tr>
                             <td>#PLN8919</td>
-                            <td>Emily Davis</td>
-                            <td>Vision Center</td>
-                            <td>$650</td>
-                            <td>$450</td>
+                            <td>Lerato Nkosi</td>
+                            <td>Spec-Savers Optometrists</td>
+                            <td>R6,500</td>
+                            <td>R4,500</td>
                             <td><span class="status-badge status-overdue">Overdue</span></td>
                             <td>Jan 10, 2026</td>
                             <td>
@@ -795,10 +1058,10 @@
                         </tr>
                         <tr>
                             <td>#PLN8918</td>
-                            <td>James Brown</td>
-                            <td>Urgent Care Clinic</td>
-                            <td>$450</td>
-                            <td>$450</td>
+                            <td>Kagiso Dlamini</td>
+                            <td>Mediclinic Sandton</td>
+                            <td>R4,500</td>
+                            <td>R4,500</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>Jan 25, 2026</td>
                             <td>
@@ -810,10 +1073,10 @@
                         </tr>
                         <tr>
                             <td>#PLN8917</td>
-                            <td>Lisa Wilson</td>
-                            <td>Specialty Surgery Center</td>
-                            <td>$5,200</td>
-                            <td>$0</td>
+                            <td>Zanele Mthembu</td>
+                            <td>Life Healthcare Glynnwood</td>
+                            <td>R52,000</td>
+                            <td>R0</td>
                             <td><span class="status-badge status-completed">Completed</span></td>
                             <td>-</td>
                             <td>
@@ -847,19 +1110,35 @@
         function logout() {
             localStorage.removeItem('paysick_user');
             localStorage.removeItem('paysick_auth_token');
+            localStorage.removeItem('paysick_onboarding_complete');
+            localStorage.removeItem('paysick_onboarding_data');
             window.location.href = 'login.html';
+        }
+
+        // Toggle menu
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
 
         // Initialize dashboard
         function initDashboard() {
             const user = checkAuth();
             if (user) {
-                // Update user info
+                // Update user info in header
                 document.getElementById('userName').textContent = user.name;
 
                 // Update avatar with initials
                 const initials = user.name.split(' ').map(n => n[0]).join('');
                 document.getElementById('userAvatar').textContent = initials;
+
+                // Update menu user info
+                document.getElementById('menuAvatar').textContent = initials;
+                document.getElementById('menuUserName').textContent = user.name;
+                document.getElementById('menuUserEmail').textContent = user.email;
             }
         }
 
