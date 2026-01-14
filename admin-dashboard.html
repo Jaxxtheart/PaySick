@@ -103,6 +103,144 @@
             color: white;
         }
 
+        /* Hamburger Menu */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #1A1A1A;
+            padding: 8px;
+        }
+
+        .menu-toggle:hover {
+            color: #FF4757;
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .menu-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #8A8A8A;
+            padding: 8px;
+        }
+
+        .menu-close:hover {
+            color: #FF4757;
+        }
+
+        .menu-user-info {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-user-details {
+            flex: 1;
+        }
+
+        .menu-user-name {
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .menu-user-email {
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        .menu-nav {
+            padding: 16px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: #1A1A1A;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #FAFAFA;
+            color: #FF4757;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .menu-item-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #E5E5E5;
+            margin: 8px 0;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
         /* Main Content */
         .container {
             max-width: 1600px;
@@ -420,12 +558,26 @@
             }
         }
 
+        @media (max-width: 1024px) {
+            .menu-toggle {
+                display: block;
+            }
+        }
+
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
 
             .user-name {
+                display: none;
+            }
+
+            .logout-btn {
+                display: none;
+            }
+
+            .admin-badge {
                 display: none;
             }
 
@@ -444,12 +596,79 @@
     </style>
 </head>
 <body>
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <div class="menu-logo">PaySick <span style="font-size: 12px; color: #8A8A8A;">Admin</span></div>
+            <button class="menu-close" onclick="toggleMenu()">✕</button>
+        </div>
+
+        <div class="menu-user-info">
+            <div class="avatar" id="menuAvatar">AU</div>
+            <div class="menu-user-details">
+                <div class="menu-user-name" id="menuUserName">Admin User</div>
+                <div class="menu-user-email" id="menuUserEmail">admin@paysick.com</div>
+            </div>
+        </div>
+
+        <nav class="menu-nav">
+            <a href="admin-dashboard.html" class="menu-item">
+                <span class="icon">🏠</span>
+                <span class="menu-item-text">Dashboard</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">👥</span>
+                <span class="menu-item-text">User Management</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">💳</span>
+                <span class="menu-item-text">Payment Plans</span>
+            </a>
+            <a href="collections.html" class="menu-item">
+                <span class="icon">📊</span>
+                <span class="menu-item-text">Collections</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">🏥</span>
+                <span class="menu-item-text">Provider Network</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item">
+                <span class="icon">📈</span>
+                <span class="menu-item-text">Analytics</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">📄</span>
+                <span class="menu-item-text">Reports</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">⚙️</span>
+                <span class="menu-item-text">System Settings</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item" onclick="logout(); return false;">
+                <span class="icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+            </a>
+        </nav>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <div class="logo">
-                <div class="logo-text">PaySick</div>
-                <span class="admin-badge">Admin</span>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <div class="logo">
+                    <div class="logo-text">PaySick</div>
+                    <span class="admin-badge">Admin</span>
+                </div>
             </div>
             <div class="user-menu">
                 <div class="user-info">
@@ -847,19 +1066,35 @@
         function logout() {
             localStorage.removeItem('paysick_user');
             localStorage.removeItem('paysick_auth_token');
+            localStorage.removeItem('paysick_onboarding_complete');
+            localStorage.removeItem('paysick_onboarding_data');
             window.location.href = 'login.html';
+        }
+
+        // Toggle menu
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
 
         // Initialize dashboard
         function initDashboard() {
             const user = checkAuth();
             if (user) {
-                // Update user info
+                // Update user info in header
                 document.getElementById('userName').textContent = user.name;
 
                 // Update avatar with initials
                 const initials = user.name.split(' ').map(n => n[0]).join('');
                 document.getElementById('userAvatar').textContent = initials;
+
+                // Update menu user info
+                document.getElementById('menuAvatar').textContent = initials;
+                document.getElementById('menuUserName').textContent = user.name;
+                document.getElementById('menuUserEmail').textContent = user.email;
             }
         }
 

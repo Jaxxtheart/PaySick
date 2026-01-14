@@ -290,11 +290,19 @@
                 localStorage.setItem('paysick_user', JSON.stringify(userData));
                 localStorage.setItem('paysick_auth_token', 'demo_token_' + Date.now());
 
-                // Redirect to appropriate dashboard
+                // Check if onboarding is complete (admins skip onboarding)
+                const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+
+                // Redirect to appropriate page
                 if (role === 'admin') {
                     window.location.href = 'admin-dashboard.html';
                 } else {
-                    window.location.href = 'dashboard.html';
+                    // Regular users need to complete onboarding first
+                    if (onboardingComplete === 'true') {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'onboarding.html';
+                    }
                 }
             } else {
                 errorMessage.textContent = 'Invalid credentials. Please check your email, password, and role selection.';
