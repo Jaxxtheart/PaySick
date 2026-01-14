@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #FF4757;
+            color: #FF4757;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #FF4757;
+            color: white;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-section h1 {
+            font-size: 32px;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            color: #8A8A8A;
+            font-size: 16px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-label {
+            color: #8A8A8A;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.red { background: rgba(255, 71, 87, 0.1); }
+        .stat-icon.green { background: rgba(46, 213, 115, 0.1); }
+        .stat-icon.blue { background: rgba(52, 152, 219, 0.1); }
+        .stat-icon.orange { background: rgba(255, 159, 64, 0.1); }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .stat-description {
+            color: #4A4A4A;
+            font-size: 14px;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #FAFAFA;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .view-all {
+            color: #FF4757;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .view-all:hover {
+            opacity: 0.7;
+        }
+
+        /* Payment Plans */
+        .payment-plan {
+            border: 2px solid #F0F0F0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .payment-plan:hover {
+            border-color: #FF4757;
+        }
+
+        .payment-plan:last-child {
+            margin-bottom: 0;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .plan-provider {
+            font-weight: 600;
+            color: #1A1A1A;
+            font-size: 16px;
+        }
+
+        .plan-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active { background: #E8F8F0; color: #2ED573; }
+        .status-upcoming { background: #FFF4E6; color: #FF9F40; }
+        .status-completed { background: #E8F0F8; color: #3498DB; }
+
+        .plan-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .plan-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-detail-label {
+            color: #8A8A8A;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .plan-detail-value {
+            color: #1A1A1A;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #F0F0F0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* Upcoming Payments */
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-radius: 8px;
+            background: #FAFAFA;
+            margin-bottom: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .payment-item:hover {
+            background: #F0F0F0;
+        }
+
+        .payment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-date {
+            color: #8A8A8A;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .payment-provider {
+            color: #1A1A1A;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .payment-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        /* Full Width Card */
+        .full-card {
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-card {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+
+            .plan-details {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">PaySick</div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">JD</div>
+                    <span class="user-name" id="userName">John Doe</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="welcome-section">
+            <h1>Welcome back, <span id="welcomeName">John</span>! 👋</h1>
+            <p>Here's an overview of your payment plans and upcoming payments</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Total Balance</span>
+                    <div class="stat-icon red">💰</div>
+                </div>
+                <div class="stat-value">$2,450</div>
+                <div class="stat-description">Across 3 active plans</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Next Payment</span>
+                    <div class="stat-icon orange">📅</div>
+                </div>
+                <div class="stat-value">$350</div>
+                <div class="stat-description">Due in 5 days</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Paid This Year</span>
+                    <div class="stat-icon green">✓</div>
+                </div>
+                <div class="stat-value">$1,890</div>
+                <div class="stat-description">6 payments completed</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Active Plans</span>
+                    <div class="stat-icon blue">📊</div>
+                </div>
+                <div class="stat-value">3</div>
+                <div class="stat-description">All in good standing</div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Active Payment Plans -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Active Payment Plans</h2>
+                    <a href="#" class="view-all">View All →</a>
+                </div>
+
+                <div class="payment-plan">
+                    <div class="plan-header">
+                        <span class="plan-provider">City General Hospital</span>
+                        <span class="plan-status status-active">Active</span>
+                    </div>
+                    <div class="plan-details">
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Total Amount</span>
+                            <span class="plan-detail-value">$1,500</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Remaining</span>
+                            <span class="plan-detail-value">$1,000</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Monthly Payment</span>
+                            <span class="plan-detail-value">$500</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Next Due</span>
+                            <span class="plan-detail-value">Jan 20, 2026</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33%"></div>
+                    </div>
+                </div>
+
+                <div class="payment-plan">
+                    <div class="plan-header">
+                        <span class="plan-provider">Dental Care Plus</span>
+                        <span class="plan-status status-active">Active</span>
+                    </div>
+                    <div class="plan-details">
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Total Amount</span>
+                            <span class="plan-detail-value">$750</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Remaining</span>
+                            <span class="plan-detail-value">$500</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Monthly Payment</span>
+                            <span class="plan-detail-value">$250</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Next Due</span>
+                            <span class="plan-detail-value">Jan 15, 2026</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33%"></div>
+                    </div>
+                </div>
+
+                <div class="payment-plan">
+                    <div class="plan-header">
+                        <span class="plan-provider">Vision Center</span>
+                        <span class="plan-status status-upcoming">Starting Soon</span>
+                    </div>
+                    <div class="plan-details">
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Total Amount</span>
+                            <span class="plan-detail-value">$600</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Remaining</span>
+                            <span class="plan-detail-value">$600</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Monthly Payment</span>
+                            <span class="plan-detail-value">$200</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span class="plan-detail-label">Starts</span>
+                            <span class="plan-detail-value">Feb 1, 2026</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Payments -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Upcoming Payments</h2>
+                    <a href="#" class="view-all">View All →</a>
+                </div>
+
+                <div class="payment-item">
+                    <div class="payment-info">
+                        <div class="payment-date">January 15, 2026</div>
+                        <div class="payment-provider">Dental Care Plus</div>
+                    </div>
+                    <div class="payment-amount">$250</div>
+                </div>
+
+                <div class="payment-item">
+                    <div class="payment-info">
+                        <div class="payment-date">January 20, 2026</div>
+                        <div class="payment-provider">City General Hospital</div>
+                    </div>
+                    <div class="payment-amount">$500</div>
+                </div>
+
+                <div class="payment-item">
+                    <div class="payment-info">
+                        <div class="payment-date">February 1, 2026</div>
+                        <div class="payment-provider">Vision Center</div>
+                    </div>
+                    <div class="payment-amount">$200</div>
+                </div>
+
+                <div class="payment-item">
+                    <div class="payment-info">
+                        <div class="payment-date">February 15, 2026</div>
+                        <div class="payment-provider">Dental Care Plus</div>
+                    </div>
+                    <div class="payment-amount">$250</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card full-card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                <div class="quick-actions">
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">💳</div>
+                        <div>Make a Payment</div>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">📄</div>
+                        <div>View Statements</div>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">⚙️</div>
+                        <div>Account Settings</div>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">💬</div>
+                        <div>Get Support</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('paysick_user') || 'null');
+            const token = localStorage.getItem('paysick_auth_token');
+
+            if (!user || !token || user.role !== 'user') {
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            return user;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('paysick_user');
+            localStorage.removeItem('paysick_auth_token');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            const user = checkAuth();
+            if (user) {
+                // Update user info
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('welcomeName').textContent = user.name.split(' ')[0];
+
+                // Update avatar with initials
+                const initials = user.name.split(' ').map(n => n[0]).join('');
+                document.getElementById('userAvatar').textContent = initials;
+            }
+        }
+
+        // Run on page load
+        window.addEventListener('load', initDashboard);
+    </script>
+</body>
+</html>
