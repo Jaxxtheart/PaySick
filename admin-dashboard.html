@@ -36,16 +36,28 @@
             align-items: center;
         }
 
-        .logo {
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
         }
 
         .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: #FF4757;
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
         }
 
         .admin-badge {
@@ -678,8 +690,27 @@
         <div class="header-content">
             <div style="display: flex; align-items: center; gap: 16px;">
                 <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-                <div class="logo">
-                    <div class="logo-text">PaySick</div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="logo-container">
+                        <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <radialGradient id="adminCrossGradient" cx="40%" cy="40%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </radialGradient>
+                                <radialGradient id="adminBgCircle" cx="50%" cy="50%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                    <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                                </radialGradient>
+                            </defs>
+                            <circle cx="50" cy="50" r="40" fill="url(#adminBgCircle)"/>
+                            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#adminCrossGradient)"/>
+                            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#adminCrossGradient)"/>
+                            <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                            <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                        </svg>
+                        <div class="logo-text">Pay<span>Sick</span></div>
+                    </div>
                     <span class="admin-badge">Admin</span>
                 </div>
             </div>
