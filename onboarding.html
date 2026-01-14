@@ -510,13 +510,19 @@
                         <input type="radio" name="paymentMethod" value="bank" required>
                         <div class="payment-icon">🏦</div>
                         <h4>Bank Account</h4>
-                        <p>Direct ACH transfer</p>
+                        <p>Direct debit order</p>
                     </label>
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="card" required>
                         <div class="payment-icon">💳</div>
                         <h4>Debit Card</h4>
                         <p>Instant verification</p>
+                    </label>
+                    <label class="payment-method-card">
+                        <input type="radio" name="paymentMethod" value="payshap" required>
+                        <div class="payment-icon">⚡</div>
+                        <h4>PayShap</h4>
+                        <p>Instant payment</p>
                     </label>
                 </div>
 
@@ -579,6 +585,43 @@
                     <div class="form-group">
                         <label>Name on Card <span class="required">*</span></label>
                         <input type="text" name="cardName" placeholder="John Doe">
+                    </div>
+                </div>
+
+                <!-- PayShap Details (shown when PayShap is selected) -->
+                <div id="payshapDetails" style="display: none;">
+                    <div class="form-group">
+                        <label>PayShap Mobile Number <span class="required">*</span></label>
+                        <input type="tel" name="payshapMobile" placeholder="082 123 4567">
+                        <small style="color: #8A8A8A; font-size: 13px; display: block; margin-top: 8px;">
+                            This is the mobile number linked to your PayShap profile
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ShapID (Optional)</label>
+                        <input type="text" name="shapId" placeholder="@username or email@example.com">
+                        <small style="color: #8A8A8A; font-size: 13px; display: block; margin-top: 8px;">
+                            Your PayShap alias (if you have one set up)
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Linked Bank <span class="required">*</span></label>
+                        <select name="payshapBank">
+                            <option value="">Select Bank</option>
+                            <option value="Standard Bank">Standard Bank</option>
+                            <option value="FNB">FNB</option>
+                            <option value="ABSA">ABSA</option>
+                            <option value="Nedbank">Nedbank</option>
+                            <option value="Capitec">Capitec</option>
+                            <option value="Discovery Bank">Discovery Bank</option>
+                            <option value="TymeBank">TymeBank</option>
+                            <option value="African Bank">African Bank</option>
+                        </select>
+                        <small style="color: #8A8A8A; font-size: 13px; display: block; margin-top: 8px;">
+                            The bank your PayShap is linked to
+                        </small>
                     </div>
                 </div>
 
@@ -677,6 +720,7 @@
             const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
             const bankDetails = document.getElementById('bankDetails');
             const cardDetails = document.getElementById('cardDetails');
+            const payshapDetails = document.getElementById('payshapDetails');
 
             paymentMethods.forEach(method => {
                 method.addEventListener('change', function() {
@@ -686,19 +730,26 @@
                     });
                     this.closest('.payment-method-card').classList.add('selected');
 
-                    // Show/hide details
+                    // Show/hide details and manage required fields
+                    bankDetails.style.display = 'none';
+                    cardDetails.style.display = 'none';
+                    payshapDetails.style.display = 'none';
+
+                    // Reset all required fields
+                    bankDetails.querySelectorAll('input, select').forEach(input => input.required = false);
+                    cardDetails.querySelectorAll('input').forEach(input => input.required = false);
+                    payshapDetails.querySelectorAll('input[name="payshapMobile"], select[name="payshapBank"]').forEach(input => input.required = false);
+
                     if (this.value === 'bank') {
                         bankDetails.style.display = 'block';
-                        cardDetails.style.display = 'none';
-                        // Make bank fields required
                         bankDetails.querySelectorAll('input, select').forEach(input => input.required = true);
-                        cardDetails.querySelectorAll('input').forEach(input => input.required = false);
-                    } else {
-                        bankDetails.style.display = 'none';
+                    } else if (this.value === 'card') {
                         cardDetails.style.display = 'block';
-                        // Make card fields required
                         cardDetails.querySelectorAll('input').forEach(input => input.required = true);
-                        bankDetails.querySelectorAll('input, select').forEach(input => input.required = false);
+                    } else if (this.value === 'payshap') {
+                        payshapDetails.style.display = 'block';
+                        payshapDetails.querySelector('input[name="payshapMobile"]').required = true;
+                        payshapDetails.querySelector('select[name="payshapBank"]').required = true;
                     }
                 });
             });
@@ -787,10 +838,27 @@
         // Populate review
         function populateReview() {
             const reviewContent = document.getElementById('reviewContent');
-            const paymentMethod = formData.paymentMethod === 'bank' ? 'Bank Account' : 'Debit Card';
-            const paymentDetails = formData.paymentMethod === 'bank'
-                ? `${formData.bankName} - Branch: ${formData.branchCode} - ****${formData.accountNumber.slice(-4)}`
-                : `Card ending in ${formData.cardNumber.replace(/\s/g, '').slice(-4)}`;
+
+            // Determine payment method display name
+            let paymentMethod;
+            if (formData.paymentMethod === 'bank') {
+                paymentMethod = 'Bank Account';
+            } else if (formData.paymentMethod === 'card') {
+                paymentMethod = 'Debit Card';
+            } else {
+                paymentMethod = 'PayShap';
+            }
+
+            // Determine payment details based on method
+            let paymentDetails;
+            if (formData.paymentMethod === 'bank') {
+                paymentDetails = `${formData.bankName} - Branch: ${formData.branchCode} - ****${formData.accountNumber.slice(-4)}`;
+            } else if (formData.paymentMethod === 'card') {
+                paymentDetails = `Card ending in ${formData.cardNumber.replace(/\s/g, '').slice(-4)}`;
+            } else if (formData.paymentMethod === 'payshap') {
+                const shapIdDisplay = formData.shapId ? ` (${formData.shapId})` : '';
+                paymentDetails = `${formData.payshapMobile}${shapIdDisplay} - ${formData.payshapBank}`;
+            }
 
             reviewContent.innerHTML = `
                 <h3 style="font-size: 18px; margin-bottom: 16px; color: #1A1A1A;">Personal Information</h3>
