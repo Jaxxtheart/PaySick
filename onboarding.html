@@ -481,8 +481,12 @@
                         <input type="text" name="postalCode" required placeholder="2001" pattern="[0-9]{4}">
                     </div>
                     <div class="form-group">
-                        <label>ID Number (Last 4 digits) <span class="required">*</span></label>
-                        <input type="text" name="idNumber" required placeholder="1234" pattern="[0-9]{4}" maxlength="4">
+                        <label>ID Number <span class="required">*</span></label>
+                        <input type="text" name="idNumber" id="idNumber" required placeholder="9001014800086" pattern="[0-9]{13}" maxlength="13">
+                        <small style="color: #8A8A8A; font-size: 13px; display: block; margin-top: 8px;">
+                            Enter your full 13-digit South African ID number
+                        </small>
+                        <div id="idError" style="color: #FF4757; font-size: 13px; margin-top: 8px; display: none;"></div>
                     </div>
                 </div>
 
@@ -713,7 +717,63 @@
 
             updateProgressBar();
             setupPaymentMethodToggle();
+            setupIDValidation();
         });
+
+        // Setup ID validation with real-time feedback
+        function setupIDValidation() {
+            const idInput = document.getElementById('idNumber');
+            const dobInput = document.querySelector('input[name="dob"]');
+            const idError = document.getElementById('idError');
+
+            // Validate ID on blur
+            idInput.addEventListener('blur', function() {
+                if (this.value.length === 13) {
+                    const validation = crossValidateIDWithDOB(this.value, dobInput);
+
+                    if (!validation.valid) {
+                        idError.textContent = validation.error;
+                        idError.style.display = 'block';
+                        this.style.borderColor = '#FF4757';
+                    } else {
+                        idError.style.display = 'none';
+                        this.style.borderColor = '#2ED573';
+
+                        // Auto-fill DOB if not already filled
+                        if (!dobInput.value && validation.dob) {
+                            const year = validation.dob.getFullYear();
+                            const month = String(validation.dob.getMonth() + 1).padStart(2, '0');
+                            const day = String(validation.dob.getDate()).padStart(2, '0');
+                            dobInput.value = `${year}-${month}-${day}`;
+                        }
+                    }
+                }
+            });
+
+            // Clear error on input
+            idInput.addEventListener('input', function() {
+                if (this.value.length < 13) {
+                    idError.style.display = 'none';
+                    this.style.borderColor = '#E5E5E5';
+                }
+            });
+
+            // Revalidate ID when DOB changes
+            dobInput.addEventListener('change', function() {
+                if (idInput.value.length === 13) {
+                    const validation = crossValidateIDWithDOB(idInput.value, dobInput);
+
+                    if (!validation.valid) {
+                        idError.textContent = validation.error;
+                        idError.style.display = 'block';
+                        idInput.style.borderColor = '#FF4757';
+                    } else {
+                        idError.style.display = 'none';
+                        idInput.style.borderColor = '#2ED573';
+                    }
+                }
+            });
+        }
 
         // Payment method toggle
         function setupPaymentMethodToggle() {
@@ -755,6 +815,109 @@
             });
         }
 
+        // Validate South African ID Number
+        function validateSAIDNumber(idNumber) {
+            // Remove any spaces
+            idNumber = idNumber.replace(/\s/g, '');
+
+            // Check if it's 13 digits
+            if (!/^\d{13}$/.test(idNumber)) {
+                return {
+                    valid: false,
+                    error: 'ID number must be exactly 13 digits'
+                };
+            }
+
+            // Extract date of birth (YYMMDD)
+            const year = idNumber.substring(0, 2);
+            const month = idNumber.substring(2, 4);
+            const day = idNumber.substring(4, 6);
+
+            // Determine century (00-22 is 2000s, 23-99 is 1900s)
+            const fullYear = parseInt(year) <= 22 ? '20' + year : '19' + year;
+            const dobFromID = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+
+            // Validate date
+            if (dobFromID.getMonth() + 1 !== parseInt(month) ||
+                dobFromID.getDate() !== parseInt(day)) {
+                return {
+                    valid: false,
+                    error: 'Invalid date of birth in ID number'
+                };
+            }
+
+            // Check if date is not in the future
+            if (dobFromID > new Date()) {
+                return {
+                    valid: false,
+                    error: 'Date of birth cannot be in the future'
+                };
+            }
+
+            // Validate checksum using Luhn algorithm (modified for SA ID)
+            let sum = 0;
+            let alternate = false;
+
+            // Process digits from right to left (excluding the last checksum digit)
+            for (let i = idNumber.length - 2; i >= 0; i--) {
+                let digit = parseInt(idNumber.charAt(i));
+
+                if (alternate) {
+                    digit *= 2;
+                    if (digit > 9) {
+                        digit = digit - 9;
+                    }
+                }
+
+                sum += digit;
+                alternate = !alternate;
+            }
+
+            // Calculate checksum
+            const checksum = (10 - (sum % 10)) % 10;
+            const providedChecksum = parseInt(idNumber.charAt(12));
+
+            if (checksum !== providedChecksum) {
+                return {
+                    valid: false,
+                    error: 'Invalid ID number - checksum verification failed'
+                };
+            }
+
+            return {
+                valid: true,
+                dob: dobFromID,
+                error: null
+            };
+        }
+
+        // Cross-validate ID number with date of birth field
+        function crossValidateIDWithDOB(idNumber, dobInput) {
+            const validation = validateSAIDNumber(idNumber);
+
+            if (!validation.valid) {
+                return validation;
+            }
+
+            // If DOB field is filled, cross-validate
+            if (dobInput && dobInput.value) {
+                const selectedDOB = new Date(dobInput.value);
+                const idDOB = validation.dob;
+
+                // Compare dates (year, month, day)
+                if (selectedDOB.getFullYear() !== idDOB.getFullYear() ||
+                    selectedDOB.getMonth() !== idDOB.getMonth() ||
+                    selectedDOB.getDate() !== idDOB.getDate()) {
+                    return {
+                        valid: false,
+                        error: 'ID number does not match the date of birth provided'
+                    };
+                }
+            }
+
+            return validation;
+        }
+
         // Update progress bar
         function updateProgressBar() {
             const progressLine = document.getElementById('progressLine');
@@ -791,6 +954,24 @@
             });
 
             if (!isValid) return;
+
+            // Additional validation for ID number on step 1
+            if (currentStep === 1) {
+                const idInput = document.getElementById('idNumber');
+                const dobInput = document.querySelector('input[name="dob"]');
+                const idError = document.getElementById('idError');
+
+                const validation = crossValidateIDWithDOB(idInput.value, dobInput);
+
+                if (!validation.valid) {
+                    idError.textContent = validation.error;
+                    idError.style.display = 'block';
+                    idInput.focus();
+                    return;
+                } else {
+                    idError.style.display = 'none';
+                }
+            }
 
             // Save current step data
             inputs.forEach(input => {
