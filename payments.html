@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Payments - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .back-btn {
+            color: #FF4757;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-btn:hover {
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            color: #8A8A8A;
+            font-size: 16px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #E5E5E5;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #8A8A8A;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #FF4757;
+            border-bottom-color: #FF4757;
+        }
+
+        .tab:hover {
+            color: #FF4757;
+        }
+
+        /* Payment List */
+        .payment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .payment-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-main {
+            flex: 1;
+        }
+
+        .payment-provider {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .payment-details {
+            display: flex;
+            gap: 24px;
+            color: #8A8A8A;
+            font-size: 14px;
+        }
+
+        .payment-detail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .payment-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .payment-amount {
+            text-align: right;
+        }
+
+        .amount-label {
+            color: #8A8A8A;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .amount-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-scheduled {
+            background: #FFF4E6;
+            color: #FF9F40;
+        }
+
+        .status-overdue {
+            background: #FFE5E8;
+            color: #E01E37;
+        }
+
+        .status-paid {
+            background: #E8F8F0;
+            color: #2ED573;
+        }
+
+        .pay-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+        }
+
+        .pay-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            color: #8A8A8A;
+            font-size: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 48px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #E5E5E5;
+            border-top-color: #FF4757;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .payment-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .payment-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .payment-details {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .tab {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container" onclick="window.location.href='dashboard.html'">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="paymentsCrossGradient" cx="40%" cy="40%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                        </radialGradient>
+                        <radialGradient id="paymentsBgCircle" cx="50%" cy="50%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                            <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="url(#paymentsBgCircle)"/>
+                    <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#paymentsCrossGradient)"/>
+                    <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#paymentsCrossGradient)"/>
+                    <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                </svg>
+                <div class="logo-text">Pay<span>Sick</span></div>
+            </div>
+            <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-header">
+            <h1 class="page-title">My Payments</h1>
+            <p class="page-description">View and manage your payment schedule</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('upcoming')">Upcoming</button>
+            <button class="tab" onclick="showTab('history')">Payment History</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading payments...</p>
+        </div>
+
+        <!-- Upcoming Payments -->
+        <div id="upcomingPayments" class="payment-list" style="display: none;">
+            <!-- Dynamically loaded -->
+        </div>
+
+        <!-- Payment History -->
+        <div id="paymentHistory" class="payment-list" style="display: none;">
+            <!-- Dynamically loaded -->
+        </div>
+    </main>
+
+    <script src="api-client.js"></script>
+    <script>
+        let currentTab = 'upcoming';
+
+        // Show tab
+        function showTab(tab) {
+            currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide content
+            document.getElementById('upcomingPayments').style.display = tab === 'upcoming' ? 'block' : 'none';
+            document.getElementById('paymentHistory').style.display = tab === 'history' ? 'block' : 'none';
+
+            // Load data if needed
+            if (tab === 'history' && document.getElementById('paymentHistory').children.length === 0) {
+                loadPaymentHistory();
+            }
+        }
+
+        // Load upcoming payments
+        async function loadUpcomingPayments() {
+            try {
+                const payments = await PaySickAPI.payments.getUpcoming();
+
+                const container = document.getElementById('upcomingPayments');
+
+                if (payments.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📅</div>
+                            <h3 class="empty-title">No Upcoming Payments</h3>
+                            <p class="empty-description">You're all caught up! No payments due at this time.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = payments.map(payment => `
+                    <div class="payment-card" onclick="window.location.href='make-payment.html?id=${payment.payment_id}'">
+                        <div class="payment-main">
+                            <div class="payment-provider">${payment.provider_name}</div>
+                            <div class="payment-details">
+                                <span class="payment-detail">
+                                    📅 Due: ${new Date(payment.due_date).toLocaleDateString()}
+                                </span>
+                                <span class="payment-detail">
+                                    💳 Payment ${payment.payment_number} of 3
+                                </span>
+                                <span class="payment-detail">
+                                    🏥 ${payment.treatment_type}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="payment-right">
+                            <div class="payment-amount">
+                                <div class="amount-label">Amount Due</div>
+                                <div class="amount-value">R${parseFloat(payment.amount).toFixed(2)}</div>
+                            </div>
+                            <span class="status-badge status-${payment.status}">${payment.status}</span>
+                            <a href="make-payment.html?id=${payment.payment_id}"
+                               class="pay-button"
+                               onclick="event.stopPropagation()">
+                                Pay Now
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading payments:', error);
+                document.getElementById('upcomingPayments').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <h3 class="empty-title">Unable to Load Payments</h3>
+                        <p class="empty-description">Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load payment history
+        async function loadPaymentHistory() {
+            try {
+                const payments = await PaySickAPI.payments.getHistory();
+
+                const container = document.getElementById('paymentHistory');
+
+                if (payments.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📊</div>
+                            <h3 class="empty-title">No Payment History</h3>
+                            <p class="empty-description">Your completed payments will appear here.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = payments.map(payment => `
+                    <div class="payment-card">
+                        <div class="payment-main">
+                            <div class="payment-provider">${payment.provider_name}</div>
+                            <div class="payment-details">
+                                <span class="payment-detail">
+                                    ✓ Paid: ${new Date(payment.payment_date).toLocaleDateString()}
+                                </span>
+                                <span class="payment-detail">
+                                    💳 Payment ${payment.payment_number} of 3
+                                </span>
+                                <span class="payment-detail">
+                                    🏥 ${payment.treatment_type}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="payment-right">
+                            <div class="payment-amount">
+                                <div class="amount-label">Amount Paid</div>
+                                <div class="amount-value" style="color: #2ED573;">R${parseFloat(payment.amount).toFixed(2)}</div>
+                            </div>
+                            <span class="status-badge status-paid">Paid</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading payment history:', error);
+                document.getElementById('paymentHistory').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <h3 class="empty-title">Unable to Load History</h3>
+                        <p class="empty-description">Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', async () => {
+            const user = JSON.parse(localStorage.getItem('paysick_user') || 'null');
+            const token = localStorage.getItem('paysick_auth_token');
+
+            if (!user || !token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            await loadUpcomingPayments();
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('upcomingPayments').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

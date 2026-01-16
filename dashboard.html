@@ -515,6 +515,31 @@
             color: #FF4757;
         }
 
+        .payment-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pay-now-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .pay-now-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+        }
+
         /* Quick Actions */
         .quick-actions {
             display: grid;
@@ -868,7 +893,7 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Upcoming Payments</h2>
-                    <a href="#" class="view-all">View All →</a>
+                    <a href="payments.html" class="view-all">View All →</a>
                 </div>
 
                 <div class="payment-item">
@@ -876,7 +901,10 @@
                         <div class="payment-date">January 15, 2026</div>
                         <div class="payment-provider">Cape Town Dental Studio</div>
                     </div>
-                    <div class="payment-amount">R2,500</div>
+                    <div class="payment-actions">
+                        <div class="payment-amount">R2,500</div>
+                        <a href="make-payment.html?id=sample-id-1" class="pay-now-btn">Pay Now</a>
+                    </div>
                 </div>
 
                 <div class="payment-item">
@@ -884,7 +912,10 @@
                         <div class="payment-date">January 20, 2026</div>
                         <div class="payment-provider">Netcare Milpark Hospital</div>
                     </div>
-                    <div class="payment-amount">R5,000</div>
+                    <div class="payment-actions">
+                        <div class="payment-amount">R5,000</div>
+                        <a href="make-payment.html?id=sample-id-2" class="pay-now-btn">Pay Now</a>
+                    </div>
                 </div>
 
                 <div class="payment-item">
@@ -892,7 +923,10 @@
                         <div class="payment-date">February 1, 2026</div>
                         <div class="payment-provider">Spec-Savers Optometrists</div>
                     </div>
-                    <div class="payment-amount">R2,000</div>
+                    <div class="payment-actions">
+                        <div class="payment-amount">R2,000</div>
+                        <a href="make-payment.html?id=sample-id-3" class="pay-now-btn">Pay Now</a>
+                    </div>
                 </div>
 
                 <div class="payment-item">
@@ -900,7 +934,10 @@
                         <div class="payment-date">February 15, 2026</div>
                         <div class="payment-provider">Cape Town Dental Studio</div>
                     </div>
-                    <div class="payment-amount">R2,500</div>
+                    <div class="payment-actions">
+                        <div class="payment-amount">R2,500</div>
+                        <a href="make-payment.html?id=sample-id-4" class="pay-now-btn">Pay Now</a>
+                    </div>
                 </div>
             </div>
 
@@ -910,11 +947,11 @@
                     <h2 class="card-title">Quick Actions</h2>
                 </div>
                 <div class="quick-actions">
-                    <a href="#" class="action-btn">
+                    <a href="payments.html" class="action-btn">
                         <div class="action-icon">💳</div>
                         <div>Make a Payment</div>
                     </a>
-                    <a href="#" class="action-btn">
+                    <a href="payments.html" class="action-btn">
                         <div class="action-icon">📄</div>
                         <div>View Statements</div>
                     </a>

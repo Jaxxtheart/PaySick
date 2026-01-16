@@ -201,10 +201,13 @@ const PaySickAPI = {
     /**
      * Make a payment
      */
-    async makePayment(paymentId, paymentData) {
+    async makePayment(paymentId, amount, paymentMethod = 'debit_order') {
       return PaySickAPI.request(`/payments/${paymentId}/pay`, {
         method: 'POST',
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify({
+          amount: amount,
+          payment_method: paymentMethod
+        })
       });
     },
 
