@@ -1095,15 +1095,21 @@
     <script>
         // Check authentication
         function checkAuth() {
-            const user = JSON.parse(localStorage.getItem('paysick_user') || 'null');
-            const token = localStorage.getItem('paysick_auth_token');
+            try {
+                const user = JSON.parse(localStorage.getItem('paysick_user') || 'null');
+                const token = localStorage.getItem('paysick_auth_token');
 
-            if (!user || !token || user.role !== 'admin') {
+                if (!user || !token || user.role !== 'admin') {
+                    window.location.href = 'login.html';
+                    return null;
+                }
+
+                return user;
+            } catch (e) {
+                console.error('Error parsing user data:', e);
                 window.location.href = 'login.html';
                 return null;
             }
-
-            return user;
         }
 
         // Logout function
@@ -1112,6 +1118,7 @@
             localStorage.removeItem('paysick_auth_token');
             localStorage.removeItem('paysick_onboarding_complete');
             localStorage.removeItem('paysick_onboarding_data');
+            localStorage.removeItem('paysick_onboarding_progress');
             window.location.href = 'login.html';
         }
 
