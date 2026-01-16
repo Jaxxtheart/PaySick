@@ -1,0 +1,40 @@
+# Vercel Ignore File
+# Files and directories that should not be uploaded to Vercel
+
+# Documentation (not needed in deployment)
+*.md
+!README.md
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore

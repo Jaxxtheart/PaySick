@@ -36,11 +36,29 @@
             align-items: center;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #FF4757;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
         }
 
         .header-actions {
@@ -427,7 +445,26 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <div class="logo" onclick="goBack()">PaySick</div>
+            <div class="logo-container" onclick="goBack()">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="collectionsCrossGradient" cx="40%" cy="40%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                        </radialGradient>
+                        <radialGradient id="collectionsBgCircle" cx="50%" cy="50%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                            <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="url(#collectionsBgCircle)"/>
+                    <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#collectionsCrossGradient)"/>
+                    <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#collectionsCrossGradient)"/>
+                    <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                </svg>
+                <div class="logo-text">Pay<span>Sick</span></div>
+            </div>
             <div class="header-actions">
                 <a href="admin-dashboard.html" class="back-btn">← Back to Dashboard</a>
             </div>
