@@ -1,0 +1,33 @@
+{
+  "name": "paysick-backend",
+  "version": "1.0.0",
+  "description": "PaySick Healthcare Payment Platform - Backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:setup": "node src/utils/setupDatabase.js",
+    "db:migrate": "psql -U $DB_USER -d $DB_NAME -f database/schema.sql"
+  },
+  "keywords": [
+    "healthcare",
+    "payments",
+    "postgresql"
+  ],
+  "author": "PaySick",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
