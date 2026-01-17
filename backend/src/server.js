@@ -92,9 +92,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`
+// Start server (only when not running as Vercel serverless function)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`
 ╔═══════════════════════════════════════════╗
 ║                                           ║
 ║       PaySick API Server Running          ║
@@ -106,15 +107,16 @@ app.listen(PORT, () => {
 ║  Health Check: http://localhost:${PORT}/health  ║
 ║                                           ║
 ╚═══════════════════════════════════════════╝
-  `);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server');
-  app.close(() => {
-    console.log('HTTP server closed');
+    `);
   });
-});
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    app.close(() => {
+      console.log('HTTP server closed');
+    });
+  });
+}
 
 module.exports = app;
