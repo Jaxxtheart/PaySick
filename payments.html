@@ -518,10 +518,27 @@
                 return;
             }
 
-            await loadUpcomingPayments();
+            // Check for tab parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
 
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('upcomingPayments').style.display = 'block';
+            if (tabParam === 'history') {
+                // Show history tab
+                currentTab = 'history';
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab')[1].classList.add('active');
+
+                await loadPaymentHistory();
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('paymentHistory').style.display = 'block';
+            } else {
+                // Show upcoming tab (default)
+                await loadUpcomingPayments();
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('upcomingPayments').style.display = 'block';
+            }
         });
     </script>
 </body>
