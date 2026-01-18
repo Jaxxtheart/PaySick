@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn about PaySick - Making healthcare accessible through flexible payment solutions.">
+    <title>About Us | PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 150px 60px 80px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f6 100%);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #4A4A4A;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Content */
+        .content {
+            padding: 80px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .content-section {
+            margin-bottom: 60px;
+        }
+
+        .content-section h2 {
+            font-size: 38px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 20px;
+        }
+
+        .content-section p {
+            font-size: 18px;
+            color: #4A4A4A;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .value-card {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .value-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #fff5f6, #ffe8eb);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .value-icon svg {
+            width: 35px;
+            height: 35px;
+        }
+
+        .value-card h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #1A1A1A;
+        }
+
+        .value-card p {
+            font-size: 16px;
+            color: #5A5A5A;
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            padding: 60px;
+            border-radius: 20px;
+            margin: 60px 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item h3 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        footer {
+            background: #1A1A1A;
+            color: white;
+            padding: 40px 60px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            color: #8A8A8A;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #8A8A8A;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #FF4757;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 30px;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .hero {
+                padding: 120px 30px 60px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .content {
+                padding: 60px 30px;
+            }
+
+            .content-section h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container" style="text-decoration: none;">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="crossGradient" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="bgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#bgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#crossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#crossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="providers.html">For Providers</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>About PaySick</h1>
+        <p>Making healthcare accessible through flexible, transparent payment solutions for all South Africans.</p>
+    </section>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="content-section">
+            <h2>Our Mission</h2>
+            <p>At PaySick, we believe that financial barriers should never prevent anyone from receiving the healthcare they need. Our mission is to make medical care accessible to all South Africans by providing simple, transparent payment solutions that work for patients and healthcare providers alike.</p>
+            <p>We're building a future where everyone can access quality healthcare when they need it, without the stress of upfront costs or complicated financing.</p>
+        </div>
+
+        <div class="stats">
+            <h2 style="font-size: 42px; margin-bottom: 10px;">PaySick by the Numbers</h2>
+            <p style="font-size: 18px; opacity: 0.95; margin-bottom: 20px;">Helping South Africans access healthcare every day</p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>10,000+</h3>
+                    <p>Patients Helped</p>
+                </div>
+                <div class="stat-item">
+                    <h3>500+</h3>
+                    <p>Healthcare Providers</p>
+                </div>
+                <div class="stat-item">
+                    <h3>R50M+</h3>
+                    <p>Bills Financed</p>
+                </div>
+                <div class="stat-item">
+                    <h3>96%</h3>
+                    <p>Satisfaction Rate</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Our Story</h2>
+            <p>PaySick was founded in 2025 by a team of healthcare and financial technology professionals who experienced firsthand the challenges South Africans face when dealing with unexpected medical expenses.</p>
+            <p>After seeing too many people delay necessary medical care due to cost concerns, we decided to create a better solution. We partnered with healthcare providers and financial institutions to build a platform that works for everyone.</p>
+            <p>Today, PaySick is proud to be South Africa's leading healthcare payment platform, helping thousands of patients access the care they need while supporting healthcare providers in growing their practices.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="transparencyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="12" cy="12" r="10" stroke="url(#transparencyGradient)" stroke-width="2" fill="none"/>
+                            <polyline points="8 12 11 15 16 9" stroke="url(#transparencyGradient)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Transparency</h3>
+                    <p>No hidden fees, no fine print. Clear, upfront pricing on everything we do.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="accessGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="url(#accessGradient)" stroke-width="2" fill="none"/>
+                            <circle cx="9" cy="7" r="4" stroke="url(#accessGradient)" stroke-width="2" fill="none"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="url(#accessGradient)" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3>Accessibility</h3>
+                    <p>Healthcare is a right, not a privilege. We make it accessible to all.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="simplicityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="url(#simplicityGradient)" stroke="url(#simplicityGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Simplicity</h3>
+                    <p>We cut through complexity to deliver straightforward solutions.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z" stroke="url(#trustGradient)" stroke-width="2" fill="none"/>
+                            <path d="M9 12l2 2 4-4" stroke="url(#trustGradient)" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h3>Trust</h3>
+                    <p>We handle your sensitive information with the highest security standards.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Regulatory Compliance</h2>
+            <p>PaySick operates under the strictest regulatory guidelines to protect our customers:</p>
+            <p><strong>National Credit Act (NCA):</strong> We are a registered credit provider, ensuring all lending is conducted responsibly.</p>
+            <p><strong>POPIA Compliance:</strong> Your personal information is protected in accordance with South Africa's Protection of Personal Information Act.</p>
+            <p><strong>Financial Intelligence Centre Act (FICA):</strong> We maintain robust anti-money laundering and fraud prevention measures.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Get in Touch</h2>
+            <p>Have questions or want to learn more? We'd love to hear from you.</p>
+            <p><a href="contact.html" style="color: #E01E37; font-weight: 600; text-decoration: none;">Contact Us →</a></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 PaySick South Africa. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a> | <a href="contact.html">Contact Us</a></p>
+    </footer>
+</body>
+</html>

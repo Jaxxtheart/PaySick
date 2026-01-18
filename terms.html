@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaySick Terms of Service - Terms and conditions for using our healthcare payment platform.">
+    <title>Terms of Service | PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+            text-decoration: none;
+            display: flex;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+        }
+
+        /* Content */
+        .content {
+            padding: 140px 60px 80px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .last-updated {
+            color: #6A6A6A;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #4A4A4A;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 15px 0 15px 30px;
+            color: #4A4A4A;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight-box {
+            background: #fff5f6;
+            border-left: 4px solid #E01E37;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .highlight-box p {
+            margin: 0;
+        }
+
+        /* Footer */
+        footer {
+            background: #1A1A1A;
+            color: white;
+            padding: 40px 60px 20px;
+            text-align: center;
+        }
+
+        footer p {
+            color: #8A8A8A;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #8A8A8A;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #FF4757;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 30px;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .content {
+                padding: 120px 30px 60px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container" style="text-decoration: none;">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="crossGradient" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="bgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#bgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#crossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#crossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+        <h1>Terms of Service</h1>
+        <p class="last-updated">Last Updated: January 18, 2026</p>
+
+        <div class="highlight-box">
+            <p><strong>Important:</strong> These Terms of Service govern your use of PaySick. By creating an account or using our services, you agree to these terms. Please read them carefully.</p>
+        </div>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using PaySick's services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using our services.</p>
+
+        <h2>2. Eligibility</h2>
+        <p>To use PaySick, you must:</p>
+        <ul>
+            <li>Be at least 18 years of age</li>
+            <li>Be a South African citizen or permanent resident</li>
+            <li>Have a valid South African ID number</li>
+            <li>Provide accurate and complete registration information</li>
+            <li>Have a valid email address and phone number</li>
+            <li>Not be prohibited from using financial services</li>
+        </ul>
+
+        <h2>3. Account Registration and Security</h2>
+
+        <h3>Registration</h3>
+        <p>You agree to:</p>
+        <ul>
+            <li>Provide accurate, current, and complete information</li>
+            <li>Maintain and update your information as needed</li>
+            <li>Maintain one account per person</li>
+            <li>Not impersonate any person or entity</li>
+        </ul>
+
+        <h3>Account Security</h3>
+        <p>You are responsible for:</p>
+        <ul>
+            <li>Maintaining the confidentiality of your account credentials</li>
+            <li>All activities that occur under your account</li>
+            <li>Immediately notifying us of unauthorized access</li>
+            <li>Using strong passwords and securing your devices</li>
+        </ul>
+
+        <h2>4. How PaySick Works</h2>
+
+        <h3>Payment Plans</h3>
+        <ul>
+            <li>PaySick allows you to split healthcare bills into 3 equal monthly payments</li>
+            <li>You must apply for each payment plan individually</li>
+            <li>Each application is subject to credit approval</li>
+            <li>We reserve the right to approve or deny any application</li>
+        </ul>
+
+        <h3>Payment Terms</h3>
+        <ul>
+            <li>Monthly payments are automatically debited on agreed dates</li>
+            <li>You must maintain sufficient funds in your account</li>
+            <li>Failed payments may incur fees and affect future applications</li>
+            <li>Early payment is allowed without penalty</li>
+        </ul>
+
+        <h2>5. Fees and Charges</h2>
+
+        <h3>Standard Fees</h3>
+        <ul>
+            <li>Account setup: Free</li>
+            <li>Payment plan fee: Disclosed before approval</li>
+            <li>No hidden fees or charges</li>
+        </ul>
+
+        <h3>Late Payment Fees</h3>
+        <ul>
+            <li>Late payment fee: R150 per missed payment</li>
+            <li>Interest on overdue amounts: 2% per month</li>
+            <li>Collection fees if referred to collections</li>
+        </ul>
+
+        <h2>6. Credit Assessment</h2>
+        <p>By applying for a payment plan, you authorize PaySick to:</p>
+        <ul>
+            <li>Conduct credit checks with credit bureaus</li>
+            <li>Verify your employment and income</li>
+            <li>Access your banking information (with consent)</li>
+            <li>Report payment history to credit bureaus</li>
+        </ul>
+
+        <h2>7. User Obligations</h2>
+        <p>You agree to:</p>
+        <ul>
+            <li>Make all payments on time</li>
+            <li>Maintain accurate contact and banking information</li>
+            <li>Use the service only for legitimate medical expenses</li>
+            <li>Not use the service for fraudulent purposes</li>
+            <li>Comply with all applicable laws</li>
+            <li>Not share your account with others</li>
+        </ul>
+
+        <h2>8. Prohibited Activities</h2>
+        <p>You may not:</p>
+        <ul>
+            <li>Provide false or misleading information</li>
+            <li>Use another person's identity or information</li>
+            <li>Attempt to manipulate or game the system</li>
+            <li>Access accounts other than your own</li>
+            <li>Reverse engineer or attempt to extract source code</li>
+            <li>Use automated tools to access the service</li>
+            <li>Violate any laws or regulations</li>
+        </ul>
+
+        <h2>9. Healthcare Provider Relationships</h2>
+        <ul>
+            <li>PaySick facilitates payment only; we are not a healthcare provider</li>
+            <li>We are not responsible for the quality of medical care</li>
+            <li>Disputes about medical services must be resolved with the provider</li>
+            <li>Payment obligations continue regardless of service disputes</li>
+        </ul>
+
+        <h2>10. Cancellation and Termination</h2>
+
+        <h3>Your Rights</h3>
+        <ul>
+            <li>You may close your account at any time</li>
+            <li>Outstanding payments must be settled before closure</li>
+            <li>You may cancel pending applications before approval</li>
+        </ul>
+
+        <h3>Our Rights</h3>
+        <p>We may suspend or terminate your account if:</p>
+        <ul>
+            <li>You violate these Terms of Service</li>
+            <li>You provide false information</li>
+            <li>You miss multiple payments</li>
+            <li>We suspect fraudulent activity</li>
+            <li>Required by law or regulation</li>
+        </ul>
+
+        <h2>11. Limitation of Liability</h2>
+        <p>PaySick is not liable for:</p>
+        <ul>
+            <li>Delays or failures in service due to circumstances beyond our control</li>
+            <li>Actions of third-party service providers</li>
+            <li>Loss of data or unauthorized access not due to our negligence</li>
+            <li>Indirect, incidental, or consequential damages</li>
+        </ul>
+
+        <h2>12. Indemnification</h2>
+        <p>You agree to indemnify and hold PaySick harmless from any claims, damages, or expenses arising from:</p>
+        <ul>
+            <li>Your violation of these Terms</li>
+            <li>Your violation of any laws or regulations</li>
+            <li>Your violation of third-party rights</li>
+            <li>Your use or misuse of the service</li>
+        </ul>
+
+        <h2>13. Dispute Resolution</h2>
+
+        <h3>Informal Resolution</h3>
+        <p>Before filing a formal dispute, please contact our customer service to resolve the issue informally.</p>
+
+        <h3>Governing Law</h3>
+        <p>These Terms are governed by the laws of South Africa. Any disputes will be resolved in South African courts.</p>
+
+        <h3>Arbitration</h3>
+        <p>For disputes under R25,000, parties agree to binding arbitration in accordance with the Arbitration Act of South Africa.</p>
+
+        <h2>14. Changes to Terms</h2>
+        <p>We may modify these Terms at any time. We will notify you of significant changes via:</p>
+        <ul>
+            <li>Email to your registered address</li>
+            <li>Prominent notice on our website</li>
+            <li>In-app notification</li>
+        </ul>
+        <p>Continued use after changes constitutes acceptance of the new Terms.</p>
+
+        <h2>15. Privacy and Data Protection</h2>
+        <p>Your use of PaySick is also governed by our <a href="privacy.html" style="color: #E01E37;">Privacy Policy</a>, which is incorporated into these Terms by reference.</p>
+
+        <h2>16. Intellectual Property</h2>
+        <p>All content, trademarks, and intellectual property on PaySick are owned by PaySick (Pty) Ltd. You may not:</p>
+        <ul>
+            <li>Copy, modify, or distribute our content</li>
+            <li>Use our trademarks without permission</li>
+            <li>Create derivative works</li>
+            <li>Use our services to develop competing products</li>
+        </ul>
+
+        <h2>17. Regulatory Compliance</h2>
+        <p>PaySick operates in compliance with:</p>
+        <ul>
+            <li>National Credit Act (NCA)</li>
+            <li>Protection of Personal Information Act (POPIA)</li>
+            <li>Financial Intelligence Centre Act (FICA)</li>
+            <li>Consumer Protection Act (CPA)</li>
+        </ul>
+
+        <h2>18. Contact Information</h2>
+        <p>For questions about these Terms:</p>
+        <ul>
+            <li><strong>Email:</strong> legal@paysick.co.za</li>
+            <li><strong>Phone:</strong> 0800 PAY SICK (0800 729 7425)</li>
+            <li><strong>Address:</strong> PaySick (Pty) Ltd, 123 Healthcare Lane, Cape Town, 8001</li>
+        </ul>
+
+        <h2>19. Severability</h2>
+        <p>If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
+
+        <h2>20. Entire Agreement</h2>
+        <p>These Terms, together with our Privacy Policy, constitute the entire agreement between you and PaySick regarding the use of our services.</p>
+
+        <div class="highlight-box">
+            <p><strong>Acknowledgment:</strong> By clicking "I Agree" or using PaySick services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 PaySick South Africa. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a> | <a href="contact.html">Contact Us</a></p>
+    </footer>
+</body>
+</html>
