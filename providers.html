@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find healthcare providers that accept PaySick. Join our growing network or request your provider.">
+    <title>Find Providers - PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 140px 60px 80px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f6 100%);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #4A4A4A;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 80px 60px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 38px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: #6A6A6A;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Provider Grid */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .provider-card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .provider-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .provider-card h3 {
+            font-size: 22px;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .provider-type {
+            color: #FF4757;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .provider-location {
+            color: #6A6A6A;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .provider-description {
+            color: #4A4A4A;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Provider Recruitment Section */
+        .recruitment-section {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+        }
+
+        .recruitment-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .recruitment-content h2 {
+            color: white;
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .recruitment-content p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+            text-align: left;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .benefit-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .benefit-card h3 {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .benefit-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .provider-signup-btn {
+            background: white;
+            color: #E01E37;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .provider-signup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Request Provider Section */
+        .request-section {
+            background: #f8f9fa;
+        }
+
+        .request-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FF4757;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: white;
+            padding: 60px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #6A6A6A;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 30px;
+            }
+
+            .hero {
+                padding: 120px 30px 60px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .section {
+                padding: 60px 30px;
+            }
+
+            .section-header h2 {
+                font-size: 32px;
+            }
+
+            .provider-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recruitment-content h2 {
+                font-size: 32px;
+            }
+
+            .request-form-container {
+                padding: 30px 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="navCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.15" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.05" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="providers.html">Providers</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Find Your Healthcare Provider</h1>
+        <p>Join South Africa's growing network of healthcare providers accepting PaySick, or request that your preferred provider partners with us.</p>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Verified Providers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">250+</div>
+                <div class="stat-label">Provider Requests</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Expressing Interest</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verified Providers Section -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Verified PaySick Partners</h2>
+            <p>These healthcare providers have partnered with PaySick and accept payment plans</p>
+        </div>
+
+        <div class="provider-grid">
+            <!-- Provider Card 1 -->
+            <div class="provider-card">
+                <span class="provider-badge">✓ VERIFIED PARTNER</span>
+                <h3>Cape Town Medical Centre</h3>
+                <div class="provider-type">General Practice & Specialists</div>
+                <div class="provider-location">📍 Cape Town, Western Cape</div>
+                <p class="provider-description">Multi-disciplinary medical centre offering general practice, specialist consultations, and diagnostic services.</p>
+            </div>
+
+            <!-- Provider Card 2 -->
+            <div class="provider-card">
+                <span class="provider-badge">✓ VERIFIED PARTNER</span>
+                <h3>Smile Dental Studio</h3>
+                <div class="provider-type">Dental Practice</div>
+                <div class="provider-location">📍 Johannesburg, Gauteng</div>
+                <p class="provider-description">Modern dental practice specializing in general dentistry, cosmetic procedures, and orthodontics.</p>
+            </div>
+
+            <!-- Provider Card 3 -->
+            <div class="provider-card">
+                <span class="provider-badge">✓ VERIFIED PARTNER</span>
+                <h3>HealthFirst Diagnostics</h3>
+                <div class="provider-type">Diagnostic & Pathology</div>
+                <div class="provider-location">📍 Pretoria, Gauteng</div>
+                <p class="provider-description">Comprehensive diagnostic services including blood tests, imaging, and pathology.</p>
+            </div>
+
+            <!-- Provider Card 4 -->
+            <div class="provider-card">
+                <span class="provider-badge">✓ VERIFIED PARTNER</span>
+                <h3>Dr. Sarah Nkosi - Dermatology</h3>
+                <div class="provider-type">Dermatologist</div>
+                <div class="provider-location">📍 Durban, KwaZulu-Natal</div>
+                <p class="provider-description">Specialist dermatologist offering medical and cosmetic skin treatments.</p>
+            </div>
+
+            <!-- Provider Card 5 -->
+            <div class="provider-card">
+                <span class="provider-badge">✓ VERIFIED PARTNER</span>
+                <h3>Wellness Physiotherapy Clinic</h3>
+                <div class="provider-type">Physiotherapy</div>
+                <div class="provider-location">📍 Port Elizabeth, Eastern Cape</div>
+                <p class="provider-description">Sports injury rehabilitation, chronic pain management, and post-operative care.</p>
+            </div>
+
+            <!-- Provider Card 6 -->
+            <div class="provider-card">
+                <span class="provider-badge">✓ VERIFIED PARTNER</span>
+                <h3>Family Care Medical Practice</h3>
+                <div class="provider-type">General Practice</div>
+                <div class="provider-location">📍 Bloemfontein, Free State</div>
+                <p class="provider-description">Family-focused healthcare with general practitioners and chronic disease management.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Provider Recruitment Section (Option 3) -->
+    <section class="section recruitment-section">
+        <div class="recruitment-content">
+            <h2>Join South Africa's Growing Healthcare Payment Network</h2>
+            <p>Attract more patients, reduce payment friction, and grow your practice with PaySick</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3>Increase Revenue</h3>
+                    <p>Patients who couldn't afford upfront payment can now access your services</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h3>Instant Settlement</h3>
+                    <p>Get paid upfront while your patients pay over time</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">📊</div>
+                    <h3>Simple Integration</h3>
+                    <p>Quick onboarding with minimal admin and seamless payment processing</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🛡️</div>
+                    <h3>Risk-Free</h3>
+                    <p>No credit risk - we handle collections and payment guarantees</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">📈</div>
+                    <h3>Patient Retention</h3>
+                    <p>Increase loyalty by offering flexible payment options</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤝</div>
+                    <h3>Dedicated Support</h3>
+                    <p>Account management and technical support included</p>
+                </div>
+            </div>
+
+            <a href="mailto:providers@paysick.co.za?subject=Provider Partnership Enquiry" class="provider-signup-btn">Become a PaySick Provider</a>
+            <p style="margin-top: 20px; font-size: 14px; color: rgba(255,255,255,0.7);">
+                Or email us at <a href="mailto:providers@paysick.co.za" style="color: #FF4757; text-decoration: none;">providers@paysick.co.za</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Request Your Provider Section (Option 5) -->
+    <section class="section request-section">
+        <div class="section-header">
+            <h2>Don't See Your Provider?</h2>
+            <p>Request that we partner with your preferred healthcare provider</p>
+        </div>
+
+        <div class="request-form-container">
+            <div class="success-message" id="successMessage">
+                ✓ Thank you! Your request has been submitted. We'll reach out to this provider.
+            </div>
+
+            <form id="providerRequestForm">
+                <div class="form-group">
+                    <label for="providerName">Provider Name *</label>
+                    <input type="text" id="providerName" name="providerName" required placeholder="e.g., Dr. Smith's Practice">
+                </div>
+
+                <div class="form-group">
+                    <label for="providerType">Provider Type *</label>
+                    <select id="providerType" name="providerType" required>
+                        <option value="">Select type...</option>
+                        <option value="general">General Practitioner</option>
+                        <option value="dentist">Dentist</option>
+                        <option value="specialist">Specialist</option>
+                        <option value="hospital">Private Hospital</option>
+                        <option value="diagnostic">Diagnostic/Pathology</option>
+                        <option value="physiotherapy">Physiotherapy</option>
+                        <option value="optometry">Optometry</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="providerLocation">Location *</label>
+                    <input type="text" id="providerLocation" name="providerLocation" required placeholder="City, Province">
+                </div>
+
+                <div class="form-group">
+                    <label for="yourName">Your Name *</label>
+                    <input type="text" id="yourName" name="yourName" required placeholder="Your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="yourEmail">Your Email *</label>
+                    <input type="email" id="yourEmail" name="yourEmail" required placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Information (Optional)</label>
+                    <textarea id="additionalInfo" name="additionalInfo" placeholder="Any additional details about the provider..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Request</button>
+
+                <p style="margin-top: 20px; font-size: 13px; color: #6A6A6A; text-align: center;">
+                    We'll contact this provider and notify you when they join our network
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#about">Careers</a></li>
+                    <li><a href="index.html#about">Press</a></li>
+                    <li><a href="index.html#about">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+
+    <script>
+        // Form submission handling
+        document.getElementById('providerRequestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = {
+                providerName: document.getElementById('providerName').value,
+                providerType: document.getElementById('providerType').value,
+                providerLocation: document.getElementById('providerLocation').value,
+                yourName: document.getElementById('yourName').value,
+                yourEmail: document.getElementById('yourEmail').value,
+                additionalInfo: document.getElementById('additionalInfo').value
+            };
+
+            // In production, this would send to your API
+            console.log('Provider Request:', formData);
+
+            // Show success message
+            document.getElementById('successMessage').style.display = 'block';
+
+            // Reset form
+            this.reset();
+
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
