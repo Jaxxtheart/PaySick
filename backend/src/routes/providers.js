@@ -78,6 +78,47 @@ router.get('/search/:term', async (req, res) => {
   }
 });
 
+// Track CTA clicks for analytics and conversion optimization
+router.post('/track-cta', async (req, res) => {
+  try {
+    const { source, timestamp, page } = req.body;
+
+    // Log CTA click to audit_log table for analytics
+    await query(
+      `INSERT INTO audit_log (
+        user_id, action, table_name, record_id, details, ip_address
+      ) VALUES (
+        NULL, 'provider_cta_click', 'providers', NULL, $1, $2
+      )`,
+      [
+        JSON.stringify({ source, page, timestamp }),
+        req.ip || req.connection.remoteAddress
+      ]
+    );
+
+    // Update provider_cta_stats table (if exists) or just return success
+    // This could be used to track conversion rates and optimize messaging
+    try {
+      await query(
+        `INSERT INTO provider_cta_stats (source, clicks, date)
+         VALUES ($1, 1, CURRENT_DATE)
+         ON CONFLICT (source, date)
+         DO UPDATE SET clicks = provider_cta_stats.clicks + 1`,
+        [source]
+      );
+    } catch (statsError) {
+      // Table might not exist yet - that's okay, audit log captured it
+      console.log('CTA stats table not available:', statsError.message);
+    }
+
+    res.json({ success: true, message: 'CTA click tracked' });
+  } catch (error) {
+    console.error('CTA tracking error:', error);
+    // Don't fail the request if tracking fails
+    res.json({ success: true, message: 'Tracking skipped' });
+  }
+});
+
 // Provider Application - Submit new provider application
 router.post('/apply', async (req, res) => {
   try {

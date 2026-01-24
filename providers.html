@@ -334,6 +334,194 @@
             font-size: 18px;
         }
 
+        /* Network Effects CTA Banner */
+        .network-cta-banner {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            padding: 40px 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(255, 71, 87, 0.3);
+            margin-bottom: 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .network-cta-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .cta-text h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .cta-text p {
+            font-size: 18px;
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .cta-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .cta-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cta-stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .cta-stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .cta-action {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .btn-cta-primary {
+            background: white;
+            color: #FF4757;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-cta-secondary {
+            background: transparent;
+            color: white;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Footer CTA */
+        .footer-cta {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .footer-cta h2 {
+            color: #2d3748;
+            font-size: 36px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .footer-cta p {
+            color: #718096;
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-cta-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .footer-feature {
+            text-align: center;
+        }
+
+        .footer-feature-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(224, 30, 55, 0.1) 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-feature-icon svg {
+            width: 35px;
+            height: 35px;
+            color: #FF4757;
+        }
+
+        .footer-feature h3 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .footer-feature p {
+            color: #718096;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .footer-cta-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -357,6 +545,44 @@
             .providers-grid {
                 grid-template-columns: 1fr;
             }
+
+            .cta-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cta-action {
+                align-items: center;
+                width: 100%;
+            }
+
+            .btn-cta-primary,
+            .btn-cta-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .cta-stats {
+                justify-content: center;
+            }
+
+            .footer-cta-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .footer-cta-actions .btn-cta-primary,
+            .footer-cta-actions .btn-cta-secondary {
+                width: 100%;
+            }
+
+            .footer-cta h2 {
+                font-size: 28px;
+            }
+
+            .footer-cta p {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -365,8 +591,41 @@
         <div class="header">
             <h1>Healthcare Provider Directory</h1>
             <div class="header-actions">
-                <a href="provider-apply.html" class="btn btn-primary">Join Our Network</a>
+                <a href="provider-apply.html" class="btn btn-primary" onclick="trackCTAClick('header-join')">Join Our Network</a>
                 <a href="dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Network Effects CTA Banner -->
+        <div class="network-cta-banner">
+            <div class="cta-content">
+                <div class="cta-text">
+                    <h2>Are You a Healthcare Provider?</h2>
+                    <p>Join South Africa's fastest-growing healthcare payment network and gain instant access to thousands of patients who can now afford quality care.</p>
+                    <div class="cta-stats">
+                        <div class="cta-stat">
+                            <div class="cta-stat-number" id="ctaTotalProviders">30+</div>
+                            <div class="cta-stat-label">Network Providers</div>
+                        </div>
+                        <div class="cta-stat">
+                            <div class="cta-stat-number">10K+</div>
+                            <div class="cta-stat-label">Active Patients</div>
+                        </div>
+                        <div class="cta-stat">
+                            <div class="cta-stat-number">R15M+</div>
+                            <div class="cta-stat-label">Settled Monthly</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cta-action">
+                    <a href="provider-apply.html" class="btn-cta-primary" onclick="trackCTAClick('banner-join')">
+                        Join the Network
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="#benefits" class="btn-cta-secondary">Learn More</a>
+                </div>
             </div>
         </div>
 
@@ -464,6 +723,68 @@
         <div id="providersContainer">
             <div class="loading">Loading providers...</div>
         </div>
+
+        <!-- Footer CTA -->
+        <div class="footer-cta" id="benefits">
+            <h2>The More Providers Join, The Stronger We Become</h2>
+            <p>PaySick's network effect means that as more providers join, every provider benefits from increased patient access, faster settlements, and better payment terms. Be part of South Africa's healthcare payment revolution.</p>
+
+            <div class="footer-cta-features">
+                <div class="footer-feature">
+                    <div class="footer-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Growing Patient Base</h3>
+                    <p>Access thousands of patients who couldn't afford treatment before but can now with PaySick's flexible payment plans.</p>
+                </div>
+
+                <div class="footer-feature">
+                    <div class="footer-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>24-Hour Settlements</h3>
+                    <p>Get paid within 24 hours of treatment. No more waiting 30-90 days for medical aid approvals or patient payments.</p>
+                </div>
+
+                <div class="footer-feature">
+                    <div class="footer-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Zero Credit Risk</h3>
+                    <p>We assume all credit risk. Focus on patient care while we handle collections and payment guarantees.</p>
+                </div>
+
+                <div class="footer-feature">
+                    <div class="footer-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Network Priority</h3>
+                    <p>Network partners get priority patient referrals, featured placement, and lower commission rates as the network grows.</p>
+                </div>
+            </div>
+
+            <div class="footer-cta-actions">
+                <a href="provider-apply.html" class="btn-cta-primary" onclick="trackCTAClick('footer-join')">
+                    Become a Network Provider Today
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                <a href="index.html#how-it-works" class="btn-cta-secondary">See How It Works</a>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -515,6 +836,9 @@
             document.getElementById('totalProviders').textContent = allProviders.length;
             document.getElementById('networkPartners').textContent = networkPartners;
             document.getElementById('provinces').textContent = provinces;
+
+            // Update CTA banner stats
+            document.getElementById('ctaTotalProviders').textContent = allProviders.length + '+';
         }
 
         function applyFilters() {
@@ -625,6 +949,27 @@
         function viewProvider(providerId) {
             // Optional: Navigate to detailed provider page
             console.log('View provider:', providerId);
+        }
+
+        // Track CTA clicks for analytics
+        async function trackCTAClick(source) {
+            try {
+                await fetch('/api/providers/track-cta', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        source: source,
+                        timestamp: new Date().toISOString(),
+                        page: 'providers-directory'
+                    })
+                });
+            } catch (error) {
+                console.log('CTA tracking error:', error);
+                // Don't block navigation on tracking failure
+            }
+            return true;
         }
     </script>
 </body>

@@ -174,7 +174,13 @@ INSERT INTO providers (
  'canalwalk@specsavers.co.za', '021 555 2828',
  'Canal Walk Shopping Centre', 'Cape Town', 'Western Cape', '7441',
  'Capitec', '470010', encode('6789012348', 'base64'),
- true, 'basic', 4.0, 'active');
+ true, 'basic', 4.0, 'active'),
+
+('Dr. Thato Kgosi - Plastic & Reconstructive Surgery', 'specialist', NULL,
+ 'contact@drkgosiplastics.co.za', '011 268 8900',
+ 'Morningside Medical Centre, Rivonia Road', 'Johannesburg', 'Gauteng', '2196',
+ 'Standard Bank', '051001', encode('6789012349', 'base64'),
+ true, 'gold', 4.0, 'active');
 
 -- Non-Network Providers (Standard providers, not in preferred network)
 INSERT INTO providers (
@@ -243,17 +249,17 @@ INSERT INTO providers (
 -- =============================================
 -- Summary Statistics
 -- =============================================
--- Total Providers: 30
--- Network Partners: 20 (66.7%)
---   - Platinum: 3 (10%)
---   - Gold: 6 (20%)
---   - Silver: 3 (10%)
---   - Basic: 8 (26.7%)
--- Standard Providers: 7 (23.3%)
--- Pending Applications: 3 (10%)
+-- Total Providers: 31
+-- Network Partners: 21 (67.7%)
+--   - Platinum: 3 (9.7%)
+--   - Gold: 7 (22.6%) - includes Dr. Thato Kgosi
+--   - Silver: 3 (9.7%)
+--   - Basic: 8 (25.8%)
+-- Standard Providers: 7 (22.6%)
+-- Pending Applications: 3 (9.7%)
 --
 -- Coverage:
---   - Gauteng: 11 providers
+--   - Gauteng: 12 providers (includes Dr. Thato Kgosi)
 --   - Western Cape: 8 providers
 --   - KwaZulu-Natal: 6 providers
 --   - Free State: 1 provider
@@ -266,4 +272,4 @@ INSERT INTO providers (
 --   - Hospitals: 11
 --   - Clinics: 8
 --   - GP Practices: 7
---   - Specialists: 4
+--   - Specialists: 5 (includes Dr. Thato Kgosi - Plastic & Reconstructive Surgery)
