@@ -36,7 +36,7 @@ The PaySick Providers System is a comprehensive healthcare provider network mana
   - Provinces Covered
 - **Provider Cards:** Display provider details with:
   - Provider name and type
-  - Provider group (Netcare, Mediclinic, Life Healthcare, etc.)
+  - Provider group (e.g., CareMax Health Group, ProHealth Systems, MediPlus Group)
   - Network partner badge
   - Location (city, province)
   - Contact information
@@ -318,12 +318,14 @@ The `backend/database/seed-providers.sql` file contains 31 representative South 
 
 **By Network Status:**
 - Network Partners: 21 (67.7%)
-  - Platinum: 3 (Netcare hospitals)
-  - Gold: 7 (Life Healthcare, Mediclinic, Dr. Thato Kgosi)
+  - Platinum: 3 (CareMax Health Group hospitals)
+  - Gold: 7 (ProHealth Systems, MediPlus Group, Dr. Thato Kgosi)
   - Silver: 3 (Independent clinics)
   - Basic: 8 (GP practices, specialists)
 - Standard Providers: 7 (22.6%)
 - Pending Applications: 3 (9.7%)
+
+**NOTE:** All provider names are fictional and for demonstration purposes only.
 
 **By Type:**
 - Hospitals: 11
@@ -341,31 +343,33 @@ The `backend/database/seed-providers.sql` file contains 31 representative South 
 - North West: 1 provider
 - Northern Cape: 1 provider
 
-### Major Provider Groups
+### Major Provider Groups (All Fictional)
 
-1. **Netcare** (3 hospitals - Platinum Partners)
-   - Milpark Hospital (Johannesburg)
-   - Christiaan Barnard Memorial (Cape Town)
-   - Sunninghill Hospital (Johannesburg)
+1. **CareMax Health Group** (3 hospitals - Platinum Partners)
+   - Milpark Medical Centre (Johannesburg)
+   - Cape Coast Memorial Hospital (Cape Town)
+   - Sunninghill Regional Hospital (Johannesburg)
 
-2. **Life Healthcare** (3 hospitals - Gold Partners)
-   - Fourways Hospital (Johannesburg)
-   - Vincent Pallotti Hospital (Cape Town)
-   - Entabeni Hospital (Durban)
+2. **ProHealth Systems** (3 hospitals - Gold Partners)
+   - Fourways Medical Hospital (Johannesburg)
+   - Pinelands Community Hospital (Cape Town)
+   - Durban Ridge Hospital (Durban)
 
-3. **Mediclinic** (3 hospitals - Gold Partners)
-   - Sandton (Johannesburg)
-   - Cape Town
-   - Newcastle
+3. **MediPlus Group** (3 hospitals - Gold Partners)
+   - Sandton Central Hospital (Johannesburg)
+   - Oranjezicht Medical Centre (Cape Town)
+   - Newcastle General Hospital (Newcastle)
 
-4. **Spec-Savers** (2 optometry practices - Basic Partners)
-   - Menlyn (Pretoria)
-   - Canal Walk (Cape Town)
+4. **ClearVision Optometry** (2 optometry practices - Basic Partners)
+   - ClearVision Optometry Menlyn (Pretoria)
+   - ClearVision Optometry Canal Walk (Cape Town)
 
 5. **Dr. Thato Kgosi** (Specialist - Gold Partner)
    - Plastic & Reconstructive Surgery
    - Morningside Medical Centre (Johannesburg)
    - Featured specialist in network with premium partnership tier
+
+**IMPORTANT:** All provider names and contact details are fictional and for demonstration purposes only. Any similarity to real healthcare providers is purely coincidental.
 
 ## 🔧 Setup Instructions
 

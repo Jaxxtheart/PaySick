@@ -5,10 +5,11 @@
 
 -- This file seeds the providers table with representative SA healthcare providers
 -- Run this after schema.sql to populate initial provider data
+-- NOTE: All provider names are fictional and for demonstration purposes only
 
 -- Major Hospital Groups (Network Partners)
 
--- Netcare Hospitals (Platinum Network Partner)
+-- CareMax Health Group (Platinum Network Partner)
 INSERT INTO providers (
     provider_name, provider_type, provider_group,
     contact_email, contact_phone,
@@ -16,25 +17,25 @@ INSERT INTO providers (
     bank_name, branch_code, account_number_encrypted,
     network_partner, partnership_tier, commission_rate, status
 ) VALUES
-('Netcare Milpark Hospital', 'hospital', 'Netcare',
- 'info@milpark.co.za', '011 480 5600',
+('Milpark Medical Centre', 'hospital', 'CareMax Health Group',
+ 'info@milparkmedical.co.za', '011 480 5600',
  '9 Guild Road, Parktown West', 'Johannesburg', 'Gauteng', '2193',
  'Standard Bank', '051001', encode('1234567890', 'base64'),
  true, 'platinum', 2.5, 'active'),
 
-('Netcare Christiaan Barnard Memorial Hospital', 'hospital', 'Netcare',
- 'info@christianbarnard.co.za', '021 480 6111',
+('Cape Coast Memorial Hospital', 'hospital', 'CareMax Health Group',
+ 'info@capecoastmemorial.co.za', '021 480 6111',
  '181 Longmarket Street', 'Cape Town', 'Western Cape', '8001',
  'Standard Bank', '051001', encode('1234567891', 'base64'),
  true, 'platinum', 2.5, 'active'),
 
-('Netcare Sunninghill Hospital', 'hospital', 'Netcare',
- 'info@sunninghill.co.za', '011 806 1500',
+('Sunninghill Regional Hospital', 'hospital', 'CareMax Health Group',
+ 'info@sunninghillregional.co.za', '011 806 1500',
  'Cnr Nanyuki & Wetherby Road', 'Johannesburg', 'Gauteng', '2157',
  'Standard Bank', '051001', encode('1234567892', 'base64'),
  true, 'platinum', 2.5, 'active');
 
--- Life Healthcare Group (Gold Network Partner)
+-- ProHealth Systems (Gold Network Partner)
 INSERT INTO providers (
     provider_name, provider_type, provider_group,
     contact_email, contact_phone,
@@ -42,25 +43,25 @@ INSERT INTO providers (
     bank_name, branch_code, account_number_encrypted,
     network_partner, partnership_tier, commission_rate, status
 ) VALUES
-('Life Fourways Hospital', 'hospital', 'Life Healthcare',
- 'info@lifefourways.co.za', '011 875 1000',
+('Fourways Medical Hospital', 'hospital', 'ProHealth Systems',
+ 'info@fourwaysmedical.co.za', '011 875 1000',
  'Cedar Road West', 'Johannesburg', 'Gauteng', '2055',
  'FNB', '250655', encode('2345678901', 'base64'),
  true, 'gold', 3.0, 'active'),
 
-('Life Vincent Pallotti Hospital', 'hospital', 'Life Healthcare',
- 'info@lifevincentpallotti.co.za', '021 506 5111',
+('Pinelands Community Hospital', 'hospital', 'ProHealth Systems',
+ 'info@pinelandshospital.co.za', '021 506 5111',
  'Alexandra Road, Pinelands', 'Cape Town', 'Western Cape', '7405',
  'FNB', '250655', encode('2345678902', 'base64'),
  true, 'gold', 3.0, 'active'),
 
-('Life Entabeni Hospital', 'hospital', 'Life Healthcare',
- 'info@lifeentabeni.co.za', '031 204 1300',
+('Durban Ridge Hospital', 'hospital', 'ProHealth Systems',
+ 'info@durbanridge.co.za', '031 204 1300',
  '148 South Ridge Road', 'Durban', 'KwaZulu-Natal', '4001',
  'FNB', '250655', encode('2345678903', 'base64'),
  true, 'gold', 3.0, 'active');
 
--- Mediclinic Group (Gold Network Partner)
+-- MediPlus Group (Gold Network Partner)
 INSERT INTO providers (
     provider_name, provider_type, provider_group,
     contact_email, contact_phone,
@@ -68,20 +69,20 @@ INSERT INTO providers (
     bank_name, branch_code, account_number_encrypted,
     network_partner, partnership_tier, commission_rate, status
 ) VALUES
-('Mediclinic Sandton', 'hospital', 'Mediclinic',
- 'info@mediclinicsandton.co.za', '011 709 2000',
+('Sandton Central Hospital', 'hospital', 'MediPlus Group',
+ 'info@sandtoncentral.co.za', '011 709 2000',
  'Peter Place, Lyme Park', 'Johannesburg', 'Gauteng', '2196',
  'ABSA', '632005', encode('3456789012', 'base64'),
  true, 'gold', 3.0, 'active'),
 
-('Mediclinic Cape Town', 'hospital', 'Mediclinic',
- 'info@mediclinic.capetown.co.za', '021 464 5500',
+('Oranjezicht Medical Centre', 'hospital', 'MediPlus Group',
+ 'info@oranjezichtmedical.co.za', '021 464 5500',
  '21 Hof Street, Oranjezicht', 'Cape Town', 'Western Cape', '8001',
  'ABSA', '632005', encode('3456789013', 'base64'),
  true, 'gold', 3.0, 'active'),
 
-('Mediclinic Newcastle', 'hospital', 'Mediclinic',
- 'info@mediclinicnewcastle.co.za', '034 328 8000',
+('Newcastle General Hospital', 'hospital', 'MediPlus Group',
+ 'info@newcastlegeneral.co.za', '034 328 8000',
  'Voortrekker Street', 'Newcastle', 'KwaZulu-Natal', '2940',
  'ABSA', '632005', encode('3456789014', 'base64'),
  true, 'gold', 3.0, 'active');
@@ -106,8 +107,8 @@ INSERT INTO providers (
  'Nedbank', '198765', encode('4567890124', 'base64'),
  true, 'silver', 3.5, 'active'),
 
-('Gateway Private Hospital', 'clinic', NULL,
- 'info@gatewayprivate.co.za', '031 303 2300',
+('Gateway Health Clinic', 'clinic', NULL,
+ 'info@gatewayhealthclinic.co.za', '031 303 2300',
  'Aurora Drive, Umhlanga', 'Durban', 'KwaZulu-Natal', '4319',
  'Capitec', '470010', encode('4567890125', 'base64'),
  true, 'silver', 3.5, 'active');
@@ -164,14 +165,14 @@ INSERT INTO providers (
  'Nedbank', '198765', encode('6789012346', 'base64'),
  true, 'basic', 4.5, 'active'),
 
-('Spec-Savers Menlyn', 'specialist', 'Spec-Savers',
- 'menlyn@specsavers.co.za', '012 368 3600',
+('ClearVision Optometry Menlyn', 'specialist', 'ClearVision Optometry',
+ 'menlyn@clearvisionopt.co.za', '012 368 3600',
  'Menlyn Park Shopping Centre', 'Pretoria', 'Gauteng', '0181',
  'Capitec', '470010', encode('6789012347', 'base64'),
  true, 'basic', 4.0, 'active'),
 
-('Spec-Savers Canal Walk', 'specialist', 'Spec-Savers',
- 'canalwalk@specsavers.co.za', '021 555 2828',
+('ClearVision Optometry Canal Walk', 'specialist', 'ClearVision Optometry',
+ 'canalwalk@clearvisionopt.co.za', '021 555 2828',
  'Canal Walk Shopping Centre', 'Cape Town', 'Western Cape', '7441',
  'Capitec', '470010', encode('6789012348', 'base64'),
  true, 'basic', 4.0, 'active'),
@@ -190,26 +191,26 @@ INSERT INTO providers (
     bank_name, branch_code, account_number_encrypted,
     network_partner, partnership_tier, commission_rate, status
 ) VALUES
-('Bloemfontein Medi-Cross', 'hospital', NULL,
+('Bloemfontein District Hospital', 'hospital', NULL,
  'info@bloemmedicross.co.za', '051 405 8000',
  'Kellner Street', 'Bloemfontein', 'Free State', '9301',
  'Standard Bank', '051001', encode('7890123456', 'base64'),
  false, NULL, NULL, 'active'),
 
-('Port Elizabeth Provincial Hospital', 'hospital', NULL,
- 'info@peprovincial.co.za', '041 405 2111',
+('Port Elizabeth Community Hospital', 'hospital', NULL,
+ 'info@pecommunity.co.za', '041 405 2111',
  'Buckingham Road', 'Port Elizabeth', 'Eastern Cape', '6001',
  'FNB', '250655', encode('7890123457', 'base64'),
  false, NULL, NULL, 'active'),
 
-('Polokwane Medi-Clinic', 'clinic', NULL,
+('Polokwane Medical Centre', 'clinic', NULL,
  'info@polokwanemedic.co.za', '015 290 3000',
  'Market Street', 'Polokwane', 'Limpopo', '0700',
  'Nedbank', '198765', encode('7890123458', 'base64'),
  false, NULL, NULL, 'active'),
 
-('Rustenburg Medical Centre', 'clinic', NULL,
- 'info@rustenburgmedical.co.za', '014 592 3456',
+('Rustenburg Family Clinic', 'clinic', NULL,
+ 'info@rustenburgfamily.co.za', '014 592 3456',
  'Beyers Naude Drive', 'Rustenburg', 'North West', '0300',
  'ABSA', '632005', encode('7890123459', 'base64'),
  false, NULL, NULL, 'active'),
@@ -273,3 +274,7 @@ INSERT INTO providers (
 --   - Clinics: 8
 --   - GP Practices: 7
 --   - Specialists: 5 (includes Dr. Thato Kgosi - Plastic & Reconstructive Surgery)
+--
+-- NOTE: All provider names and contact details are fictional
+--       and for demonstration purposes only. Any similarity to
+--       real healthcare providers is purely coincidental.
