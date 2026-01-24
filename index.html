@@ -292,7 +292,89 @@
             color: #5A5A5A;
             line-height: 1.6;
         }
-        
+
+        /* Providers Section */
+        .providers-section {
+            padding: 120px 60px;
+            background: white;
+        }
+
+        .providers-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .providers-text h2 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .providers-text p {
+            font-size: 18px;
+            color: #5A5A5A;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .providers-benefits {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .providers-benefits li {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #2d3748;
+        }
+
+        .providers-benefits svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .providers-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .providers-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .provider-stat-card {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.05) 0%, rgba(224, 30, 55, 0.05) 100%);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #FF4757;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FF4757;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #5A5A5A;
+            font-weight: 500;
+        }
+
         /* CTA Section */
         .cta-section {
             padding: 120px 60px;
@@ -456,10 +538,30 @@
             
             .features,
             .how-it-works,
+            .providers-section,
             .cta-section {
                 padding: 80px 30px;
             }
-            
+
+            .providers-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .providers-text h2 {
+                font-size: 32px;
+            }
+
+            .providers-actions {
+                flex-direction: column;
+            }
+
+            .providers-actions .primary-btn,
+            .providers-actions .secondary-btn {
+                width: 100%;
+                text-align: center;
+            }
+
             .section-title {
                 font-size: 36px;
             }
@@ -505,7 +607,7 @@
         <ul>
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#features">Features</a></li>
-            <li><a href="#providers">For Providers</a></li>
+            <li><a href="provider-apply.html">For Providers</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="login.html" class="cta-button">Get Started</a></li>
         </ul>
@@ -663,6 +765,57 @@
         </div>
     </section>
 
+    <!-- For Providers Section -->
+    <section class="providers-section" id="providers">
+        <div class="providers-content">
+            <div class="providers-text">
+                <h2>Are You a Healthcare Provider?</h2>
+                <p>Join South Africa's fastest-growing healthcare payment network. Get paid within 24 hours, access thousands of new patients, and eliminate credit risk.</p>
+                <ul class="providers-benefits">
+                    <li>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#2ED573" stroke-width="2" fill="none"/>
+                            <path d="M9 12l2 2 4-4" stroke="#2ED573" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span><strong>24-hour settlements</strong> - No more 30-90 day waits</span>
+                    </li>
+                    <li>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#2ED573" stroke-width="2" fill="none"/>
+                            <path d="M9 12l2 2 4-4" stroke="#2ED573" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span><strong>Grow your patient base</strong> - Access patients who couldn't afford care</span>
+                    </li>
+                    <li>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#2ED573" stroke-width="2" fill="none"/>
+                            <path d="M9 12l2 2 4-4" stroke="#2ED573" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span><strong>Zero credit risk</strong> - We handle collections and guarantees</span>
+                    </li>
+                </ul>
+                <div class="providers-actions">
+                    <a href="provider-apply.html" class="primary-btn">Join Our Network</a>
+                    <a href="providers.html" class="secondary-btn">Browse Provider Directory</a>
+                </div>
+            </div>
+            <div class="providers-stats">
+                <div class="provider-stat-card">
+                    <div class="stat-number">31+</div>
+                    <div class="stat-label">Network Providers</div>
+                </div>
+                <div class="provider-stat-card">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Active Patients</div>
+                </div>
+                <div class="provider-stat-card">
+                    <div class="stat-number">R15M+</div>
+                    <div class="stat-label">Settled Monthly</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="cta-section" id="start">
         <h2>Ready to simplify your healthcare payments?</h2>
@@ -701,7 +854,7 @@
                 <ul>
                     <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#features">Payment Terms</a></li>
-                    <li><a href="#providers">Find Providers</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
                     <li><a href="#about">Mobile App</a></li>
                 </ul>
             </div>
