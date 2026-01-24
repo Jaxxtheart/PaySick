@@ -349,11 +349,16 @@
             font-size: 24px;
         }
 
-        .stat-icon.red { background: rgba(255, 71, 87, 0.1); }
-        .stat-icon.green { background: rgba(46, 213, 115, 0.1); }
-        .stat-icon.blue { background: rgba(52, 152, 219, 0.1); }
-        .stat-icon.orange { background: rgba(255, 159, 64, 0.1); }
-        .stat-icon.purple { background: rgba(155, 89, 182, 0.1); }
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-icon.red { background: rgba(255, 71, 87, 0.1); color: #FF4757; }
+        .stat-icon.green { background: rgba(46, 213, 115, 0.1); color: #2ED573; }
+        .stat-icon.blue { background: rgba(52, 152, 219, 0.1); color: #3498DB; }
+        .stat-icon.orange { background: rgba(255, 159, 64, 0.1); color: #FF9F40; }
+        .stat-icon.purple { background: rgba(155, 89, 182, 0.1); color: #9B59B6; }
 
         .stat-value {
             font-size: 36px;
@@ -782,7 +787,13 @@
             <div class="stat-card">
                 <div class="stat-card-header">
                     <span class="stat-label">Total Users</span>
-                    <div class="stat-icon blue">👥</div>
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="stat-value">
                     1,247
@@ -794,7 +805,12 @@
             <div class="stat-card">
                 <div class="stat-card-header">
                     <span class="stat-label">Total Revenue</span>
-                    <div class="stat-icon green">💰</div>
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="stat-value">
                     R4.86M
@@ -806,7 +822,13 @@
             <div class="stat-card">
                 <div class="stat-card-header">
                     <span class="stat-label">Active Plans</span>
-                    <div class="stat-icon orange">📊</div>
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="18" y1="20" x2="18" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="12" y1="20" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="6" y1="20" x2="6" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="stat-value">
                     3,892
@@ -818,7 +840,12 @@
             <div class="stat-card">
                 <div class="stat-card-header">
                     <span class="stat-label">Success Rate</span>
-                    <div class="stat-icon purple">✓</div>
+                    <div class="stat-icon purple">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="stat-value">
                     96.8%
@@ -830,7 +857,12 @@
             <div class="stat-card">
                 <div class="stat-card-header">
                     <span class="stat-label">Pending Approvals</span>
-                    <div class="stat-icon red">⏱️</div>
+                    <div class="stat-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="stat-value">23</div>
                 <div class="stat-description">Requires attention</div>
