@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaySick Licensing & Regulatory Disclosure - Regulatory status and licensing position">
+    <title>Licenses - PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 900px;
+            margin: 120px auto 60px;
+            padding: 0 60px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #FF4757;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .page-header .tagline {
+            font-size: 20px;
+            color: #FF4757;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-header .last-updated {
+            font-size: 14px;
+            color: #6A6A6A;
+            font-style: italic;
+        }
+
+        .licenses-content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .licenses-content h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .licenses-content h2:first-of-type {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .licenses-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2A2A2A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .licenses-content p {
+            margin-bottom: 15px;
+            color: #3A3A3A;
+        }
+
+        .licenses-content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .licenses-content li {
+            margin-bottom: 10px;
+            color: #3A3A3A;
+        }
+
+        .licenses-content strong {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .licenses-content a {
+            color: #FF4757;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .licenses-content a:hover {
+            color: #E01E37;
+            text-decoration: underline;
+        }
+
+        .disclosure-notice {
+            background: linear-gradient(135deg, #fff5f6, #ffffff);
+            border-left: 4px solid #FF4757;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .disclosure-notice p {
+            font-weight: 500;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .disclosure-notice p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #E0E0E0;
+            margin: 30px 0;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 30px;
+            }
+
+            .main-content {
+                padding: 0 30px;
+                margin-top: 100px;
+            }
+
+            .page-header h1 {
+                font-size: 32px;
+            }
+
+            .licenses-content h2 {
+                font-size: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="navCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.15" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.05" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="providers.html">Providers</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1>PaySick – Licensing & Regulatory Disclosure</h1>
+            <div class="tagline">Heal Now. Pay Later.</div>
+            <div class="last-updated">Last Updated: 12 January 2025</div>
+        </div>
+
+        <div class="licenses-content">
+            <div class="disclosure-notice">
+                <p><strong>PURPOSE OF THIS DISCLOSURE</strong></p>
+                <p>This Licensing & Regulatory Disclosure sets out the <strong>regulatory status, licensing position, and perimeter limitations</strong> applicable to PaySick (Pty) Ltd ("<strong>PaySick</strong>"). It is intended to provide transparency to customers, healthcare providers, partners, regulators, and the general public.</p>
+                <p>This document must be read together with the <strong>PaySick Terms of Service</strong> and <strong>Privacy Policy</strong>.</p>
+            </div>
+
+            <hr>
+
+            <h2>1. CORPORATE STATUS</h2>
+            <p>PaySick (Pty) Ltd is a private company incorporated in the Republic of South Africa.</p>
+
+            <hr>
+
+            <h2>2. NO CREDIT, LENDING, OR BANKING LICENCE</h2>
+            <p>PaySick is <strong>not</strong>:</p>
+            <ul>
+                <li>A bank or mutual bank;</li>
+                <li>A registered credit provider;</li>
+                <li>A lender, financier, or deposit-taking institution;</li>
+                <li>A provider of incidental or revolving credit.</li>
+            </ul>
+            <p>PaySick does <strong>not</strong> provide loans, advances, overdrafts, or credit facilities as contemplated under the <strong>National Credit Act, 34 of 2005 (NCA)</strong>.</p>
+            <p>PaySick facilitates <strong>deferred payment arrangements</strong> for specific healthcare services through fixed, non-revolving Payment Plans.</p>
+
+            <hr>
+
+            <h2>3. FINANCIAL REGULATORY PERIMETER</h2>
+            <p>Accordingly:</p>
+            <ul>
+                <li>PaySick is <strong>not registered</strong> as a credit provider under the NCA;</li>
+                <li>PaySick is <strong>not licensed or supervised</strong> by the South African Reserve Bank (SARB) as a bank;</li>
+                <li>PaySick does <strong>not render financial advice or intermediary services</strong> under the Financial Advisory and Intermediary Services Act, 37 of 2002 (FAIS).</li>
+            </ul>
+            <p>Where PaySick integrates with regulated third parties (including banks, payment service providers, or identity verification providers), those parties operate under their <strong>own regulatory licences and supervisory frameworks</strong>.</p>
+
+            <hr>
+
+            <h2>4. PAYMENT PROCESSING AND THIRD-PARTY LICENSING</h2>
+            <p>Payment processing, debiting, and settlement services are performed by <strong>licensed and regulated payment service providers</strong>. PaySick does not itself:</p>
+            <ul>
+                <li>Hold or store full card details;</li>
+                <li>Perform regulated clearing or settlement activities;</li>
+                <li>Act as a payment system operator.</li>
+            </ul>
+
+            <hr>
+
+            <h2>5. NO REGULATORY ENDORSEMENT OR RELIANCE</h2>
+            <p>Use of PaySick does not imply:</p>
+            <ul>
+                <li>Regulatory approval;</li>
+                <li>Licensing endorsement;</li>
+                <li>Prudential supervision.</li>
+            </ul>
+            <p>Users and Providers acknowledge that they do not rely on PaySick as a licensed financial institution.</p>
+
+            <hr>
+
+            <h2>6. REGULATORY CHANGE AND RESERVATION OF RIGHTS</h2>
+            <p>If any regulatory authority determines that any aspect of the PaySick Service requires licensing, registration, or authorisation, PaySick reserves the right to:</p>
+            <ul>
+                <li>Modify or discontinue affected features;</li>
+                <li>Suspend or terminate Payment Plans;</li>
+                <li>Obtain appropriate licences where legally and commercially viable.</li>
+            </ul>
+
+            <hr>
+
+            <h2>7. CONTACT DETAILS</h2>
+            <div class="contact-section">
+                <p>For regulatory or licensing queries:</p>
+                <p><strong>PaySick (Pty) Ltd</strong></p>
+                <p>Email: <a href="mailto:support@paysick.co.za">support@paysick.co.za</a></p>
+                <p>Website: <a href="http://www.paysick.co.za">www.paysick.co.za</a></p>
+            </div>
+
+            <hr>
+
+            <div class="disclosure-notice">
+                <p><strong>This Disclosure is published in the interests of transparency, regulatory clarity, and responsible platform governance.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#about">Careers</a></li>
+                    <li><a href="index.html#about">Press</a></li>
+                    <li><a href="index.html#about">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+</body>
+</html>

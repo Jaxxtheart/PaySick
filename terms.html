@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaySick Terms of Service - Legal agreement for using PaySick healthcare payment services">
+    <title>Terms of Service - PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 900px;
+            margin: 120px auto 60px;
+            padding: 0 60px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #FF4757;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .page-header .tagline {
+            font-size: 20px;
+            color: #FF4757;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-header .last-updated {
+            font-size: 14px;
+            color: #6A6A6A;
+            font-style: italic;
+        }
+
+        .terms-content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .terms-content h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .terms-content h2:first-of-type {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .terms-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2A2A2A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .terms-content p {
+            margin-bottom: 15px;
+            color: #3A3A3A;
+        }
+
+        .terms-content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .terms-content li {
+            margin-bottom: 10px;
+            color: #3A3A3A;
+        }
+
+        .terms-content strong {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .terms-content a {
+            color: #FF4757;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .terms-content a:hover {
+            color: #E01E37;
+            text-decoration: underline;
+        }
+
+        .legal-notice {
+            background: linear-gradient(135deg, #fff5f6, #ffffff);
+            border-left: 4px solid #FF4757;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .legal-notice p {
+            font-weight: 500;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .legal-notice p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #E0E0E0;
+            margin: 30px 0;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 30px;
+            }
+
+            .main-content {
+                padding: 0 30px;
+                margin-top: 100px;
+            }
+
+            .page-header h1 {
+                font-size: 32px;
+            }
+
+            .terms-content h2 {
+                font-size: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="navCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.15" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.05" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="providers.html">Providers</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1>PaySick Terms of Service</h1>
+            <div class="tagline">Heal Now. Pay Later.</div>
+            <div class="last-updated">Last Updated: 12 January 2025</div>
+        </div>
+
+        <div class="terms-content">
+            <div class="legal-notice">
+                <p><strong>IMPORTANT LEGAL NOTICE</strong></p>
+                <p>These Terms of Service ("<strong>Terms</strong>") constitute a <strong>legally binding agreement</strong> between you (the "<strong>Customer</strong>" or "<strong>User</strong>") and <strong>PaySick (Pty) Ltd</strong> ("<strong>PaySick</strong>", "<strong>we</strong>", "<strong>us</strong>", or "<strong>our</strong>"). By accessing, registering for, or using the PaySick platform, products, or services (collectively, the "<strong>Service</strong>"), you <strong>irrevocably agree</strong> to be bound by these Terms.</p>
+                <p><strong>PAY SICK IS NOT A CREDIT PROVIDER, DOES NOT OFFER CREDIT OR LOANS, AND DOES NOT EXTEND INCIDENTAL OR REVOLVING CREDIT.</strong> The Service facilitates <strong>deferred payment arrangements</strong> for healthcare services. <strong>LATE FEES APPLY FOR MISSED OR FAILED PAYMENTS.</strong></p>
+                <p>If you do not agree to these Terms, you must not use the Service.</p>
+            </div>
+
+            <hr>
+
+            <h2>1. DEFINITIONS AND INTERPRETATION</h2>
+            <p>In these Terms, unless the context indicates otherwise:</p>
+            <ul>
+                <li><strong>"Customer" / "You"</strong> means the individual entering into a Payment Plan using PaySick.</li>
+                <li><strong>"Provider"</strong> means any healthcare provider, facility, practitioner, or merchant that accepts PaySick as a payment option.</li>
+                <li><strong>"Payment Plan"</strong> means a fixed, short-term instalment arrangement for a specific healthcare transaction.</li>
+                <li><strong>"Due Date"</strong> means the calendar date on which an instalment becomes payable.</li>
+                <li><strong>"Late Fee"</strong> means an administrative and enforcement fee charged for non-payment or delayed payment.</li>
+                <li><strong>"Platform"</strong> means PaySick's applications, APIs, websites, systems, and infrastructure.</li>
+            </ul>
+            <p>Headings are for convenience only and do not affect interpretation.</p>
+
+            <hr>
+
+            <h2>2. NATURE OF THE SERVICE – EXPRESS EXCLUSION OF CREDIT</h2>
+            <h3>2.1 No Credit, No Lending, No Financing</h3>
+            <p>PaySick does <strong>not</strong> provide credit, loans, advances, overdrafts, or financing of any kind. Payment Plans are <strong>non-interest-bearing, non-revolving, fixed settlement arrangements</strong> limited to the value of a specific healthcare service already rendered or contractually agreed.</p>
+
+            <h3>2.2 Not a Credit Agreement</h3>
+            <p>The Payment Plan does <strong>not</strong> constitute a credit agreement, incidental credit agreement, or credit facility under the National Credit Act, 34 of 2005 ("<strong>NCA</strong>") or equivalent legislation.</p>
+
+            <h3>2.3 Regulatory Classification Risk</h3>
+            <p>Should any authority determine that any aspect of the Service constitutes regulated credit, PaySick reserves the right to <strong>immediately amend, suspend, novate, or terminate</strong> affected Payment Plans to ensure compliance.</p>
+
+            <hr>
+
+            <h2>3. CUSTOMER ELIGIBILITY AND REPRESENTATIONS</h2>
+            <p>By using the Service, you represent and warrant that:</p>
+            <ul>
+                <li>You are at least 18 years of age and legally competent;</li>
+                <li>All information provided is true, accurate, and complete;</li>
+                <li>You are acting for personal healthcare purposes and not for resale or third-party financing;</li>
+                <li>You understand and accept the consequences of late or missed payments.</li>
+            </ul>
+            <p>PaySick may perform identity, affordability, fraud, or risk checks and may decline access <strong>without obligation to provide reasons</strong>.</p>
+
+            <hr>
+
+            <h2>4. PAYMENT PLANS AND CUSTOMER OBLIGATIONS</h2>
+            <h3>4.1 Plan Disclosure and Acceptance</h3>
+            <p>Before confirmation, PaySick will disclose:</p>
+            <ul>
+                <li>Total payable amount;</li>
+                <li>Instalment amounts and schedule;</li>
+                <li>Due Dates;</li>
+                <li>Applicable Late Fees;</li>
+                <li>Consequences of non-payment.</li>
+            </ul>
+            <p>Acceptance constitutes <strong>irrevocable consent</strong>.</p>
+
+            <h3>4.2 Unconditional Payment Obligation</h3>
+            <p>All Payment Plan obligations are <strong>absolute and unconditional</strong>, irrespective of:</p>
+            <ul>
+                <li>Disputes with the Provider;</li>
+                <li>Dissatisfaction with healthcare outcomes;</li>
+                <li>Insurance claim rejections;</li>
+                <li>Provider insolvency or misconduct.</li>
+            </ul>
+
+            <hr>
+
+            <h2>5. LATE PAYMENTS, FEES, AND ENFORCEMENT</h2>
+            <h3>5.1 Late Fees</h3>
+            <p>If payment is not received on or before the Due Date, PaySick may levy a Late Fee as disclosed. Late Fees are <strong>not interest</strong> and represent administrative, operational, and enforcement costs.</p>
+
+            <h3>5.2 Escalation and Recovery</h3>
+            <p>Persistent non-payment may result in:</p>
+            <ul>
+                <li>Multiple Late Fees;</li>
+                <li>Suspension or permanent restriction of access;</li>
+                <li>Referral to third-party collections or legal enforcement;</li>
+                <li>Reporting to permitted risk, fraud, or industry databases where lawful.</li>
+            </ul>
+
+            <h3>5.3 No Waiver</h3>
+            <p>Failure to enforce any right does not constitute a waiver.</p>
+
+            <hr>
+
+            <h2>6. PAYMENT AUTHORISATION</h2>
+            <p>You authorise PaySick to:</p>
+            <ul>
+                <li>Debit your nominated payment method on Due Dates;</li>
+                <li>Re-attempt failed debits;</li>
+                <li>Use alternative lawful recovery mechanisms.</li>
+            </ul>
+            <p>You are solely responsible for ensuring sufficient funds and valid payment credentials.</p>
+
+            <hr>
+
+            <h2>7. PROVIDER RELATIONSHIP AND DISCLAIMERS</h2>
+            <h3>7.1 No Agency or Partnership</h3>
+            <p>PaySick is <strong>not</strong> an agent, partner, employer, or representative of any Provider.</p>
+
+            <h3>7.2 No Responsibility for Healthcare Services</h3>
+            <p>PaySick bears <strong>no responsibility or liability</strong> for:</p>
+            <ul>
+                <li>Medical advice or treatment;</li>
+                <li>Clinical outcomes;</li>
+                <li>Provider negligence, malpractice, or regulatory breaches;</li>
+                <li>Pricing, refunds, or cancellations.</li>
+            </ul>
+            <p>All healthcare disputes must be resolved directly with the Provider.</p>
+
+            <hr>
+
+            <h2>8. PROVIDER RISK ALLOCATION</h2>
+            <p>PaySick reserves the right to:</p>
+            <ul>
+                <li>Suspend or terminate Providers;</li>
+                <li>Withhold or claw back settlement amounts in cases of fraud, abuse, or regulatory breach;</li>
+                <li>Share information with regulators, insurers, or law enforcement where required.</li>
+            </ul>
+            <p>Providers indemnify PaySick against claims arising from their services, conduct, or non-compliance.</p>
+
+            <hr>
+
+            <h2>9. FRAUD, MISUSE, AND ABUSE</h2>
+            <p>Any suspected fraud, misrepresentation, or abuse may result in:</p>
+            <ul>
+                <li>Immediate suspension;</li>
+                <li>Termination;</li>
+                <li>Recovery of losses;</li>
+                <li>Criminal or civil action.</li>
+            </ul>
+
+            <hr>
+
+            <h2>10. LIMITATION OF LIABILITY</h2>
+            <p>To the maximum extent permitted by law:</p>
+            <ul>
+                <li>PaySick is not liable for indirect, consequential, or economic loss;</li>
+                <li>PaySick's total liability is limited to fees actually paid to PaySick for the relevant transaction.</li>
+            </ul>
+            <p>Nothing limits liability that cannot be excluded by law.</p>
+
+            <hr>
+
+            <h2>11. INDEMNITIES</h2>
+            <p>You indemnify PaySick against all losses, claims, penalties, damages, and costs arising from:</p>
+            <ul>
+                <li>Breach of these Terms;</li>
+                <li>Misuse of the Service;</li>
+                <li>Disputes with Providers;</li>
+                <li>Regulatory or legal action caused by your conduct.</li>
+            </ul>
+
+            <hr>
+
+            <h2>12. DATA, PRIVACY, AND REGULATORY DISCLOSURES</h2>
+            <p>PaySick processes personal data in accordance with applicable data protection laws and its Privacy Policy. Data may be shared with payment processors, risk partners, regulators, or enforcement agencies where lawful.</p>
+
+            <hr>
+
+            <h2>13. SUSPENSION, TERMINATION, AND SURVIVAL</h2>
+            <p>PaySick may suspend or terminate access at any time. Payment obligations, indemnities, and limitation clauses survive termination.</p>
+
+            <hr>
+
+            <h2>14. AMENDMENTS</h2>
+            <p>PaySick may amend these Terms at any time. Continued use constitutes acceptance.</p>
+
+            <hr>
+
+            <h2>15. GOVERNING LAW AND JURISDICTION</h2>
+            <p>These Terms are governed by the laws of the <strong>Republic of South Africa</strong>. Courts of South Africa have exclusive jurisdiction.</p>
+
+            <hr>
+
+            <h2>16. CONTACT DETAILS</h2>
+            <div class="contact-section">
+                <p><strong>PaySick (Pty) Ltd</strong></p>
+                <p>Email: <a href="mailto:support@paysick.co.za">support@paysick.co.za</a></p>
+                <p>Website: <a href="http://www.paysick.co.za">www.paysick.co.za</a></p>
+            </div>
+
+            <hr>
+
+            <div class="legal-notice">
+                <p><strong>BY USING PAYSICK, YOU CONFIRM THAT YOU UNDERSTAND THIS IS NOT A CREDIT PRODUCT, THAT LATE FEES APPLY, AND THAT PAYMENT OBLIGATIONS ARE STRICT AND ENFORCEABLE.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#about">Careers</a></li>
+                    <li><a href="index.html#about">Press</a></li>
+                    <li><a href="index.html#about">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+</body>
+</html>

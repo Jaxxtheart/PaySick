@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaySick Accessibility Statement - Commitment to inclusive and equitable digital access">
+    <title>Accessibility Statement - PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 900px;
+            margin: 120px auto 60px;
+            padding: 0 60px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #FF4757;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .page-header .tagline {
+            font-size: 20px;
+            color: #FF4757;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-header .last-updated {
+            font-size: 14px;
+            color: #6A6A6A;
+            font-style: italic;
+        }
+
+        .accessibility-content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .accessibility-content h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .accessibility-content h2:first-of-type {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .accessibility-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2A2A2A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .accessibility-content p {
+            margin-bottom: 15px;
+            color: #3A3A3A;
+        }
+
+        .accessibility-content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .accessibility-content li {
+            margin-bottom: 10px;
+            color: #3A3A3A;
+        }
+
+        .accessibility-content strong {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .accessibility-content a {
+            color: #FF4757;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .accessibility-content a:hover {
+            color: #E01E37;
+            text-decoration: underline;
+        }
+
+        .statement-notice {
+            background: linear-gradient(135deg, #fff5f6, #ffffff);
+            border-left: 4px solid #FF4757;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .statement-notice p {
+            font-weight: 500;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .statement-notice p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #E0E0E0;
+            margin: 30px 0;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 30px;
+            }
+
+            .main-content {
+                padding: 0 30px;
+                margin-top: 100px;
+            }
+
+            .page-header h1 {
+                font-size: 32px;
+            }
+
+            .accessibility-content h2 {
+                font-size: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="navCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.15" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.05" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="providers.html">Providers</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1>PaySick – Accessibility Statement</h1>
+            <div class="tagline">Heal Now. Pay Later.</div>
+            <div class="last-updated">Last Updated: 12 January 2025</div>
+        </div>
+
+        <div class="accessibility-content">
+            <div class="statement-notice">
+                <p><strong>PURPOSE OF THIS STATEMENT</strong></p>
+                <p>This Accessibility Statement outlines PaySick (Pty) Ltd's ("<strong>PaySick</strong>") commitment to providing <strong>reasonable, inclusive, and equitable access</strong> to its digital services.</p>
+                <p>This Statement supports PaySick's broader commitments to:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Fair customer treatment;</li>
+                    <li>Responsible platform conduct; and</li>
+                    <li>Financial-services-grade governance standards.</li>
+                </ul>
+            </div>
+
+            <hr>
+
+            <h2>1. ACCESSIBILITY COMMITMENT</h2>
+            <p>PaySick is committed to making its websites, applications, and digital services accessible to as many users as reasonably possible, including individuals with disabilities.</p>
+            <p>Accessibility is approached in a manner that is:</p>
+            <ul>
+                <li>Proportionate;</li>
+                <li>Risk-based;</li>
+                <li>Consistent with PaySick's business model and technical architecture.</li>
+            </ul>
+
+            <hr>
+
+            <h2>2. ACCESSIBILITY STANDARDS</h2>
+            <p>PaySick aims, where reasonably practicable, to align with:</p>
+            <ul>
+                <li>The <strong>Web Content Accessibility Guidelines (WCAG) 2.1</strong>, Level AA; and</li>
+                <li>Accessibility features supported by modern browsers, devices, and operating systems.</li>
+            </ul>
+            <p>Design considerations include:</p>
+            <ul>
+                <li>Adequate colour contrast and readable typography;</li>
+                <li>Keyboard navigation support;</li>
+                <li>Screen reader compatibility;</li>
+                <li>Clear instructions and error messaging.</li>
+            </ul>
+
+            <hr>
+
+            <h2>3. LIMITATIONS AND THIRD-PARTY CONTENT</h2>
+            <p>While PaySick makes reasonable efforts to support accessibility:</p>
+            <ul>
+                <li>Certain third-party tools, integrations, or content may not fully conform to accessibility standards;</li>
+                <li>Accessibility may vary depending on user devices, browsers, and assistive technologies.</li>
+            </ul>
+            <p>PaySick does not guarantee uninterrupted or error-free access across all assistive technologies.</p>
+
+            <hr>
+
+            <h2>4. ALTERNATIVE ACCESS AND SUPPORT</h2>
+            <p>If you experience difficulty accessing any part of the PaySick Service, you may contact PaySick for assistance. Where reasonably feasible, alternative support or access methods will be provided.</p>
+
+            <hr>
+
+            <h2>5. GOVERNANCE AND REVIEW</h2>
+            <p>Accessibility considerations form part of PaySick's:</p>
+            <ul>
+                <li>Platform governance processes;</li>
+                <li>Risk management frameworks;</li>
+                <li>Periodic policy and control reviews.</li>
+            </ul>
+            <p>This Statement may be updated from time to time to reflect platform changes or evolving best practices.</p>
+
+            <hr>
+
+            <h2>6. CONTACT DETAILS</h2>
+            <div class="contact-section">
+                <p>For accessibility-related enquiries or support:</p>
+                <p><strong>PaySick (Pty) Ltd</strong></p>
+                <p>Email: <a href="mailto:support@paysick.co.za">support@paysick.co.za</a></p>
+                <p>Website: <a href="http://www.paysick.co.za">www.paysick.co.za</a></p>
+            </div>
+
+            <hr>
+
+            <div class="statement-notice">
+                <p><strong>This Accessibility Statement is published to promote transparency, inclusion, and responsible digital service delivery.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#about">Careers</a></li>
+                    <li><a href="index.html#about">Press</a></li>
+                    <li><a href="index.html#about">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+</body>
+</html>

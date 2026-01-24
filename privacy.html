@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaySick Privacy Policy - How we collect, use, and protect your personal information">
+    <title>Privacy Policy - PaySick</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 900px;
+            margin: 120px auto 60px;
+            padding: 0 60px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #FF4757;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .page-header .tagline {
+            font-size: 20px;
+            color: #FF4757;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-header .last-updated {
+            font-size: 14px;
+            color: #6A6A6A;
+            font-style: italic;
+        }
+
+        .privacy-content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .privacy-content h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .privacy-content h2:first-of-type {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .privacy-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2A2A2A;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .privacy-content p {
+            margin-bottom: 15px;
+            color: #3A3A3A;
+        }
+
+        .privacy-content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-content li {
+            margin-bottom: 10px;
+            color: #3A3A3A;
+        }
+
+        .privacy-content strong {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .privacy-content a {
+            color: #FF4757;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .privacy-content a:hover {
+            color: #E01E37;
+            text-decoration: underline;
+        }
+
+        .privacy-notice {
+            background: linear-gradient(135deg, #fff5f6, #ffffff);
+            border-left: 4px solid #FF4757;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .privacy-notice p {
+            font-weight: 500;
+            color: #1A1A1A;
+            margin-bottom: 10px;
+        }
+
+        .privacy-notice p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #E0E0E0;
+            margin: 30px 0;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 30px;
+            }
+
+            .main-content {
+                padding: 0 30px;
+                margin-top: 100px;
+            }
+
+            .page-header h1 {
+                font-size: 32px;
+            }
+
+            .privacy-content h2 {
+                font-size: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="navCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.15" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.05" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="providers.html">Providers</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1>PaySick Privacy Policy</h1>
+            <div class="tagline">Heal Now. Pay Later.</div>
+            <div class="last-updated">Last Updated: 12 January 2025</div>
+        </div>
+
+        <div class="privacy-content">
+            <div class="privacy-notice">
+                <p><strong>IMPORTANT PRIVACY NOTICE</strong></p>
+                <p>This Privacy Policy explains how <strong>PaySick (Pty) Ltd</strong> ("<strong>PaySick</strong>", "<strong>we</strong>", "<strong>us</strong>", or "<strong>our</strong>") collects, uses, stores, shares, and protects personal information when you access or use the PaySick platform, products, and services (collectively, the "<strong>Service</strong>").</p>
+                <p>PaySick operates with <strong>financial‑services‑grade governance, security, and risk controls</strong>, notwithstanding that PaySick is <strong>not a bank, credit provider, or lender</strong>.</p>
+                <p>By using the Service, you acknowledge that your personal information will be processed in accordance with this Privacy Policy.</p>
+            </div>
+
+            <hr>
+
+            <h2>1. SCOPE AND APPLICATION</h2>
+            <p>This Privacy Policy applies to:</p>
+            <ul>
+                <li>Customers and prospective customers;</li>
+                <li>Healthcare Providers and their representatives;</li>
+                <li>Website and application users;</li>
+                <li>Any individual whose personal information is processed in connection with the Service.</li>
+            </ul>
+            <p>This Policy is read together with the <strong>PaySick Terms of Service</strong>.</p>
+
+            <hr>
+
+            <h2>2. INFORMATION WE COLLECT</h2>
+            <h3>2.1 Personal Information</h3>
+            <p>We may collect and process the following categories of personal information:</p>
+            <ul>
+                <li><strong>Identity Information</strong>: full name, identity number, date of birth, nationality;</li>
+                <li><strong>Contact Information</strong>: email address, mobile number, residential address;</li>
+                <li><strong>Financial Information</strong>: bank account details, card tokens, payment history, settlement status;</li>
+                <li><strong>Transactional Information</strong>: payment plans, instalments, late fees, Provider details;</li>
+                <li><strong>Verification Information</strong>: identity verification outcomes, fraud and risk indicators;</li>
+                <li><strong>Technical Information</strong>: IP address, device identifiers, browser data, usage logs;</li>
+                <li><strong>Communications</strong>: customer support interactions, call recordings, correspondence.</li>
+            </ul>
+
+            <h3>2.2 Special Personal Information</h3>
+            <p>PaySick does <strong>not</strong> intentionally collect medical records or detailed health information. However, limited <strong>health‑related transactional metadata</strong> (e.g. type of Provider or treatment category) may be processed <strong>strictly for payment facilitation, fraud prevention, and regulatory compliance</strong>.</p>
+
+            <hr>
+
+            <h2>3. PURPOSES OF PROCESSING</h2>
+            <p>We process personal information for the following lawful purposes:</p>
+            <ul>
+                <li>To provide, operate, and administer the Service;</li>
+                <li>To establish and manage Payment Plans;</li>
+                <li>To process payments, debits, and settlements;</li>
+                <li>To perform identity verification, fraud detection, and risk assessments;</li>
+                <li>To enforce contractual obligations, including late payment recovery;</li>
+                <li>To comply with legal, regulatory, and governance obligations;</li>
+                <li>To respond to enquiries, complaints, and disputes;</li>
+                <li>To improve platform security, performance, and resilience.</li>
+            </ul>
+
+            <hr>
+
+            <h2>4. LEGAL BASIS FOR PROCESSING</h2>
+            <p>PaySick processes personal information based on one or more of the following legal grounds:</p>
+            <ul>
+                <li><strong>Contractual necessity</strong> – to perform obligations under the Terms of Service;</li>
+                <li><strong>Legal obligation</strong> – to comply with applicable laws and regulatory requirements;</li>
+                <li><strong>Legitimate interests</strong> – including fraud prevention, risk management, and business continuity;</li>
+                <li><strong>Consent</strong> – where explicitly obtained and required by law.</li>
+            </ul>
+
+            <hr>
+
+            <h2>5. INFORMATION SHARING AND DISCLOSURE</h2>
+            <p>We may share personal information with:</p>
+            <ul>
+                <li><strong>Payment processors and banking partners</strong>;</li>
+                <li><strong>Identity verification and fraud prevention service providers</strong>;</li>
+                <li><strong>Debt recovery, legal, and enforcement partners</strong>;</li>
+                <li><strong>Healthcare Providers</strong>, strictly on a need‑to‑know basis;</li>
+                <li><strong>Regulators, supervisory bodies, law enforcement, or courts</strong> where required or permitted by law;</li>
+                <li><strong>Professional advisers</strong>, including auditors, lawyers, and risk consultants.</li>
+            </ul>
+            <p>We do <strong>not</strong> sell personal information.</p>
+
+            <hr>
+
+            <h2>6. CROSS‑BORDER DATA TRANSFERS</h2>
+            <p>Where personal information is transferred outside the Republic of South Africa, PaySick ensures that:</p>
+            <ul>
+                <li>The recipient jurisdiction provides an adequate level of data protection; or</li>
+                <li>Appropriate contractual safeguards are in place.</li>
+            </ul>
+
+            <hr>
+
+            <h2>7. DATA RETENTION</h2>
+            <p>Personal information is retained only for as long as necessary to:</p>
+            <ul>
+                <li>Fulfil the purposes set out in this Policy;</li>
+                <li>Meet legal, regulatory, audit, and risk requirements;</li>
+                <li>Resolve disputes and enforce agreements.</li>
+            </ul>
+            <p>Retention periods may extend beyond termination of the Service where required by law.</p>
+
+            <hr>
+
+            <h2>8. INFORMATION SECURITY (POPIA SECTIONS 19–22)</h2>
+            <p>PaySick implements and maintains <strong>appropriate, reasonable technical and organisational measures</strong> as required under <strong>Sections 19 to 22 of the Protection of Personal Information Act, 4 of 2013 ("POPIA")</strong>, to prevent:</p>
+            <ul>
+                <li>Loss of, damage to, or unauthorised destruction of personal information;</li>
+                <li>Unlawful access to or processing of personal information.</li>
+            </ul>
+            <p>These measures include, but are not limited to:</p>
+            <ul>
+                <li><strong>Risk Assessments (Section 19):</strong> Ongoing identification of internal and external risks to personal information, including cyber, fraud, operational, and third‑party risks;</li>
+                <li><strong>Safeguards (Section 19):</strong> Encryption of data at rest and in transit, secure key management, segregation of environments, access control based on least‑privilege principles, and secure software development practices;</li>
+                <li><strong>Verification (Section 19):</strong> Regular testing, monitoring, and review of security controls, including audits and third‑party assurance where appropriate;</li>
+                <li><strong>Operator Controls (Section 21):</strong> Written agreements with operators (processors) to ensure confidentiality, security safeguards, and compliance with POPIA;</li>
+                <li><strong>Personnel Controls:</strong> Confidentiality obligations, role‑based access, and security awareness training;</li>
+                <li><strong>Incident Response (Section 22):</strong> Documented breach detection, response, escalation, and remediation procedures.</li>
+            </ul>
+            <p>Despite these safeguards, no system is entirely immune to risk, and you acknowledge the existence of residual risk inherent in digital services.</p>
+
+            <hr>
+
+            <h2>9. DATA SUBJECT RIGHTS</h2>
+            <p>Subject to applicable law, you may have the right to:</p>
+            <ul>
+                <li>Access your personal information;</li>
+                <li>Request correction or updating;</li>
+                <li>Object to certain processing activities;</li>
+                <li>Request deletion, where legally permissible;</li>
+                <li>Lodge a complaint with the Information Regulator.</li>
+            </ul>
+            <p>Requests may be subject to identity verification and lawful limitations.</p>
+
+            <hr>
+
+            <h2>10. AUTOMATED DECISION‑MAKING</h2>
+            <p>PaySick may use automated systems to:</p>
+            <ul>
+                <li>Assess eligibility;</li>
+                <li>Detect fraud;</li>
+                <li>Manage payment risk.</li>
+            </ul>
+            <p>Such decisions are subject to governance controls and human oversight where appropriate.</p>
+
+            <hr>
+
+            <h2>11. COOKIES AND TRACKING</h2>
+            <p>PaySick uses cookies and similar technologies for security, analytics, and service optimisation. You may manage cookie preferences via your browser settings.</p>
+
+            <hr>
+
+            <h2>12. SECURITY COMPROMISE AND BREACH NOTIFICATION (POPIA SECTION 22)</h2>
+            <p>In the event of a <strong>security compromise</strong> as contemplated in <strong>Section 22 of POPIA</strong>, PaySick will:</p>
+            <ul>
+                <li>Take immediate steps to contain and remediate the compromise;</li>
+                <li>Conduct an assessment to determine the nature and scope of the incident;</li>
+                <li>Notify the <strong>Information Regulator</strong> and affected data subjects as soon as reasonably possible, where required by law;</li>
+                <li>Provide sufficient information to enable affected individuals to take protective measures.</li>
+            </ul>
+            <p>Notification may be delayed where a law enforcement authority determines that such notification would impede a criminal investigation.</p>
+            <p>PaySick maintains incident records and post‑incident reviews to strengthen ongoing information security controls.</p>
+
+            <hr>
+
+            <h2>13. CHANGES TO THIS POLICY</h2>
+            <p>PaySick may update this Privacy Policy periodically. Continued use of the Service constitutes acceptance of the updated Policy.</p>
+
+            <hr>
+
+            <h2>14. CONTACT DETAILS</h2>
+            <div class="contact-section">
+                <p><strong>Information Officer</strong></p>
+                <p><strong>PaySick (Pty) Ltd</strong></p>
+                <p>Email: <a href="mailto:support@paysick.co.za">support@paysick.co.za</a></p>
+            </div>
+
+            <hr>
+
+            <div class="privacy-notice">
+                <p><strong>By using PaySick, you acknowledge that your personal information is processed in accordance with financial‑services‑grade governance, security, and regulatory controls.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#about">Careers</a></li>
+                    <li><a href="index.html#about">Press</a></li>
+                    <li><a href="index.html#about">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+</body>
+</html>
