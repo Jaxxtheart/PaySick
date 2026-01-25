@@ -1,10 +1,10 @@
-# PaySick 🏥💳
+# PaySick
 
 > South African Healthcare Payment Platform - Making medical care accessible through flexible payment plans
 
 PaySick is a fintech healthcare platform that enables patients to split their medical bills into manageable 3-month payment plans. We partner with healthcare providers across South Africa to make quality healthcare accessible to everyone.
 
-## 🌟 Features
+## Features
 
 ### For Patients
 - **Instant Approval**: Get approved for payment plans up to R850
@@ -29,7 +29,7 @@ PaySick is a fintech healthcare platform that enables patients to split their me
 - **Transaction Tracking**: Complete payment ledger
 - **Collections System**: Automated overdue payment management
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Choose Your Deployment Method
 
@@ -48,18 +48,23 @@ npm run db:setup
 npm run dev
 ```
 
-## 📚 Documentation
+## Documentation
 
+- **[Changelog](CHANGELOG.md)** - Version history and recent updates
+- **[Design System](DESIGN_SYSTEM.md)** - UI/UX guidelines and SVG icon system
 - **[Vercel Deployment Guide](VERCEL_DEPLOYMENT.md)** - Deploy to Vercel with Vercel Postgres
 - **[Database Setup Guide](DATABASE_SETUP.md)** - Set up local PostgreSQL database
 - **[Installation Notes](INSTALLATION_NOTES.md)** - Quick reference for setup
 - **[Backend API Documentation](backend/README.md)** - API endpoints and usage
 - **[Dashboard Guide](DASHBOARD_README.md)** - User dashboard documentation
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 PaySick/
+├── api/
+│   └── index.js                 # Vercel serverless entry point
+│
 ├── backend/                      # Backend API server
 │   ├── src/
 │   │   ├── config/
@@ -75,23 +80,37 @@ PaySick/
 │   ├── database/
 │   │   └── schema.sql           # Complete database schema
 │   ├── .env.example             # Environment variables template
-│   └── package.json             # Dependencies
+│   └── package.json             # Backend dependencies
 │
 ├── Frontend Files (HTML/CSS/JS)
-│   ├── index.html               # Landing page
+│   ├── index.html               # Landing page with custom SVG icons
 │   ├── login.html               # User login
 │   ├── onboarding.html          # User onboarding flow
 │   ├── dashboard.html           # User dashboard
 │   ├── admin-dashboard.html     # Admin interface
 │   ├── collections.html         # Collections management
+│   ├── providers.html           # Provider partnership page
+│   ├── privacy.html             # POPIA-compliant privacy policy
+│   ├── terms.html               # Terms of service
+│   ├── about.html               # About us page
+│   ├── contact.html             # Contact page
 │   └── api-client.js            # Frontend API client
 │
-├── vercel.json                  # Vercel deployment config
+├── package.json                 # Root package.json for Vercel deployment
+├── vercel.json                  # Vercel deployment config (modernized)
 ├── .vercelignore               # Vercel ignore rules
-└── Documentation files
+│
+└── Documentation
+    ├── README.md                # This file
+    ├── CHANGELOG.md             # Version history
+    ├── DESIGN_SYSTEM.md         # Design guidelines and SVG icons
+    ├── VERCEL_DEPLOYMENT.md     # Deployment guide
+    ├── DATABASE_SETUP.md        # Database setup
+    ├── INSTALLATION_NOTES.md    # Setup notes
+    └── DASHBOARD_README.md      # Dashboard documentation
 ```
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Core Tables
 - **users** - Patient accounts and personal information
@@ -111,7 +130,7 @@ PaySick/
 
 [View complete schema](backend/database/schema.sql)
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Authentication
 ```
@@ -145,7 +164,7 @@ GET    /api/providers/search/:term  Search providers
 
 [Full API documentation](backend/README.md)
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 - **Node.js** - Runtime environment
@@ -164,7 +183,7 @@ GET    /api/providers/search/:term  Search providers
 - **Vercel** - Hosting platform
 - **Vercel Postgres** - Managed PostgreSQL database
 
-## 🔐 Security Features
+## Security Features
 
 - **JWT Authentication** - Secure token-based auth
 - **Password Hashing** - bcrypt encryption (when implemented)
@@ -175,7 +194,7 @@ GET    /api/providers/search/:term  Search providers
 - **POPIA Compliance** - Complete audit logging
 - **Data Encryption** - Banking details encrypted at rest
 
-## 🌍 Deployment
+## Deployment
 
 ### Deploy to Vercel (Recommended)
 
@@ -224,7 +243,7 @@ GET    /api/providers/search/:term  Search providers
 
 [Complete local setup guide](DATABASE_SETUP.md)
 
-## 📊 Database Hosting Options
+## Database Hosting Options
 
 ### Vercel Postgres (Recommended)
 - ✅ Easy integration with Vercel
@@ -250,7 +269,7 @@ GET    /api/providers/search/:term  Search providers
 - ✅ Easy deployment
 - 🔗 [railway.app](https://railway.app)
 
-## 🧪 Testing
+## Testing
 
 ### Test the API
 
@@ -273,7 +292,7 @@ curl -X POST http://localhost:3000/api/users/register \
   }'
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -283,48 +302,88 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the ISC License.
 
-## 🆘 Support
+## Support
 
 - **Documentation**: See guides in the root directory
 - **Issues**: Open an issue on GitHub
 - **Email**: support@paysick.co.za (example)
 
-## 🗺️ Roadmap
+## Roadmap
 
-- [ ] Implement SMS notifications via Twilio
-- [ ] Add email notifications
-- [ ] Implement actual payment gateway integration
-- [ ] Add biometric authentication
-- [ ] Build mobile app (React Native)
-- [ ] Add real-time payment tracking
-- [ ] Implement ML-based fraud detection
-- [ ] Add provider analytics dashboard
-- [ ] Build admin panel for approvals
-- [ ] Add multi-language support
+### Phase 1: Core Platform (Completed)
+- [x] Database schema and backend API
+- [x] User authentication and authorization
+- [x] Frontend UI with custom SVG icons
+- [x] All website pages (Providers, Privacy, Terms, About, Contact)
+- [x] POPIA compliance and legal documentation
+- [x] Vercel deployment configuration
 
-## 📈 Status
+### Phase 2: Payment Integration (In Progress)
+- [ ] Payment gateway integration (Stripe/PayFast)
+- [ ] Automated payment processing
+- [ ] Payment reconciliation system
+- [ ] Refund and dispute handling
 
+### Phase 3: Communication & Notifications
+- [ ] SMS notifications via Twilio
+- [ ] Email notifications (transactional)
+- [ ] Payment reminders and alerts
+- [ ] Provider communication portal
+
+### Phase 4: Advanced Features
+- [ ] Mobile app (React Native)
+- [ ] Real-time payment tracking
+- [ ] ML-based fraud detection
+- [ ] Biometric authentication
+- [ ] Multi-language support (Afrikaans, Zulu, Xhosa)
+
+### Phase 5: Analytics & Optimization
+- [ ] Advanced provider analytics dashboard
+- [ ] Customer behavior analytics
+- [ ] A/B testing framework
+- [ ] Performance monitoring and optimization
+
+## Status
+
+### Completed
 - ✅ Database schema complete
 - ✅ Backend API complete
 - ✅ User authentication implemented
-- ✅ Frontend UI complete
-- ✅ Vercel deployment ready
+- ✅ Frontend UI complete with custom SVG icons
+- ✅ Vercel deployment ready (Node.js 24.x)
+- ✅ All website pages (Providers, Privacy, Terms, About, Contact)
+- ✅ POPIA-compliant privacy policy
+- ✅ Custom SVG icon system matching brand design
+- ✅ Responsive design across all pages
+- ✅ Provider partnership page
+- ✅ Complete legal documentation
+
+### In Progress
 - 🔲 Payment gateway integration
 - 🔲 SMS/Email notifications
 - 🔲 Production deployment
 
-## 🙏 Acknowledgments
+### Planned
+- 🔲 Mobile app (React Native)
+- 🔲 Real-time payment tracking
+- 🔲 ML-based fraud detection
+- 🔲 Multi-language support
 
-- Built with ❤️ for South Africa
+## Acknowledgments
+
+- Built with care for South Africa
 - Designed to comply with NCA and POPIA regulations
 - Inspired by the need for accessible healthcare
+- Custom SVG icon system designed for brand consistency
 
 ---
 
-**Made in South Africa 🇿🇦**
+**Made in South Africa**
 
 **PaySick** - Making Healthcare Accessible, One Payment at a Time
+
+For version history and recent updates, see [CHANGELOG.md](CHANGELOG.md)
