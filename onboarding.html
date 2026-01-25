@@ -733,7 +733,12 @@
 
         <!-- Success View -->
         <div class="success-view" id="successView">
-            <div class="success-icon">✓</div>
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <polyline points="8 12 11 15 16 9" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
             <h2>Setup Complete!</h2>
             <p>Your account has been successfully configured. You can now start managing your healthcare payments.</p>
             <button class="btn btn-primary" onclick="goToDashboard()">Go to Dashboard</button>
