@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lender Dashboard - PaySick Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .marketplace-badge {
+            background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .lender-selector {
+            padding: 8px 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+        }
+
+        .lender-selector:focus {
+            outline: none;
+            border-color: #3498DB;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #FF4757;
+            color: #FF4757;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #FF4757;
+            color: white;
+        }
+
+        /* Menu Toggle */
+        .menu-toggle {
+            display: block;
+            background: none;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #1A1A1A;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            color: #3498DB;
+            border-color: #3498DB;
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #8A8A8A;
+            padding: 8px;
+        }
+
+        .menu-close:hover {
+            color: #FF4757;
+        }
+
+        .menu-nav {
+            padding: 16px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: #1A1A1A;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #FAFAFA;
+            color: #3498DB;
+        }
+
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498DB;
+            border-left: 3px solid #3498DB;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #E5E5E5;
+            margin: 8px 0;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-section h1 {
+            font-size: 32px;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            color: #8A8A8A;
+            font-size: 16px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            color: #8A8A8A;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .stat-value.blue { color: #3498DB; }
+        .stat-value.green { color: #2ED573; }
+        .stat-value.orange { color: #FF9F40; }
+        .stat-value.red { color: #FF4757; }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #FAFAFA;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ED573 0%, #1ABC9C 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 213, 115, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            color: #1A1A1A;
+        }
+
+        .btn-secondary:hover {
+            border-color: #3498DB;
+            color: #3498DB;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #3498DB;
+            color: #3498DB;
+        }
+
+        .btn-outline:hover {
+            background: #3498DB;
+            color: white;
+        }
+
+        /* Application Cards */
+        .application-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3498DB;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .application-card.low-risk {
+            border-left-color: #2ED573;
+        }
+
+        .application-card.medium-risk {
+            border-left-color: #FF9F40;
+        }
+
+        .application-card.high-risk {
+            border-left-color: #FF4757;
+        }
+
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .application-id {
+            font-size: 14px;
+            color: #8A8A8A;
+            margin-bottom: 4px;
+        }
+
+        .application-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .risk-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .risk-badge.low {
+            background: #E8F8F0;
+            color: #2ED573;
+        }
+
+        .risk-badge.medium {
+            background: #FFF4E6;
+            color: #FF9F40;
+        }
+
+        .risk-badge.high {
+            background: #FFE5E8;
+            color: #FF4757;
+        }
+
+        .application-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            font-size: 14px;
+            color: #8A8A8A;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: #8A8A8A;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .application-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .application-actions .btn {
+            flex: 1;
+        }
+
+        /* Adjustment Form */
+        .adjustment-form {
+            background: #FAFAFA;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .adjustment-form.active {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4A4A4A;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498DB;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8A8A8A;
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #4A4A4A;
+            margin-bottom: 8px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8A8A8A;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #E5E5E5;
+            border-top-color: #3498DB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #2ED573 0%, #1ABC9C 100%);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .application-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+
+            .application-actions {
+                flex-direction: column;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .lender-selector {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <div class="logo-container">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="menuCrossGradient" cx="40%" cy="40%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                        </radialGradient>
+                        <radialGradient id="menuBgCircle" cx="50%" cy="50%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                            <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="url(#menuBgCircle)"/>
+                    <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#menuCrossGradient)"/>
+                    <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#menuCrossGradient)"/>
+                    <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                </svg>
+                <div class="logo-text">Pay<span>Sick</span></div>
+            </div>
+            <button class="menu-close" onclick="toggleMenu()">x</button>
+        </div>
+
+        <nav class="menu-nav">
+            <a href="lender-dashboard.html" class="menu-item active">
+                <span class="icon">📋</span>
+                <span>Pending Applications</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">💰</span>
+                <span>Active Loans</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">📊</span>
+                <span>Performance</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="admin-dashboard.html" class="menu-item">
+                <span class="icon">🛠️</span>
+                <span>Admin Dashboard</span>
+            </a>
+            <a href="index.html" class="menu-item">
+                <span class="icon">🌐</span>
+                <span>Main Site</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item" onclick="logout(); return false;">
+                <span class="icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="logo-container">
+                        <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <radialGradient id="headerCrossGradient" cx="40%" cy="40%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                                </radialGradient>
+                                <radialGradient id="headerBgCircle" cx="50%" cy="50%">
+                                    <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                    <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                                </radialGradient>
+                            </defs>
+                            <circle cx="50" cy="50" r="40" fill="url(#headerBgCircle)"/>
+                            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#headerCrossGradient)"/>
+                            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#headerCrossGradient)"/>
+                            <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                            <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                        </svg>
+                        <div class="logo-text">Pay<span>Sick</span></div>
+                    </div>
+                    <span class="marketplace-badge">Marketplace</span>
+                </div>
+            </div>
+            <div class="user-menu">
+                <select class="lender-selector" id="lenderSelector" onchange="changeLender()">
+                    <option value="PAYSICK">PaySick Balance Sheet</option>
+                    <option value="MEDIFIN">MediFin Bank</option>
+                </select>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="welcome-section">
+            <h1>Lender Dashboard</h1>
+            <p>Review and respond to loan applications</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Pending Applications</div>
+                <div class="stat-value blue" id="statPending">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Awaiting Selection</div>
+                <div class="stat-value orange" id="statAwaiting">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Loans</div>
+                <div class="stat-value green" id="statActive">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Loaned</div>
+                <div class="stat-value" id="statTotal">-</div>
+            </div>
+        </div>
+
+        <!-- Applications -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Pending Loan Applications</h2>
+                <div class="card-actions">
+                    <button class="btn btn-secondary" onclick="loadApplications()">Refresh</button>
+                </div>
+            </div>
+
+            <div id="applicationsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading applications...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Configuration
+        const API_BASE = '/api/marketplace';
+        let selectedLender = 'PAYSICK';
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('paysick_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            return token;
+        }
+
+        // Get auth headers
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('paysick_auth_token')}`
+            };
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('paysick_user');
+            localStorage.removeItem('paysick_auth_token');
+            window.location.href = 'login.html';
+        }
+
+        // Toggle menu
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('active');
+            document.getElementById('menuOverlay').classList.toggle('active');
+        }
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return 'R' + parseFloat(amount).toLocaleString('en-ZA', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Format percentage
+        function formatPercent(value) {
+            return (parseFloat(value) * 100).toFixed(2) + '%';
+        }
+
+        // Get risk class
+        function getRiskClass(tier) {
+            switch (tier) {
+                case 'LOW': return 'low';
+                case 'MEDIUM': return 'medium';
+                case 'HIGH': return 'high';
+                default: return 'medium';
+            }
+        }
+
+        // Change lender
+        function changeLender() {
+            selectedLender = document.getElementById('lenderSelector').value;
+            loadApplications();
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, {
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('statPending').textContent = stats.pending_applications || 0;
+                    document.getElementById('statAwaiting').textContent = stats.awaiting_selection || 0;
+                    document.getElementById('statActive').textContent = stats.active_loans || 0;
+                    document.getElementById('statTotal').textContent = formatCurrency(stats.total_loaned || 0);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load applications
+        async function loadApplications() {
+            const container = document.getElementById('applicationsContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading applications...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/pending-applications`, {
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load applications');
+                }
+
+                const applications = await response.json();
+
+                if (applications.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <h3>No Pending Applications</h3>
+                            <p>New applications will appear here when patients apply for loans.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `<div class="application-grid">${applications.map(app => renderApplication(app)).join('')}</div>`;
+
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <h3>Error Loading Applications</h3>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="loadApplications()" style="margin-top: 16px;">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Render application card
+        function renderApplication(app) {
+            const riskClass = getRiskClass(app.risk_tier);
+            const recommendedRate = app.recommended_rate || 0.20;
+            const recommendedTerm = app.recommended_term || app.requested_term;
+            const monthlyPayment = app.recommended_monthly_payment ||
+                calculateMonthlyPayment(app.loan_amount, recommendedRate, recommendedTerm);
+
+            return `
+                <div class="application-card ${riskClass}-risk" id="app-${app.application_id}">
+                    <div class="application-header">
+                        <div>
+                            <div class="application-id">Application #${app.application_id.substring(0, 8)}</div>
+                            <div class="application-amount">${formatCurrency(app.loan_amount)}</div>
+                        </div>
+                        <span class="risk-badge ${riskClass}">${app.risk_score || 'N/A'} - ${app.risk_tier || 'MEDIUM'}</span>
+                    </div>
+
+                    <div class="application-details">
+                        <div class="detail-section">
+                            <h4>Application Details</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Procedure:</span>
+                                <span class="detail-value">${app.procedure_type}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Provider:</span>
+                                <span class="detail-value">${app.provider_name || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Requested Term:</span>
+                                <span class="detail-value">${app.requested_term} months</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>Risk Assessment</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">PaySick Score:</span>
+                                <span class="detail-value">${app.risk_score || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Monthly Income:</span>
+                                <span class="detail-value">${app.monthly_income ? formatCurrency(app.monthly_income) : 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Employment:</span>
+                                <span class="detail-value">${app.employment_status || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Affordability:</span>
+                                <span class="detail-value">${app.affordability_score ? app.affordability_score + '%' : 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>Recommended Terms</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Rate:</span>
+                                <span class="detail-value">${formatPercent(recommendedRate)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Term:</span>
+                                <span class="detail-value">${recommendedTerm} months</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Monthly Payment:</span>
+                                <span class="detail-value">${formatCurrency(monthlyPayment)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="application-actions">
+                        <button class="btn btn-success" onclick="approveApplication('${app.application_id}')">
+                            Approve (Use Terms)
+                        </button>
+                        <button class="btn btn-outline" onclick="toggleAdjustForm('${app.application_id}')">
+                            Adjust Terms
+                        </button>
+                        <button class="btn btn-danger" onclick="declineApplication('${app.application_id}')">
+                            Decline
+                        </button>
+                    </div>
+
+                    <div class="adjustment-form" id="adjust-${app.application_id}">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Adjusted Rate (%)</label>
+                                <input type="number" step="0.1" id="rate-${app.application_id}"
+                                    value="${(recommendedRate * 100).toFixed(2)}" placeholder="e.g., 22.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Adjusted Term (months)</label>
+                                <input type="number" id="term-${app.application_id}"
+                                    value="${recommendedTerm}" placeholder="e.g., 12">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes / Conditions</label>
+                            <textarea id="notes-${app.application_id}" rows="2"
+                                placeholder="Optional notes or conditions for the offer"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-secondary" onclick="toggleAdjustForm('${app.application_id}')">
+                                Cancel
+                            </button>
+                            <button class="btn btn-success" onclick="approveWithAdjustments('${app.application_id}')">
+                                Submit Adjusted Offer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Calculate monthly payment
+        function calculateMonthlyPayment(principal, annualRate, term) {
+            const monthlyRate = annualRate / 12;
+            if (monthlyRate === 0) return principal / term;
+            return principal * (monthlyRate * Math.pow(1 + monthlyRate, term)) /
+                   (Math.pow(1 + monthlyRate, term) - 1);
+        }
+
+        // Toggle adjustment form
+        function toggleAdjustForm(applicationId) {
+            const form = document.getElementById(`adjust-${applicationId}`);
+            form.classList.toggle('active');
+        }
+
+        // Approve application
+        async function approveApplication(applicationId) {
+            await submitOffer(applicationId, true);
+        }
+
+        // Approve with adjustments
+        async function approveWithAdjustments(applicationId) {
+            const rate = parseFloat(document.getElementById(`rate-${applicationId}`).value) / 100;
+            const term = parseInt(document.getElementById(`term-${applicationId}`).value);
+            const notes = document.getElementById(`notes-${applicationId}`).value;
+
+            await submitOffer(applicationId, true, rate, term, notes);
+        }
+
+        // Decline application
+        async function declineApplication(applicationId) {
+            const reason = prompt('Reason for declining (optional):');
+            await submitOffer(applicationId, false, null, null, null, reason);
+        }
+
+        // Submit offer
+        async function submitOffer(applicationId, accepted, adjustedRate, adjustedTerm, notes, reason) {
+            try {
+                const response = await fetch(`${API_BASE}/admin/manual-offers`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        applicationId,
+                        lenderCode: selectedLender,
+                        accepted,
+                        adjustedRate,
+                        adjustedTerm,
+                        lenderNotes: notes,
+                        reason
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to submit offer');
+                }
+
+                showToast(accepted ? 'Offer submitted successfully!' : 'Application declined', 'success');
+
+                // Remove the card from view
+                const card = document.getElementById(`app-${applicationId}`);
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(-100px)';
+                    setTimeout(() => card.remove(), 300);
+                }
+
+                // Reload stats
+                loadStats();
+
+            } catch (error) {
+                console.error('Error submitting offer:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Initialize
+        function init() {
+            checkAuth();
+            loadStats();
+            loadApplications();
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

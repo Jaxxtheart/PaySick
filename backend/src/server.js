@@ -12,6 +12,7 @@ const userRoutes = require('./routes/users');
 const applicationRoutes = require('./routes/applications');
 const paymentRoutes = require('./routes/payments');
 const providerRoutes = require('./routes/providers');
+const marketplaceRoutes = require('./routes/marketplace');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,6 +58,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/providers', providerRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -69,7 +71,8 @@ app.get('/', (req, res) => {
       users: '/api/users',
       applications: '/api/applications',
       payments: '/api/payments',
-      providers: '/api/providers'
+      providers: '/api/providers',
+      marketplace: '/api/marketplace'
     }
   });
 });
