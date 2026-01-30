@@ -781,7 +781,7 @@
             if (offers.length === 0) {
                 section.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">⏳</div>
+                        <div class="icon">⚡</div>
                         <h3>Waiting for Offers</h3>
                         <p>Lenders are reviewing your application. You'll receive offers shortly.</p>
                         <button class="btn btn-secondary" onclick="location.reload()">Refresh</button>
@@ -912,7 +912,7 @@
         function showEmptyState() {
             document.getElementById('offersSection').innerHTML = `
                 <div class="empty-state">
-                    <div class="icon">📋</div>
+                    <div class="icon">📱</div>
                     <h3>No Applications Yet</h3>
                     <p>You haven't submitted any loan applications. Start by applying for medical financing.</p>
                     <a href="marketplace-apply.html" class="btn btn-primary" style="display: inline-block; text-decoration: none;">Apply Now</a>
@@ -924,7 +924,7 @@
         function showError(message) {
             document.getElementById('offersSection').innerHTML = `
                 <div class="empty-state">
-                    <div class="icon">⚠️</div>
+                    <div class="icon">🔒</div>
                     <h3>Error</h3>
                     <p>${message}</p>
                     <button class="btn btn-secondary" onclick="location.reload()">Try Again</button>
@@ -990,13 +990,13 @@
         function getProcedureIcon(type) {
             const icons = {
                 'Dental': '🦷',
-                'Eye Care': '👁️',
-                'Cosmetic': '✨',
-                'Orthopedic': '🦴',
-                'Fertility': '👶',
-                'General Surgery': '🏥'
+                'Eye Care': '👓',
+                'Cosmetic': '💎',
+                'Orthopedic': '🩺',
+                'Fertility': '🌱',
+                'General Surgery': '⚕️'
             };
-            return icons[type] || '🏥';
+            return icons[type] || '⚕️';
         }
 
         function showToast(message, type = 'success') {
