@@ -241,6 +241,65 @@ const PaySickAPI = {
     async search(searchTerm) {
       return PaySickAPI.request(`/providers/search/${encodeURIComponent(searchTerm)}`);
     }
+  },
+
+  /**
+   * Marketplace APIs - Lending marketplace for medical procedures
+   */
+  marketplace: {
+    /**
+     * Submit loan application to marketplace
+     */
+    async submitApplication(applicationData) {
+      return PaySickAPI.request('/marketplace/applications', {
+        method: 'POST',
+        body: JSON.stringify(applicationData)
+      });
+    },
+
+    /**
+     * Get all user's marketplace applications
+     */
+    async getApplications() {
+      return PaySickAPI.request('/marketplace/applications');
+    },
+
+    /**
+     * Get specific application with offers
+     */
+    async getApplication(applicationId) {
+      return PaySickAPI.request(`/marketplace/applications/${applicationId}`);
+    },
+
+    /**
+     * Get offers for an application
+     */
+    async getOffers(applicationId) {
+      return PaySickAPI.request(`/marketplace/applications/${applicationId}/offers`);
+    },
+
+    /**
+     * Accept an offer
+     */
+    async acceptOffer(offerId) {
+      return PaySickAPI.request(`/marketplace/offers/${offerId}/accept`, {
+        method: 'POST'
+      });
+    },
+
+    /**
+     * Get user's marketplace loans
+     */
+    async getLoans() {
+      return PaySickAPI.request('/marketplace/loans');
+    },
+
+    /**
+     * Get loan repayment schedule
+     */
+    async getLoanRepayments(loanId) {
+      return PaySickAPI.request(`/marketplace/loans/${loanId}/repayments`);
+    }
   }
 };
 

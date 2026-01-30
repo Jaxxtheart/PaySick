@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Medical Finance - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            color: #4A4A4A;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            color: #8A8A8A;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E5E5E5;
+            color: #8A8A8A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #2ED573;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 14px;
+            color: #8A8A8A;
+            display: none;
+        }
+
+        .step.active .step-label {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background: #E5E5E5;
+        }
+
+        .step.completed + .step-connector {
+            background: #2ED573;
+        }
+
+        @media (min-width: 768px) {
+            .step-label {
+                display: block;
+            }
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .section-description {
+            font-size: 16px;
+            color: #8A8A8A;
+            margin-bottom: 32px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4A4A4A;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FF4757;
+            box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-prefix {
+            position: relative;
+        }
+
+        .input-prefix span {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8A8A8A;
+            font-weight: 600;
+        }
+
+        .input-prefix input {
+            padding-left: 40px;
+        }
+
+        /* Procedure Cards */
+        .procedure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .procedure-card {
+            border: 2px solid #E5E5E5;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .procedure-card:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.02);
+        }
+
+        .procedure-card.selected {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .procedure-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .procedure-card .name {
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .procedure-card .description {
+            font-size: 13px;
+            color: #8A8A8A;
+        }
+
+        /* Amount Slider */
+        .amount-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .amount-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .amount-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #E5E5E5;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .amount-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+        }
+
+        .amount-range {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        /* Term Selection */
+        .term-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .term-option {
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .term-option:hover {
+            border-color: #FF4757;
+        }
+
+        .term-option.selected {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .term-option .months {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .term-option .label {
+            font-size: 12px;
+            color: #8A8A8A;
+        }
+
+        /* Estimate Box */
+        .estimate-box {
+            background: linear-gradient(135deg, #FAFAFA 0%, #F0F0F0 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .estimate-title {
+            font-size: 14px;
+            color: #8A8A8A;
+            margin-bottom: 8px;
+        }
+
+        .estimate-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .estimate-note {
+            font-size: 13px;
+            color: #8A8A8A;
+            margin-top: 8px;
+        }
+
+        /* Navigation Buttons */
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            color: #4A4A4A;
+        }
+
+        .btn-secondary:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #E5E5E5;
+            color: #8A8A8A;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Summary Section */
+        .summary-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: #FAFAFA;
+            border-radius: 10px;
+        }
+
+        .summary-item .label {
+            color: #8A8A8A;
+        }
+
+        .summary-item .value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .summary-highlight {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(224, 30, 55, 0.1) 100%);
+            border: 2px solid #FF4757;
+        }
+
+        .summary-highlight .value {
+            color: #FF4757;
+            font-size: 20px;
+        }
+
+        /* Success State */
+        .success-state {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2ED573 0%, #1ABC9C 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 40px;
+            color: white;
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #8A8A8A;
+            margin-bottom: 32px;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #E5E5E5;
+            border-top-color: #FF4757;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 16px;
+            color: #4A4A4A;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #2ED573 0%, #1ABC9C 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo-container">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="crossGradient" cx="40%" cy="40%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                        </radialGradient>
+                        <radialGradient id="bgCircle" cx="50%" cy="50%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                            <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="url(#bgCircle)"/>
+                    <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#crossGradient)"/>
+                    <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#crossGradient)"/>
+                    <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                </svg>
+                <div class="logo-text">Pay<span>Sick</span></div>
+            </a>
+            <a href="dashboard.html" class="back-btn">
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Finding you the best rates...</div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-header">
+            <h1>Apply for Medical Finance</h1>
+            <p>Get competitive rates from multiple lenders</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Procedure</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Amount</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Details</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Review</div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <!-- Step 1: Procedure Type -->
+            <div class="form-section active" id="step1">
+                <h2 class="section-title">What procedure do you need?</h2>
+                <p class="section-description">Select the type of medical procedure you're financing</p>
+
+                <div class="procedure-grid">
+                    <div class="procedure-card" data-procedure="Dental" data-code="DENT">
+                        <div class="icon">🦷</div>
+                        <div class="name">Dental</div>
+                        <div class="description">Implants, crowns, braces</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Eye Care" data-code="EYES">
+                        <div class="icon">👁️</div>
+                        <div class="name">Eye Care</div>
+                        <div class="description">LASIK, cataract surgery</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Cosmetic" data-code="COSM">
+                        <div class="icon">✨</div>
+                        <div class="name">Cosmetic</div>
+                        <div class="description">Plastic surgery, skin</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Orthopedic" data-code="ORTH">
+                        <div class="icon">🦴</div>
+                        <div class="name">Orthopedic</div>
+                        <div class="description">Joint, spine surgery</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Fertility" data-code="FERT">
+                        <div class="icon">👶</div>
+                        <div class="name">Fertility</div>
+                        <div class="description">IVF, fertility treatments</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="General Surgery" data-code="SURG">
+                        <div class="icon">🏥</div>
+                        <div class="name">General Surgery</div>
+                        <div class="description">Other medical procedures</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="procedureDescription">Describe your procedure (optional)</label>
+                    <textarea id="procedureDescription" rows="3" placeholder="E.g., Dental implants for 2 teeth, wisdom tooth extraction..."></textarea>
+                </div>
+
+                <div class="form-navigation">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="nextStep()" id="step1Next" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Loan Amount -->
+            <div class="form-section" id="step2">
+                <h2 class="section-title">How much do you need?</h2>
+                <p class="section-description">Select the amount you'd like to finance</p>
+
+                <div class="amount-display">
+                    <div class="amount-value" id="amountDisplay">R50,000</div>
+                </div>
+
+                <input type="range" class="amount-slider" id="amountSlider" min="5000" max="500000" step="1000" value="50000">
+                <div class="amount-range">
+                    <span>R5,000</span>
+                    <span>R500,000</span>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <h3 style="font-size: 18px; margin-bottom: 16px;">Select repayment term</h3>
+                    <div class="term-grid">
+                        <div class="term-option" data-term="6">
+                            <div class="months">6</div>
+                            <div class="label">months</div>
+                        </div>
+                        <div class="term-option selected" data-term="12">
+                            <div class="months">12</div>
+                            <div class="label">months</div>
+                        </div>
+                        <div class="term-option" data-term="18">
+                            <div class="months">18</div>
+                            <div class="label">months</div>
+                        </div>
+                        <div class="term-option" data-term="24">
+                            <div class="months">24</div>
+                            <div class="label">months</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="estimate-box">
+                    <div class="estimate-title">Estimated monthly payment</div>
+                    <div class="estimate-value" id="monthlyEstimate">R4,583</div>
+                    <div class="estimate-note">* Final payment depends on the rate you're offered</div>
+                </div>
+
+                <div class="form-navigation">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Employment Details -->
+            <div class="form-section" id="step3">
+                <h2 class="section-title">Tell us about your income</h2>
+                <p class="section-description">This helps lenders offer you better rates</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employmentStatus">Employment Status</label>
+                        <select id="employmentStatus">
+                            <option value="">Select status</option>
+                            <option value="EMPLOYED">Employed Full-time</option>
+                            <option value="PART_TIME">Employed Part-time</option>
+                            <option value="SELF_EMPLOYED">Self-employed</option>
+                            <option value="CONTRACTOR">Contractor</option>
+                            <option value="RETIRED">Retired</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="employmentDuration">How long at current employer?</label>
+                        <select id="employmentDuration">
+                            <option value="">Select duration</option>
+                            <option value="6">Less than 6 months</option>
+                            <option value="12">6-12 months</option>
+                            <option value="24">1-2 years</option>
+                            <option value="60">2-5 years</option>
+                            <option value="120">5+ years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyIncome">Monthly Income (before tax)</label>
+                    <div class="input-prefix">
+                        <span>R</span>
+                        <input type="number" id="monthlyIncome" placeholder="25000" min="1000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider">Healthcare Provider (optional)</label>
+                    <input type="text" id="provider" placeholder="E.g., Life Hospital, Netcare Dental...">
+                </div>
+
+                <div class="form-navigation">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="step3Next" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Review & Submit -->
+            <div class="form-section" id="step4">
+                <h2 class="section-title">Review your application</h2>
+                <p class="section-description">Make sure everything looks correct</p>
+
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="label">Procedure Type</span>
+                        <span class="value" id="summaryProcedure">-</span>
+                    </div>
+                    <div class="summary-item summary-highlight">
+                        <span class="label">Loan Amount</span>
+                        <span class="value" id="summaryAmount">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Repayment Term</span>
+                        <span class="value" id="summaryTerm">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Employment</span>
+                        <span class="value" id="summaryEmployment">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Monthly Income</span>
+                        <span class="value" id="summaryIncome">-</span>
+                    </div>
+                </div>
+
+                <div class="estimate-box" style="margin-top: 24px;">
+                    <div class="estimate-title">What happens next?</div>
+                    <p style="color: #4A4A4A; line-height: 1.6;">
+                        Your application will be sent to our network of lenders who will compete to offer you the best rate.
+                        You'll receive multiple offers within minutes and can choose the one that works best for you.
+                    </p>
+                </div>
+
+                <div class="form-navigation">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitApplication()">Submit Application</button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="form-section" id="successState">
+                <div class="success-state">
+                    <div class="success-icon">✓</div>
+                    <h2 class="success-title">Application Submitted!</h2>
+                    <p class="success-message">
+                        We're finding you the best rates from our lending partners.<br>
+                        You'll receive offers shortly.
+                    </p>
+                    <button class="btn btn-primary" onclick="viewOffers()">View My Offers</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="api-client.js"></script>
+    <script>
+        // Application state
+        let currentStep = 1;
+        let applicationData = {
+            procedureType: '',
+            procedureCode: '',
+            procedureDescription: '',
+            loanAmount: 50000,
+            requestedTerm: 12,
+            employmentStatus: '',
+            employmentDurationMonths: 0,
+            monthlyIncome: 0,
+            provider: ''
+        };
+        let applicationId = null;
+
+        // Check authentication
+        function checkAuth() {
+            if (!PaySickAPI.users.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize
+        function init() {
+            if (!checkAuth()) return;
+
+            // Set up procedure card selection
+            document.querySelectorAll('.procedure-card').forEach(card => {
+                card.addEventListener('click', () => selectProcedure(card));
+            });
+
+            // Set up amount slider
+            const slider = document.getElementById('amountSlider');
+            slider.addEventListener('input', updateAmount);
+
+            // Set up term selection
+            document.querySelectorAll('.term-option').forEach(option => {
+                option.addEventListener('click', () => selectTerm(option));
+            });
+
+            // Set up form validation
+            document.getElementById('employmentStatus').addEventListener('change', validateStep3);
+            document.getElementById('employmentDuration').addEventListener('change', validateStep3);
+            document.getElementById('monthlyIncome').addEventListener('input', validateStep3);
+
+            updateAmount();
+        }
+
+        // Select procedure
+        function selectProcedure(card) {
+            document.querySelectorAll('.procedure-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+
+            applicationData.procedureType = card.dataset.procedure;
+            applicationData.procedureCode = card.dataset.code;
+            document.getElementById('step1Next').disabled = false;
+        }
+
+        // Update amount display
+        function updateAmount() {
+            const slider = document.getElementById('amountSlider');
+            const amount = parseInt(slider.value);
+            applicationData.loanAmount = amount;
+
+            document.getElementById('amountDisplay').textContent = formatCurrency(amount);
+            updateMonthlyEstimate();
+        }
+
+        // Select term
+        function selectTerm(option) {
+            document.querySelectorAll('.term-option').forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+
+            applicationData.requestedTerm = parseInt(option.dataset.term);
+            updateMonthlyEstimate();
+        }
+
+        // Update monthly estimate
+        function updateMonthlyEstimate() {
+            const principal = applicationData.loanAmount;
+            const term = applicationData.requestedTerm;
+            const rate = 0.22; // Estimate 22% APR
+
+            const monthlyRate = rate / 12;
+            const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, term)) /
+                           (Math.pow(1 + monthlyRate, term) - 1);
+
+            document.getElementById('monthlyEstimate').textContent = formatCurrency(payment);
+        }
+
+        // Validate step 3
+        function validateStep3() {
+            const status = document.getElementById('employmentStatus').value;
+            const duration = document.getElementById('employmentDuration').value;
+            const income = document.getElementById('monthlyIncome').value;
+
+            applicationData.employmentStatus = status;
+            applicationData.employmentDurationMonths = parseInt(duration) || 0;
+            applicationData.monthlyIncome = parseInt(income) || 0;
+
+            const isValid = status && duration && income && parseInt(income) >= 1000;
+            document.getElementById('step3Next').disabled = !isValid;
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep === 3) {
+                applicationData.procedureDescription = document.getElementById('procedureDescription').value;
+                applicationData.provider = document.getElementById('provider').value;
+                updateSummary();
+            }
+
+            if (currentStep < 4) {
+                document.querySelector(`#step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+
+                currentStep++;
+
+                document.querySelector(`#step${currentStep}`).classList.add('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.querySelector(`#step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+
+                currentStep--;
+
+                document.querySelector(`#step${currentStep}`).classList.add('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('completed');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            }
+        }
+
+        // Update summary
+        function updateSummary() {
+            document.getElementById('summaryProcedure').textContent = applicationData.procedureType;
+            document.getElementById('summaryAmount').textContent = formatCurrency(applicationData.loanAmount);
+            document.getElementById('summaryTerm').textContent = applicationData.requestedTerm + ' months';
+            document.getElementById('summaryEmployment').textContent = formatEmployment(applicationData.employmentStatus);
+            document.getElementById('summaryIncome').textContent = formatCurrency(applicationData.monthlyIncome);
+        }
+
+        // Submit application
+        async function submitApplication() {
+            showLoading(true);
+
+            try {
+                const response = await PaySickAPI.marketplace.submitApplication({
+                    procedureType: applicationData.procedureType,
+                    procedureCode: applicationData.procedureCode,
+                    procedureDescription: applicationData.procedureDescription,
+                    loanAmount: applicationData.loanAmount,
+                    requestedTerm: applicationData.requestedTerm,
+                    monthlyIncome: applicationData.monthlyIncome,
+                    employmentStatus: applicationData.employmentStatus,
+                    employmentDurationMonths: applicationData.employmentDurationMonths
+                });
+
+                applicationId = response.applicationId;
+
+                // Show success state
+                document.querySelector(`#step${currentStep}`).classList.remove('active');
+                document.getElementById('successState').classList.add('active');
+
+                showToast('Application submitted successfully!', 'success');
+
+            } catch (error) {
+                console.error('Submit error:', error);
+                showToast(error.message || 'Failed to submit application', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // View offers
+        function viewOffers() {
+            if (applicationId) {
+                window.location.href = `marketplace-offers.html?id=${applicationId}`;
+            } else {
+                window.location.href = 'marketplace-offers.html';
+            }
+        }
+
+        // Helper functions
+        function formatCurrency(amount) {
+            return 'R' + Math.round(amount).toLocaleString('en-ZA');
+        }
+
+        function formatEmployment(status) {
+            const labels = {
+                'EMPLOYED': 'Employed Full-time',
+                'PART_TIME': 'Part-time',
+                'SELF_EMPLOYED': 'Self-employed',
+                'CONTRACTOR': 'Contractor',
+                'RETIRED': 'Retired',
+                'OTHER': 'Other'
+            };
+            return labels[status] || status;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
