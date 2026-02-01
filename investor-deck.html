@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PaySick - Investor Presentation</title>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -37,6 +38,38 @@
             overflow-x: hidden;
         }
 
+        /* Download Button */
+        .download-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(255, 71, 87, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(255, 71, 87, 0.4);
+        }
+
+        .download-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
         /* Slide Container */
         .slide {
             min-height: 100vh;
@@ -54,22 +87,24 @@
             .slide {
                 padding: 40px 24px;
             }
+            .download-btn {
+                top: auto;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .download-btn:hover {
+                transform: translateX(-50%) translateY(-2px);
+            }
         }
 
         /* Slide Variations */
-        .slide--white {
-            background: var(--white);
-        }
-
-        .slide--light {
-            background: var(--bg);
-        }
-
+        .slide--white { background: var(--white); }
+        .slide--light { background: var(--bg); }
         .slide--gradient {
             background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
             color: var(--white);
         }
-
         .slide--dark {
             background: var(--black);
             color: var(--white);
@@ -251,6 +286,20 @@
             }
         }
 
+        /* Four Column Layout */
+        .four-col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .four-col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         /* Cards */
         .card {
             background: var(--white);
@@ -316,29 +365,6 @@
             line-height: 1.5;
             max-width: 900px;
             text-align: center;
-        }
-
-        .quote-author {
-            margin-top: 32px;
-            font-size: 18px;
-            font-weight: 500;
-            font-style: normal;
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            margin-top: 24px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 4px;
         }
 
         /* Timeline */
@@ -458,99 +484,6 @@
             margin-top: 4px;
         }
 
-        /* Flywheel */
-        .flywheel {
-            position: relative;
-            width: 500px;
-            height: 500px;
-        }
-
-        .flywheel-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 160px;
-            height: 160px;
-            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .flywheel-item {
-            position: absolute;
-            width: 140px;
-            text-align: center;
-        }
-
-        .flywheel-item:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
-        .flywheel-item:nth-child(3) { top: 20%; right: 0; }
-        .flywheel-item:nth-child(4) { bottom: 20%; right: 0; }
-        .flywheel-item:nth-child(5) { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .flywheel-item:nth-child(6) { bottom: 20%; left: 0; }
-        .flywheel-item:nth-child(7) { top: 20%; left: 0; }
-
-        .flywheel-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
-        }
-
-        .flywheel-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--black);
-        }
-
-        /* Revenue Bars */
-        .revenue-chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 40px;
-            height: 300px;
-            margin-top: 60px;
-        }
-
-        .revenue-bar {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .bar {
-            width: 100%;
-            max-width: 120px;
-            background: linear-gradient(180deg, #FF4757 0%, #E01E37 100%);
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding-bottom: 16px;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .bar-label {
-            margin-top: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--gray-dark);
-        }
-
         /* Team Grid */
         .team-grid {
             display: grid;
@@ -605,6 +538,12 @@
             display: flex;
             gap: 24px;
             margin-top: 48px;
+        }
+
+        @media (max-width: 768px) {
+            .funds-chart {
+                flex-direction: column;
+            }
         }
 
         .fund-item {
@@ -693,25 +632,9 @@
                 page-break-after: always;
                 min-height: 100vh;
             }
-            .nav-dots {
+            .nav-dots, .download-btn {
                 display: none;
             }
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate {
-            animation: fadeInUp 0.8s ease forwards;
         }
 
         /* Competitors Table */
@@ -745,14 +668,8 @@
             color: var(--primary);
         }
 
-        .check {
-            color: #2ED573;
-            font-weight: 700;
-        }
-
-        .cross {
-            color: var(--gray);
-        }
+        .check { color: #2ED573; font-weight: 700; }
+        .cross { color: var(--gray); }
 
         /* Tagline */
         .tagline {
@@ -781,9 +698,37 @@
         .slide--gradient .divider {
             background: rgba(255, 255, 255, 0.5);
         }
+
+        /* Big Number */
+        .big-number {
+            font-size: 120px;
+            font-weight: 700;
+            letter-spacing: -4px;
+            line-height: 1;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide--gradient .big-number {
+            background: white;
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
     </style>
 </head>
 <body>
+    <!-- Download Button -->
+    <button class="download-btn" onclick="downloadPPTX()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download PPTX
+    </button>
+
     <!-- Navigation Dots -->
     <nav class="nav-dots">
         <div class="nav-dot active" data-slide="0"></div>
@@ -798,7 +743,6 @@
         <div class="nav-dot" data-slide="9"></div>
         <div class="nav-dot" data-slide="10"></div>
         <div class="nav-dot" data-slide="11"></div>
-        <div class="nav-dot" data-slide="12"></div>
     </nav>
 
     <!-- SLIDE 1: Cover -->
@@ -826,9 +770,9 @@
             </div>
             <div class="tagline">Heal Now, Pay Later</div>
             <h1>The Future of<br>Healthcare Finance</h1>
-            <p class="subtitle">A multi-lender marketplace transforming how Africa accesses and pays for healthcare. Series A Investment Opportunity.</p>
+            <p class="subtitle">A multi-lender marketplace transforming how Africa accesses and pays for healthcare. Seed Investment Opportunity.</p>
         </div>
-        <span class="slide-number">01 / 13</span>
+        <span class="slide-number">01 / 12</span>
     </section>
 
     <!-- SLIDE 2: The Problem -->
@@ -856,24 +800,107 @@
             </div>
             <ul class="feature-list" style="margin-top: 60px;">
                 <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
                     <span>Traditional credit products don't serve healthcare needs specifically</span>
                 </li>
                 <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
                     <span>Providers lose patients who can't pay upfront</span>
                 </li>
                 <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FF4757" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
                     <span>No elegant, dignified financing solution exists at point of care</span>
                 </li>
             </ul>
         </div>
-        <span class="slide-number">02 / 13</span>
+        <span class="slide-number">02 / 12</span>
     </section>
 
-    <!-- SLIDE 3: The Solution -->
+    <!-- SLIDE 3: Market Opportunity (Enhanced) -->
     <section class="slide slide--gradient" id="slide-2">
+        <div class="content content--center">
+            <span class="tagline">The Opportunity</span>
+            <h2>A <span class="highlight">R240 billion</span> market<br>with zero dominant players</h2>
+
+            <div class="market-circles">
+                <div class="market-circle">
+                    <div class="circle tam">
+                        <div class="circle-value">R240B</div>
+                        <div class="circle-label">TAM</div>
+                    </div>
+                    <div class="market-title" style="color: white;">Total Addressable</div>
+                    <div class="market-desc" style="color: rgba(255,255,255,0.7);">SA Private Healthcare</div>
+                </div>
+                <div class="market-circle">
+                    <div class="circle sam" style="background: rgba(255,255,255,0.3);">
+                        <div class="circle-value">R85B</div>
+                        <div class="circle-label">SAM</div>
+                    </div>
+                    <div class="market-title" style="color: white;">Serviceable</div>
+                    <div class="market-desc" style="color: rgba(255,255,255,0.7);">Elective & Planned Care</div>
+                </div>
+                <div class="market-circle">
+                    <div class="circle som" style="background: rgba(255,255,255,0.5);">
+                        <div class="circle-value">R12B</div>
+                        <div class="circle-label">SOM</div>
+                    </div>
+                    <div class="market-title" style="color: white;">Obtainable</div>
+                    <div class="market-desc" style="color: rgba(255,255,255,0.7);">5-Year Target</div>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">03 / 12</span>
+    </section>
+
+    <!-- SLIDE 4: Why Now -->
+    <section class="slide slide--white" id="slide-3">
+        <div class="content content--center">
+            <span class="tagline">Why Now</span>
+            <h2>The perfect storm for<br><span class="highlight">healthcare fintech</span></h2>
+
+            <div class="four-col">
+                <div class="card" style="padding: 32px;">
+                    <div style="font-size: 48px; font-weight: 700; color: var(--primary); margin-bottom: 16px;">8%</div>
+                    <h4 style="font-size: 18px;">Annual Growth</h4>
+                    <p style="font-size: 14px;">Healthcare spending outpacing GDP every year</p>
+                </div>
+                <div class="card" style="padding: 32px;">
+                    <div style="font-size: 48px; font-weight: 700; color: var(--primary); margin-bottom: 16px;">72%</div>
+                    <h4 style="font-size: 18px;">Mobile Penetration</h4>
+                    <p style="font-size: 14px;">Smartphone adoption enabling digital-first finance</p>
+                </div>
+                <div class="card" style="padding: 32px;">
+                    <div style="font-size: 48px; font-weight: 700; color: var(--primary); margin-bottom: 16px;">0</div>
+                    <h4 style="font-size: 18px;">Dominant Players</h4>
+                    <p style="font-size: 14px;">No specialized healthcare BNPL in market</p>
+                </div>
+                <div class="card" style="padding: 32px;">
+                    <div style="font-size: 48px; font-weight: 700; color: var(--primary); margin-bottom: 16px;">$4B</div>
+                    <h4 style="font-size: 18px;">Global BNPL Wave</h4>
+                    <p style="font-size: 14px;">Healthcare fintech attracting massive capital globally</p>
+                </div>
+            </div>
+
+            <ul class="feature-list" style="margin-top: 60px; text-align: left; max-width: 900px;">
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                    <span><strong>Regulatory tailwind:</strong> NCA amendments favor transparent, digital lending</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                    <span><strong>Provider pressure:</strong> Rising competition forcing clinics to offer payment options</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                    <span><strong>Africa expansion:</strong> $200B+ continental healthcare market waiting</span>
+                </li>
+            </ul>
+        </div>
+        <span class="slide-number">04 / 12</span>
+    </section>
+
+    <!-- SLIDE 5: The Solution -->
+    <section class="slide slide--light" id="slide-4">
         <div class="content content--center">
             <span class="tagline">The Solution</span>
             <h2>Healthcare financing<br>that just works</h2>
@@ -913,58 +940,11 @@
                 </div>
             </div>
         </div>
-        <span class="slide-number">03 / 13</span>
+        <span class="slide-number">05 / 12</span>
     </section>
 
-    <!-- SLIDE 4: Market Opportunity -->
-    <section class="slide slide--white" id="slide-3">
-        <div class="content content--center">
-            <span class="tagline">Market Opportunity</span>
-            <h2>A <span class="highlight">R240 billion</span> market<br>waiting to be served</h2>
-
-            <div class="market-circles">
-                <div class="market-circle">
-                    <div class="circle tam">
-                        <div class="circle-value">R240B</div>
-                        <div class="circle-label">TAM</div>
-                    </div>
-                    <div class="market-title">Total Addressable</div>
-                    <div class="market-desc">SA Private Healthcare</div>
-                </div>
-                <div class="market-circle">
-                    <div class="circle sam">
-                        <div class="circle-value">R85B</div>
-                        <div class="circle-label">SAM</div>
-                    </div>
-                    <div class="market-title">Serviceable</div>
-                    <div class="market-desc">Elective & Planned Care</div>
-                </div>
-                <div class="market-circle">
-                    <div class="circle som">
-                        <div class="circle-value">R12B</div>
-                        <div class="circle-label">SOM</div>
-                    </div>
-                    <div class="market-title">Obtainable</div>
-                    <div class="market-desc">5-Year Target</div>
-                </div>
-            </div>
-
-            <ul class="feature-list" style="margin-top: 60px; text-align: left; max-width: 800px;">
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                    <span>South Africa first, then expand across Africa's $200B+ healthcare market</span>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                    <span>Healthcare spending growing 8% annually, outpacing GDP</span>
-                </li>
-            </ul>
-        </div>
-        <span class="slide-number">04 / 13</span>
-    </section>
-
-    <!-- SLIDE 5: How It Works -->
-    <section class="slide slide--light" id="slide-4">
+    <!-- SLIDE 6: How It Works -->
+    <section class="slide slide--white" id="slide-5">
         <div class="content content--center">
             <span class="tagline">Product</span>
             <h2>Seamlessly integrated into<br>the healthcare journey</h2>
@@ -1034,176 +1014,69 @@
                 </div>
             </div>
         </div>
-        <span class="slide-number">05 / 13</span>
-    </section>
-
-    <!-- SLIDE 6: Marketplace Platform -->
-    <section class="slide slide--dark" id="slide-5">
-        <div class="content content--center">
-            <span class="tagline">The Platform</span>
-            <h2>A marketplace that creates<br><span class="highlight">value for everyone</span></h2>
-            <p class="subtitle" style="margin-bottom: 40px;">PaySick handles all underwriting and risk assessment. Lenders simply decide to fund or not. This unique model creates a capital-efficient, scalable platform.</p>
-
-            <div class="three-col" style="margin-top: 40px;">
-                <div class="card" style="background: rgba(255,255,255,0.1); color: white;">
-                    <h4 style="color: white;">Balance Sheet</h4>
-                    <p style="color: rgba(255,255,255,0.7);">PaySick funds directly for fastest approval and maximum control</p>
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                        <div style="font-size: 28px; font-weight: 700;">PaySick</div>
-                        <div style="font-size: 14px; color: rgba(255,255,255,0.5);">PRIMARY LENDER</div>
-                    </div>
-                </div>
-                <div class="card" style="background: rgba(255,255,255,0.1); color: white;">
-                    <h4 style="color: white;">Banks & FIs</h4>
-                    <p style="color: rgba(255,255,255,0.7);">Traditional lenders access pre-qualified healthcare borrowers</p>
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                        <div style="font-size: 28px; font-weight: 700;">FNB, Nedbank...</div>
-                        <div style="font-size: 14px; color: rgba(255,255,255,0.5);">BANK PARTNERS</div>
-                    </div>
-                </div>
-                <div class="card" style="background: rgba(255,255,255,0.1); color: white;">
-                    <h4 style="color: white;">Fintechs</h4>
-                    <p style="color: rgba(255,255,255,0.7);">Digital lenders compete for quality healthcare loans</p>
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                        <div style="font-size: 28px; font-weight: 700;">MediFin, Lulalend...</div>
-                        <div style="font-size: 14px; color: rgba(255,255,255,0.5);">FINTECH PARTNERS</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stats-grid" style="margin-top: 60px;">
-                <div class="stat">
-                    <div class="stat-value" style="color: var(--primary);">15+</div>
-                    <div class="stat-label">Lender Partners</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" style="color: var(--primary);">3.2%</div>
-                    <div class="stat-label">Avg. Default Rate</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" style="color: var(--primary);">R1M</div>
-                    <div class="stat-label">Max Loan Size</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" style="color: var(--primary);">60mo</div>
-                    <div class="stat-label">Max Term</div>
-                </div>
-            </div>
-        </div>
-        <span class="slide-number">06 / 13</span>
+        <span class="slide-number">06 / 12</span>
     </section>
 
     <!-- SLIDE 7: Business Model -->
-    <section class="slide slide--white" id="slide-6">
+    <section class="slide slide--dark" id="slide-6">
         <div class="content">
             <span class="tagline">Business Model</span>
             <h2>Multiple revenue streams,<br><span class="highlight">compounding returns</span></h2>
 
             <div class="two-col" style="margin-top: 60px;">
                 <div>
-                    <div class="card" style="margin-bottom: 24px;">
-                        <h4>Marketplace Fees</h4>
-                        <p>2-4% origination fee on all marketplace loans facilitated through the platform.</p>
+                    <div class="card" style="margin-bottom: 24px; background: rgba(255,255,255,0.1);">
+                        <h4 style="color: white;">Marketplace Fees</h4>
+                        <p style="color: rgba(255,255,255,0.7);">2-4% origination fee on all marketplace loans facilitated through the platform.</p>
                         <div style="margin-top: 16px; font-size: 24px; font-weight: 700; color: var(--primary);">40% of Revenue</div>
                     </div>
-                    <div class="card" style="margin-bottom: 24px;">
-                        <h4>Net Interest Margin</h4>
-                        <p>Balance sheet lending generates NIM on directly funded loans.</p>
+                    <div class="card" style="margin-bottom: 24px; background: rgba(255,255,255,0.1);">
+                        <h4 style="color: white;">Net Interest Margin</h4>
+                        <p style="color: rgba(255,255,255,0.7);">Balance sheet lending generates NIM on directly funded loans.</p>
                         <div style="margin-top: 16px; font-size: 24px; font-weight: 700; color: var(--primary);">35% of Revenue</div>
                     </div>
-                    <div class="card">
-                        <h4>Provider Fees</h4>
-                        <p>Network providers pay subscription + transaction fees for embedded financing.</p>
+                    <div class="card" style="background: rgba(255,255,255,0.1);">
+                        <h4 style="color: white;">Provider Fees</h4>
+                        <p style="color: rgba(255,255,255,0.7);">Network providers pay subscription + transaction fees for embedded financing.</p>
                         <div style="margin-top: 16px; font-size: 24px; font-weight: 700; color: var(--primary);">25% of Revenue</div>
                     </div>
                 </div>
                 <div>
-                    <h3>Unit Economics</h3>
+                    <h3 style="color: white;">Target Unit Economics</h3>
                     <div style="margin-top: 24px;">
-                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--gray-light);">
+                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: white;">
                             <span>Average Loan Size</span>
                             <span style="font-weight: 700;">R18,500</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--gray-light);">
+                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: white;">
                             <span>Blended Revenue per Loan</span>
                             <span style="font-weight: 700;">R1,850 (10%)</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--gray-light);">
-                            <span>Customer Acquisition Cost</span>
+                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: white;">
+                            <span>Target CAC</span>
                             <span style="font-weight: 700;">R320</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--gray-light);">
-                            <span>Gross Margin</span>
+                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: white;">
+                            <span>Target Gross Margin</span>
                             <span style="font-weight: 700;">68%</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--gray-light);">
-                            <span>LTV:CAC Ratio</span>
+                        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.2); color: white;">
+                            <span>Target LTV:CAC Ratio</span>
                             <span style="font-weight: 700; color: var(--primary);">5.8x</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding: 16px 0;">
-                            <span>Payback Period</span>
+                        <div style="display: flex; justify-content: space-between; padding: 16px 0; color: white;">
+                            <span>Target Payback Period</span>
                             <span style="font-weight: 700; color: var(--primary);">2.1 months</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <span class="slide-number">07 / 13</span>
+        <span class="slide-number">07 / 12</span>
     </section>
 
-    <!-- SLIDE 8: Traction -->
-    <section class="slide slide--gradient" id="slide-7">
-        <div class="content content--center">
-            <span class="tagline">Traction</span>
-            <h2>Proven product-market fit<br>with rapid growth</h2>
-
-            <div class="stats-grid" style="margin-top: 60px;">
-                <div class="stat">
-                    <div class="stat-value">R48M</div>
-                    <div class="stat-label">Loans Originated</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">2,800+</div>
-                    <div class="stat-label">Active Patients</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">180+</div>
-                    <div class="stat-label">Provider Partners</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">127%</div>
-                    <div class="stat-label">QoQ Growth</div>
-                </div>
-            </div>
-
-            <div class="revenue-chart" style="margin-top: 80px;">
-                <div class="revenue-bar">
-                    <div class="bar" style="height: 60px; background: rgba(255,255,255,0.3);">R2M</div>
-                    <div class="bar-label" style="color: rgba(255,255,255,0.8);">Q1 2025</div>
-                </div>
-                <div class="revenue-bar">
-                    <div class="bar" style="height: 100px; background: rgba(255,255,255,0.4);">R4.5M</div>
-                    <div class="bar-label" style="color: rgba(255,255,255,0.8);">Q2 2025</div>
-                </div>
-                <div class="revenue-bar">
-                    <div class="bar" style="height: 160px; background: rgba(255,255,255,0.5);">R9.8M</div>
-                    <div class="bar-label" style="color: rgba(255,255,255,0.8);">Q3 2025</div>
-                </div>
-                <div class="revenue-bar">
-                    <div class="bar" style="height: 240px; background: rgba(255,255,255,0.7);">R18M</div>
-                    <div class="bar-label" style="color: rgba(255,255,255,0.8);">Q4 2025</div>
-                </div>
-                <div class="revenue-bar">
-                    <div class="bar" style="height: 300px; background: white; color: var(--primary);">R48M</div>
-                    <div class="bar-label" style="color: rgba(255,255,255,0.8);">2025 Total</div>
-                </div>
-            </div>
-        </div>
-        <span class="slide-number">08 / 13</span>
-    </section>
-
-    <!-- SLIDE 9: Competitive Advantage -->
-    <section class="slide slide--light" id="slide-8">
+    <!-- SLIDE 8: Competitive Advantage -->
+    <section class="slide slide--light" id="slide-7">
         <div class="content">
             <span class="tagline">Moats</span>
             <h2>Sustainable competitive<br><span class="highlight">advantages</span></h2>
@@ -1248,14 +1121,7 @@
                         <td>Sometimes</td>
                     </tr>
                     <tr>
-                        <td>Provider Pays Upfront</td>
-                        <td class="check">Yes</td>
-                        <td class="cross">No</td>
-                        <td class="cross">No</td>
-                        <td class="cross">No</td>
-                    </tr>
-                    <tr>
-                        <td>Healthcare Data Insights</td>
+                        <td>Provider Paid Upfront</td>
                         <td class="check">Yes</td>
                         <td class="cross">No</td>
                         <td class="cross">No</td>
@@ -1275,15 +1141,15 @@
                 </div>
                 <div class="card">
                     <h4>Brand Trust</h4>
-                    <p>Healthcare financing requires deep trust. PaySick is becoming the trusted name in medical payments.</p>
+                    <p>Healthcare financing requires deep trust. PaySick will become the trusted name in medical payments.</p>
                 </div>
             </div>
         </div>
-        <span class="slide-number">09 / 13</span>
+        <span class="slide-number">08 / 12</span>
     </section>
 
-    <!-- SLIDE 10: Team -->
-    <section class="slide slide--white" id="slide-9">
+    <!-- SLIDE 9: Team -->
+    <section class="slide slide--white" id="slide-8">
         <div class="content content--center">
             <span class="tagline">Leadership</span>
             <h2>A team built to win</h2>
@@ -1323,175 +1189,108 @@
                     <div class="team-prev">Ex-TransUnion, Experian</div>
                 </div>
             </div>
-
-            <div style="margin-top: 60px; display: flex; gap: 60px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; font-weight: 700; color: var(--primary);">45+</div>
-                    <div style="font-size: 14px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px;">Team Members</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; font-weight: 700; color: var(--primary);">120+</div>
-                    <div style="font-size: 14px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px;">Years Combined Experience</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; font-weight: 700; color: var(--primary);">4</div>
-                    <div style="font-size: 14px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px;">Previous Exits</div>
-                </div>
-            </div>
         </div>
-        <span class="slide-number">10 / 13</span>
+        <span class="slide-number">09 / 12</span>
     </section>
 
-    <!-- SLIDE 11: Financial Projections -->
-    <section class="slide slide--light" id="slide-10">
-        <div class="content">
-            <span class="tagline">Projections</span>
-            <h2>Path to <span class="highlight">R1B+ revenue</span></h2>
+    <!-- SLIDE 10: Roadmap -->
+    <section class="slide slide--gradient" id="slide-9">
+        <div class="content content--center">
+            <span class="tagline">Roadmap</span>
+            <h2>Path to market leadership</h2>
 
-            <div class="two-col" style="margin-top: 60px;">
-                <div>
-                    <table class="competitors-table" style="font-size: 14px;">
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>2025</th>
-                                <th>2026</th>
-                                <th>2027</th>
-                                <th>2028</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Loan Volume</td>
-                                <td>R48M</td>
-                                <td>R180M</td>
-                                <td>R520M</td>
-                                <td>R1.2B</td>
-                            </tr>
-                            <tr>
-                                <td>Revenue</td>
-                                <td>R8M</td>
-                                <td>R32M</td>
-                                <td>R95M</td>
-                                <td>R220M</td>
-                            </tr>
-                            <tr>
-                                <td>Gross Margin</td>
-                                <td>62%</td>
-                                <td>66%</td>
-                                <td>68%</td>
-                                <td>70%</td>
-                            </tr>
-                            <tr>
-                                <td>Patients</td>
-                                <td>2.8K</td>
-                                <td>12K</td>
-                                <td>35K</td>
-                                <td>85K</td>
-                            </tr>
-                            <tr>
-                                <td>Providers</td>
-                                <td>180</td>
-                                <td>450</td>
-                                <td>900</td>
-                                <td>1,500</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: 700;">EBITDA</td>
-                                <td style="color: var(--primary);">(R12M)</td>
-                                <td style="color: var(--primary);">(R5M)</td>
-                                <td style="color: #2ED573;">R18M</td>
-                                <td style="color: #2ED573;">R68M</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="timeline" style="margin-top: 80px;">
+                <div class="timeline-item active">
+                    <div class="timeline-dot" style="background: white; color: var(--primary); border-color: white;">Q2</div>
+                    <div class="timeline-label" style="color: rgba(255,255,255,0.7);">2026</div>
+                    <div class="timeline-value" style="color: white;">MVP Launch</div>
+                    <p style="font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px;">First 50 providers<br>R5M loan volume</p>
                 </div>
-                <div>
-                    <h3>Key Assumptions</h3>
-                    <ul class="feature-list" style="margin-top: 24px;">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span>75% YoY loan volume growth</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span>Blended take rate of 18% on volume</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span>Default rate stabilizing at 3.5%</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span>CAC declining 15% annually</span>
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#2ED573" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-                            <span>Profitability in Q2 2027</span>
-                        </li>
-                    </ul>
-
-                    <div style="margin-top: 40px; padding: 24px; background: white; border-radius: 16px;">
-                        <div style="font-size: 14px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Exit Potential (2028)</div>
-                        <div style="font-size: 36px; font-weight: 700; color: var(--primary);">R2.2B - R3.5B</div>
-                        <div style="font-size: 14px; color: var(--gray);">10-16x Revenue Multiple</div>
-                    </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background: transparent; color: white; border-color: rgba(255,255,255,0.5);">Q4</div>
+                    <div class="timeline-label" style="color: rgba(255,255,255,0.7);">2026</div>
+                    <div class="timeline-value" style="color: white;">Marketplace Live</div>
+                    <p style="font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px;">5 lender partners<br>R50M loan volume</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background: transparent; color: white; border-color: rgba(255,255,255,0.5);">Q2</div>
+                    <div class="timeline-label" style="color: rgba(255,255,255,0.7);">2027</div>
+                    <div class="timeline-value" style="color: white;">National Scale</div>
+                    <p style="font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px;">500 providers<br>R200M loan volume</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background: transparent; color: white; border-color: rgba(255,255,255,0.5);">Q4</div>
+                    <div class="timeline-label" style="color: rgba(255,255,255,0.7);">2027</div>
+                    <div class="timeline-value" style="color: white;">Series A</div>
+                    <p style="font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px;">Proven unit economics<br>R500M+ volume</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background: transparent; color: white; border-color: rgba(255,255,255,0.5);">2028</div>
+                    <div class="timeline-label" style="color: rgba(255,255,255,0.7);"></div>
+                    <div class="timeline-value" style="color: white;">Africa Expansion</div>
+                    <p style="font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px;">Kenya, Nigeria<br>R1B+ volume</p>
                 </div>
             </div>
+
+            <div style="margin-top: 80px; padding: 32px 48px; background: rgba(255,255,255,0.1); border-radius: 16px; display: inline-block;">
+                <div style="font-size: 14px; opacity: 0.7; margin-bottom: 8px;">Exit Potential (2028+)</div>
+                <div style="font-size: 48px; font-weight: 700;">R2.2B - R3.5B</div>
+                <div style="font-size: 14px; opacity: 0.7;">Based on 10-16x revenue multiples for healthcare fintech</div>
+            </div>
         </div>
-        <span class="slide-number">11 / 13</span>
+        <span class="slide-number">10 / 12</span>
     </section>
 
-    <!-- SLIDE 12: The Ask -->
-    <section class="slide slide--gradient" id="slide-11">
+    <!-- SLIDE 11: The Ask -->
+    <section class="slide slide--white" id="slide-10">
         <div class="content content--center">
             <span class="tagline">The Ask</span>
-            <h2>Series A: <span class="highlight">R120M</span></h2>
-            <p class="subtitle" style="margin-bottom: 60px;">Raising R120 million to accelerate growth, expand the provider network, and scale the lending marketplace nationally.</p>
+            <h2>Seed Round: <span class="highlight">R25M</span></h2>
+            <p class="subtitle" style="margin-bottom: 60px;">Raising R25 million to build the MVP, onboard first providers, and prove product-market fit.</p>
 
             <div class="funds-chart">
-                <div class="fund-item" style="background: rgba(255,255,255,0.15); color: white;">
-                    <div class="fund-percent" style="color: white;">40%</div>
-                    <div class="fund-label" style="color: white;">Lending Capital</div>
-                    <div class="fund-desc" style="color: rgba(255,255,255,0.7);">Balance sheet growth & warehouse facility</div>
+                <div class="fund-item">
+                    <div class="fund-percent">40%</div>
+                    <div class="fund-label">Product & Tech</div>
+                    <div class="fund-desc">Platform development, AI underwriting engine</div>
                 </div>
-                <div class="fund-item" style="background: rgba(255,255,255,0.15); color: white;">
-                    <div class="fund-percent" style="color: white;">30%</div>
-                    <div class="fund-label" style="color: white;">Sales & Marketing</div>
-                    <div class="fund-desc" style="color: rgba(255,255,255,0.7);">Provider acquisition & brand building</div>
+                <div class="fund-item">
+                    <div class="fund-percent">30%</div>
+                    <div class="fund-label">Initial Lending</div>
+                    <div class="fund-desc">Balance sheet capital for first loans</div>
                 </div>
-                <div class="fund-item" style="background: rgba(255,255,255,0.15); color: white;">
-                    <div class="fund-percent" style="color: white;">20%</div>
-                    <div class="fund-label" style="color: white;">Product & Tech</div>
-                    <div class="fund-desc" style="color: rgba(255,255,255,0.7);">Platform development & AI underwriting</div>
+                <div class="fund-item">
+                    <div class="fund-percent">20%</div>
+                    <div class="fund-label">Go-to-Market</div>
+                    <div class="fund-desc">Provider sales, patient acquisition</div>
                 </div>
-                <div class="fund-item" style="background: rgba(255,255,255,0.15); color: white;">
-                    <div class="fund-percent" style="color: white;">10%</div>
-                    <div class="fund-label" style="color: white;">Operations</div>
-                    <div class="fund-desc" style="color: rgba(255,255,255,0.7);">Team expansion & compliance</div>
+                <div class="fund-item">
+                    <div class="fund-percent">10%</div>
+                    <div class="fund-label">Operations</div>
+                    <div class="fund-desc">Team, compliance, legal</div>
                 </div>
             </div>
 
             <div style="margin-top: 60px; display: flex; gap: 60px; justify-content: center; flex-wrap: wrap;">
                 <div style="text-align: center;">
-                    <div style="font-size: 14px; opacity: 0.7; margin-bottom: 8px;">Pre-Money Valuation</div>
-                    <div style="font-size: 36px; font-weight: 700;">R480M</div>
+                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Pre-Money Valuation</div>
+                    <div style="font-size: 36px; font-weight: 700; color: var(--primary);">R50M</div>
                 </div>
                 <div style="text-align: center;">
-                    <div style="font-size: 14px; opacity: 0.7; margin-bottom: 8px;">Equity Offered</div>
-                    <div style="font-size: 36px; font-weight: 700;">20%</div>
+                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Equity Offered</div>
+                    <div style="font-size: 36px; font-weight: 700; color: var(--primary);">33%</div>
                 </div>
                 <div style="text-align: center;">
-                    <div style="font-size: 14px; opacity: 0.7; margin-bottom: 8px;">Runway</div>
-                    <div style="font-size: 36px; font-weight: 700;">24 months</div>
+                    <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Runway</div>
+                    <div style="font-size: 36px; font-weight: 700; color: var(--primary);">18 months</div>
                 </div>
             </div>
         </div>
-        <span class="slide-number">12 / 13</span>
+        <span class="slide-number">11 / 12</span>
     </section>
 
-    <!-- SLIDE 13: Vision & Close -->
-    <section class="slide slide--dark" id="slide-12">
+    <!-- SLIDE 12: Vision & Close -->
+    <section class="slide slide--dark" id="slide-11">
         <div class="content content--center">
             <div class="logo" style="margin-bottom: 40px;">
                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 80px; height: 80px;">
@@ -1513,7 +1312,7 @@
                 "We believe healthcare should never be delayed because of cost. PaySick is building the financial infrastructure to make that vision a reality across Africa."
             </blockquote>
 
-            <div class="divider" style="margin: 48px auto;"></div>
+            <div class="divider" style="margin: 48px auto; background: rgba(255,255,255,0.3);"></div>
 
             <h2 style="font-size: 48px;">Let's <span class="highlight">heal together</span></h2>
             <p class="subtitle" style="margin-bottom: 40px;">Join us in building the future of healthcare finance.</p>
@@ -1525,10 +1324,9 @@
             <div style="margin-top: 60px; display: flex; gap: 40px; justify-content: center; font-size: 14px; opacity: 0.6;">
                 <span>invest@paysick.co.za</span>
                 <span>paysick.co.za</span>
-                <span>+27 21 xxx xxxx</span>
             </div>
         </div>
-        <span class="slide-number">13 / 13</span>
+        <span class="slide-number">12 / 12</span>
     </section>
 
     <script>
@@ -1536,7 +1334,6 @@
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('.nav-dot');
 
-        // Intersection Observer for active dot
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -1550,7 +1347,6 @@
 
         slides.forEach(slide => observer.observe(slide));
 
-        // Click to navigate
         dots.forEach(dot => {
             dot.addEventListener('click', () => {
                 const slideIndex = parseInt(dot.dataset.slide);
@@ -1558,10 +1354,8 @@
             });
         });
 
-        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             const currentSlide = Array.from(dots).findIndex(dot => dot.classList.contains('active'));
-
             if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
                 e.preventDefault();
                 if (currentSlide < slides.length - 1) {
@@ -1574,6 +1368,222 @@
                 }
             }
         });
+
+        // PPTX Download Function
+        function downloadPPTX() {
+            const pptx = new PptxGenJS();
+
+            // Set presentation properties
+            pptx.author = 'PaySick';
+            pptx.title = 'PaySick Investor Presentation';
+            pptx.subject = 'Seed Investment Opportunity';
+            pptx.company = 'PaySick';
+
+            // Define colors
+            const PRIMARY = 'FF4757';
+            const PRIMARY_DARK = 'E01E37';
+            const BLACK = '1A1A1A';
+            const GRAY = '8A8A8A';
+            const WHITE = 'FFFFFF';
+
+            // Slide 1: Cover
+            let slide1 = pptx.addSlide();
+            slide1.addText('PaySick', { x: 0.5, y: 2.5, w: 9, h: 0.8, fontSize: 48, fontFace: 'Arial', color: BLACK, align: 'center' });
+            slide1.addText('HEAL NOW, PAY LATER', { x: 0.5, y: 3.3, w: 9, h: 0.4, fontSize: 16, fontFace: 'Arial', color: PRIMARY, align: 'center', bold: true });
+            slide1.addText('The Future of\nHealthcare Finance', { x: 0.5, y: 3.9, w: 9, h: 1.2, fontSize: 36, fontFace: 'Arial', color: BLACK, align: 'center', bold: true });
+            slide1.addText('A multi-lender marketplace transforming how Africa accesses and pays for healthcare.\nSeed Investment Opportunity.', { x: 1, y: 5.3, w: 8, h: 0.8, fontSize: 14, fontFace: 'Arial', color: GRAY, align: 'center' });
+
+            // Slide 2: The Problem
+            let slide2 = pptx.addSlide();
+            slide2.bkgd = 'FAFAFA';
+            slide2.addText('THE PROBLEM', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide2.addText('Healthcare is unaffordable\nfor most South Africans', { x: 0.5, y: 0.9, w: 9, h: 1, fontSize: 28, fontFace: 'Arial', color: BLACK, bold: true });
+
+            const stats2 = [
+                { val: '84%', label: 'Uninsured Population' },
+                { val: 'R12K', label: 'Avg. Procedure Cost' },
+                { val: '47%', label: 'Delay Care Due to Cost' },
+                { val: '3.2M', label: 'Deferred Procedures/Year' }
+            ];
+            stats2.forEach((stat, i) => {
+                slide2.addText(stat.val, { x: 0.5 + (i * 2.3), y: 2.2, w: 2, h: 0.6, fontSize: 32, fontFace: 'Arial', color: BLACK, bold: true, align: 'center' });
+                slide2.addText(stat.label, { x: 0.5 + (i * 2.3), y: 2.8, w: 2, h: 0.4, fontSize: 10, fontFace: 'Arial', color: GRAY, align: 'center' });
+            });
+
+            slide2.addText('• Traditional credit products don\'t serve healthcare needs\n• Providers lose patients who can\'t pay upfront\n• No elegant financing solution at point of care', { x: 0.5, y: 3.5, w: 9, h: 1.2, fontSize: 14, fontFace: 'Arial', color: BLACK });
+
+            // Slide 3: Market Opportunity
+            let slide3 = pptx.addSlide();
+            slide3.bkgd = PRIMARY;
+            slide3.addText('THE OPPORTUNITY', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: WHITE, bold: true });
+            slide3.addText('A R240 billion market\nwith zero dominant players', { x: 0.5, y: 0.9, w: 9, h: 1, fontSize: 28, fontFace: 'Arial', color: WHITE, bold: true });
+
+            slide3.addText('R240B', { x: 1, y: 2.5, w: 2.5, h: 0.8, fontSize: 36, fontFace: 'Arial', color: WHITE, bold: true, align: 'center' });
+            slide3.addText('TAM\nSA Private Healthcare', { x: 1, y: 3.3, w: 2.5, h: 0.6, fontSize: 11, fontFace: 'Arial', color: WHITE, align: 'center' });
+
+            slide3.addText('R85B', { x: 3.7, y: 2.5, w: 2.5, h: 0.8, fontSize: 36, fontFace: 'Arial', color: WHITE, bold: true, align: 'center' });
+            slide3.addText('SAM\nElective & Planned Care', { x: 3.7, y: 3.3, w: 2.5, h: 0.6, fontSize: 11, fontFace: 'Arial', color: WHITE, align: 'center' });
+
+            slide3.addText('R12B', { x: 6.4, y: 2.5, w: 2.5, h: 0.8, fontSize: 36, fontFace: 'Arial', color: WHITE, bold: true, align: 'center' });
+            slide3.addText('SOM\n5-Year Target', { x: 6.4, y: 3.3, w: 2.5, h: 0.6, fontSize: 11, fontFace: 'Arial', color: WHITE, align: 'center' });
+
+            // Slide 4: Why Now
+            let slide4 = pptx.addSlide();
+            slide4.addText('WHY NOW', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide4.addText('The perfect storm for\nhealthcare fintech', { x: 0.5, y: 0.9, w: 9, h: 1, fontSize: 28, fontFace: 'Arial', color: BLACK, bold: true });
+
+            const whyNow = [
+                { val: '8%', label: 'Annual Growth', desc: 'Healthcare spending outpacing GDP' },
+                { val: '72%', label: 'Mobile Penetration', desc: 'Digital-first finance enabled' },
+                { val: '0', label: 'Dominant Players', desc: 'No healthcare BNPL exists' },
+                { val: '$4B', label: 'Global Wave', desc: 'Healthcare fintech capital' }
+            ];
+            whyNow.forEach((item, i) => {
+                slide4.addText(item.val, { x: 0.5 + (i * 2.3), y: 2.2, w: 2, h: 0.5, fontSize: 28, fontFace: 'Arial', color: PRIMARY, bold: true, align: 'center' });
+                slide4.addText(item.label, { x: 0.5 + (i * 2.3), y: 2.7, w: 2, h: 0.3, fontSize: 12, fontFace: 'Arial', color: BLACK, bold: true, align: 'center' });
+                slide4.addText(item.desc, { x: 0.5 + (i * 2.3), y: 3, w: 2, h: 0.4, fontSize: 9, fontFace: 'Arial', color: GRAY, align: 'center' });
+            });
+
+            slide4.addText('• Regulatory tailwind: NCA amendments favor digital lending\n• Provider pressure: Clinics forced to offer payment options\n• Africa expansion: $200B+ continental market waiting', { x: 0.5, y: 3.8, w: 9, h: 1, fontSize: 13, fontFace: 'Arial', color: BLACK });
+
+            // Slide 5: The Solution
+            let slide5 = pptx.addSlide();
+            slide5.bkgd = 'FAFAFA';
+            slide5.addText('THE SOLUTION', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide5.addText('Healthcare financing\nthat just works', { x: 0.5, y: 0.9, w: 9, h: 1, fontSize: 28, fontFace: 'Arial', color: BLACK, bold: true });
+
+            const solutions = [
+                { title: '60-Second Approval', desc: 'Real-time underwriting delivers instant decisions at point of care.' },
+                { title: 'Flexible Terms', desc: '3 to 60 month terms with transparent pricing.' },
+                { title: 'Multi-Lender Marketplace', desc: 'Competitive offers ensure best rates.' }
+            ];
+            solutions.forEach((sol, i) => {
+                slide5.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: 0.5 + (i * 3), y: 2.2, w: 2.8, h: 1.8, fill: { color: WHITE }, line: { color: 'E5E5E5', width: 1 } });
+                slide5.addText(sol.title, { x: 0.6 + (i * 3), y: 2.4, w: 2.6, h: 0.4, fontSize: 14, fontFace: 'Arial', color: BLACK, bold: true });
+                slide5.addText(sol.desc, { x: 0.6 + (i * 3), y: 2.9, w: 2.6, h: 0.8, fontSize: 11, fontFace: 'Arial', color: GRAY });
+            });
+
+            // Slide 6: How It Works
+            let slide6 = pptx.addSlide();
+            slide6.addText('PRODUCT', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide6.addText('Seamlessly integrated into\nthe healthcare journey', { x: 0.5, y: 0.9, w: 9, h: 1, fontSize: 28, fontFace: 'Arial', color: BLACK, bold: true });
+
+            const steps = ['Patient\nApplies in 60s', 'PaySick\nUnderwrites Risk', 'Marketplace\nLenders Compete', 'Patient\nPicks Best Offer', 'Provider\nPaid in 24hrs'];
+            steps.forEach((step, i) => {
+                slide6.addShape(pptx.shapes.OVAL, { x: 0.7 + (i * 1.7), y: 2.2, w: 0.5, h: 0.5, fill: { color: PRIMARY } });
+                slide6.addText((i + 1).toString(), { x: 0.7 + (i * 1.7), y: 2.27, w: 0.5, h: 0.4, fontSize: 14, fontFace: 'Arial', color: WHITE, align: 'center', bold: true });
+                slide6.addText(step, { x: 0.3 + (i * 1.7), y: 2.8, w: 1.4, h: 0.6, fontSize: 10, fontFace: 'Arial', color: BLACK, align: 'center' });
+            });
+
+            slide6.addText('For Patients:\n• No upfront payment required\n• Compare multiple offers\n• Transparent monthly payments', { x: 0.5, y: 3.6, w: 4.5, h: 1.2, fontSize: 12, fontFace: 'Arial', color: BLACK });
+            slide6.addText('For Providers:\n• Full payment in 24 hours\n• Zero credit risk\n• Increased conversions', { x: 5, y: 3.6, w: 4.5, h: 1.2, fontSize: 12, fontFace: 'Arial', color: BLACK });
+
+            // Slide 7: Business Model
+            let slide7 = pptx.addSlide();
+            slide7.bkgd = BLACK;
+            slide7.addText('BUSINESS MODEL', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide7.addText('Multiple revenue streams,\ncompounding returns', { x: 0.5, y: 0.9, w: 9, h: 1, fontSize: 28, fontFace: 'Arial', color: WHITE, bold: true });
+
+            slide7.addText('Marketplace Fees (40%)\n2-4% origination fee on all loans\n\nNet Interest Margin (35%)\nNIM on directly funded loans\n\nProvider Fees (25%)\nSubscription + transaction fees', { x: 0.5, y: 2, w: 4, h: 2.5, fontSize: 12, fontFace: 'Arial', color: WHITE });
+
+            slide7.addText('Target Unit Economics\n\nAvg. Loan Size: R18,500\nRevenue per Loan: R1,850 (10%)\nTarget CAC: R320\nTarget Gross Margin: 68%\nTarget LTV:CAC: 5.8x\nPayback Period: 2.1 months', { x: 5, y: 2, w: 4.5, h: 2.5, fontSize: 12, fontFace: 'Arial', color: WHITE });
+
+            // Slide 8: Competitive Advantage
+            let slide8 = pptx.addSlide();
+            slide8.bkgd = 'FAFAFA';
+            slide8.addText('MOATS', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide8.addText('Sustainable competitive advantages', { x: 0.5, y: 0.9, w: 9, h: 0.6, fontSize: 28, fontFace: 'Arial', color: BLACK, bold: true });
+
+            const tableData = [
+                ['Capability', 'PaySick', 'Banks', 'Loan Apps', 'Cards'],
+                ['Healthcare-Specific UX', 'Yes', 'No', 'No', 'No'],
+                ['Point-of-Care Integration', 'Yes', 'No', 'No', 'No'],
+                ['Multi-Lender Competition', 'Yes', 'No', 'No', 'No'],
+                ['60-Second Approval', 'Yes', 'No', 'Sometimes', 'Sometimes'],
+                ['Provider Paid Upfront', 'Yes', 'No', 'No', 'No']
+            ];
+            slide8.addTable(tableData, { x: 0.5, y: 1.6, w: 9, h: 2, fontFace: 'Arial', fontSize: 10, color: BLACK, border: { pt: 0.5, color: 'E5E5E5' }, align: 'center' });
+
+            slide8.addText('Network Effects\nMore providers → more patients → more lenders → better rates', { x: 0.5, y: 4, w: 2.8, h: 0.8, fontSize: 10, fontFace: 'Arial', color: BLACK });
+            slide8.addText('Data Moat\nProprietary healthcare risk models improve with every loan', { x: 3.5, y: 4, w: 2.8, h: 0.8, fontSize: 10, fontFace: 'Arial', color: BLACK });
+            slide8.addText('Brand Trust\nBecoming the trusted name in medical payments', { x: 6.5, y: 4, w: 2.8, h: 0.8, fontSize: 10, fontFace: 'Arial', color: BLACK });
+
+            // Slide 9: Team
+            let slide9 = pptx.addSlide();
+            slide9.addText('LEADERSHIP', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide9.addText('A team built to win', { x: 0.5, y: 0.9, w: 9, h: 0.6, fontSize: 28, fontFace: 'Arial', color: BLACK, bold: true });
+            slide9.addText('Operators with deep experience in fintech, healthcare, and marketplace businesses.', { x: 0.5, y: 1.5, w: 9, h: 0.4, fontSize: 14, fontFace: 'Arial', color: GRAY });
+
+            const team = [
+                { role: 'CEO', title: 'Chief Executive Officer', prev: 'Ex-Discovery, Yoco' },
+                { role: 'CTO', title: 'Chief Technology Officer', prev: 'Ex-Amazon, Takealot' },
+                { role: 'CFO', title: 'Chief Financial Officer', prev: 'Ex-Capitec, RMB' },
+                { role: 'CRO', title: 'Chief Risk Officer', prev: 'Ex-TransUnion, Experian' }
+            ];
+            team.forEach((member, i) => {
+                slide9.addShape(pptx.shapes.OVAL, { x: 0.8 + (i * 2.3), y: 2.2, w: 1.2, h: 1.2, fill: { color: 'E5E5E5' } });
+                slide9.addText(member.role, { x: 0.5 + (i * 2.3), y: 3.5, w: 1.8, h: 0.3, fontSize: 14, fontFace: 'Arial', color: BLACK, bold: true, align: 'center' });
+                slide9.addText(member.title, { x: 0.5 + (i * 2.3), y: 3.8, w: 1.8, h: 0.3, fontSize: 9, fontFace: 'Arial', color: GRAY, align: 'center' });
+                slide9.addText(member.prev, { x: 0.5 + (i * 2.3), y: 4.1, w: 1.8, h: 0.3, fontSize: 9, fontFace: 'Arial', color: PRIMARY, align: 'center' });
+            });
+
+            // Slide 10: Roadmap
+            let slide10 = pptx.addSlide();
+            slide10.bkgd = PRIMARY;
+            slide10.addText('ROADMAP', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: WHITE, bold: true });
+            slide10.addText('Path to market leadership', { x: 0.5, y: 0.9, w: 9, h: 0.6, fontSize: 28, fontFace: 'Arial', color: WHITE, bold: true });
+
+            const roadmap = [
+                { time: 'Q2 2026', title: 'MVP Launch', desc: 'First 50 providers, R5M volume' },
+                { time: 'Q4 2026', title: 'Marketplace Live', desc: '5 lender partners, R50M volume' },
+                { time: 'Q2 2027', title: 'National Scale', desc: '500 providers, R200M volume' },
+                { time: 'Q4 2027', title: 'Series A', desc: 'Proven economics, R500M+ volume' },
+                { time: '2028', title: 'Africa Expansion', desc: 'Kenya, Nigeria, R1B+ volume' }
+            ];
+            roadmap.forEach((item, i) => {
+                slide10.addText(item.time, { x: 0.3 + (i * 1.9), y: 1.8, w: 1.6, h: 0.3, fontSize: 11, fontFace: 'Arial', color: WHITE, align: 'center' });
+                slide10.addText(item.title, { x: 0.3 + (i * 1.9), y: 2.2, w: 1.6, h: 0.3, fontSize: 12, fontFace: 'Arial', color: WHITE, bold: true, align: 'center' });
+                slide10.addText(item.desc, { x: 0.3 + (i * 1.9), y: 2.5, w: 1.6, h: 0.5, fontSize: 9, fontFace: 'Arial', color: WHITE, align: 'center' });
+            });
+
+            slide10.addText('Exit Potential (2028+)', { x: 3, y: 3.5, w: 4, h: 0.3, fontSize: 11, fontFace: 'Arial', color: WHITE, align: 'center' });
+            slide10.addText('R2.2B - R3.5B', { x: 3, y: 3.9, w: 4, h: 0.5, fontSize: 32, fontFace: 'Arial', color: WHITE, bold: true, align: 'center' });
+            slide10.addText('Based on 10-16x revenue multiples for healthcare fintech', { x: 2.5, y: 4.4, w: 5, h: 0.3, fontSize: 10, fontFace: 'Arial', color: WHITE, align: 'center' });
+
+            // Slide 11: The Ask
+            let slide11 = pptx.addSlide();
+            slide11.addText('THE ASK', { x: 0.5, y: 0.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: PRIMARY, bold: true });
+            slide11.addText('Seed Round: R25M', { x: 0.5, y: 0.9, w: 9, h: 0.6, fontSize: 32, fontFace: 'Arial', color: BLACK, bold: true });
+            slide11.addText('Raising R25 million to build the MVP, onboard first providers, and prove product-market fit.', { x: 0.5, y: 1.5, w: 9, h: 0.4, fontSize: 14, fontFace: 'Arial', color: GRAY });
+
+            const funds = [
+                { pct: '40%', label: 'Product & Tech', desc: 'Platform, AI underwriting' },
+                { pct: '30%', label: 'Initial Lending', desc: 'Balance sheet capital' },
+                { pct: '20%', label: 'Go-to-Market', desc: 'Sales, acquisition' },
+                { pct: '10%', label: 'Operations', desc: 'Team, compliance' }
+            ];
+            funds.forEach((fund, i) => {
+                slide11.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: 0.5 + (i * 2.3), y: 2.2, w: 2.1, h: 1.5, fill: { color: 'FAFAFA' } });
+                slide11.addText(fund.pct, { x: 0.5 + (i * 2.3), y: 2.3, w: 2.1, h: 0.5, fontSize: 28, fontFace: 'Arial', color: PRIMARY, bold: true, align: 'center' });
+                slide11.addText(fund.label, { x: 0.5 + (i * 2.3), y: 2.8, w: 2.1, h: 0.3, fontSize: 11, fontFace: 'Arial', color: BLACK, bold: true, align: 'center' });
+                slide11.addText(fund.desc, { x: 0.5 + (i * 2.3), y: 3.1, w: 2.1, h: 0.4, fontSize: 9, fontFace: 'Arial', color: GRAY, align: 'center' });
+            });
+
+            slide11.addText('Pre-Money: R50M', { x: 1, y: 4.2, w: 2.5, h: 0.4, fontSize: 14, fontFace: 'Arial', color: PRIMARY, bold: true, align: 'center' });
+            slide11.addText('Equity: 33%', { x: 3.8, y: 4.2, w: 2.5, h: 0.4, fontSize: 14, fontFace: 'Arial', color: PRIMARY, bold: true, align: 'center' });
+            slide11.addText('Runway: 18 months', { x: 6.5, y: 4.2, w: 2.5, h: 0.4, fontSize: 14, fontFace: 'Arial', color: PRIMARY, bold: true, align: 'center' });
+
+            // Slide 12: Close
+            let slide12 = pptx.addSlide();
+            slide12.bkgd = BLACK;
+            slide12.addText('PaySick', { x: 0.5, y: 1.5, w: 9, h: 0.8, fontSize: 48, fontFace: 'Arial', color: WHITE, align: 'center' });
+            slide12.addText('"We believe healthcare should never be delayed because of cost. PaySick is building the financial infrastructure to make that vision a reality across Africa."', { x: 1, y: 2.5, w: 8, h: 1, fontSize: 16, fontFace: 'Arial', color: WHITE, align: 'center', italic: true });
+            slide12.addText("Let's heal together", { x: 0.5, y: 3.8, w: 9, h: 0.5, fontSize: 28, fontFace: 'Arial', color: WHITE, bold: true, align: 'center' });
+            slide12.addText('invest@paysick.co.za  |  paysick.co.za', { x: 0.5, y: 4.5, w: 9, h: 0.3, fontSize: 12, fontFace: 'Arial', color: GRAY, align: 'center' });
+
+            // Download
+            pptx.writeFile({ fileName: 'PaySick_Investor_Deck.pptx' });
+        }
     </script>
 </body>
 </html>
