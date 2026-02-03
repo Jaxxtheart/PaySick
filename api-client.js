@@ -4,8 +4,10 @@
  */
 
 const PaySickAPI = {
-  // Configuration
-  baseURL: 'http://localhost:3000/api',
+  // Configuration - dynamically set baseURL based on environment
+  baseURL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000/api'
+    : '/api',
 
   /**
    * Helper function to make API requests
