@@ -317,8 +317,74 @@
         }
 
         .payment-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-icon svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .payment-icon svg .icon-stroke {
+            stroke: #8A8A8A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .payment-icon svg .icon-fill {
+            fill: #8A8A8A;
+            transition: fill 0.3s ease;
+        }
+
+        .payment-method-card:hover .payment-icon svg .icon-stroke,
+        .payment-method-card.selected .payment-icon svg .icon-stroke {
+            stroke: #FF4757;
+        }
+
+        .payment-method-card:hover .payment-icon svg .icon-fill,
+        .payment-method-card.selected .payment-icon svg .icon-fill {
+            fill: #FF4757;
+        }
+
+        .success-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .success-icon svg .icon-stroke {
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .lock-icon {
+            display: inline;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .lock-icon .icon-stroke {
+            stroke: #3498DB;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .lock-icon .icon-fill {
+            fill: #3498DB;
         }
 
         .payment-method-card h4 {
@@ -530,7 +596,7 @@
                 <p class="section-description">Set up your preferred payment method for automatic monthly payments</p>
 
                 <div class="info-box">
-                    <p><strong>🔒 Your information is secure.</strong> We use bank-level encryption to protect your payment details. POPIA compliant. Your information will never be shared without your consent.</p>
+                    <p><strong><svg class="lock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="5" y="11" width="14" height="10" rx="2"/><path class="icon-stroke" d="M8 11V7a4 4 0 018 0v4"/><circle class="icon-fill" cx="12" cy="16" r="1.5"/></svg>Your information is secure.</strong> We use bank-level encryption to protect your payment details. POPIA compliant. Your information will never be shared without your consent.</p>
                 </div>
 
                 <div class="form-group">
@@ -540,19 +606,41 @@
                 <div class="payment-methods">
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="bank" required>
-                        <div class="payment-icon">🏦</div>
+                        <div class="payment-icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M4 16l16-10 16 10"/>
+                                <path class="icon-stroke" d="M8 16v14"/>
+                                <path class="icon-stroke" d="M16 16v14"/>
+                                <path class="icon-stroke" d="M24 16v14"/>
+                                <path class="icon-stroke" d="M32 16v14"/>
+                                <path class="icon-stroke" d="M4 30h32"/>
+                                <path class="icon-stroke" d="M2 34h36"/>
+                                <rect class="icon-fill" x="18" y="10" width="4" height="4" rx="0.5"/>
+                            </svg>
+                        </div>
                         <h4>Bank Account</h4>
                         <p>Direct debit order</p>
                     </label>
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="card" required>
-                        <div class="payment-icon">💳</div>
+                        <div class="payment-icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <rect class="icon-stroke" x="4" y="8" width="32" height="24" rx="3"/>
+                                <path class="icon-stroke" d="M4 16h32"/>
+                                <path class="icon-stroke" d="M10 26h8"/>
+                                <path class="icon-stroke" d="M10 22h4"/>
+                            </svg>
+                        </div>
                         <h4>Debit Card</h4>
                         <p>Instant verification</p>
                     </label>
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="payshap" required>
-                        <div class="payment-icon">⚡</div>
+                        <div class="payment-icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M24 4L12 22h8l-2 14L32 18h-8l2-14z"/>
+                            </svg>
+                        </div>
                         <h4>PayShap</h4>
                         <p>Instant payment</p>
                     </label>
@@ -700,7 +788,11 @@
 
         <!-- Success View -->
         <div class="success-view" id="successView">
-            <div class="success-icon">✓</div>
+            <div class="success-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path class="icon-stroke" d="M8 20l8 8L32 12"/>
+                </svg>
+            </div>
             <h2>Setup Complete!</h2>
             <p>Your account has been successfully configured. You can now start managing your healthcare payments.</p>
             <button class="btn btn-primary" onclick="goToDashboard()">Go to Dashboard</button>

@@ -201,6 +201,88 @@
             margin: 8px 0;
         }
 
+        .menu-item .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-item .icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .menu-item .icon svg .icon-stroke {
+            stroke: #4A4A4A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .menu-item .icon svg .icon-fill {
+            fill: #4A4A4A;
+            transition: fill 0.3s ease;
+        }
+
+        .menu-item:hover .icon svg .icon-stroke,
+        .menu-item.active .icon svg .icon-stroke {
+            stroke: #3498DB;
+        }
+
+        .menu-item:hover .icon svg .icon-fill,
+        .menu-item.active .icon svg .icon-fill {
+            fill: #3498DB;
+        }
+
+        .close-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .close-icon .icon-stroke {
+            stroke: #8A8A8A;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .menu-close:hover .close-icon .icon-stroke {
+            stroke: #FF4757;
+        }
+
+        .menu-toggle-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .menu-toggle-icon .icon-stroke {
+            stroke: #1A1A1A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .menu-toggle:hover .menu-toggle-icon .icon-stroke {
+            stroke: #3498DB;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+        }
+
+        .empty-icon .icon-stroke {
+            stroke: #8A8A8A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         /* Menu Overlay */
         .menu-overlay {
             position: fixed;
@@ -667,38 +749,38 @@
                 </svg>
                 <div class="logo-text">Pay<span>Sick</span></div>
             </div>
-            <button class="menu-close" onclick="toggleMenu()">x</button>
+            <button class="menu-close" onclick="toggleMenu()"><svg class="close-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M6 6l12 12M6 18L18 6"/></svg></button>
         </div>
 
         <nav class="menu-nav">
             <a href="lender-dashboard.html" class="menu-item active">
-                <span class="icon">📋</span>
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="4" y="2" width="16" height="20" rx="2"/><line class="icon-stroke" x1="8" y1="6" x2="16" y2="6"/><line class="icon-stroke" x1="8" y1="10" x2="16" y2="10"/><line class="icon-stroke" x1="8" y1="14" x2="12" y2="14"/></svg></span>
                 <span>Pending Applications</span>
             </a>
             <a href="#" class="menu-item">
-                <span class="icon">💰</span>
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle class="icon-stroke" cx="12" cy="12" r="10"/><path class="icon-stroke" d="M12 6v12M8 10h8a2 2 0 010 4H8"/></svg></span>
                 <span>Active Loans</span>
             </a>
             <a href="#" class="menu-item">
-                <span class="icon">📊</span>
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="4" y="4" width="4" height="16"/><rect class="icon-stroke" x="10" y="8" width="4" height="12"/><rect class="icon-stroke" x="16" y="12" width="4" height="8"/></svg></span>
                 <span>Performance</span>
             </a>
 
             <div class="menu-divider"></div>
 
             <a href="admin-dashboard.html" class="menu-item">
-                <span class="icon">🛠️</span>
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span>
                 <span>Admin Dashboard</span>
             </a>
             <a href="index.html" class="menu-item">
-                <span class="icon">🌐</span>
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle class="icon-stroke" cx="12" cy="12" r="10"/><path class="icon-stroke" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
                 <span>Main Site</span>
             </a>
 
             <div class="menu-divider"></div>
 
             <a href="#" class="menu-item" onclick="logout(); return false;">
-                <span class="icon">🚪</span>
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline class="icon-stroke" points="16 17 21 12 16 7"/><line class="icon-stroke" x1="21" y1="12" x2="9" y2="12"/></svg></span>
                 <span>Logout</span>
             </a>
         </nav>
@@ -708,7 +790,7 @@
     <header class="header">
         <div class="header-content">
             <div style="display: flex; align-items: center; gap: 16px;">
-                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <button class="menu-toggle" onclick="toggleMenu()"><svg class="menu-toggle-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M3 12h18M3 6h18M3 18h18"/></svg></button>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="logo-container">
                         <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -909,7 +991,7 @@
                 if (applications.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="icon">📭</div>
+                            <svg class="empty-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="2" y="4" width="20" height="16" rx="2"/><path class="icon-stroke" d="M2 8h20"/><path class="icon-stroke" d="M8 12v4M12 12v4M16 12v4"/></svg>
                             <h3>No Pending Applications</h3>
                             <p>New applications will appear here when patients apply for loans.</p>
                         </div>
@@ -923,7 +1005,7 @@
                 console.error('Error loading applications:', error);
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">⚠️</div>
+                        <svg class="empty-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M12 9v4M12 17h.01"/><path class="icon-stroke" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
                         <h3>Error Loading Applications</h3>
                         <p>${error.message}</p>
                         <button class="btn btn-primary" onclick="loadApplications()" style="margin-top: 16px;">Try Again</button>
