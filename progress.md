@@ -149,6 +149,7 @@ baseURL: window.location.hostname === 'localhost' || window.location.hostname ==
 - Multi-lender marketplace
 - Custom SVG icon system
 - Investor presentation deck
+- Provider Network (directory, admin, application pages)
 
 ### In Progress
 - Payment gateway integration
