@@ -4,6 +4,44 @@ This document tracks the development progress of the PaySick healthcare payment 
 
 ## Latest Updates
 
+### 2026-02-05 - Investor Deck Risk Management Slide
+
+Added comprehensive Risk Management slide (Slide 8) to address investor concerns about healthcare financing risk.
+
+#### Investor Concerns Addressed
+1. **Actuarial risk differences** - Healthcare financing vs retail BNPL risk profiles
+2. **Higher loan amounts** - Healthcare quantum substantially higher than retail BNPL
+3. **Need-based lending** - Historically lower repayment rates for desperate customers
+4. **Payback uncertainty** - LGD concerns without strong underwriting
+
+#### Key Messaging Added
+- **Non-discretionary need**: Patients finance essential procedures, not impulse purchases
+- **Higher ticket sizes**: R18K avg. loan spreads underwriting costs efficiently
+- **Provider partnership**: Healthcare providers become soft collection partners
+- **Family support**: Medical debt attracts family payment commitment
+
+#### Proprietary Risk Models Highlighted
+- Healthcare-specific PD (Probability of Default) models
+- Procedure type risk weighting
+- Provider network performance data
+- Healthcare-specific affordability ratios
+- Medical outcome correlation factors
+
+#### LGD Mitigation Strategies
+- Provider-assisted soft collections
+- Employer garnish arrangements for formal sector
+- Medical aid assignment protocols
+- Family co-signer programs
+
+#### Target Metrics Presented
+| Metric | Target | vs Retail BNPL |
+|--------|--------|----------------|
+| PD | 3.2% | vs 8%+ |
+| LGD | 45% | - |
+| Net Loss Rate | 1.4% | vs 8%+ |
+
+---
+
 ### 2026-02-03 - Provider Network Pages Restored
 
 Restored and updated the Provider Network functionality including all provider-related pages.
