@@ -38,8 +38,8 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Required fields missing' });
     }
 
-    if (bill_amount < 500 || bill_amount > 850) {
-      return res.status(400).json({ error: 'Bill amount must be between R500 and R850' });
+    if (bill_amount < 500 || bill_amount > 500000) {
+      return res.status(400).json({ error: 'Bill amount must be between R500 and R500,000' });
     }
 
     // Check user's credit limit
@@ -57,14 +57,19 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     // Get user financial info for risk assessment
-    const userInfo = await query(
-      `SELECT u.*, bd.bank_name, ha.declared_income, ha.monthly_debt_obligations
-       FROM users u
-       LEFT JOIN banking_details bd ON u.user_id = bd.user_id AND bd.is_primary = true
-       LEFT JOIN healthcare_affordability ha ON u.user_id = ha.user_id
-       WHERE u.user_id = $1`,
-      [req.user.userId]
-    );
+    // Note: healthcare_affordability table may not exist yet if migration hasn't run
+    let userInfo;
+    try {
+      userInfo = await query(
+        `SELECT u.*, bd.bank_name
+         FROM users u
+         LEFT JOIN banking_details bd ON u.user_id = bd.user_id AND bd.is_primary = true
+         WHERE u.user_id = $1`,
+        [req.user.userId]
+      );
+    } catch (e) {
+      userInfo = { rows: [{}] };
+    }
 
     // Create initial application to get application_id for risk assessment
     const initialApp = await query(

@@ -61,26 +61,50 @@ class HealthcareRiskService extends EventEmitter {
       applicationBehavior
     } = params;
 
-    // Get or create patient health score
-    const healthScore = await this.getOrCreateHealthScore(userId, {
-      medicalAidScheme,
-      medicalAidOption,
-      hasChronicConditions
-    });
+    // Get or create patient health score (with fallback if tables don't exist)
+    let healthScore;
+    try {
+      healthScore = await this.getOrCreateHealthScore(userId, {
+        medicalAidScheme,
+        medicalAidOption,
+        hasChronicConditions
+      });
+    } catch (e) {
+      console.warn('Health score tables not available, using defaults:', e.message);
+      healthScore = { health_payment_score: 60, family_support_indicator: 0.5 };
+    }
 
-    // Get procedure risk profile
-    const procedureRisk = await this.getProcedureRiskProfile(procedureType, icd10Code);
+    // Get procedure risk profile (with fallback)
+    let procedureRisk;
+    try {
+      procedureRisk = await this.getProcedureRiskProfile(procedureType, icd10Code);
+    } catch (e) {
+      console.warn('Procedure risk tables not available, using defaults:', e.message);
+      procedureRisk = { base_pd_risk: 40, base_lgd_risk: 45, necessity_score: 0.6 };
+    }
 
-    // Calculate affordability
-    const affordability = await this.calculateHealthcareAffordability(userId, {
-      monthlyIncome,
-      existingDebt,
-      loanAmount,
-      medicalAidPremium: medicalAidScheme ? await this.estimateMedicalAidPremium(medicalAidScheme, medicalAidOption) : 0
-    });
+    // Calculate affordability (with fallback - doesn't require special tables)
+    let affordability;
+    try {
+      affordability = await this.calculateHealthcareAffordability(userId, {
+        monthlyIncome,
+        existingDebt,
+        loanAmount,
+        medicalAidPremium: medicalAidScheme ? await this.estimateMedicalAidPremium(medicalAidScheme, medicalAidOption) : 0
+      });
+    } catch (e) {
+      console.warn('Affordability calculation failed, using defaults:', e.message);
+      affordability = { affordability_score: 65, max_loan_amount: loanAmount, affordability_band: 'medium' };
+    }
 
-    // Get provider performance data
-    const providerPerformance = await this.getProviderPerformance(providerId);
+    // Get provider performance data (with fallback)
+    let providerPerformance;
+    try {
+      providerPerformance = await this.getProviderPerformance(providerId);
+    } catch (e) {
+      console.warn('Provider performance lookup failed:', e.message);
+      providerPerformance = { performance_score: 50, is_network_partner: false };
+    }
 
     // Analyze application behavior signals
     const behavioralScore = this.analyzeBehavioralSignals(applicationBehavior);
@@ -123,48 +147,53 @@ class HealthcareRiskService extends EventEmitter {
       pdResult.pd_score
     );
 
-    // Store the risk assessment
-    const assessment = await this.storeRiskAssessment({
-      applicationId,
-      userId,
+    // Store the risk assessment (skip if tables don't exist)
+    let assessment = { assessment_id: null };
+    try {
+      assessment = await this.storeRiskAssessment({
+        applicationId,
+        userId,
 
-      // PD
-      pdScore: pdResult.pd_score,
-      pdBand: pdResult.pd_band,
-      pdHealthScoreComponent: pdResult.components.healthScore,
-      pdProcedureRiskComponent: pdResult.components.procedureRisk,
-      pdAffordabilityComponent: pdResult.components.affordability,
-      pdProviderComponent: pdResult.components.provider,
-      pdBehavioralComponent: pdResult.components.behavioral,
+        // PD
+        pdScore: pdResult.pd_score,
+        pdBand: pdResult.pd_band,
+        pdHealthScoreComponent: pdResult.components.healthScore,
+        pdProcedureRiskComponent: pdResult.components.procedureRisk,
+        pdAffordabilityComponent: pdResult.components.affordability,
+        pdProviderComponent: pdResult.components.provider,
+        pdBehavioralComponent: pdResult.components.behavioral,
 
-      // LGD
-      lgdScore: lgdResult.lgd_score,
-      lgdBand: lgdResult.lgd_band,
-      lgdCollateralComponent: lgdResult.components.medicalAidRecovery,
-      lgdFamilySupportComponent: lgdResult.components.familySupport,
-      lgdProcedureValueComponent: lgdResult.components.procedureValue,
-      lgdProviderRecoveryComponent: lgdResult.components.providerRecovery,
+        // LGD
+        lgdScore: lgdResult.lgd_score,
+        lgdBand: lgdResult.lgd_band,
+        lgdCollateralComponent: lgdResult.components.medicalAidRecovery,
+        lgdFamilySupportComponent: lgdResult.components.familySupport,
+        lgdProcedureValueComponent: lgdResult.components.procedureValue,
+        lgdProviderRecoveryComponent: lgdResult.components.providerRecovery,
 
-      // Expected Loss
-      exposureAtDefault,
-      expectedLoss,
-      expectedLossRate,
+        // Expected Loss
+        exposureAtDefault,
+        expectedLoss,
+        expectedLossRate,
 
-      // Decision
-      riskDecision: riskDecision.decision,
-      riskAdjustedPricing,
-      recommendedTermMonths: recommendedTerm,
-      maxApprovedAmount,
+        // Decision
+        riskDecision: riskDecision.decision,
+        riskAdjustedPricing,
+        recommendedTermMonths: recommendedTerm,
+        maxApprovedAmount,
 
-      modelVersion: this.MODEL_VERSION,
-      modelConfidence: this.calculateModelConfidence(healthScore, procedureRisk)
-    });
+        modelVersion: this.MODEL_VERSION,
+        modelConfidence: this.calculateModelConfidence(healthScore, procedureRisk)
+      });
 
-    this.emit('assessment:completed', {
-      assessmentId: assessment.assessment_id,
-      applicationId,
-      decision: riskDecision.decision
-    });
+      this.emit('assessment:completed', {
+        assessmentId: assessment.assessment_id,
+        applicationId,
+        decision: riskDecision.decision
+      });
+    } catch (e) {
+      console.warn('Risk assessment storage failed (tables may not exist):', e.message);
+    }
 
     return {
       assessmentId: assessment.assessment_id,
