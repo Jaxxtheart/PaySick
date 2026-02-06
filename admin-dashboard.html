@@ -795,6 +795,10 @@
                 <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="3" y="3" width="18" height="18" rx="2"/><path class="icon-stroke" d="M12 7v10M7 12h10"/></svg></span>
                 <span class="menu-item-text">Provider Network</span>
             </a>
+            <a href="#risk-section" class="menu-item" onclick="toggleMenu(); document.getElementById('risk-section').scrollIntoView({behavior: 'smooth'}); return false;">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path class="icon-stroke" d="M9 12l2 2 4-4"/></svg></span>
+                <span class="menu-item-text">Risk Management</span>
+            </a>
 
             <div class="menu-divider"></div>
 
@@ -938,6 +942,146 @@
                 </div>
                 <div class="stat-value">23</div>
                 <div class="stat-description">Requires attention</div>
+            </div>
+        </div>
+
+        <!-- Risk Portfolio Section -->
+        <div class="card" id="risk-section">
+            <div class="card-header">
+                <h2 class="card-title">Risk Portfolio <svg class="title-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;"><path class="icon-stroke" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></h2>
+                <div class="card-actions">
+                    <button class="btn btn-secondary" onclick="refreshRiskData()">Refresh</button>
+                    <button class="btn btn-primary" onclick="window.location.href='#'">View Details</button>
+                </div>
+            </div>
+
+            <!-- Risk Metrics Grid -->
+            <div class="stats-grid" style="margin-bottom: 24px;">
+                <div class="stat-card" style="border-left: 4px solid #2ED573;">
+                    <div class="stat-card-header">
+                        <span class="stat-label">Avg PD</span>
+                        <div class="stat-icon green"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                    </div>
+                    <div class="stat-value" id="avgPD">3.2%</div>
+                    <div class="stat-description">Target: 3.2% <span class="stat-trend up" id="pdTrend">On Target</span></div>
+                </div>
+
+                <div class="stat-card" style="border-left: 4px solid #FF9F40;">
+                    <div class="stat-card-header">
+                        <span class="stat-label">Avg LGD</span>
+                        <div class="stat-icon orange"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                    </div>
+                    <div class="stat-value" id="avgLGD">45%</div>
+                    <div class="stat-description">Target: 45% <span class="stat-trend up" id="lgdTrend">On Target</span></div>
+                </div>
+
+                <div class="stat-card" style="border-left: 4px solid #3498DB;">
+                    <div class="stat-card-header">
+                        <span class="stat-label">Expected Loss Rate</span>
+                        <div class="stat-icon blue"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle class="icon-stroke" cx="12" cy="12" r="10"/><path class="icon-stroke" d="M12 6v12M8 10h8a2 2 0 010 4H8"/></svg></div>
+                    </div>
+                    <div class="stat-value" id="avgEL">1.4%</div>
+                    <div class="stat-description">vs Retail BNPL: 8%+ <span class="stat-trend up">-6.6%</span></div>
+                </div>
+
+                <div class="stat-card" style="border-left: 4px solid #9B59B6;">
+                    <div class="stat-card-header">
+                        <span class="stat-label">Total Exposure</span>
+                        <div class="stat-icon purple"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="4" y="4" width="4" height="16"/><rect class="icon-stroke" x="10" y="8" width="4" height="12"/><rect class="icon-stroke" x="16" y="12" width="4" height="8"/></svg></div>
+                    </div>
+                    <div class="stat-value" id="totalExposure">R2.4M</div>
+                    <div class="stat-description">Expected Loss: <span id="expectedLoss">R33,600</span></div>
+                </div>
+            </div>
+
+            <!-- Risk Distribution -->
+            <div class="grid-2">
+                <div style="background: #FAFAFA; border-radius: 12px; padding: 20px;">
+                    <h3 style="margin-bottom: 16px; color: #1A1A1A; font-size: 16px;">PD Distribution by Band</h3>
+                    <div id="pdDistribution">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <span style="width: 80px; font-size: 13px; color: #4A4A4A;">Very Low</span>
+                            <div style="flex: 1; height: 20px; background: #E5E5E5; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 35%; height: 100%; background: #2ED573;"></div>
+                            </div>
+                            <span style="width: 50px; text-align: right; font-size: 13px; font-weight: 600;">35%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <span style="width: 80px; font-size: 13px; color: #4A4A4A;">Low</span>
+                            <div style="flex: 1; height: 20px; background: #E5E5E5; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 40%; height: 100%; background: #3498DB;"></div>
+                            </div>
+                            <span style="width: 50px; text-align: right; font-size: 13px; font-weight: 600;">40%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <span style="width: 80px; font-size: 13px; color: #4A4A4A;">Medium</span>
+                            <div style="flex: 1; height: 20px; background: #E5E5E5; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 18%; height: 100%; background: #FF9F40;"></div>
+                            </div>
+                            <span style="width: 50px; text-align: right; font-size: 13px; font-weight: 600;">18%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <span style="width: 80px; font-size: 13px; color: #4A4A4A;">High</span>
+                            <div style="flex: 1; height: 20px; background: #E5E5E5; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 7%; height: 100%; background: #FF4757;"></div>
+                            </div>
+                            <span style="width: 50px; text-align: right; font-size: 13px; font-weight: 600;">7%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #FAFAFA; border-radius: 12px; padding: 20px;">
+                    <h3 style="margin-bottom: 16px; color: #1A1A1A; font-size: 16px;">Healthcare Data Sources</h3>
+                    <div id="dataSources">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="font-size: 14px; color: #1A1A1A;">Medical Aid Claims History</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="font-size: 14px; color: #1A1A1A;">Chronic Medication Adherence</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="font-size: 14px; color: #1A1A1A;">Healthcare Payment History</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="font-size: 14px; color: #1A1A1A;">Medical Credit Bureau (MedCredits)</span>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="font-size: 14px; color: #1A1A1A;">ICD-10 Procedure Risk Profile</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                            <span style="font-size: 14px; color: #1A1A1A;">Provider Network Performance</span>
+                            <span class="status-badge status-active">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Performance -->
+            <div style="margin-top: 24px; background: linear-gradient(135deg, #FAFAFA 0%, #F0F0F0 100%); border-radius: 12px; padding: 20px;">
+                <h3 style="margin-bottom: 16px; color: #1A1A1A; font-size: 16px;">Model Performance - v1.0</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #2ED573;">0.85</div>
+                        <div style="font-size: 12px; color: #8A8A8A;">AUC-ROC</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #3498DB;">0.72</div>
+                        <div style="font-size: 12px; color: #8A8A8A;">Gini Coefficient</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #9B59B6;">0.68</div>
+                        <div style="font-size: 12px; color: #8A8A8A;">KS Statistic</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700; color: #FF9F40;">95%</div>
+                        <div style="font-size: 12px; color: #8A8A8A;">Model Confidence</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1299,8 +1443,57 @@
             }
         }
 
+        // Refresh risk data from API
+        async function refreshRiskData() {
+            const token = localStorage.getItem('paysick_auth_token');
+            if (!token) return;
+
+            try {
+                const response = await fetch('/api/risk/portfolio-summary', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const summary = data.summary;
+
+                    // Update UI with real data
+                    document.getElementById('avgPD').textContent = (summary.avg_pd * 100).toFixed(1) + '%';
+                    document.getElementById('avgLGD').textContent = (summary.avg_lgd * 100).toFixed(0) + '%';
+                    document.getElementById('avgEL').textContent = (summary.avg_expected_loss_rate * 100).toFixed(1) + '%';
+                    document.getElementById('totalExposure').textContent = 'R' + formatNumber(summary.total_exposure);
+                    document.getElementById('expectedLoss').textContent = 'R' + formatNumber(summary.total_expected_loss);
+
+                    // Update trends based on variance
+                    const pdVariance = data.performance_vs_target.pd_variance;
+                    const pdTrend = document.getElementById('pdTrend');
+                    if (pdVariance <= 0) {
+                        pdTrend.textContent = 'On Target';
+                        pdTrend.className = 'stat-trend up';
+                    } else {
+                        pdTrend.textContent = '+' + (pdVariance * 100).toFixed(1) + '%';
+                        pdTrend.className = 'stat-trend down';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch risk data:', error);
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K';
+            }
+            return num.toLocaleString();
+        }
+
         // Run on page load
         window.addEventListener('load', initDashboard);
+        window.addEventListener('load', refreshRiskData);
     </script>
 </body>
 </html>
