@@ -21,6 +21,9 @@ const { LoanApprovalBridge } = require('../services/loan-approval-bridge.service
 // MIDDLEWARE
 // ============================================
 
+// Default JWT secret for development (should be set in production)
+const JWT_SECRET = process.env.JWT_SECRET || 'paysick-dev-secret-change-in-production';
+
 /**
  * Verify JWT token for authenticated routes
  */
@@ -32,8 +35,9 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Access token required' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
+      console.error('JWT verification error:', err.message);
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
     req.user = user;
