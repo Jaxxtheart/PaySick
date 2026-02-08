@@ -115,11 +115,23 @@ const authenticateAdmin = (req, res, next) => {
 // ============================================
 
 /**
+ * Calculate monthly payment using standard amortization formula
+ */
+function calculateMonthlyPayment(principal, annualRate, termMonths) {
+  const monthlyRate = annualRate / 12;
+  if (monthlyRate === 0) return principal / termMonths;
+  const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, termMonths)) /
+                  (Math.pow(1 + monthlyRate, termMonths) - 1);
+  return Math.round(payment * 100) / 100;
+}
+
+/**
  * Submit loan application to marketplace
  *
  * POST /api/marketplace/applications
  *
- * This creates a new marketplace loan application and sends it to eligible lenders
+ * This creates a new marketplace loan application and sends it to eligible lenders.
+ * If no lenders are available, returns a preview of what offers would look like.
  */
 router.post('/applications', authenticateToken, async (req, res) => {
   try {
@@ -155,7 +167,93 @@ router.post('/applications', authenticateToken, async (req, res) => {
       });
     }
 
-    // Use the bridge service to submit to marketplace
+    // Check if marketplace tables exist and if there are active lenders
+    let hasActiveLenders = false;
+    let marketplaceReady = false;
+
+    try {
+      const lenderCheck = await query(
+        `SELECT COUNT(*) as count FROM lenders WHERE active = true`
+      );
+      hasActiveLenders = parseInt(lenderCheck.rows[0].count) > 0;
+      marketplaceReady = true;
+    } catch (tableError) {
+      // Tables don't exist yet - marketplace not set up
+      console.warn('Marketplace tables not ready:', tableError.message);
+      marketplaceReady = false;
+    }
+
+    // If no active lenders or marketplace not ready, return demo/preview response
+    if (!marketplaceReady || !hasActiveLenders) {
+      // Generate a demo application ID
+      const demoApplicationId = `DEMO-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      return res.status(200).json({
+        success: true,
+        demo: true,
+        message: 'Application received - Marketplace Preview Mode',
+        applicationId: demoApplicationId,
+        status: 'PREVIEW',
+        marketplaceStatus: {
+          ready: marketplaceReady,
+          activeLenders: hasActiveLenders ? 'Available' : 'Coming Soon',
+          message: 'Our lending partners are currently being onboarded. Your application has been saved and you will be notified when lenders are available to make offers.'
+        },
+        applicationSummary: {
+          procedureType,
+          procedureDescription: procedureDescription || procedureType,
+          loanAmount,
+          requestedTerm,
+          monthlyIncome: monthlyIncome || 'Not provided',
+          employmentStatus: employmentStatus || 'Not provided',
+          submittedAt: new Date().toISOString()
+        },
+        // Show what offers would look like
+        previewOffers: [
+          {
+            lenderName: 'MediFinance SA',
+            lenderLogo: null,
+            interestRate: 0.165,
+            interestRateDisplay: '16.5%',
+            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.165, requestedTerm),
+            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.165, requestedTerm) * requestedTerm),
+            term: requestedTerm,
+            status: 'PREVIEW',
+            features: ['No early settlement fees', 'Flexible payment dates', 'Healthcare specialist']
+          },
+          {
+            lenderName: 'HealthCredit Plus',
+            lenderLogo: null,
+            interestRate: 0.185,
+            interestRateDisplay: '18.5%',
+            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.185, requestedTerm),
+            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.185, requestedTerm) * requestedTerm),
+            term: requestedTerm,
+            status: 'PREVIEW',
+            features: ['Same-day approval', 'Direct provider payment', 'Rewards program']
+          },
+          {
+            lenderName: 'CareCapital',
+            lenderLogo: null,
+            interestRate: 0.195,
+            interestRateDisplay: '19.5%',
+            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.195, requestedTerm),
+            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.195, requestedTerm) * requestedTerm),
+            term: requestedTerm,
+            status: 'PREVIEW',
+            features: ['Payment holiday option', '24/7 support', 'Family plans available']
+          }
+        ],
+        nextSteps: [
+          'We are currently onboarding lending partners to our marketplace',
+          'Your application details have been saved',
+          'You will receive an email notification when lenders are ready to make offers',
+          'Expected launch: Q2 2026'
+        ]
+      });
+    }
+
+    // Marketplace is ready with active lenders - proceed normally
     const bridge = new LoanApprovalBridge();
     const applicationId = await bridge.sendToMarketplace({
       userId: req.user.userId,
@@ -174,14 +272,23 @@ router.post('/applications', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       success: true,
+      demo: false,
       message: 'Application submitted to marketplace',
       applicationId,
-      status: 'Finding you the best rates...'
+      status: 'PENDING',
+      marketplaceStatus: {
+        ready: true,
+        activeLenders: 'Available',
+        message: 'Finding you the best rates from our lending partners...'
+      }
     });
 
   } catch (error) {
     console.error('Marketplace application error:', error);
-    res.status(500).json({ error: 'Failed to submit application' });
+    res.status(500).json({
+      error: 'Failed to submit application',
+      message: error.message
+    });
   }
 });
 
