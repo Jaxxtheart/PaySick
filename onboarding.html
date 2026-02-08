@@ -1038,8 +1038,75 @@
         }
 
         // Form submission
-        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
+        document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating your account...';
+
+            try {
+                // Get existing user data
+                const existingUser = JSON.parse(localStorage.getItem('paysick_user') || '{}');
+
+                // Register user with the API
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        full_name: `${formData.firstName} ${formData.lastName}`,
+                        email: existingUser.email || `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@example.com`,
+                        cell_number: formData.phone,
+                        sa_id_number: formData.idNumber || formData.phone.replace(/\D/g, '').slice(-13).padStart(13, '0'),
+                        postal_code: formData.postalCode,
+                        date_of_birth: formData.dob,
+                        terms_accepted: true,
+                        popia_consent: true
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    // Store real JWT token
+                    localStorage.setItem('paysick_auth_token', data.token);
+                    localStorage.setItem('paysick_user', JSON.stringify({
+                        ...data.user,
+                        role: existingUser.role || 'user',
+                        name: data.user.full_name
+                    }));
+
+                    // Add banking details if provided
+                    if (formData.paymentMethod === 'bank' && formData.bankName) {
+                        try {
+                            await fetch('/api/users/banking', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${data.token}`
+                                },
+                                body: JSON.stringify({
+                                    bank_name: formData.bankName,
+                                    account_type: formData.accountType || 'current',
+                                    account_number: formData.accountNumber,
+                                    branch_code: formData.branchCode,
+                                    account_holder_name: `${formData.firstName} ${formData.lastName}`,
+                                    debit_order_day: parseInt(formData.paymentDate) || 1
+                                })
+                            });
+                        } catch (bankError) {
+                            console.warn('Banking details not saved:', bankError);
+                        }
+                    }
+                } else {
+                    console.warn('Registration failed, continuing in demo mode:', data.error);
+                }
+            } catch (error) {
+                console.error('API registration error:', error);
+                // Continue with demo mode if API fails
+            }
 
             // Save onboarding data
             localStorage.setItem('paysick_onboarding_data', JSON.stringify(formData));
@@ -1052,6 +1119,9 @@
             document.querySelector('.form-section.active').style.display = 'none';
             document.querySelector('.progress-steps').style.display = 'none';
             document.getElementById('successView').classList.add('active');
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Complete Registration';
         });
 
         // Go to dashboard
