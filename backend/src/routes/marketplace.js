@@ -299,6 +299,21 @@ router.post('/applications', authenticateToken, async (req, res) => {
  */
 router.get('/applications', authenticateToken, async (req, res) => {
   try {
+    // Check if marketplace tables exist
+    let tableExists = false;
+    try {
+      await query('SELECT 1 FROM loan_applications LIMIT 1');
+      tableExists = true;
+    } catch (e) {
+      // Table doesn't exist
+      tableExists = false;
+    }
+
+    if (!tableExists) {
+      // Return empty array with a message - marketplace not set up yet
+      return res.json([]);
+    }
+
     const result = await query(
       `SELECT
         la.*,

@@ -155,6 +155,60 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Demo login - creates a real JWT for testing without database
+router.post('/demo-login', async (req, res) => {
+  try {
+    const { email, role } = req.body;
+
+    // Only allow specific demo accounts
+    const demoAccounts = {
+      'user@paysick.com': {
+        user_id: 'demo-user-001',
+        full_name: 'John Doe',
+        email: 'user@paysick.com',
+        cell_number: '0821234567',
+        status: 'active',
+        credit_limit: 50000,
+        risk_tier: 'standard'
+      },
+      'admin@paysick.com': {
+        user_id: 'demo-admin-001',
+        full_name: 'Admin User',
+        email: 'admin@paysick.com',
+        cell_number: '0829876543',
+        status: 'active',
+        credit_limit: 100000,
+        risk_tier: 'low'
+      }
+    };
+
+    const demoUser = demoAccounts[email];
+    if (!demoUser) {
+      return res.status(401).json({ error: 'Invalid demo credentials' });
+    }
+
+    // Generate a real JWT token
+    const token = jwt.sign(
+      { userId: demoUser.user_id, email: demoUser.email },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      message: 'Demo login successful',
+      demo: true,
+      user: {
+        ...demoUser,
+        role: role || 'user'
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Demo login error:', error);
+    res.status(500).json({ error: 'Failed to process demo login' });
+  }
+});
+
 // Get user profile
 router.get('/profile', authenticateToken, async (req, res) => {
   try {

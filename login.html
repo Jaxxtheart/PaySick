@@ -333,48 +333,29 @@
                         }
                     }
                 } else {
-                    // API login failed - fall back to demo mode for testing
-                    console.warn('API login failed, using demo mode:', data.error);
+                    // API login failed - try demo login endpoint
+                    console.warn('API login failed, trying demo login:', data.error);
 
-                    // Demo authentication fallback
-                    let isValid = false;
-                    let userData = null;
+                    // Try the demo login endpoint which creates a real JWT
+                    const demoResponse = await fetch('/api/users/demo-login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, role })
+                    });
 
-                    if (role === 'user' && email === 'user@paysick.com') {
-                        isValid = true;
-                        userData = {
-                            email: email,
-                            role: 'user',
-                            name: 'John Doe',
-                            user_id: 'demo-user-001'
-                        };
-                    } else if (role === 'admin' && email === 'admin@paysick.com') {
-                        isValid = true;
-                        userData = {
-                            email: email,
-                            role: 'admin',
-                            name: 'Admin User',
-                            user_id: 'demo-admin-001'
-                        };
-                    }
+                    const demoData = await demoResponse.json();
 
-                    if (isValid) {
-                        // Create a proper demo JWT token (signed with default secret)
-                        // In demo mode, we'll create a simple base64 token structure
-                        const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-                        const payload = btoa(JSON.stringify({
-                            userId: userData.user_id,
-                            email: userData.email,
-                            iat: Math.floor(Date.now() / 1000),
-                            exp: Math.floor(Date.now() / 1000) + 86400
+                    if (demoResponse.ok && demoData.token) {
+                        // Store real JWT token from demo endpoint
+                        localStorage.setItem('paysick_auth_token', demoData.token);
+                        localStorage.setItem('paysick_user', JSON.stringify({
+                            ...demoData.user,
+                            name: demoData.user.full_name
                         }));
-                        // Note: This is a mock token - real JWT needs proper signing
-                        // The backend will need to handle this gracefully
-                        const mockToken = `${header}.${payload}.demo-signature`;
 
-                        localStorage.setItem('paysick_user', JSON.stringify(userData));
-                        localStorage.setItem('paysick_auth_token', mockToken);
-
+                        // Redirect to appropriate page
                         if (role === 'admin') {
                             window.location.href = 'admin-dashboard.html';
                         } else {
@@ -386,7 +367,7 @@
                             }
                         }
                     } else {
-                        throw new Error('Invalid credentials');
+                        throw new Error(demoData.error || 'Invalid credentials');
                     }
                 }
             } catch (error) {
