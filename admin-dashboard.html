@@ -662,6 +662,117 @@
             font-weight: 600;
         }
 
+        /* Payment Chart Styles */
+        .payment-chart-container {
+            background: linear-gradient(135deg, #FAFAFA 0%, #F5F5F5 100%);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .payment-chart {
+            width: 100%;
+            height: 280px;
+        }
+
+        .chart-label {
+            font-size: 11px;
+            fill: #8A8A8A;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .grid-line {
+            stroke: #E5E5E5;
+            stroke-width: 1;
+            stroke-dasharray: 4 4;
+        }
+
+        .chart-bar {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.85;
+            filter: brightness(1.1);
+        }
+
+        .trend-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .trend-point {
+            transition: r 0.2s ease, fill 0.2s ease;
+            cursor: pointer;
+        }
+
+        .trend-point:hover {
+            r: 8;
+            fill: #FF4757;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-text {
+            font-size: 13px;
+            color: #4A4A4A;
+            font-weight: 500;
+        }
+
+        .chart-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            display: block;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #8A8A8A;
+            font-weight: 500;
+        }
+
         /* Activity Feed */
         .activity-item {
             padding: 16px;
@@ -1231,8 +1342,100 @@
                     <h2 class="card-title">Payment Analytics</h2>
                     <button class="btn btn-secondary">View Report</button>
                 </div>
-                <div class="chart-placeholder">
-                    <svg class="title-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M3 3v18h18"/><path class="icon-stroke" d="M18 9l-5 5-4-4-6 6"/></svg> Payment Trends Chart
+                <div id="paymentChart" class="payment-chart-container">
+                    <svg viewBox="0 0 500 280" class="payment-chart">
+                        <!-- Chart Background Grid -->
+                        <defs>
+                            <linearGradient id="barGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:0.8" />
+                            </linearGradient>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3498DB;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2ED573;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Y-Axis Labels -->
+                        <text x="45" y="45" class="chart-label" text-anchor="end">R800K</text>
+                        <text x="45" y="95" class="chart-label" text-anchor="end">R600K</text>
+                        <text x="45" y="145" class="chart-label" text-anchor="end">R400K</text>
+                        <text x="45" y="195" class="chart-label" text-anchor="end">R200K</text>
+                        <text x="45" y="245" class="chart-label" text-anchor="end">R0</text>
+
+                        <!-- Grid Lines -->
+                        <line x1="55" y1="40" x2="480" y2="40" class="grid-line"/>
+                        <line x1="55" y1="90" x2="480" y2="90" class="grid-line"/>
+                        <line x1="55" y1="140" x2="480" y2="140" class="grid-line"/>
+                        <line x1="55" y1="190" x2="480" y2="190" class="grid-line"/>
+                        <line x1="55" y1="240" x2="480" y2="240" class="grid-line"/>
+
+                        <!-- Bars with animation -->
+                        <g class="chart-bars">
+                            <rect x="75" y="115" width="45" height="125" rx="4" fill="url(#barGradient)" class="chart-bar" data-value="520000"/>
+                            <rect x="145" y="85" width="45" height="155" rx="4" fill="url(#barGradient)" class="chart-bar" data-value="620000"/>
+                            <rect x="215" y="70" width="45" height="170" rx="4" fill="url(#barGradient)" class="chart-bar" data-value="680000"/>
+                            <rect x="285" y="60" width="45" height="180" rx="4" fill="url(#barGradient)" class="chart-bar" data-value="720000"/>
+                            <rect x="355" y="50" width="45" height="190" rx="4" fill="url(#barGradient)" class="chart-bar" data-value="760000"/>
+                            <rect x="425" y="35" width="45" height="205" rx="4" fill="url(#barGradient)" class="chart-bar" data-value="820000"/>
+                        </g>
+
+                        <!-- Trend Line -->
+                        <polyline
+                            points="97,115 167,85 237,70 307,60 377,50 447,35"
+                            fill="none"
+                            stroke="url(#lineGradient)"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="trend-line"/>
+
+                        <!-- Trend Line Points -->
+                        <g class="trend-points">
+                            <circle cx="97" cy="115" r="5" fill="#3498DB" class="trend-point"/>
+                            <circle cx="167" cy="85" r="5" fill="#3498DB" class="trend-point"/>
+                            <circle cx="237" cy="70" r="5" fill="#3498DB" class="trend-point"/>
+                            <circle cx="307" cy="60" r="5" fill="#3498DB" class="trend-point"/>
+                            <circle cx="377" cy="50" r="5" fill="#3498DB" class="trend-point"/>
+                            <circle cx="447" cy="35" r="5" fill="#2ED573" class="trend-point"/>
+                        </g>
+
+                        <!-- X-Axis Labels -->
+                        <text x="97" y="265" class="chart-label" text-anchor="middle">Sep</text>
+                        <text x="167" y="265" class="chart-label" text-anchor="middle">Oct</text>
+                        <text x="237" y="265" class="chart-label" text-anchor="middle">Nov</text>
+                        <text x="307" y="265" class="chart-label" text-anchor="middle">Dec</text>
+                        <text x="377" y="265" class="chart-label" text-anchor="middle">Jan</text>
+                        <text x="447" y="265" class="chart-label" text-anchor="middle">Feb</text>
+                    </svg>
+
+                    <!-- Chart Legend -->
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);"></span>
+                            <span class="legend-text">Payments Collected</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: linear-gradient(90deg, #3498DB 0%, #2ED573 100%);"></span>
+                            <span class="legend-text">Growth Trend</span>
+                        </div>
+                    </div>
+
+                    <!-- Chart Summary -->
+                    <div class="chart-summary">
+                        <div class="summary-item">
+                            <span class="summary-value" style="color: #2ED573;">+57.7%</span>
+                            <span class="summary-label">6-Month Growth</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value">R4.12M</span>
+                            <span class="summary-label">Total Collected</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-value">R687K</span>
+                            <span class="summary-label">Monthly Avg</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1491,9 +1694,113 @@
             return num.toLocaleString();
         }
 
+        // Initialize payment chart with interactive tooltips
+        function initPaymentChart() {
+            const bars = document.querySelectorAll('.chart-bar');
+            const points = document.querySelectorAll('.trend-point');
+            const chartContainer = document.getElementById('paymentChart');
+
+            // Payment data for each month
+            const paymentData = [
+                { month: 'Sep 2025', amount: 520000, plans: 312 },
+                { month: 'Oct 2025', amount: 620000, plans: 358 },
+                { month: 'Nov 2025', amount: 680000, plans: 402 },
+                { month: 'Dec 2025', amount: 720000, plans: 438 },
+                { month: 'Jan 2026', amount: 760000, plans: 472 },
+                { month: 'Feb 2026', amount: 820000, plans: 518 }
+            ];
+
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'chart-tooltip';
+            tooltip.style.cssText = `
+                position: absolute;
+                background: white;
+                border-radius: 8px;
+                padding: 12px 16px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                z-index: 100;
+                min-width: 140px;
+            `;
+            chartContainer.style.position = 'relative';
+            chartContainer.appendChild(tooltip);
+
+            // Add hover events to bars
+            bars.forEach((bar, index) => {
+                bar.addEventListener('mouseenter', (e) => {
+                    const data = paymentData[index];
+                    tooltip.innerHTML = `
+                        <div style="font-weight: 700; color: #1A1A1A; margin-bottom: 8px;">${data.month}</div>
+                        <div style="font-size: 13px; color: #4A4A4A; margin-bottom: 4px;">
+                            <span style="color: #FF4757; font-weight: 600;">R${(data.amount / 1000).toFixed(0)}K</span> collected
+                        </div>
+                        <div style="font-size: 12px; color: #8A8A8A;">
+                            ${data.plans} payment plans
+                        </div>
+                    `;
+                    tooltip.style.opacity = '1';
+                });
+
+                bar.addEventListener('mousemove', (e) => {
+                    const rect = chartContainer.getBoundingClientRect();
+                    tooltip.style.left = (e.clientX - rect.left + 10) + 'px';
+                    tooltip.style.top = (e.clientY - rect.top - 70) + 'px';
+                });
+
+                bar.addEventListener('mouseleave', () => {
+                    tooltip.style.opacity = '0';
+                });
+            });
+
+            // Add hover events to trend points
+            points.forEach((point, index) => {
+                point.addEventListener('mouseenter', (e) => {
+                    const data = paymentData[index];
+                    const growth = index > 0
+                        ? ((data.amount - paymentData[index-1].amount) / paymentData[index-1].amount * 100).toFixed(1)
+                        : '0';
+                    tooltip.innerHTML = `
+                        <div style="font-weight: 700; color: #1A1A1A; margin-bottom: 8px;">${data.month}</div>
+                        <div style="font-size: 13px; color: #4A4A4A; margin-bottom: 4px;">
+                            Growth: <span style="color: ${growth >= 0 ? '#2ED573' : '#FF4757'}; font-weight: 600;">${growth >= 0 ? '+' : ''}${growth}%</span>
+                        </div>
+                    `;
+                    tooltip.style.opacity = '1';
+                });
+
+                point.addEventListener('mousemove', (e) => {
+                    const rect = chartContainer.getBoundingClientRect();
+                    tooltip.style.left = (e.clientX - rect.left + 10) + 'px';
+                    tooltip.style.top = (e.clientY - rect.top - 50) + 'px';
+                });
+
+                point.addEventListener('mouseleave', () => {
+                    tooltip.style.opacity = '0';
+                });
+            });
+
+            // Animate bars on load
+            bars.forEach((bar, index) => {
+                const originalHeight = bar.getAttribute('height');
+                const originalY = bar.getAttribute('y');
+                bar.setAttribute('height', '0');
+                bar.setAttribute('y', 240);
+
+                setTimeout(() => {
+                    bar.style.transition = 'all 0.6s ease-out';
+                    bar.setAttribute('height', originalHeight);
+                    bar.setAttribute('y', originalY);
+                }, index * 100);
+            });
+        }
+
         // Run on page load
         window.addEventListener('load', initDashboard);
         window.addEventListener('load', refreshRiskData);
+        window.addEventListener('load', initPaymentChart);
     </script>
 </body>
 </html>
