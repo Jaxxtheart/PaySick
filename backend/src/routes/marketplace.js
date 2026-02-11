@@ -11,39 +11,16 @@
 
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { query } = require('../config/database');
 const { MarketplaceAuctionService, marketplaceAuctionService } = require('../services/marketplace-auction.service');
 const { LoanApprovalBridge } = require('../services/loan-approval-bridge.service');
+const { authenticateToken, requireAdmin, requireLender } = require('../middleware/auth.middleware');
+const { logSecurityEvent, sanitizeObject } = require('../services/security.service');
 
 // ============================================
 // MIDDLEWARE
 // ============================================
-
-// Default JWT secret for development (should be set in production)
-const JWT_SECRET = process.env.JWT_SECRET || 'paysick-dev-secret-change-in-production';
-
-/**
- * Verify JWT token for authenticated routes
- */
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      console.error('JWT verification error:', err.message);
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-    req.user = user;
-    next();
-  });
-};
 
 /**
  * Validate webhook signature from lenders
@@ -88,27 +65,8 @@ const validateWebhookSignature = async (req, res, next) => {
   }
 };
 
-/**
- * Admin authentication (simplified for demo)
- */
-const authenticateAdmin = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Admin token required' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-    // In production, check admin role
-    req.user = user;
-    req.isAdmin = true;
-    next();
-  });
-};
+// Note: [authenticateToken, requireAdmin] replaced by requireAdmin from auth.middleware
+// Use [authenticateToken, requireAdmin] for admin routes
 
 // ============================================
 // PATIENT ENDPOINTS
@@ -566,7 +524,7 @@ router.post('/webhooks/offer-response', validateWebhookSignature, async (req, re
  *
  * GET /api/marketplace/admin/pending-applications
  */
-router.get('/admin/pending-applications', authenticateAdmin, async (req, res) => {
+router.get('/admin/pending-applications', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const applications = await marketplaceAuctionService.getPendingApplications();
     res.json(applications);
@@ -583,7 +541,7 @@ router.get('/admin/pending-applications', authenticateAdmin, async (req, res) =>
  *
  * Admin dashboard uses this to manually enter lender responses
  */
-router.post('/admin/manual-offers', authenticateAdmin, async (req, res) => {
+router.post('/admin/manual-offers', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const {
       applicationId,
@@ -630,7 +588,7 @@ router.post('/admin/manual-offers', authenticateAdmin, async (req, res) => {
  *
  * GET /api/marketplace/admin/lenders
  */
-router.get('/admin/lenders', authenticateAdmin, async (req, res) => {
+router.get('/admin/lenders', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const result = await query(
       `SELECT
@@ -664,7 +622,7 @@ router.get('/admin/lenders', authenticateAdmin, async (req, res) => {
  *
  * GET /api/marketplace/admin/lender-stats
  */
-router.get('/admin/lender-stats', authenticateAdmin, async (req, res) => {
+router.get('/admin/lender-stats', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const result = await query(`SELECT * FROM vw_lender_performance`);
     res.json(result.rows);
@@ -679,7 +637,7 @@ router.get('/admin/lender-stats', authenticateAdmin, async (req, res) => {
  *
  * GET /api/marketplace/admin/stats
  */
-router.get('/admin/stats', authenticateAdmin, async (req, res) => {
+router.get('/admin/stats', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const stats = await query(`
       SELECT

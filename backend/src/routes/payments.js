@@ -1,29 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { query, transaction } = require('../config/database');
-const jwt = require('jsonwebtoken');
-
-// Default JWT secret for development (should be set in production)
-const JWT_SECRET = process.env.JWT_SECRET || 'paysick-dev-secret-change-in-production';
-
-// Middleware to verify JWT token
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      console.error('JWT verification error:', err.message);
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-    req.user = user;
-    next();
-  });
-};
+const { authenticateToken, requireAdmin } = require('../middleware/auth.middleware');
+const { logSecurityEvent } = require('../services/security.service');
 
 // Get all payment plans for user
 router.get('/plans', authenticateToken, async (req, res) => {
