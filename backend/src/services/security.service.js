@@ -10,8 +10,12 @@
  */
 
 const crypto = require('crypto');
-const bcrypt = require('bcrypt');
+const { promisify } = require('util');
 const { query } = require('../config/database');
+
+// Promisify crypto functions
+const scryptAsync = promisify(crypto.scrypt);
+const randomBytesAsync = promisify(crypto.randomBytes);
 
 // ============================================
 // CONFIGURATION VALIDATION
@@ -72,34 +76,68 @@ function getEncryptionKey() {
 }
 
 // ============================================
-// PASSWORD HASHING (bcrypt)
+// PASSWORD HASHING (scrypt - Node.js built-in)
 // ============================================
 
-const BCRYPT_ROUNDS = 12; // ~250ms on modern hardware, good security/performance balance
+// Scrypt parameters for banking-grade security
+const SCRYPT_KEYLEN = 64;       // Output key length
+const SCRYPT_COST = 16384;      // CPU/memory cost (N) - 2^14
+const SCRYPT_BLOCK_SIZE = 8;    // Block size (r)
+const SCRYPT_PARALLELIZATION = 1; // Parallelization (p)
 
 /**
- * Hash a password using bcrypt
+ * Hash a password using scrypt (Node.js built-in, no external deps)
  * @param {string} password - Plain text password
- * @returns {Promise<string>} - Hashed password
+ * @returns {Promise<string>} - Hashed password in format: salt:hash
  */
 async function hashPassword(password) {
   if (!password || password.length < 8) {
     throw new Error('Password must be at least 8 characters');
   }
-  return bcrypt.hash(password, BCRYPT_ROUNDS);
+
+  const salt = await randomBytesAsync(32);
+  const hash = await scryptAsync(password, salt, SCRYPT_KEYLEN, {
+    N: SCRYPT_COST,
+    r: SCRYPT_BLOCK_SIZE,
+    p: SCRYPT_PARALLELIZATION
+  });
+
+  // Format: salt:hash (both as hex)
+  return `${salt.toString('hex')}:${hash.toString('hex')}`;
 }
 
 /**
  * Verify a password against its hash
  * @param {string} password - Plain text password
- * @param {string} hash - Stored hash
+ * @param {string} storedHash - Stored hash in format salt:hash
  * @returns {Promise<boolean>} - True if password matches
  */
-async function verifyPassword(password, hash) {
-  if (!password || !hash) {
+async function verifyPassword(password, storedHash) {
+  if (!password || !storedHash) {
     return false;
   }
-  return bcrypt.compare(password, hash);
+
+  try {
+    const [saltHex, hashHex] = storedHash.split(':');
+    if (!saltHex || !hashHex) {
+      return false;
+    }
+
+    const salt = Buffer.from(saltHex, 'hex');
+    const hash = Buffer.from(hashHex, 'hex');
+
+    const derivedKey = await scryptAsync(password, salt, SCRYPT_KEYLEN, {
+      N: SCRYPT_COST,
+      r: SCRYPT_BLOCK_SIZE,
+      p: SCRYPT_PARALLELIZATION
+    });
+
+    // Constant-time comparison to prevent timing attacks
+    return crypto.timingSafeEqual(hash, derivedKey);
+  } catch (error) {
+    console.error('Password verification error:', error.message);
+    return false;
+  }
 }
 
 // ============================================
