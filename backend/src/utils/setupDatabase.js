@@ -48,6 +48,32 @@ async function setupDatabase() {
     await appPool.query(schema);
     console.log('✅ Schema executed successfully\n');
 
+    // Run migrations
+    console.log('📋 Running migrations...');
+    const migrationsDir = path.join(__dirname, '../migrations');
+    if (fs.existsSync(migrationsDir)) {
+      const migrations = fs.readdirSync(migrationsDir)
+        .filter(f => f.endsWith('.sql'))
+        .sort();
+
+      for (const migration of migrations) {
+        try {
+          console.log(`   Running ${migration}...`);
+          const sql = fs.readFileSync(path.join(migrationsDir, migration), 'utf8');
+          await appPool.query(sql);
+          console.log(`   ✅ ${migration} completed`);
+        } catch (err) {
+          // Ignore errors for "already exists" type issues
+          if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+            console.warn(`   ⚠️  ${migration}: ${err.message}`);
+          } else {
+            console.log(`   ℹ️  ${migration} (already applied)`);
+          }
+        }
+      }
+    }
+    console.log('✅ Migrations completed\n');
+
     // Insert sample data
     console.log('📝 Inserting sample providers...');
     await appPool.query(`

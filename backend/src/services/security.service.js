@@ -219,31 +219,39 @@ async function createSession(user, ipAddress, userAgent) {
   const accessExpiresAt = new Date(Date.now() + TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
   const refreshExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
 
-  // Store session in database
-  await query(
-    `INSERT INTO user_sessions (
-      user_id,
-      access_token_hash,
-      refresh_token_hash,
-      access_expires_at,
-      refresh_expires_at,
-      ip_address,
-      user_agent,
-      created_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
-    [
-      user.user_id,
-      accessTokenHash,
-      refreshTokenHash,
-      accessExpiresAt,
-      refreshExpiresAt,
-      ipAddress,
-      userAgent
-    ]
-  );
+  try {
+    // Store session in database
+    await query(
+      `INSERT INTO user_sessions (
+        user_id,
+        access_token_hash,
+        refresh_token_hash,
+        access_expires_at,
+        refresh_expires_at,
+        ip_address,
+        user_agent,
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+      [
+        user.user_id,
+        accessTokenHash,
+        refreshTokenHash,
+        accessExpiresAt,
+        refreshExpiresAt,
+        ipAddress,
+        userAgent
+      ]
+    );
 
-  // Log authentication event
-  await logSecurityEvent('LOGIN', user.user_id, ipAddress, userAgent, { success: true });
+    // Log authentication event
+    await logSecurityEvent('LOGIN', user.user_id, ipAddress, userAgent, { success: true });
+  } catch (error) {
+    // If session table doesn't exist, throw a clear error
+    if (error.message.includes('does not exist')) {
+      throw new Error('Database not initialized. Please run: npm run db:setup');
+    }
+    throw error;
+  }
 
   return {
     accessToken,
@@ -261,47 +269,56 @@ async function createSession(user, ipAddress, userAgent) {
 async function validateAccessToken(token) {
   if (!token) return null;
 
-  const tokenHash = hashToken(token);
+  try {
+    const tokenHash = hashToken(token);
 
-  const result = await query(
-    `SELECT
-      s.session_id,
-      s.user_id,
-      s.access_expires_at,
-      s.revoked,
-      u.email,
-      u.full_name,
-      u.role
-    FROM user_sessions s
-    JOIN users u ON s.user_id = u.user_id
-    WHERE s.access_token_hash = $1
-    LIMIT 1`,
-    [tokenHash]
-  );
+    const result = await query(
+      `SELECT
+        s.session_id,
+        s.user_id,
+        s.access_expires_at,
+        s.revoked,
+        u.email,
+        u.full_name,
+        u.role
+      FROM user_sessions s
+      JOIN users u ON s.user_id = u.user_id
+      WHERE s.access_token_hash = $1
+      LIMIT 1`,
+      [tokenHash]
+    );
 
-  if (result.rows.length === 0) {
-    return null;
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const session = result.rows[0];
+
+    // Check if revoked
+    if (session.revoked) {
+      return null;
+    }
+
+    // Check if expired
+    if (new Date(session.access_expires_at) < new Date()) {
+      return null;
+    }
+
+    return {
+      userId: session.user_id,
+      email: session.email,
+      fullName: session.full_name,
+      role: session.role,
+      sessionId: session.session_id
+    };
+  } catch (error) {
+    // If tables don't exist, return null (invalid token)
+    if (error.message.includes('does not exist')) {
+      console.warn('Security tables not initialized. Run database setup.');
+      return null;
+    }
+    throw error;
   }
-
-  const session = result.rows[0];
-
-  // Check if revoked
-  if (session.revoked) {
-    return null;
-  }
-
-  // Check if expired
-  if (new Date(session.access_expires_at) < new Date()) {
-    return null;
-  }
-
-  return {
-    userId: session.user_id,
-    email: session.email,
-    fullName: session.full_name,
-    role: session.role,
-    sessionId: session.session_id
-  };
 }
 
 /**
@@ -481,23 +498,36 @@ function sanitizeObject(obj) {
  * @returns {Promise<boolean>} - True if should be blocked
  */
 async function isIPBlocked(ipAddress) {
-  const result = await query(
-    `SELECT COUNT(*) as attempts
-    FROM security_audit_log
-    WHERE ip_address = $1
-    AND event_type = 'LOGIN_FAILED'
-    AND created_at > NOW() - INTERVAL '15 minutes'`,
-    [ipAddress]
-  );
+  try {
+    const result = await query(
+      `SELECT COUNT(*) as attempts
+      FROM security_audit_log
+      WHERE ip_address = $1
+      AND event_type = 'LOGIN_FAILED'
+      AND created_at > NOW() - INTERVAL '15 minutes'`,
+      [ipAddress]
+    );
 
-  return parseInt(result.rows[0].attempts) >= 5;
+    return parseInt(result.rows[0].attempts) >= 5;
+  } catch (error) {
+    // If table doesn't exist yet, don't block
+    if (error.message.includes('does not exist')) {
+      return false;
+    }
+    throw error;
+  }
 }
 
 /**
  * Record a failed login attempt
  */
 async function recordFailedLogin(ipAddress, email) {
-  await logSecurityEvent('LOGIN_FAILED', null, ipAddress, null, { email });
+  try {
+    await logSecurityEvent('LOGIN_FAILED', null, ipAddress, null, { email });
+  } catch (error) {
+    // Don't let logging failures break login flow
+    console.warn('Failed to record login attempt:', error.message);
+  }
 }
 
 // ============================================
