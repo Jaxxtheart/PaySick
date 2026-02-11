@@ -255,7 +255,9 @@
             <div class="form-group">
                 <label for="role">Login As</label>
                 <select id="role" required>
-                    <option value="user">User</option>
+                    <option value="user">Patient / User</option>
+                    <option value="provider">Healthcare Provider</option>
+                    <option value="lender">Lender</option>
                     <option value="admin">Admin</option>
                 </select>
             </div>
@@ -277,7 +279,9 @@
 
         <div class="demo-credentials">
             <h3>Demo Credentials</h3>
-            <p><strong>User:</strong> user@paysick.com / password123</p>
+            <p><strong>Patient:</strong> user@paysick.com / password123</p>
+            <p><strong>Provider:</strong> provider@paysick.com / provider123</p>
+            <p><strong>Lender:</strong> lender@paysick.com / lender123</p>
             <p><strong>Admin:</strong> admin@paysick.com / admin123</p>
         </div>
 
@@ -307,7 +311,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email, sa_id_number: password })
+                    body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
@@ -321,16 +325,24 @@
                         name: data.user.full_name
                     }));
 
-                    // Redirect to appropriate page
-                    if (role === 'admin') {
-                        window.location.href = 'admin-dashboard.html';
-                    } else {
-                        const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                        if (onboardingComplete === 'true') {
-                            window.location.href = 'dashboard.html';
-                        } else {
-                            window.location.href = 'onboarding.html';
-                        }
+                    // Redirect to appropriate page based on role
+                    switch (role) {
+                        case 'admin':
+                            window.location.href = 'admin-dashboard.html';
+                            break;
+                        case 'provider':
+                            window.location.href = 'dashboard.html'; // Provider dashboard coming soon
+                            break;
+                        case 'lender':
+                            window.location.href = 'lender-dashboard.html';
+                            break;
+                        default:
+                            const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                            if (onboardingComplete === 'true') {
+                                window.location.href = 'dashboard.html';
+                            } else {
+                                window.location.href = 'onboarding.html';
+                            }
                     }
                 } else {
                     // API login failed - try demo login endpoint
@@ -355,16 +367,24 @@
                             name: demoData.user.full_name
                         }));
 
-                        // Redirect to appropriate page
-                        if (role === 'admin') {
-                            window.location.href = 'admin-dashboard.html';
-                        } else {
-                            const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                            if (onboardingComplete === 'true') {
-                                window.location.href = 'dashboard.html';
-                            } else {
-                                window.location.href = 'onboarding.html';
-                            }
+                        // Redirect to appropriate page based on role
+                        switch (role) {
+                            case 'admin':
+                                window.location.href = 'admin-dashboard.html';
+                                break;
+                            case 'provider':
+                                window.location.href = 'provider-dashboard.html';
+                                break;
+                            case 'lender':
+                                window.location.href = 'lender-dashboard.html';
+                                break;
+                            default:
+                                const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                                if (onboardingComplete === 'true') {
+                                    window.location.href = 'dashboard.html';
+                                } else {
+                                    window.location.href = 'onboarding.html';
+                                }
                         }
                     } else {
                         throw new Error(demoData.error || 'Invalid credentials');
@@ -390,13 +410,16 @@
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
 
-            if (role === 'admin') {
-                emailInput.value = 'admin@paysick.com';
-                passwordInput.value = 'admin123';
-            } else {
-                emailInput.value = 'user@paysick.com';
-                passwordInput.value = 'password123';
-            }
+            const credentials = {
+                user: { email: 'user@paysick.com', password: 'password123' },
+                provider: { email: 'provider@paysick.com', password: 'provider123' },
+                lender: { email: 'lender@paysick.com', password: 'lender123' },
+                admin: { email: 'admin@paysick.com', password: 'admin123' }
+            };
+
+            const creds = credentials[role] || credentials.user;
+            emailInput.value = creds.email;
+            passwordInput.value = creds.password;
         });
 
         // Set default credentials on page load
