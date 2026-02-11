@@ -316,9 +316,9 @@
 
                 const data = await response.json();
 
-                if (response.ok && data.token) {
+                if (response.ok && (data.accessToken || data.token)) {
                     // Store real JWT token and user data
-                    localStorage.setItem('paysick_auth_token', data.token);
+                    localStorage.setItem('paysick_auth_token', data.accessToken || data.token);
                     localStorage.setItem('paysick_user', JSON.stringify({
                         ...data.user,
                         role: role,
@@ -359,7 +359,7 @@
 
                     const demoData = await demoResponse.json();
 
-                    if (demoResponse.ok && demoData.token) {
+                    if (demoResponse.ok && (demoData.accessToken || demoData.token)) {
                         // Store real JWT token from demo endpoint
                         localStorage.setItem('paysick_auth_token', demoData.token);
                         localStorage.setItem('paysick_user', JSON.stringify({

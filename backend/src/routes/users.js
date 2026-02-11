@@ -345,12 +345,14 @@ router.post('/login', async (req, res) => {
 
 /**
  * POST /api/users/demo-login
- * Demo login for development/testing only
- * DISABLED IN PRODUCTION
+ * Demo login for development/testing
+ * Can be enabled in production via ALLOW_DEMO_LOGIN=true
  */
 router.post('/demo-login', async (req, res) => {
-  // CRITICAL: Disable in production
-  if (process.env.NODE_ENV === 'production') {
+  // Allow demo login if explicitly enabled or not in production
+  const allowDemo = process.env.ALLOW_DEMO_LOGIN === 'true' || process.env.NODE_ENV !== 'production';
+
+  if (!allowDemo) {
     return res.status(403).json({
       error: 'Demo login is disabled in production',
       code: 'DEMO_DISABLED'
@@ -373,6 +375,28 @@ router.post('/demo-login', async (req, res) => {
         credit_limit: 50000,
         risk_tier: 'standard',
         role: 'user'
+      },
+      'provider@paysick.com': {
+        user_id: 'demo-provider-001',
+        full_name: 'Dr. Sarah Smith',
+        email: 'provider@paysick.com',
+        cell_number: '0823456789',
+        status: 'active',
+        credit_limit: 0,
+        risk_tier: 'low',
+        role: 'provider',
+        practice_name: 'Smith Medical Centre'
+      },
+      'lender@paysick.com': {
+        user_id: 'demo-lender-001',
+        full_name: 'Capital Finance',
+        email: 'lender@paysick.com',
+        cell_number: '0824567890',
+        status: 'active',
+        credit_limit: 0,
+        risk_tier: 'low',
+        role: 'lender',
+        company_name: 'Capital Finance SA'
       },
       'admin@paysick.com': {
         user_id: 'demo-admin-001',
