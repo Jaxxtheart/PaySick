@@ -39,23 +39,11 @@ const PORT = process.env.PORT || 3000;
 // SECURITY MIDDLEWARE
 // ============================================
 
-// Helmet with strict CSP for banking application
+// Helmet with relaxed CSP for API
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for now
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
-    }
-  },
-  crossOriginEmbedderPolicy: false, // Disable for API
+  contentSecurityPolicy: false, // Disable CSP for API server
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
@@ -63,53 +51,38 @@ app.use(helmet({
   }
 }));
 
-// CORS configuration - STRICT in production
-const getAllowedOrigins = () => {
-  if (process.env.CORS_ORIGIN) {
-    return process.env.CORS_ORIGIN.split(',').map(o => o.trim());
-  }
-
-  // In production, MUST have explicit origins
-  if (process.env.NODE_ENV === 'production') {
-    console.error('SECURITY WARNING: CORS_ORIGIN not set in production. Defaulting to same-origin only.');
-    return false; // Disallow all cross-origin requests
-  }
-
-  // Development only - allow localhost
-  return [
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'http://localhost:8080',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:5000'
-  ];
-};
-
+// CORS configuration - Allow same-origin and configured origins
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = getAllowedOrigins();
-
-    // Allow requests with no origin (same-origin, mobile apps, Postman)
+    // Allow requests with no origin (same-origin, Postman, mobile apps)
     if (!origin) {
       return callback(null, true);
     }
 
-    if (allowedOrigins === false) {
-      return callback(new Error('CORS not allowed'), false);
+    // Allow configured origins
+    if (process.env.CORS_ORIGIN) {
+      const allowedOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
     }
 
-    if (allowedOrigins.includes(origin)) {
+    // Allow Vercel preview deployments
+    if (origin.includes('vercel.app')) {
       return callback(null, true);
     }
 
-    console.warn(`CORS blocked request from: ${origin}`);
+    // Allow localhost in development
+    if (process.env.NODE_ENV !== 'production' && origin.includes('localhost')) {
+      return callback(null, true);
+    }
+
+    console.warn(`CORS blocked: ${origin}`);
     return callback(new Error('Not allowed by CORS'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining'],
-  maxAge: 600, // 10 minutes
   optionsSuccessStatus: 200
 };
 
