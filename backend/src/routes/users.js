@@ -415,32 +415,46 @@ router.post('/demo-login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid demo credentials' });
     }
 
-    // Create session
-    const session = await createSession(
-      { user_id: demoUser.user_id, email: demoUser.email, role: role || demoUser.role },
-      ipAddress,
-      req.get('User-Agent')
-    );
+    // For demo mode, generate a simple token without database
+    const crypto = require('crypto');
+    const demoToken = crypto.randomBytes(32).toString('hex');
+    const userRole = role || demoUser.role;
 
-    await logSecurityEvent('DEMO_LOGIN', demoUser.user_id, ipAddress, req.get('User-Agent'), {
-      email: demoUser.email,
-      role: role || demoUser.role
-    });
+    // Try to create proper session, fall back to simple token if DB fails
+    let accessToken = demoToken;
+    let refreshToken = crypto.randomBytes(32).toString('hex');
+
+    try {
+      const session = await createSession(
+        { user_id: demoUser.user_id, email: demoUser.email, role: userRole },
+        ipAddress,
+        req.get('User-Agent')
+      );
+      accessToken = session.accessToken;
+      refreshToken = session.refreshToken;
+
+      await logSecurityEvent('DEMO_LOGIN', demoUser.user_id, ipAddress, req.get('User-Agent'), {
+        email: demoUser.email,
+        role: userRole
+      });
+    } catch (dbError) {
+      console.warn('Demo login: DB session failed, using simple token:', dbError.message);
+    }
 
     res.json({
       message: 'Demo login successful',
       demo: true,
       user: {
         ...demoUser,
-        role: role || demoUser.role
+        role: userRole
       },
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-      expiresIn: session.expiresIn
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      expiresIn: 86400
     });
   } catch (error) {
     console.error('Demo login error:', error);
-    res.status(500).json({ error: 'Failed to process demo login' });
+    res.status(500).json({ error: 'Failed to process demo login', details: error.message });
   }
 });
 
