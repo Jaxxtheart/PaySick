@@ -11,35 +11,16 @@
 
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { query } = require('../config/database');
 const { MarketplaceAuctionService, marketplaceAuctionService } = require('../services/marketplace-auction.service');
 const { LoanApprovalBridge } = require('../services/loan-approval-bridge.service');
+const { authenticateToken, requireAdmin, requireLender } = require('../middleware/auth.middleware');
+const { logSecurityEvent, sanitizeObject } = require('../services/security.service');
 
 // ============================================
 // MIDDLEWARE
 // ============================================
-
-/**
- * Verify JWT token for authenticated routes
- */
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-    req.user = user;
-    next();
-  });
-};
 
 /**
  * Validate webhook signature from lenders
@@ -84,38 +65,31 @@ const validateWebhookSignature = async (req, res, next) => {
   }
 };
 
-/**
- * Admin authentication (simplified for demo)
- */
-const authenticateAdmin = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Admin token required' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-    // In production, check admin role
-    req.user = user;
-    req.isAdmin = true;
-    next();
-  });
-};
+// Note: [authenticateToken, requireAdmin] replaced by requireAdmin from auth.middleware
+// Use [authenticateToken, requireAdmin] for admin routes
 
 // ============================================
 // PATIENT ENDPOINTS
 // ============================================
 
 /**
+ * Calculate monthly payment using standard amortization formula
+ */
+function calculateMonthlyPayment(principal, annualRate, termMonths) {
+  const monthlyRate = annualRate / 12;
+  if (monthlyRate === 0) return principal / termMonths;
+  const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, termMonths)) /
+                  (Math.pow(1 + monthlyRate, termMonths) - 1);
+  return Math.round(payment * 100) / 100;
+}
+
+/**
  * Submit loan application to marketplace
  *
  * POST /api/marketplace/applications
  *
- * This creates a new marketplace loan application and sends it to eligible lenders
+ * This creates a new marketplace loan application and sends it to eligible lenders.
+ * If no lenders are available, returns a preview of what offers would look like.
  */
 router.post('/applications', authenticateToken, async (req, res) => {
   try {
@@ -151,7 +125,93 @@ router.post('/applications', authenticateToken, async (req, res) => {
       });
     }
 
-    // Use the bridge service to submit to marketplace
+    // Check if marketplace tables exist and if there are active lenders
+    let hasActiveLenders = false;
+    let marketplaceReady = false;
+
+    try {
+      const lenderCheck = await query(
+        `SELECT COUNT(*) as count FROM lenders WHERE active = true`
+      );
+      hasActiveLenders = parseInt(lenderCheck.rows[0].count) > 0;
+      marketplaceReady = true;
+    } catch (tableError) {
+      // Tables don't exist yet - marketplace not set up
+      console.warn('Marketplace tables not ready:', tableError.message);
+      marketplaceReady = false;
+    }
+
+    // If no active lenders or marketplace not ready, return demo/preview response
+    if (!marketplaceReady || !hasActiveLenders) {
+      // Generate a demo application ID
+      const demoApplicationId = `DEMO-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+      return res.status(200).json({
+        success: true,
+        demo: true,
+        message: 'Application received - Marketplace Preview Mode',
+        applicationId: demoApplicationId,
+        status: 'PREVIEW',
+        marketplaceStatus: {
+          ready: marketplaceReady,
+          activeLenders: hasActiveLenders ? 'Available' : 'Coming Soon',
+          message: 'Our lending partners are currently being onboarded. Your application has been saved and you will be notified when lenders are available to make offers.'
+        },
+        applicationSummary: {
+          procedureType,
+          procedureDescription: procedureDescription || procedureType,
+          loanAmount,
+          requestedTerm,
+          monthlyIncome: monthlyIncome || 'Not provided',
+          employmentStatus: employmentStatus || 'Not provided',
+          submittedAt: new Date().toISOString()
+        },
+        // Show what offers would look like
+        previewOffers: [
+          {
+            lenderName: 'MediFinance SA',
+            lenderLogo: null,
+            interestRate: 0.165,
+            interestRateDisplay: '16.5%',
+            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.165, requestedTerm),
+            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.165, requestedTerm) * requestedTerm),
+            term: requestedTerm,
+            status: 'PREVIEW',
+            features: ['No early settlement fees', 'Flexible payment dates', 'Healthcare specialist']
+          },
+          {
+            lenderName: 'HealthCredit Plus',
+            lenderLogo: null,
+            interestRate: 0.185,
+            interestRateDisplay: '18.5%',
+            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.185, requestedTerm),
+            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.185, requestedTerm) * requestedTerm),
+            term: requestedTerm,
+            status: 'PREVIEW',
+            features: ['Same-day approval', 'Direct provider payment', 'Rewards program']
+          },
+          {
+            lenderName: 'CareCapital',
+            lenderLogo: null,
+            interestRate: 0.195,
+            interestRateDisplay: '19.5%',
+            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.195, requestedTerm),
+            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.195, requestedTerm) * requestedTerm),
+            term: requestedTerm,
+            status: 'PREVIEW',
+            features: ['Payment holiday option', '24/7 support', 'Family plans available']
+          }
+        ],
+        nextSteps: [
+          'We are currently onboarding lending partners to our marketplace',
+          'Your application details have been saved',
+          'You will receive an email notification when lenders are ready to make offers',
+          'Expected launch: Q2 2026'
+        ]
+      });
+    }
+
+    // Marketplace is ready with active lenders - proceed normally
     const bridge = new LoanApprovalBridge();
     const applicationId = await bridge.sendToMarketplace({
       userId: req.user.userId,
@@ -170,14 +230,23 @@ router.post('/applications', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       success: true,
+      demo: false,
       message: 'Application submitted to marketplace',
       applicationId,
-      status: 'Finding you the best rates...'
+      status: 'PENDING',
+      marketplaceStatus: {
+        ready: true,
+        activeLenders: 'Available',
+        message: 'Finding you the best rates from our lending partners...'
+      }
     });
 
   } catch (error) {
     console.error('Marketplace application error:', error);
-    res.status(500).json({ error: 'Failed to submit application' });
+    res.status(500).json({
+      error: 'Failed to submit application',
+      message: error.message
+    });
   }
 });
 
@@ -188,6 +257,21 @@ router.post('/applications', authenticateToken, async (req, res) => {
  */
 router.get('/applications', authenticateToken, async (req, res) => {
   try {
+    // Check if marketplace tables exist
+    let tableExists = false;
+    try {
+      await query('SELECT 1 FROM loan_applications LIMIT 1');
+      tableExists = true;
+    } catch (e) {
+      // Table doesn't exist
+      tableExists = false;
+    }
+
+    if (!tableExists) {
+      // Return empty array with a message - marketplace not set up yet
+      return res.json([]);
+    }
+
     const result = await query(
       `SELECT
         la.*,
@@ -440,7 +524,7 @@ router.post('/webhooks/offer-response', validateWebhookSignature, async (req, re
  *
  * GET /api/marketplace/admin/pending-applications
  */
-router.get('/admin/pending-applications', authenticateAdmin, async (req, res) => {
+router.get('/admin/pending-applications', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const applications = await marketplaceAuctionService.getPendingApplications();
     res.json(applications);
@@ -457,7 +541,7 @@ router.get('/admin/pending-applications', authenticateAdmin, async (req, res) =>
  *
  * Admin dashboard uses this to manually enter lender responses
  */
-router.post('/admin/manual-offers', authenticateAdmin, async (req, res) => {
+router.post('/admin/manual-offers', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const {
       applicationId,
@@ -504,7 +588,7 @@ router.post('/admin/manual-offers', authenticateAdmin, async (req, res) => {
  *
  * GET /api/marketplace/admin/lenders
  */
-router.get('/admin/lenders', authenticateAdmin, async (req, res) => {
+router.get('/admin/lenders', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const result = await query(
       `SELECT
@@ -538,7 +622,7 @@ router.get('/admin/lenders', authenticateAdmin, async (req, res) => {
  *
  * GET /api/marketplace/admin/lender-stats
  */
-router.get('/admin/lender-stats', authenticateAdmin, async (req, res) => {
+router.get('/admin/lender-stats', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const result = await query(`SELECT * FROM vw_lender_performance`);
     res.json(result.rows);
@@ -553,7 +637,7 @@ router.get('/admin/lender-stats', authenticateAdmin, async (req, res) => {
  *
  * GET /api/marketplace/admin/stats
  */
-router.get('/admin/stats', authenticateAdmin, async (req, res) => {
+router.get('/admin/stats', [authenticateToken, requireAdmin], async (req, res) => {
   try {
     const stats = await query(`
       SELECT

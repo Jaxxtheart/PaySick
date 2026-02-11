@@ -8,13 +8,21 @@
 -- =============================================
 
 -- Users/Patients Table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Personal Information
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    cell_number VARCHAR(10) NOT NULL, -- SA format: 0821234567
+    cell_number VARCHAR(15) NOT NULL, -- SA format: 0821234567
+
+    -- Security (Banking-Grade)
+    password_hash VARCHAR(255),
+    password_changed_at TIMESTAMP,
+    failed_login_attempts INTEGER DEFAULT 0,
+    locked_until TIMESTAMP,
+    must_change_password BOOLEAN DEFAULT false,
+    role VARCHAR(20) DEFAULT 'user',
 
     -- Identity & Verification (FICA/POPIA)
     sa_id_number VARCHAR(13) UNIQUE NOT NULL, -- 13-digit SA ID
@@ -30,22 +38,83 @@ CREATE TABLE users (
     status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, active, suspended, closed
     risk_tier VARCHAR(20), -- low, medium, high
     credit_limit DECIMAL(10,2) DEFAULT 850.00,
+    debit_order_day INTEGER,
 
     -- Audit
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP,
 
-    -- Indexes
-    CONSTRAINT chk_cell_number CHECK (cell_number ~ '^0[0-9]{9}$'),
+    -- Constraints
+    CONSTRAINT chk_cell_number CHECK (cell_number ~ '^0[0-9]{9,14}$'),
     CONSTRAINT chk_id_number CHECK (LENGTH(sa_id_number) = 13),
-    CONSTRAINT chk_postal_code CHECK (postal_code ~ '^[0-9]{4}$')
+    CONSTRAINT chk_postal_code CHECK (postal_code ~ '^[0-9]{4}$'),
+    CONSTRAINT valid_role CHECK (role IN ('user', 'admin', 'lender', 'provider'))
 );
 
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_cell ON users(cell_number);
-CREATE INDEX idx_users_id_number ON users(sa_id_number);
-CREATE INDEX idx_users_status ON users(status);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_cell ON users(cell_number);
+CREATE INDEX IF NOT EXISTS idx_users_id_number ON users(sa_id_number);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+
+-- =============================================
+-- SECURITY TABLES (Banking-Grade)
+-- =============================================
+
+-- User Sessions (Opaque Token Storage)
+CREATE TABLE IF NOT EXISTS user_sessions (
+    session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    access_token_hash VARCHAR(64) NOT NULL UNIQUE,
+    refresh_token_hash VARCHAR(64) NOT NULL UNIQUE,
+    access_expires_at TIMESTAMP NOT NULL,
+    refresh_expires_at TIMESTAMP NOT NULL,
+    ip_address INET,
+    user_agent TEXT,
+    device_fingerprint VARCHAR(64),
+    revoked BOOLEAN DEFAULT false,
+    revoked_at TIMESTAMP,
+    revoke_reason VARCHAR(255),
+    last_activity TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_access_token ON user_sessions(access_token_hash);
+CREATE INDEX IF NOT EXISTS idx_sessions_refresh_token ON user_sessions(refresh_token_hash);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires ON user_sessions(access_expires_at) WHERE revoked = false;
+
+-- Security Audit Log
+CREATE TABLE IF NOT EXISTS security_audit_log (
+    log_id BIGSERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    user_id UUID REFERENCES users(user_id),
+    ip_address INET,
+    user_agent TEXT,
+    details JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_log_user ON security_audit_log(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_log_ip ON security_audit_log(ip_address, event_type, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_log_type ON security_audit_log(event_type, created_at DESC);
+
+-- Encrypted Banking Details (AES-256-GCM)
+CREATE TABLE IF NOT EXISTS encrypted_banking_details (
+    banking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    encrypted_data TEXT NOT NULL,
+    bank_name VARCHAR(100),
+    account_type VARCHAR(50),
+    last_four_digits VARCHAR(4),
+    is_primary BOOLEAN DEFAULT false,
+    verified BOOLEAN DEFAULT false,
+    verified_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_encrypted_banking_user ON encrypted_banking_details(user_id);
 
 -- Banking Details Table (NCA Compliant)
 CREATE TABLE banking_details (

@@ -1,25 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { query, transaction } = require('../config/database');
-const jwt = require('jsonwebtoken');
-
-// Middleware to verify JWT token
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-    req.user = user;
-    next();
-  });
-};
+const { healthcareRiskService } = require('../services/healthcare-risk.service');
+const { authenticateToken, requireAdmin } = require('../middleware/auth.middleware');
+const { sanitizeObject, logSecurityEvent } = require('../services/security.service');
 
 // Create new application
 router.post('/', authenticateToken, async (req, res) => {
@@ -37,8 +21,8 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Required fields missing' });
     }
 
-    if (bill_amount < 500 || bill_amount > 850) {
-      return res.status(400).json({ error: 'Bill amount must be between R500 and R850' });
+    if (bill_amount < 500 || bill_amount > 500000) {
+      return res.status(400).json({ error: 'Bill amount must be between R500 and R500,000' });
     }
 
     // Check user's credit limit
@@ -55,22 +39,28 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Account not active' });
     }
 
-    // Simple risk scoring (in production, this would be more complex)
-    const risk_score = Math.floor(Math.random() * 30) + 50; // Random score between 50-80
+    // Get user financial info for risk assessment
+    // Note: healthcare_affordability table may not exist yet if migration hasn't run
+    let userInfo;
+    try {
+      userInfo = await query(
+        `SELECT u.*, bd.bank_name
+         FROM users u
+         LEFT JOIN banking_details bd ON u.user_id = bd.user_id AND bd.is_primary = true
+         WHERE u.user_id = $1`,
+        [req.user.userId]
+      );
+    } catch (e) {
+      userInfo = { rows: [{}] };
+    }
 
-    // Auto-approve for demo purposes (in production, this would have proper risk assessment)
-    const status = risk_score >= 60 ? 'approved' : 'under_review';
-    const approved_amount = status === 'approved' ? bill_amount : null;
-    const monthly_payment = status === 'approved' ? (bill_amount / 3).toFixed(2) : null;
-
-    // Create application
-    const result = await query(
+    // Create initial application to get application_id for risk assessment
+    const initialApp = await query(
       `INSERT INTO applications (
         user_id, provider_id, bill_amount, treatment_type, provider_name,
-        existing_patient, risk_score, status, decision_date, approved_amount,
-        monthly_payment, ip_address, user_agent
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, $9, $10, $11, $12)
-      RETURNING *`,
+        existing_patient, status, ip_address, user_agent
+      ) VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
+      RETURNING application_id`,
       [
         req.user.userId,
         provider_id || null,
@@ -78,16 +68,88 @@ router.post('/', authenticateToken, async (req, res) => {
         treatment_type,
         provider_name,
         existing_patient || false,
-        risk_score,
-        status,
-        approved_amount,
-        monthly_payment,
         req.ip,
         req.get('User-Agent')
       ]
     );
 
+    const applicationId = initialApp.rows[0].application_id;
+
+    // Run healthcare risk assessment
+    let riskAssessment;
+    try {
+      riskAssessment = await healthcareRiskService.calculateRiskAssessment({
+        userId: req.user.userId,
+        applicationId,
+        loanAmount: bill_amount,
+        procedureType: treatment_type,
+        icd10Code: req.body.icd10_code || null,
+        providerId: provider_id || null,
+        monthlyIncome: userInfo.rows[0]?.declared_income || req.body.monthly_income || 15000,
+        existingDebt: userInfo.rows[0]?.monthly_debt_obligations || req.body.existing_debt || 0,
+        medicalAidScheme: req.body.medical_aid_scheme || null,
+        medicalAidOption: req.body.medical_aid_option || null,
+        hasChronicConditions: req.body.has_chronic_conditions || false,
+        applicationBehavior: {
+          completionTimeSeconds: req.body.completion_time_seconds || 180,
+          applicationHour: new Date().getHours(),
+          deviceType: req.get('User-Agent')?.includes('Mobile') ? 'mobile' : 'desktop',
+          locationConsistent: true
+        }
+      });
+    } catch (riskError) {
+      console.error('Risk assessment error:', riskError);
+      // Fallback to basic scoring if risk service fails
+      riskAssessment = {
+        decision: { decision: 'review', reason: 'Risk service unavailable' },
+        pd: { score: 0.05 },
+        healthScore: 50
+      };
+    }
+
+    // Determine status based on risk decision
+    const status = riskAssessment.decision.decision === 'approve' ? 'approved' :
+                   riskAssessment.decision.decision === 'decline' ? 'declined' : 'under_review';
+    const approved_amount = status === 'approved' ? bill_amount : null;
+    const monthly_payment = status === 'approved' ? (bill_amount / 3).toFixed(2) : null;
+
+    // Convert PD score to 0-100 scale for legacy risk_score field
+    const risk_score = Math.round((1 - riskAssessment.pd.score) * 100);
+
+    // Update application with risk assessment results
+    const result = await query(
+      `UPDATE applications SET
+        risk_score = $1,
+        status = $2,
+        decision_date = CURRENT_TIMESTAMP,
+        approved_amount = $3,
+        monthly_payment = $4,
+        decision_reason = $5
+      WHERE application_id = $6
+      RETURNING *`,
+      [
+        risk_score,
+        status,
+        approved_amount,
+        monthly_payment,
+        riskAssessment.decision.reason,
+        applicationId
+      ]
+    );
+
     const application = result.rows[0];
+
+    // Include risk assessment details in response
+    application.risk_assessment = {
+      pd_score: riskAssessment.pd.score,
+      pd_band: riskAssessment.pd.band,
+      lgd_score: riskAssessment.lgd?.score,
+      lgd_band: riskAssessment.lgd?.band,
+      expected_loss_rate: riskAssessment.expectedLoss?.rate,
+      health_payment_score: riskAssessment.healthScore,
+      affordability_band: riskAssessment.affordability,
+      pricing: riskAssessment.pricing
+    };
 
     // If approved, create payment plan
     if (status === 'approved') {
