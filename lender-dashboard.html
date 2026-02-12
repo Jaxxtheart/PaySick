@@ -948,6 +948,67 @@
             loadApplications();
         }
 
+        // Generate mock statistics for demo
+        function getMockStats() {
+            return {
+                pending_applications: 3,
+                awaiting_selection: 2,
+                active_loans: 47,
+                total_loaned: 1250000
+            };
+        }
+
+        // Generate mock applications for demo
+        function getMockApplications() {
+            return [
+                {
+                    application_id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    loan_amount: 15000,
+                    procedure_type: 'Dental Implants',
+                    provider_name: 'Smile Dental Clinic',
+                    requested_term: 12,
+                    risk_score: 78,
+                    risk_tier: 'LOW',
+                    monthly_income: 35000,
+                    employment_status: 'Employed Full-Time',
+                    affordability_score: 85,
+                    recommended_rate: 0.18,
+                    recommended_term: 12,
+                    recommended_monthly_payment: 1375
+                },
+                {
+                    application_id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+                    loan_amount: 45000,
+                    procedure_type: 'Orthopaedic Surgery',
+                    provider_name: 'Mediclinic Sandton',
+                    requested_term: 24,
+                    risk_score: 62,
+                    risk_tier: 'MEDIUM',
+                    monthly_income: 28000,
+                    employment_status: 'Self-Employed',
+                    affordability_score: 68,
+                    recommended_rate: 0.22,
+                    recommended_term: 24,
+                    recommended_monthly_payment: 2312
+                },
+                {
+                    application_id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+                    loan_amount: 8500,
+                    procedure_type: 'Vision Correction',
+                    provider_name: 'ClearView Eye Centre',
+                    requested_term: 6,
+                    risk_score: 91,
+                    risk_tier: 'LOW',
+                    monthly_income: 42000,
+                    employment_status: 'Employed Full-Time',
+                    affordability_score: 94,
+                    recommended_rate: 0.15,
+                    recommended_term: 6,
+                    recommended_monthly_payment: 1475
+                }
+            ];
+        }
+
         // Load statistics
         async function loadStats() {
             try {
@@ -961,9 +1022,17 @@
                     document.getElementById('statAwaiting').textContent = stats.awaiting_selection || 0;
                     document.getElementById('statActive').textContent = stats.active_loans || 0;
                     document.getElementById('statTotal').textContent = formatCurrency(stats.total_loaned || 0);
+                } else {
+                    throw new Error('API not available');
                 }
             } catch (error) {
-                console.error('Error loading stats:', error);
+                console.error('Error loading stats, using mock data:', error);
+                // Use mock data when API is unavailable
+                const stats = getMockStats();
+                document.getElementById('statPending').textContent = stats.pending_applications;
+                document.getElementById('statAwaiting').textContent = stats.awaiting_selection;
+                document.getElementById('statActive').textContent = stats.active_loans;
+                document.getElementById('statTotal').textContent = formatCurrency(stats.total_loaned);
             }
         }
 
@@ -977,41 +1046,36 @@
                 </div>
             `;
 
+            let applications = [];
+
             try {
                 const response = await fetch(`${API_BASE}/admin/pending-applications`, {
                     headers: getHeaders()
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to load applications');
+                    throw new Error('API not available');
                 }
 
-                const applications = await response.json();
-
-                if (applications.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <svg class="empty-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="2" y="4" width="20" height="16" rx="2"/><path class="icon-stroke" d="M2 8h20"/><path class="icon-stroke" d="M8 12v4M12 12v4M16 12v4"/></svg>
-                            <h3>No Pending Applications</h3>
-                            <p>New applications will appear here when patients apply for loans.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = `<div class="application-grid">${applications.map(app => renderApplication(app)).join('')}</div>`;
-
+                applications = await response.json();
             } catch (error) {
-                console.error('Error loading applications:', error);
+                console.error('Error loading applications, using mock data:', error);
+                // Use mock data when API is unavailable
+                applications = getMockApplications();
+            }
+
+            if (applications.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <svg class="empty-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M12 9v4M12 17h.01"/><path class="icon-stroke" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-                        <h3>Error Loading Applications</h3>
-                        <p>${error.message}</p>
-                        <button class="btn btn-primary" onclick="loadApplications()" style="margin-top: 16px;">Try Again</button>
+                        <svg class="empty-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="2" y="4" width="20" height="16" rx="2"/><path class="icon-stroke" d="M2 8h20"/><path class="icon-stroke" d="M8 12v4M12 12v4M16 12v4"/></svg>
+                        <h3>No Pending Applications</h3>
+                        <p>New applications will appear here when patients apply for loans.</p>
                     </div>
                 `;
+                return;
             }
+
+            container.innerHTML = `<div class="application-grid">${applications.map(app => renderApplication(app)).join('')}</div>`;
         }
 
         // Render application card
