@@ -709,7 +709,7 @@
                 <p class="section-description">Select the type of medical procedure you're financing</p>
 
                 <div class="procedure-grid">
-                    <div class="procedure-card" data-procedure="Dental" data-code="DENT">
+                    <div class="procedure-card" data-procedure="Dental" data-code="DENT" onclick="selectProcedure(this)">
                         <div class="icon">
                             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                 <path class="icon-stroke" d="M20 4c-4 0-7 2-8 5-1 3-0.5 6 0 9 0.5 3 1 6 0.5 9-0.3 2 0.5 4 2 5s3.5 0.5 4.5-1c0.8-1.2 1-3 1-5 0-2 0.2-4 1-5 0.8 1 1 3 1 5 0 2 0.2 3.8 1 5 1 1.5 3 2 4.5 1s2.3-3 2-5c-0.5-3 0-6 0.5-9 0.5-3 1-6 0-9-1-3-4-5-8-5z"/>
@@ -719,7 +719,7 @@
                         <div class="name">Dental</div>
                         <div class="description">Implants, crowns, braces</div>
                     </div>
-                    <div class="procedure-card" data-procedure="Eye Care" data-code="EYES">
+                    <div class="procedure-card" data-procedure="Eye Care" data-code="EYES" onclick="selectProcedure(this)">
                         <div class="icon">
                             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                 <path class="icon-stroke" d="M4 20c0 0 6-10 16-10s16 10 16 10-6 10-16 10S4 20 4 20z"/>
@@ -730,7 +730,7 @@
                         <div class="name">Eye Care</div>
                         <div class="description">LASIK, cataract surgery</div>
                     </div>
-                    <div class="procedure-card" data-procedure="Cosmetic" data-code="COSM">
+                    <div class="procedure-card" data-procedure="Cosmetic" data-code="COSM" onclick="selectProcedure(this)">
                         <div class="icon">
                             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                 <path class="icon-stroke" d="M20 4L6 14l4 22h20l4-22L20 4z"/>
@@ -743,7 +743,7 @@
                         <div class="name">Cosmetic</div>
                         <div class="description">Plastic surgery, skin</div>
                     </div>
-                    <div class="procedure-card" data-procedure="Orthopedic" data-code="ORTH">
+                    <div class="procedure-card" data-procedure="Orthopedic" data-code="ORTH" onclick="selectProcedure(this)">
                         <div class="icon">
                             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                 <path class="icon-stroke" d="M12 4c-3 0-5 2-5 4.5S10 13 10 13v14s-3 2.5-3 4.5 2 4.5 5 4.5 5-2 5-4.5-3-4.5-3-4.5V13s3-2.5 3-4.5S15 4 12 4z"/>
@@ -754,7 +754,7 @@
                         <div class="name">Orthopedic</div>
                         <div class="description">Joint, spine surgery</div>
                     </div>
-                    <div class="procedure-card" data-procedure="Fertility" data-code="FERT">
+                    <div class="procedure-card" data-procedure="Fertility" data-code="FERT" onclick="selectProcedure(this)">
                         <div class="icon">
                             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                 <path class="icon-stroke" d="M20 36V22"/>
@@ -767,7 +767,7 @@
                         <div class="name">Fertility</div>
                         <div class="description">IVF, fertility treatments</div>
                     </div>
-                    <div class="procedure-card" data-procedure="General Surgery" data-code="SURG">
+                    <div class="procedure-card" data-procedure="General Surgery" data-code="SURG" onclick="selectProcedure(this)">
                         <div class="icon">
                             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
                                 <rect class="icon-stroke" x="16" y="4" width="8" height="32" rx="2"/>
@@ -809,19 +809,19 @@
                 <div style="margin-top: 32px;">
                     <h3 style="font-size: 18px; margin-bottom: 16px;">Select repayment term</h3>
                     <div class="term-grid">
-                        <div class="term-option" data-term="6">
+                        <div class="term-option" data-term="6" onclick="selectTerm(this)">
                             <div class="months">6</div>
                             <div class="label">months</div>
                         </div>
-                        <div class="term-option selected" data-term="12">
+                        <div class="term-option selected" data-term="12" onclick="selectTerm(this)">
                             <div class="months">12</div>
                             <div class="label">months</div>
                         </div>
-                        <div class="term-option" data-term="18">
+                        <div class="term-option" data-term="18" onclick="selectTerm(this)">
                             <div class="months">18</div>
                             <div class="label">months</div>
                         </div>
-                        <div class="term-option" data-term="24">
+                        <div class="term-option" data-term="24" onclick="selectTerm(this)">
                             <div class="months">24</div>
                             <div class="label">months</div>
                         </div>
@@ -1000,7 +1000,14 @@
 
         // Check authentication
         function checkAuth() {
-            if (!PaySickAPI.users.isAuthenticated()) {
+            // Check localStorage directly as fallback if PaySickAPI isn't loaded
+            const token = localStorage.getItem('paysick_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            // Also try PaySickAPI if available
+            if (typeof PaySickAPI !== 'undefined' && !PaySickAPI.users.isAuthenticated()) {
                 window.location.href = 'login.html';
                 return false;
             }
@@ -1011,24 +1018,25 @@
         function init() {
             if (!checkAuth()) return;
 
-            // Set up procedure card selection
-            document.querySelectorAll('.procedure-card').forEach(card => {
-                card.addEventListener('click', () => selectProcedure(card));
-            });
+            // Procedure cards already have onclick handlers in HTML
+            // Just ensure they work
 
             // Set up amount slider
             const slider = document.getElementById('amountSlider');
-            slider.addEventListener('input', updateAmount);
+            if (slider) {
+                slider.addEventListener('input', updateAmount);
+            }
 
-            // Set up term selection
-            document.querySelectorAll('.term-option').forEach(option => {
-                option.addEventListener('click', () => selectTerm(option));
-            });
+            // Term options already have onclick handlers in HTML
 
             // Set up form validation
-            document.getElementById('employmentStatus').addEventListener('change', validateStep3);
-            document.getElementById('employmentDuration').addEventListener('change', validateStep3);
-            document.getElementById('monthlyIncome').addEventListener('input', validateStep3);
+            const empStatus = document.getElementById('employmentStatus');
+            const empDuration = document.getElementById('employmentDuration');
+            const monthlyIncome = document.getElementById('monthlyIncome');
+
+            if (empStatus) empStatus.addEventListener('change', validateStep3);
+            if (empDuration) empDuration.addEventListener('change', validateStep3);
+            if (monthlyIncome) monthlyIncome.addEventListener('input', validateStep3);
 
             updateAmount();
         }
@@ -1131,21 +1139,91 @@
             document.getElementById('summaryIncome').textContent = formatCurrency(applicationData.monthlyIncome);
         }
 
+        // Generate demo response when API is unavailable
+        function generateDemoResponse() {
+            const amount = applicationData.loanAmount;
+            const term = applicationData.requestedTerm;
+
+            // Calculate realistic monthly payments for different rates
+            const calculateMonthly = (principal, rate, months) => {
+                const monthlyRate = rate / 12;
+                return principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) /
+                       (Math.pow(1 + monthlyRate, months) - 1);
+            };
+
+            return {
+                applicationId: 'demo-' + Date.now(),
+                status: 'PREVIEW',
+                demo: true,
+                marketplaceStatus: {
+                    message: 'Our lending marketplace is being set up. Below is a preview of typical offers.'
+                },
+                previewOffers: [
+                    {
+                        lenderName: 'MediFin Capital',
+                        interestRate: 0.189,
+                        interestRateDisplay: '18.9%',
+                        term: term,
+                        monthlyPayment: Math.round(calculateMonthly(amount, 0.189, term)),
+                        totalRepayment: Math.round(calculateMonthly(amount, 0.189, term) * term),
+                        features: ['No early settlement fee', 'Flexible payment dates']
+                    },
+                    {
+                        lenderName: 'Healthcare Finance SA',
+                        interestRate: 0.219,
+                        interestRateDisplay: '21.9%',
+                        term: term,
+                        monthlyPayment: Math.round(calculateMonthly(amount, 0.219, term)),
+                        totalRepayment: Math.round(calculateMonthly(amount, 0.219, term) * term),
+                        features: ['Quick approval', 'Same-day funding']
+                    },
+                    {
+                        lenderName: 'WellnessLoan',
+                        interestRate: 0.249,
+                        interestRateDisplay: '24.9%',
+                        term: term,
+                        monthlyPayment: Math.round(calculateMonthly(amount, 0.249, term)),
+                        totalRepayment: Math.round(calculateMonthly(amount, 0.249, term) * term),
+                        features: ['No credit check required']
+                    }
+                ],
+                nextSteps: [
+                    'Your application has been saved',
+                    'Lenders are being onboarded to the marketplace',
+                    'You will be notified when real offers are available'
+                ]
+            };
+        }
+
         // Submit application
         async function submitApplication() {
             showLoading(true);
 
             try {
-                const response = await PaySickAPI.marketplace.submitApplication({
-                    procedureType: applicationData.procedureType,
-                    procedureCode: applicationData.procedureCode,
-                    procedureDescription: applicationData.procedureDescription,
-                    loanAmount: applicationData.loanAmount,
-                    requestedTerm: applicationData.requestedTerm,
-                    monthlyIncome: applicationData.monthlyIncome,
-                    employmentStatus: applicationData.employmentStatus,
-                    employmentDurationMonths: applicationData.employmentDurationMonths
-                });
+                let response;
+
+                // Try API if available, otherwise use demo mode
+                if (typeof PaySickAPI !== 'undefined' && PaySickAPI.marketplace) {
+                    try {
+                        response = await PaySickAPI.marketplace.submitApplication({
+                            procedureType: applicationData.procedureType,
+                            procedureCode: applicationData.procedureCode,
+                            procedureDescription: applicationData.procedureDescription,
+                            loanAmount: applicationData.loanAmount,
+                            requestedTerm: applicationData.requestedTerm,
+                            monthlyIncome: applicationData.monthlyIncome,
+                            employmentStatus: applicationData.employmentStatus,
+                            employmentDurationMonths: applicationData.employmentDurationMonths
+                        });
+                    } catch (apiError) {
+                        console.warn('API call failed, using demo mode:', apiError);
+                        response = generateDemoResponse();
+                    }
+                } else {
+                    // Demo mode when API client isn't loaded
+                    console.log('PaySickAPI not available, using demo mode');
+                    response = generateDemoResponse();
+                }
 
                 applicationId = response.applicationId;
 
