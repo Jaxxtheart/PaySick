@@ -182,7 +182,7 @@
         }
 
         .download-btn-primary {
-            background: #0D9488;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
             color: white;
             padding: 18px 48px;
             border-radius: 30px;
@@ -192,13 +192,14 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: background 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: none;
             cursor: pointer;
         }
 
         .download-btn-primary:hover {
-            background: #0F766E;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
         }
 
         .download-btn-primary svg {
@@ -423,8 +424,8 @@
             display: inline-block;
             font-size: 14px;
             font-weight: 600;
-            color: #0D9488;
-            background: #F0FDFA;
+            color: #E01E37;
+            background: #fff5f6;
             padding: 6px 14px;
             border-radius: 4px;
         }
@@ -532,7 +533,7 @@
         }
 
         .download-btn-bottom {
-            background: #0D9488;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
             color: white;
             padding: 18px 48px;
             border-radius: 30px;
@@ -542,14 +543,15 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            transition: background 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: none;
             cursor: pointer;
             margin-bottom: 24px;
         }
 
         .download-btn-bottom:hover {
-            background: #0F766E;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
         }
 
         .download-btn-bottom svg {
