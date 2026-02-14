@@ -16,6 +16,10 @@
     {
       "src": "css/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -38,6 +42,14 @@
     {
       "src": "/css/(.*)",
       "dest": "/css/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/research",
+      "dest": "/research.html"
     },
     {
       "src": "/",

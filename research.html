@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaySick | Underwriting Risk & Adverse Selection White Paper</title>
+    <meta name="description" content="Comprehensive framework for managing underwriting risk and adverse selection in healthcare lending. Addresses loss drivers, scenario analysis, and the PaySick Shield Framework for maintaining net loss rates below 2%.">
+    <meta property="og:title" content="PaySick White Paper: Underwriting Risk in Healthcare Lending">
+    <meta property="og:description" content="A framework for building loss-resistant healthcare financing at scale. 19.6M addressable population. 5-layer risk architecture. Global replicability.">
+    <meta property="og:type" content="article">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: #FFFFFF;
+        }
+
+        /* ---- Navigation ---- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-svg {
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4A4A4A;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #E01E37;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #1A1A1A;
+            cursor: pointer;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .menu-icon .icon-stroke {
+            stroke: #1A1A1A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        /* ---- Hero Section ---- */
+        .hero {
+            padding: 200px 60px 140px;
+            background: #FAFAFA;
+            text-align: center;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #8A8A8A;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 28px;
+            letter-spacing: -2px;
+            line-height: 1.08;
+            max-width: 900px;
+        }
+
+        .hero-subtitle {
+            font-size: 22px;
+            color: #4A4A4A;
+            font-weight: 400;
+            max-width: 640px;
+            margin: 0 auto 40px;
+            line-height: 1.5;
+        }
+
+        .hero-meta {
+            font-size: 14px;
+            color: #8A8A8A;
+            letter-spacing: 0.5px;
+            margin-bottom: 48px;
+        }
+
+        .hero-meta span {
+            margin: 0 8px;
+            color: #D0D0D0;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .download-btn-primary {
+            background: #0D9488;
+            color: white;
+            padding: 18px 48px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn-primary:hover {
+            background: #0F766E;
+        }
+
+        .download-btn-primary svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .scroll-link {
+            color: #8A8A8A;
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-link:hover {
+            color: #1A1A1A;
+        }
+
+        /* ---- Executive Summary ---- */
+        .exec-summary {
+            padding: 120px 60px;
+            background: #FFFFFF;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .exec-summary-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #8A8A8A;
+            margin-bottom: 24px;
+        }
+
+        .exec-summary h2 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+            margin-bottom: 60px;
+            line-height: 1.15;
+            max-width: 700px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            margin-bottom: 80px;
+            border-top: 1px solid #E5E5E5;
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .stat-item {
+            padding: 48px 32px;
+            border-right: 1px solid #E5E5E5;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 600;
+            color: #1A1A1A;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #8A8A8A;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .exec-text {
+            max-width: 720px;
+        }
+
+        .exec-text p {
+            font-size: 17px;
+            color: #4A4A4A;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        /* ---- Main Content Layout ---- */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 60px 120px;
+        }
+
+        /* ---- TOC Sidebar ---- */
+        .toc-sidebar {
+            position: sticky;
+            top: 120px;
+            align-self: start;
+            height: fit-content;
+        }
+
+        .toc-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8A8A8A;
+            margin-bottom: 24px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 0;
+        }
+
+        .toc-list a {
+            display: block;
+            padding: 10px 0;
+            text-decoration: none;
+            font-size: 14px;
+            color: #8A8A8A;
+            border-left: 2px solid transparent;
+            padding-left: 16px;
+            transition: color 0.3s ease, border-color 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .toc-list a:hover,
+        .toc-list a.active {
+            color: #1A1A1A;
+            border-left-color: #E01E37;
+        }
+
+        .toc-section-num {
+            font-weight: 600;
+            margin-right: 6px;
+            color: #C0C0C0;
+        }
+
+        /* Mobile TOC toggle */
+        .toc-mobile-toggle {
+            display: none;
+            width: 100%;
+            background: #FAFAFA;
+            border: 1px solid #E5E5E5;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A1A1A;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .toc-mobile-toggle::after {
+            content: '+';
+            float: right;
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        .toc-mobile-toggle.open::after {
+            content: '\2212';
+        }
+
+        /* ---- Sections ---- */
+        .sections-container {
+            min-width: 0;
+        }
+
+        .section-card {
+            padding: 48px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .section-card:first-child {
+            padding-top: 0;
+        }
+
+        .section-card:last-child {
+            border-bottom: none;
+        }
+
+        .section-num {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #C0C0C0;
+            margin-bottom: 12px;
+        }
+
+        .section-card h3 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .section-card p {
+            font-size: 16px;
+            color: #5A5A5A;
+            line-height: 1.7;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .section-data-point {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0D9488;
+            background: #F0FDFA;
+            padding: 6px 14px;
+            border-radius: 4px;
+        }
+
+        /* ---- Key Findings ---- */
+        .findings {
+            padding: 120px 60px;
+            background: #FAFAFA;
+        }
+
+        .findings-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .findings-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #8A8A8A;
+            margin-bottom: 24px;
+        }
+
+        .findings h2 {
+            font-size: 42px;
+            font-weight: 600;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+            margin-bottom: 64px;
+            line-height: 1.15;
+        }
+
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .finding-card {
+            background: #FFFFFF;
+            padding: 40px 32px;
+            border: 1px solid #E5E5E5;
+            transition: border-color 0.3s ease;
+        }
+
+        .finding-card:hover {
+            border-color: #C0C0C0;
+        }
+
+        .finding-card-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8A8A8A;
+            margin-bottom: 20px;
+        }
+
+        .finding-stat {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .finding-card p {
+            font-size: 15px;
+            color: #5A5A5A;
+            line-height: 1.6;
+        }
+
+        /* ---- Download Section ---- */
+        .download-section {
+            padding: 120px 60px;
+            background: #F0F4F8;
+            text-align: center;
+        }
+
+        .download-inner {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .download-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 32px;
+        }
+
+        .download-section h2 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .download-file-info {
+            font-size: 14px;
+            color: #8A8A8A;
+            margin-bottom: 32px;
+        }
+
+        .download-btn-bottom {
+            background: #0D9488;
+            color: white;
+            padding: 18px 48px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+
+        .download-btn-bottom:hover {
+            background: #0F766E;
+        }
+
+        .download-btn-bottom svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .download-note {
+            font-size: 13px;
+            color: #8A8A8A;
+            font-style: italic;
+        }
+
+        /* ---- Footer ---- */
+        footer {
+            padding: 60px 60px 40px;
+            background: #1A1A1A;
+            color: white;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .footer-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .footer-logo-text {
+            font-size: 32px;
+            font-weight: 400;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            color: #8A8A8A;
+        }
+
+        .footer-tagline {
+            color: #8A8A8A;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: #8A8A8A;
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 2.2;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #333;
+            color: #8A8A8A;
+            font-size: 14px;
+        }
+
+        /* ---- Scroll Fade-In ---- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Responsive ---- */
+
+        @media (max-width: 1024px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+                gap: 0;
+                padding: 0 40px 80px;
+            }
+
+            .toc-sidebar {
+                position: static;
+                display: none;
+            }
+
+            .toc-sidebar.open {
+                display: block;
+            }
+
+            .toc-mobile-toggle {
+                display: block;
+                margin: 0 40px 32px;
+            }
+
+            .findings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-item:nth-child(2) {
+                border-right: none;
+            }
+
+            .stat-item:nth-child(1),
+            .stat-item:nth-child(2) {
+                border-bottom: 1px solid #E5E5E5;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 30px;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero {
+                padding: 160px 30px 100px;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+                letter-spacing: -1px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .hero-meta {
+                font-size: 12px;
+            }
+
+            .hero-meta span {
+                display: none;
+            }
+
+            .hero-meta {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .exec-summary {
+                padding: 80px 30px;
+            }
+
+            .exec-summary h2 {
+                font-size: 32px;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-item {
+                border-right: none;
+                border-bottom: 1px solid #E5E5E5;
+                padding: 32px 24px;
+            }
+
+            .stat-item:last-child {
+                border-bottom: none;
+            }
+
+            .stat-number {
+                font-size: 40px;
+            }
+
+            .content-layout {
+                padding: 0 30px 60px;
+            }
+
+            .toc-mobile-toggle {
+                margin: 0 30px 24px;
+            }
+
+            .findings {
+                padding: 80px 30px;
+            }
+
+            .findings h2 {
+                font-size: 32px;
+            }
+
+            .findings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .download-section {
+                padding: 80px 30px;
+            }
+
+            .download-section h2 {
+                font-size: 28px;
+            }
+
+            footer {
+                padding: 40px 30px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="navCrossGradient" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="providers.html">For Providers</a></li>
+            <li><a href="research.html" style="color: #1A1A1A; font-weight: 500;">Research</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
+        </ul>
+        <button class="mobile-menu-toggle" aria-label="Menu">
+            <svg class="menu-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path class="icon-stroke" d="M3 6h18M3 12h18M3 18h18"/>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-label">PaySick Research</div>
+        <h1>When Care Meets Capital: Underwriting Risk &amp; Adverse Selection</h1>
+        <p class="hero-subtitle">A Framework for Building Loss-Resistant Healthcare Financing at Scale</p>
+        <div class="hero-meta">
+            <span class="hero-meta-divider">February 2026</span>
+            <span>|</span>
+            <span>Version 4.0</span>
+            <span>|</span>
+            <span>11 Sections</span>
+            <span>|</span>
+            <span>By Mosiuwa Tshabalala</span>
+        </div>
+        <div class="hero-actions">
+            <button class="download-btn-primary" onclick="downloadPDF()">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5M3 17h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Download White Paper (PDF)
+            </button>
+            <a href="#executive-summary" class="scroll-link">Read Executive Summary Below &darr;</a>
+        </div>
+    </section>
+
+    <!-- Executive Summary -->
+    <section class="exec-summary" id="executive-summary">
+        <div class="fade-in">
+            <div class="exec-summary-label">Executive Summary</div>
+            <h2>A structural approach to healthcare lending risk</h2>
+        </div>
+
+        <div class="stat-grid fade-in">
+            <div class="stat-item">
+                <div class="stat-number">19.6M</div>
+                <div class="stat-label">Addressable adult population across two defined segments</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">&lt; 2%</div>
+                <div class="stat-label">Target net loss rate across economic cycles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5 layers</div>
+                <div class="stat-label">Structural controls in the PaySick Shield Framework</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">6 markets</div>
+                <div class="stat-label">Global replicability validated (SA + 5 expansion)</div>
+            </div>
+        </div>
+
+        <div class="exec-text fade-in">
+            <p>Healthcare financing sits at the intersection of two critical imperatives: expanding access to medical care and maintaining rigorous financial discipline. This white paper presents PaySick's comprehensive framework for underwriting risk and managing adverse selection in healthcare lending across South Africa and five global expansion markets.</p>
+            <p>The analysis addresses how structural asymmetries in healthcare financing, including information gaps between borrowers and lenders, moral hazard in treatment selection, and cyclical economic pressures, can be systematically mitigated through a multi-layered risk architecture. The PaySick Shield Framework integrates borrower verification, procedure-level risk scoring, dynamic pricing, portfolio diversification, and loss-absorption reserves into a unified system targeting net loss rates below 2% across economic cycles.</p>
+            <p>Spanning 11 sections, the paper examines population segmentation, procedure-specific economics, scenario-based stress testing, regulatory considerations, and a phased global expansion roadmap, offering institutional and investor audiences a rigorous foundation for evaluating PaySick's risk management architecture.</p>
+        </div>
+    </section>
+
+    <!-- Mobile TOC Toggle -->
+    <button class="toc-mobile-toggle" id="tocToggle">Table of Contents</button>
+
+    <!-- Main Content: TOC + Sections -->
+    <div class="content-layout">
+        <aside class="toc-sidebar" id="tocSidebar">
+            <div class="toc-label">Contents</div>
+            <ul class="toc-list">
+                <li><a href="#section-1"><span class="toc-section-num">01</span> Introduction &amp; Scope</a></li>
+                <li><a href="#section-2"><span class="toc-section-num">02</span> Market Context &amp; Population Segmentation</a></li>
+                <li><a href="#section-3"><span class="toc-section-num">03</span> Adverse Selection in Healthcare Lending</a></li>
+                <li><a href="#section-4"><span class="toc-section-num">04</span> The PaySick Shield Framework</a></li>
+                <li><a href="#section-5"><span class="toc-section-num">05</span> Procedure-Level Economics</a></li>
+                <li><a href="#section-6"><span class="toc-section-num">06</span> Scenario Analysis &amp; Stress Testing</a></li>
+                <li><a href="#section-7"><span class="toc-section-num">07</span> Default Performance Benchmarks</a></li>
+                <li><a href="#section-8"><span class="toc-section-num">08</span> Regulatory &amp; Compliance Framework</a></li>
+                <li><a href="#section-9"><span class="toc-section-num">09</span> Global Expansion Roadmap</a></li>
+                <li><a href="#section-10"><span class="toc-section-num">10</span> Capital Structure &amp; Loss Reserves</a></li>
+                <li><a href="#section-11"><span class="toc-section-num">11</span> Conclusions &amp; Recommendations</a></li>
+            </ul>
+        </aside>
+
+        <div class="sections-container">
+            <div class="section-card fade-in" id="section-1">
+                <div class="section-num">SECTION 01</div>
+                <h3>Introduction &amp; Scope</h3>
+                <p>Establishes the foundational thesis: healthcare financing requires purpose-built risk frameworks distinct from general consumer lending. Defines the scope of analysis across South Africa's dual-segment healthcare market and introduces the structural approach to loss prevention.</p>
+                <div class="section-data-point">Healthcare-specific risk framework</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-2">
+                <div class="section-num">SECTION 02</div>
+                <h3>Market Context &amp; Population Segmentation</h3>
+                <p>Maps the addressable market into two distinct segments: 9.7 million medical aid holders seeking supplementary financing and 9.9 million uninsured adults paying out of pocket. Analyses income distributions, healthcare spending patterns, and credit behaviours within each segment.</p>
+                <div class="section-data-point">19.6M addressable adults across two segments</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-3">
+                <div class="section-num">SECTION 03</div>
+                <h3>Adverse Selection in Healthcare Lending</h3>
+                <p>Examines the information asymmetries that drive adverse selection in healthcare finance, including treatment urgency bias, provider-induced demand, and the moral hazard of deferred payment. Quantifies the cost of unmanaged selection risk.</p>
+                <div class="section-data-point">84% of South Africans lack medical aid</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-4">
+                <div class="section-num">SECTION 04</div>
+                <h3>The PaySick Shield Framework</h3>
+                <p>Details the five-layer defence architecture: borrower verification and scoring, procedure-level risk assessment, dynamic pricing and terms adjustment, portfolio-level diversification constraints, and loss-absorption capital reserves. Each layer is quantified with expected loss reduction impact.</p>
+                <div class="section-data-point">5 layers targeting &lt; 2% net loss</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-5">
+                <div class="section-num">SECTION 05</div>
+                <h3>Procedure-Level Economics</h3>
+                <p>Breaks down unit economics across healthcare verticals including dental, ophthalmology, cosmetic surgery, orthopaedic, and general medical procedures. Identifies highest-profitability verticals and maps risk-adjusted returns by procedure category.</p>
+                <div class="section-data-point">Dental &amp; ophthalmology: highest-margin verticals</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-6">
+                <div class="section-num">SECTION 06</div>
+                <h3>Scenario Analysis &amp; Stress Testing</h3>
+                <p>Models portfolio performance under base, adverse, and severe stress scenarios including recession, interest rate shocks, and provider concentration risk. Demonstrates Shield Framework resilience across economic cycles.</p>
+                <div class="section-data-point">Stress-tested across 3 macro scenarios</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-7">
+                <div class="section-num">SECTION 07</div>
+                <h3>Default Performance Benchmarks</h3>
+                <p>Benchmarks healthcare lending default rates against global data: healthcare loans have demonstrated a 1.6% cumulative default rate over 25 years globally, significantly outperforming general consumer credit. Analyses the structural reasons for this outperformance.</p>
+                <div class="section-data-point">1.6% cumulative default over 25 years globally</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-8">
+                <div class="section-num">SECTION 08</div>
+                <h3>Regulatory &amp; Compliance Framework</h3>
+                <p>Maps the regulatory landscape across the National Credit Act, POPIA, Financial Sector Conduct Authority requirements, and healthcare-specific regulations. Outlines PaySick's compliance architecture and licensing pathway.</p>
+                <div class="section-data-point">NCA, POPIA &amp; FSCA compliant</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-9">
+                <div class="section-num">SECTION 09</div>
+                <h3>Global Expansion Roadmap</h3>
+                <p>Validates the replicability of the PaySick model across five expansion markets: India, United Kingdom, Australia, Kenya, and the Philippines. Each market is assessed on healthcare financing gap, regulatory feasibility, and addressable population size.</p>
+                <div class="section-data-point">5 markets across 4 continents</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-10">
+                <div class="section-num">SECTION 10</div>
+                <h3>Capital Structure &amp; Loss Reserves</h3>
+                <p>Defines the capital allocation model including loss reserve ratios, required capital buffers by portfolio stage, and the relationship between growth velocity and capital consumption. Models the path to self-sustaining portfolio economics.</p>
+                <div class="section-data-point">Defined reserve ratios by portfolio stage</div>
+            </div>
+
+            <div class="section-card fade-in" id="section-11">
+                <div class="section-num">SECTION 11</div>
+                <h3>Conclusions &amp; Recommendations</h3>
+                <p>Synthesises findings into actionable recommendations for institutional partners and investors. Articulates the thesis that purpose-built healthcare financing, when structurally defended against adverse selection, represents a durable and scalable asset class.</p>
+                <div class="section-data-point">Healthcare financing as a durable asset class</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Findings -->
+    <section class="findings" id="key-findings">
+        <div class="findings-inner">
+            <div class="fade-in">
+                <div class="findings-label">Key Findings</div>
+                <h2>What the research reveals</h2>
+            </div>
+
+            <div class="findings-grid">
+                <div class="finding-card fade-in">
+                    <div class="finding-card-label">Market Opportunity</div>
+                    <div class="finding-stat">84% of South Africans lack medical aid coverage</div>
+                    <p>The structural gap between healthcare need and financing availability creates a vast, underserved market. PaySick targets the intersection of clinical urgency and financial exclusion where traditional credit products fail.</p>
+                </div>
+
+                <div class="finding-card fade-in">
+                    <div class="finding-card-label">Risk Architecture</div>
+                    <div class="finding-stat">5-layer Shield Framework targeting &lt; 2% net loss</div>
+                    <p>Rather than relying on a single underwriting gate, the Shield Framework distributes risk mitigation across five structural layers, from individual scoring through to portfolio-level capital reserves, creating defence in depth.</p>
+                </div>
+
+                <div class="finding-card fade-in">
+                    <div class="finding-card-label">Population Segments</div>
+                    <div class="finding-stat">Segment 1: 9.7M medical aid holders<br>Segment 2: 9.9M uninsured OOP users</div>
+                    <p>Two distinct borrower populations with different risk profiles, repayment behaviours, and healthcare utilisation patterns. The dual-segment approach enables targeted underwriting and diversified portfolio construction.</p>
+                </div>
+
+                <div class="finding-card fade-in">
+                    <div class="finding-card-label">Global Expansion</div>
+                    <div class="finding-stat">5 markets across 4 continents</div>
+                    <p>India, United Kingdom, Australia, Kenya, and the Philippines each present validated market conditions for the PaySick model: significant healthcare financing gaps, supportive regulatory environments, and large addressable populations.</p>
+                </div>
+
+                <div class="finding-card fade-in">
+                    <div class="finding-card-label">Procedure Economics</div>
+                    <div class="finding-stat">Dental, ophthalmology &amp; cosmetic surgery: highest-margin verticals</div>
+                    <p>Elective and semi-elective procedures with predictable cost structures and high patient commitment deliver the strongest risk-adjusted returns. These verticals form the foundation of early portfolio construction.</p>
+                </div>
+
+                <div class="finding-card fade-in">
+                    <div class="finding-card-label">Default Performance</div>
+                    <div class="finding-stat">1.6% cumulative default over 25 years globally</div>
+                    <p>Healthcare loans structurally outperform general consumer credit. The combination of treatment completion incentive, provider relationship continuity, and procedure-specific repayment motivation creates a natural loss-suppression mechanism.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download-section" id="download">
+        <div class="download-inner">
+            <svg class="download-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="12" y="4" width="40" height="56" rx="4" stroke="#1A1A1A" stroke-width="2.5"/>
+                <path d="M22 4V0" stroke="none"/>
+                <path d="M24 20h16M24 28h16M24 36h10" stroke="#C0C0C0" stroke-width="2" stroke-linecap="round"/>
+                <path d="M32 44v10m0 0l-4-4m4 4l4-4" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2>Download the Full White Paper</h2>
+            <p class="download-file-info">PDF &middot; PaySick_Underwriting_Risk_WhitePaper_V4.pdf</p>
+            <button class="download-btn-bottom" onclick="downloadPDF()">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5M3 17h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Download PDF
+            </button>
+            <p class="download-note">Confidential &mdash; For institutional and investor audiences</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo-container">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="footerCrossGradient" cx="40%" cy="40%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="research.html">Research</a></li>
+                    <li><a href="investor-deck.html">Investors</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="index.html#about">Privacy Policy</a></li>
+                    <li><a href="index.html#about">Terms of Service</a></li>
+                    <li><a href="index.html#about">POPIA Compliance</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+
+    <script>
+        // PDF Download handler
+        function downloadPDF() {
+            var link = document.createElement('a');
+            link.href = '/assets/docs/PaySick_Underwriting_Risk_WhitePaper_V4.pdf';
+            link.download = 'PaySick_Underwriting_Risk_WhitePaper_V4.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Scroll fade-in observer
+        var fadeElements = document.querySelectorAll('.fade-in');
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        fadeElements.forEach(function(el) {
+            observer.observe(el);
+        });
+
+        // TOC active state on scroll
+        var tocLinks = document.querySelectorAll('.toc-list a');
+        var sections = document.querySelectorAll('.section-card');
+
+        window.addEventListener('scroll', function() {
+            var scrollPos = window.scrollY + 160;
+            sections.forEach(function(section, index) {
+                var top = section.offsetTop;
+                var bottom = top + section.offsetHeight;
+                if (scrollPos >= top && scrollPos < bottom) {
+                    tocLinks.forEach(function(link) { link.classList.remove('active'); });
+                    if (tocLinks[index]) {
+                        tocLinks[index].classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Mobile TOC toggle
+        var tocToggle = document.getElementById('tocToggle');
+        var tocSidebar = document.getElementById('tocSidebar');
+
+        tocToggle.addEventListener('click', function() {
+            tocSidebar.classList.toggle('open');
+            tocToggle.classList.toggle('open');
+        });
+
+        // Close mobile TOC when a link is clicked
+        tocLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 1024) {
+                    tocSidebar.classList.remove('open');
+                    tocToggle.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
