@@ -1,60 +1,45 @@
 #!/usr/bin/env python3
-"""Part 4: Sections 10-11, References, and ZIP assembly."""
+"""Part 4: Sections 10-11, References, and final ZIP assembly."""
 import zipfile, os
 from generate_docx_part1 import *
-from generate_docx_part2 import build_body_part2
-from generate_docx_part3 import build_body_part3
+from generate_docx_part2 import build_part2
+from generate_docx_part3 import build_part3
 
-def build_body_part4():
-    parts = []
+def build_part4():
+    p = []
 
-    # ══════════════════════════════════════════════════════════
-    # SECTION 10: RISK-SHARING WATERFALL
-    # ══════════════════════════════════════════════════════════
-    parts.append(section_label("Section 10"))
-    parts.append(heading1("Risk-Sharing Waterfall: Who Bears What", page_break=True))
-    parts.append(accent_bar())
-    parts.append(body("A clear understanding of risk allocation across the value chain is essential for investor confidence. The PaySick model distributes risk structurally across four parties:"))
-
-    parts.append(make_table(
+    # ─── SECTION 10: RISK-SHARING WATERFALL ──────────────────
+    p.append(slabel("Section 10"))
+    p.append(h1("Risk-Sharing Waterfall: Who Bears What"))
+    p.append(h1_bar())
+    p.append(body("A clear understanding of risk allocation across the value chain is essential for investor confidence. The PaySick model distributes risk structurally across four parties:"))
+    p.append(TBL(
         ["Party", "Risk Exposure", "Mitigation", "Incentive Alignment"],
-        [
-            ["Provider", "Zero direct credit risk (paid in 24hrs). Indirect risk via provider scoring affecting future approval limits and payout speed.", "Co-payment holdback on new providers. Graduated trust. Treatment benchmarking.", "Better patient repayment = higher limits, faster payouts, more patients."],
-            ["PaySick (Marketplace)", "Earns origination fee. Bears no credit risk on marketplace loans. Bears reputational risk from poor lender behaviour.", "Rate caps, lender quality scoring, minimum coverage requirements.", "Better approval quality = lender retention = sustained fee income."],
-            ["PaySick (Balance Sheet)", "Bears full credit risk on directly funded loans (target 35% of revenue). This is the learning engine.", "Healthcare-specific underwriting. Cap at 40% of total book. Circuit breakers at 6% arrears.", "Balance sheet data trains marketplace algorithms. Exposure shrinks as marketplace scales."],
-            ["Lender Partners", "Bear credit risk on marketplace loans. Protected by PaySick\u2019s pre-screening (only qualified patients reach marketplace).", "First-loss data from PaySick\u2019s own book. Diversification across procedure types and providers.", "PaySick\u2019s balance sheet acts as canary: if PaySick\u2019s own book deteriorates, lenders see the signal early."],
-            ["Patient", "Bears repayment obligation. Protected by affordability checks, flexible restructuring, and transparent terms.", "Hard income ceiling prevents over-extension. Proactive restructuring for complications. No hidden fees.", "Medical debt carries social and family support dynamics. Patients return for follow-up care."],
-        ],
-        [1800, 2600, 2400, 2200]
+        [["Provider", "Zero direct credit risk (paid in 24hrs). Indirect risk via provider scoring affecting future approval limits and payout speed.", "Co-payment holdback on new providers. Graduated trust. Treatment benchmarking.", "Better patient repayment = higher limits, faster payouts, more patients."],
+         ["PaySick (Marketplace)", "Earns origination fee. Bears no credit risk on marketplace loans. Bears reputational risk from poor lender behaviour.", "Rate caps, lender quality scoring, minimum coverage requirements.", "Better approval quality = lender retention = sustained fee income."],
+         ["PaySick (Balance Sheet)", "Bears full credit risk on directly funded loans (target 35% of revenue). This is the learning engine.", "Healthcare-specific underwriting. Cap at 40% of total book. Circuit breakers at 6% arrears.", "Balance sheet data trains marketplace algorithms. Exposure shrinks as marketplace scales."],
+         ["Lender Partners", "Bear credit risk on marketplace loans. Protected by PaySick\u2019s pre-screening (only qualified patients reach marketplace).", "First-loss data from PaySick\u2019s own book. Diversification across procedure types and providers.", "PaySick\u2019s balance sheet acts as canary: if PaySick\u2019s own book deteriorates, lenders see the signal early."],
+         ["Patient", "Bears repayment obligation. Protected by affordability checks, flexible restructuring, and transparent terms.", "Hard income ceiling prevents over-extension. Proactive restructuring for complications. No hidden fees.", "Medical debt carries social and family support dynamics. Patients return for follow-up care."]],
+        [1800, 2600, 2400, 2226]
     ))
+    p.append(callout("The Critical Insight: As the marketplace scales, PaySick\u2019s own balance sheet exposure shrinks as a percentage of total volume, while the underwriting intelligence from balance sheet lending improves marketplace quality. The balance sheet is a learning engine, not the long-term risk centre."))
 
-    parts.append(callout("The Critical Insight: As the marketplace scales, PaySick\u2019s own balance sheet exposure shrinks as a percentage of total volume, while the underwriting intelligence from balance sheet lending improves marketplace quality. The balance sheet is a learning engine, not the long-term risk centre."))
+    # ─── SECTION 11: CONCLUSION ──────────────────────────────
+    p.append(slabel("Section 11"))
+    p.append(h1("Conclusion"))
+    p.append(h1_bar())
+    p.append(body("Healthcare lending is not retail BNPL with a different label. It operates in a fundamentally different risk environment characterised by non-discretionary demand, provider-mediated distribution, and multi-party incentive dynamics that generic consumer lending models are not equipped to manage."))
+    p.append(body("The PaySick Shield Framework addresses this by building five layers of structural protection, each designed to break the adverse selection cascade at a different point. The framework achieves three objectives simultaneously:"))
+    p.append(bul("Target net loss rate of 1.0\u20131.44%, with structural break-even at PD of 14%+ and multiple circuit breakers long before that threshold.", prefix="Loss prevention: "))
+    p.append(bul("Every transaction strengthens the model, creating an unreplicable dataset that improves loss rates over time, from an expected 5% PD at cold start to below 2.5% at scale.", prefix="Data compounding: "))
+    p.append(bul("The framework is market-agnostic by design, requiring only local calibration of regulatory thresholds, affordability ceilings, and provider onboarding criteria.", prefix="Global scalability: "))
+    p.append(body("The single most important insight for investors: the provider gets paid in 24 hours, but trust is earned over 6 months. New providers start with capped limits and graduated payouts tied to their patients\u2019 repayment performance. This one structural control, when combined with patient affordability ceilings and portfolio circuit breakers, creates a healthcare lending platform that is structurally resistant to the adverse selection dynamics that plague retail consumer credit."))
+    p.append(callout("PaySick\u2019s risk framework is not a credit score with a healthcare label. It is a three-dimensional model encompassing clinical, financial, and insurance dimensions that improves with every transaction. Generic fintechs see a loan. PaySick sees a procedure, a provider, a patient, and a payer. That is why our loss rates will structurally outperform, and that is why this framework scales."))
 
-    # ══════════════════════════════════════════════════════════
-    # SECTION 11: CONCLUSION
-    # ══════════════════════════════════════════════════════════
-    parts.append(section_label("Section 11"))
-    parts.append(heading1("Conclusion", page_break=True))
-    parts.append(accent_bar())
-
-    parts.append(body("Healthcare lending is not retail BNPL with a different label. It operates in a fundamentally different risk environment characterised by non-discretionary demand, provider-mediated distribution, and multi-party incentive dynamics that generic consumer lending models are not equipped to manage."))
-    parts.append(body("The PaySick Shield Framework addresses this by building five layers of structural protection, each designed to break the adverse selection cascade at a different point. The framework achieves three objectives simultaneously:"))
-
-    parts.append(bullet("Target net loss rate of 1.0\u20131.44%, with structural break-even at PD of 14%+ and multiple circuit breakers long before that threshold.", bold_prefix="Loss prevention: "))
-    parts.append(bullet("Every transaction strengthens the model, creating an unreplicable dataset that improves loss rates over time, from an expected 5% PD at cold start to below 2.5% at scale.", bold_prefix="Data compounding: "))
-    parts.append(bullet("The framework is market-agnostic by design, requiring only local calibration of regulatory thresholds, affordability ceilings, and provider onboarding criteria.", bold_prefix="Global scalability: "))
-
-    parts.append(body("The single most important insight for investors: the provider gets paid in 24 hours, but trust is earned over 6 months. New providers start with capped limits and graduated payouts tied to their patients\u2019 repayment performance. This one structural control, when combined with patient affordability ceilings and portfolio circuit breakers, creates a healthcare lending platform that is structurally resistant to the adverse selection dynamics that plague retail consumer credit."))
-
-    parts.append(callout("PaySick\u2019s risk framework is not a credit score with a healthcare label. It is a three-dimensional model encompassing clinical, financial, and insurance dimensions that improves with every transaction. Generic fintechs see a loan. PaySick sees a procedure, a provider, a patient, and a payer. That is why our loss rates will structurally outperform, and that is why this framework scales."))
-
-    # ══════════════════════════════════════════════════════════
-    # REFERENCES
-    # ══════════════════════════════════════════════════════════
-    parts.append(section_label("References"))
-    parts.append(heading1("References", page_break=True))
-    parts.append(accent_bar())
-
+    # ─── REFERENCES ──────────────────────────────────────────
+    p.append(slabel("References"))
+    p.append(h1("References"))
+    p.append(h1_bar())
     refs = [
         "Browne Commission (1986) Report of the Commission of Inquiry into Health Services. Pretoria: Government Printer.",
         "Consumer Financial Protection Bureau (CFPB) (2024) Buy Now, Pay Later: Market Trends and Consumer Impacts. Washington, DC: CFPB Office of Research.",
@@ -85,23 +70,26 @@ def build_body_part4():
         "Private Healthcare Information Network (PHIN) (2025) Annual Self-Pay and Private Hospital Admissions Report 2024. London: PHIN.",
     ]
     for ref in refs:
-        parts.append(body(ref))
+        p.append(P([R(ref, size=10, color=BODY_TEXT)], after=80, line_spacing=280))
 
     # End mark
-    parts.append(spacer(200))
-    parts.append(make_para([make_run("\u2014 END \u2014", size=11, color=LIGHT_GRAY, font="Segoe UI")], alignment="center", spacing_after=100))
-    parts.append(spacer(100))
+    p.append(sp(300))
+    p.append(P([R("\u2014 END \u2014", size=11, color=GRAY_MED)], align="center", after=120, line_spacing=240))
+    p.append(sp(200))
 
-    # Footer
-    logo1 = make_run("Pay", size=14, color=DARK_TEXT, font="Segoe UI")
-    logo2 = make_run("Sick", size=14, color="4A4A4A", font="Segoe UI")
-    parts.append(make_para([logo1, logo2], alignment="center", spacing_after=20))
-    parts.append(make_para([make_run("Heal Now, Pay Later", size=10, color=LIGHT_GRAY, font="Segoe UI")], alignment="center", spacing_after=60))
-    parts.append(make_para([make_run("\u00a9 2026 PaySick (Pty) Ltd. All rights reserved.", size=9, color=LIGHT_GRAY, font="Segoe UI")], alignment="center", spacing_after=10))
-    parts.append(make_para([make_run("This document is confidential and intended solely for the use of intended recipients.", size=9, color=LIGHT_GRAY, font="Segoe UI")], alignment="center", spacing_after=10))
-    parts.append(make_para([make_run("Unauthorised distribution is prohibited.", size=9, color=LIGHT_GRAY, font="Segoe UI")], alignment="center"))
+    # Footer branding
+    p.append(P([R("Pay", size=14, color=DARK_TEXT), R("Sick", size=14, color="4A4A4A")],
+               align="center", after=20, line_spacing=240))
+    p.append(P([R("Heal Now, Pay Later", size=10, color=GRAY_MED)],
+               align="center", after=80, line_spacing=240))
+    p.append(P([R("\u00a9 2026 PaySick (Pty) Ltd. All rights reserved.", size=9, color=GRAY_LIGHT)],
+               align="center", after=20, line_spacing=240))
+    p.append(P([R("This document is confidential and intended solely for the use of intended recipients.", size=9, color=GRAY_LIGHT)],
+               align="center", after=20, line_spacing=240))
+    p.append(P([R("Unauthorised distribution is prohibited.", size=9, color=GRAY_LIGHT)],
+               align="center", after=0, line_spacing=240))
 
-    return parts
+    return p
 
 
 # ══════════════════════════════════════════════════════════════
@@ -109,15 +97,17 @@ def build_body_part4():
 # ══════════════════════════════════════════════════════════════
 
 def assemble_docx():
+    # Generate logo PNG
+    logo_png = make_logo_png(200, 200)
+
     # Gather all body parts
-    all_parts = build_body()            # Part 1: Cover, TOC, Abstract, Sections 1-2
-    all_parts += build_body_part2()     # Part 2: Sections 3-5
-    all_parts += build_body_part3()     # Part 3: Sections 6-9
-    all_parts += build_body_part4()     # Part 4: Sections 10-11, References
+    all_parts = build_all()        # Cover, TOC, Abstract
+    all_parts += build_part2()     # Sections 1-5
+    all_parts += build_part3()     # Sections 6-9
+    all_parts += build_part4()     # Sections 10-11, References
 
     body_xml = '\n'.join(all_parts)
 
-    # document.xml
     document_xml = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -134,6 +124,8 @@ def assemble_docx():
             xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
             xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
             xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
             mc:Ignorable="w14 wp14">
   <w:body>
     {body_xml}
@@ -145,7 +137,6 @@ def assemble_docx():
   </w:body>
 </w:document>'''
 
-    # styles.xml
     styles_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:docDefaults>
@@ -159,7 +150,7 @@ def assemble_docx():
     </w:rPrDefault>
     <w:pPrDefault>
       <w:pPr>
-        <w:spacing w:after="120" w:line="276" w:lineRule="auto"/>
+        <w:spacing w:after="160" w:line="288" w:lineRule="auto"/>
       </w:pPr>
     </w:pPrDefault>
   </w:docDefaults>
@@ -167,18 +158,17 @@ def assemble_docx():
     <w:name w:val="Table Grid"/>
     <w:tblPr>
       <w:tblBorders>
-        <w:top w:val="single" w:sz="4" w:space="0" w:color="E5E5E5"/>
-        <w:left w:val="single" w:sz="4" w:space="0" w:color="E5E5E5"/>
-        <w:bottom w:val="single" w:sz="4" w:space="0" w:color="E5E5E5"/>
-        <w:right w:val="single" w:sz="4" w:space="0" w:color="E5E5E5"/>
-        <w:insideH w:val="single" w:sz="4" w:space="0" w:color="E5E5E5"/>
-        <w:insideV w:val="single" w:sz="4" w:space="0" w:color="E5E5E5"/>
+        <w:top w:val="single" w:sz="2" w:space="0" w:color="E0E0E0"/>
+        <w:left w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+        <w:bottom w:val="single" w:sz="2" w:space="0" w:color="E0E0E0"/>
+        <w:right w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+        <w:insideH w:val="single" w:sz="2" w:space="0" w:color="E0E0E0"/>
+        <w:insideV w:val="none" w:sz="0" w:space="0" w:color="auto"/>
       </w:tblBorders>
     </w:tblPr>
   </w:style>
 </w:styles>'''
 
-    # settings.xml
     settings_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:defaultTabStop w:val="720"/>
@@ -187,7 +177,6 @@ def assemble_docx():
   </w:compat>
 </w:settings>'''
 
-    # fontTable.xml
     font_table_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:fonts xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:font w:name="Segoe UI">
@@ -198,32 +187,30 @@ def assemble_docx():
   </w:font>
 </w:fonts>'''
 
-    # [Content_Types].xml
     content_types_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
   <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
   <Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
 </Types>'''
 
-    # _rels/.rels
     rels_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
 </Relationships>'''
 
-    # word/_rels/document.xml.rels
     doc_rels_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
   <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
   <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+  <Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.png"/>
 </Relationships>'''
 
-    # Build ZIP
     with zipfile.ZipFile(OUTPATH, 'w', zipfile.ZIP_DEFLATED) as zf:
         zf.writestr('[Content_Types].xml', content_types_xml)
         zf.writestr('_rels/.rels', rels_xml)
@@ -232,6 +219,7 @@ def assemble_docx():
         zf.writestr('word/styles.xml', styles_xml)
         zf.writestr('word/settings.xml', settings_xml)
         zf.writestr('word/fontTable.xml', font_table_xml)
+        zf.writestr('word/media/logo.png', logo_png)
 
     print(f"Generated: {OUTPATH}")
     sz = os.path.getsize(OUTPATH)
