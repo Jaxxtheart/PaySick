@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PaySick | When Care Meets Capital: Underwriting Risk &amp; Adverse Selection White Paper</title>
+<style>
+    @page {
+        size: A4;
+        margin: 2.5cm 2.5cm 3cm 2.5cm;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 11pt;
+        color: #1A1A1A;
+        line-height: 1.7;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ---- Cover Page ---- */
+    .cover {
+        page-break-after: always;
+        text-align: center;
+        padding: 120px 60px 80px;
+        background: #FAFAFA;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cover-logo {
+        font-size: 42px;
+        font-weight: 400;
+        letter-spacing: -1px;
+        margin-bottom: 8px;
+        color: #1A1A1A;
+    }
+
+    .cover-logo span {
+        font-weight: 300;
+        color: #4A4A4A;
+    }
+
+    .cover-tagline {
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #8A8A8A;
+        margin-bottom: 80px;
+    }
+
+    .cover-divider {
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(135deg, #FF4757, #E01E37);
+        margin: 0 auto 60px;
+        border: none;
+    }
+
+    .cover-title {
+        font-size: 34px;
+        font-weight: 600;
+        color: #1A1A1A;
+        letter-spacing: -1px;
+        line-height: 1.15;
+        margin-bottom: 20px;
+        max-width: 600px;
+    }
+
+    .cover-subtitle {
+        font-size: 16px;
+        color: #4A4A4A;
+        font-weight: 400;
+        margin-bottom: 60px;
+        max-width: 480px;
+        line-height: 1.5;
+    }
+
+    .cover-meta {
+        font-size: 11px;
+        color: #8A8A8A;
+        letter-spacing: 0.5px;
+        line-height: 2;
+    }
+
+    .cover-meta strong {
+        color: #4A4A4A;
+    }
+
+    .cover-confidential {
+        margin-top: 60px;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #C0C0C0;
+        border-top: 1px solid #E5E5E5;
+        padding-top: 20px;
+    }
+
+    /* ---- Page Headers ---- */
+    .page-header {
+        border-bottom: 2px solid #F0F0F0;
+        padding-bottom: 12px;
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .page-header-logo {
+        font-size: 16px;
+        font-weight: 400;
+        color: #C0C0C0;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header-logo span {
+        font-weight: 300;
+    }
+
+    .page-header-title {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #C0C0C0;
+    }
+
+    /* ---- Section Styling ---- */
+    .section {
+        page-break-before: always;
+        padding-top: 20px;
+    }
+
+    .section:first-of-type {
+        page-break-before: auto;
+    }
+
+    .section-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #E01E37;
+        margin-bottom: 8px;
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1A1A1A;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+        margin-bottom: 30px;
+    }
+
+    h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1A1A1A;
+        letter-spacing: -0.3px;
+        margin-top: 36px;
+        margin-bottom: 16px;
+        line-height: 1.3;
+    }
+
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1A1A1A;
+        margin-top: 28px;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    p {
+        font-size: 11pt;
+        color: #4A4A4A;
+        line-height: 1.75;
+        margin-bottom: 14px;
+    }
+
+    /* ---- Callout Box ---- */
+    .callout {
+        background: #fff5f6;
+        border-left: 4px solid #E01E37;
+        padding: 20px 24px;
+        margin: 28px 0;
+    }
+
+    .callout p {
+        margin-bottom: 0;
+        color: #1A1A1A;
+        font-weight: 500;
+        font-size: 11pt;
+    }
+
+    .callout-subtle {
+        background: #FAFAFA;
+        border-left: 4px solid #E5E5E5;
+        padding: 20px 24px;
+        margin: 28px 0;
+    }
+
+    .callout-subtle p {
+        margin-bottom: 0;
+        color: #4A4A4A;
+    }
+
+    /* ---- Data Highlight ---- */
+    .data-highlight {
+        display: inline-block;
+        background: #fff5f6;
+        color: #E01E37;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 11pt;
+    }
+
+    /* ---- Stat Row ---- */
+    .stat-row {
+        display: flex;
+        gap: 0;
+        margin: 32px 0;
+        border: 1px solid #E5E5E5;
+    }
+
+    .stat-box {
+        flex: 1;
+        padding: 28px 20px;
+        border-right: 1px solid #E5E5E5;
+        text-align: center;
+    }
+
+    .stat-box:last-child {
+        border-right: none;
+    }
+
+    .stat-box-number {
+        font-size: 32px;
+        font-weight: 600;
+        color: #1A1A1A;
+        letter-spacing: -1px;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .stat-box-label {
+        font-size: 10px;
+        color: #8A8A8A;
+        line-height: 1.4;
+    }
+
+    /* ---- Tables ---- */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 24px 0;
+        font-size: 10.5pt;
+    }
+
+    thead th {
+        background: #1A1A1A;
+        color: #FFFFFF;
+        font-weight: 600;
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 14px 16px;
+        text-align: left;
+    }
+
+    tbody td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #F0F0F0;
+        color: #4A4A4A;
+        vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+        background: #FAFAFA;
+    }
+
+    tbody td:first-child {
+        font-weight: 600;
+        color: #1A1A1A;
+    }
+
+    /* ---- Lists ---- */
+    ul, ol {
+        margin: 12px 0 20px 24px;
+        color: #4A4A4A;
+    }
+
+    li {
+        margin-bottom: 8px;
+        line-height: 1.65;
+        font-size: 11pt;
+    }
+
+    /* ---- Horizontal Rule ---- */
+    hr {
+        border: none;
+        height: 1px;
+        background: #E5E5E5;
+        margin: 40px 0;
+    }
+
+    /* ---- TOC ---- */
+    .toc {
+        page-break-after: always;
+        padding-top: 40px;
+    }
+
+    .toc h1 {
+        font-size: 28px;
+        margin-bottom: 40px;
+    }
+
+    .toc-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 14px 0;
+        border-bottom: 1px solid #F0F0F0;
+    }
+
+    .toc-entry-num {
+        font-size: 12px;
+        font-weight: 600;
+        color: #C0C0C0;
+        margin-right: 16px;
+        min-width: 28px;
+    }
+
+    .toc-entry-title {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 500;
+        color: #1A1A1A;
+    }
+
+    .toc-entry-page {
+        font-size: 12px;
+        color: #8A8A8A;
+        margin-left: 16px;
+    }
+
+    /* ---- Footer ---- */
+    .doc-footer {
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 1px solid #E5E5E5;
+        font-size: 9px;
+        color: #C0C0C0;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+
+    /* ---- Figure / Chart Placeholder ---- */
+    .figure {
+        background: #FAFAFA;
+        border: 1px solid #E5E5E5;
+        padding: 40px 24px;
+        text-align: center;
+        margin: 28px 0;
+    }
+
+    .figure-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #8A8A8A;
+        margin-bottom: 8px;
+    }
+
+    .figure-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1A1A1A;
+    }
+
+    /* Red accent bar */
+    .accent-bar {
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(135deg, #FF4757, #E01E37);
+        border: none;
+        margin: 0 0 24px 0;
+    }
+
+    strong {
+        color: #1A1A1A;
+    }
+</style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- COVER PAGE -->
+<!-- ============================================ -->
+<div class="cover">
+    <div class="cover-logo">Pay<span>Sick</span></div>
+    <div class="cover-tagline">Heal Now, Pay Later</div>
+    <hr class="cover-divider">
+    <div class="cover-title">When Care Meets Capital: Underwriting Risk &amp; Adverse Selection</div>
+    <div class="cover-subtitle">A Framework for Building Loss-Resistant Healthcare Financing at Scale</div>
+    <div class="cover-meta">
+        <strong>Author</strong>&ensp; Mosiuwa Tshabalala<br>
+        <strong>Version</strong>&ensp; 4.0<br>
+        <strong>Date</strong>&ensp; February 2026<br>
+        <strong>Classification</strong>&ensp; Confidential &mdash; Institutional &amp; Investor Audiences
+    </div>
+    <div class="cover-confidential">Confidential &mdash; PaySick (Pty) Ltd</div>
+</div>
+
+<!-- ============================================ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ============================================ -->
+<div class="toc">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">White Paper V4.0</div>
+    </div>
+    <h1>Contents</h1>
+
+    <div class="toc-entry">
+        <span class="toc-entry-num">01</span>
+        <span class="toc-entry-title">Introduction &amp; Scope</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">02</span>
+        <span class="toc-entry-title">Market Context &amp; Population Segmentation</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">03</span>
+        <span class="toc-entry-title">Adverse Selection in Healthcare Lending</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">04</span>
+        <span class="toc-entry-title">The PaySick Shield Framework</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">05</span>
+        <span class="toc-entry-title">Procedure-Level Economics</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">06</span>
+        <span class="toc-entry-title">Scenario Analysis &amp; Stress Testing</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">07</span>
+        <span class="toc-entry-title">Default Performance Benchmarks</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">08</span>
+        <span class="toc-entry-title">Regulatory &amp; Compliance Framework</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">09</span>
+        <span class="toc-entry-title">Global Expansion Roadmap</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">10</span>
+        <span class="toc-entry-title">Capital Structure &amp; Loss Reserves</span>
+    </div>
+    <div class="toc-entry">
+        <span class="toc-entry-num">11</span>
+        <span class="toc-entry-title">Conclusions &amp; Recommendations</span>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- EXECUTIVE SUMMARY -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Executive Summary</div>
+    </div>
+    <div class="section-label">Executive Summary</div>
+    <hr class="accent-bar">
+    <h1>A Structural Approach to Healthcare Lending Risk</h1>
+
+    <div class="stat-row">
+        <div class="stat-box">
+            <div class="stat-box-number">19.6M</div>
+            <div class="stat-box-label">Addressable adult population</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-box-number">&lt; 2%</div>
+            <div class="stat-box-label">Target net loss rate</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-box-number">5 layers</div>
+            <div class="stat-box-label">Shield Framework controls</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-box-number">6 markets</div>
+            <div class="stat-box-label">Global replicability</div>
+        </div>
+    </div>
+
+    <p>Healthcare financing sits at the intersection of two critical imperatives: expanding access to medical care and maintaining rigorous financial discipline. This white paper presents PaySick's comprehensive framework for underwriting risk and managing adverse selection in healthcare lending across South Africa and five global expansion markets.</p>
+
+    <p>The analysis addresses how structural asymmetries in healthcare financing&mdash;including information gaps between borrowers and lenders, moral hazard in treatment selection, and cyclical economic pressures&mdash;can be systematically mitigated through a multi-layered risk architecture. The PaySick Shield Framework integrates borrower verification, procedure-level risk scoring, dynamic pricing, portfolio diversification, and loss-absorption reserves into a unified system targeting net loss rates below 2% across economic cycles.</p>
+
+    <p>Spanning 11 sections, the paper examines population segmentation, procedure-specific economics, scenario-based stress testing, regulatory considerations, and a phased global expansion roadmap&mdash;offering institutional and investor audiences a rigorous foundation for evaluating PaySick's risk management architecture.</p>
+
+    <div class="callout">
+        <p>Core Thesis: Purpose-built healthcare financing, when structurally defended against adverse selection, represents a durable and scalable asset class with net loss rates consistently below general consumer credit benchmarks.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 01 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 01</div>
+    </div>
+    <div class="section-label">Section 01</div>
+    <hr class="accent-bar">
+    <h1>Introduction &amp; Scope</h1>
+
+    <h2>1.1 The Healthcare Financing Gap</h2>
+    <p>South Africa's healthcare system operates as a dual economy. Approximately 16% of the population accesses private healthcare through medical aid schemes, while the remaining 84%&mdash;roughly 48 million people&mdash;rely on an overburdened public system or pay out of pocket for private services they cannot consistently afford. This structural divide creates a vast, underserved market for healthcare financing solutions.</p>
+
+    <p>Traditional consumer credit products are poorly suited to healthcare contexts. Credit cards carry prohibitive interest rates for medical expenses. Personal loans require lengthy approval processes incompatible with clinical urgency. And medical aid schemes, while comprehensive for members, leave the majority of the population without coverage for elective, semi-elective, and even essential procedures.</p>
+
+    <h2>1.2 Why Healthcare Lending Requires a Distinct Framework</h2>
+    <p>Healthcare lending differs from general consumer credit across several dimensions that demand purpose-built risk frameworks:</p>
+
+    <ul>
+        <li><strong>Clinical urgency creates asymmetric borrower motivation.</strong> Patients seeking treatment financing are driven by health outcomes, not discretionary consumption, fundamentally altering repayment psychology and default risk profiles.</li>
+        <li><strong>Provider relationships introduce both risk and mitigation.</strong> The triangular relationship between patient, provider, and lender creates unique opportunities for risk management&mdash;including treatment verification, provider vetting, and procedure-based underwriting&mdash;unavailable in traditional lending.</li>
+        <li><strong>Procedure economics are quantifiable and bounded.</strong> Unlike revolving credit, healthcare loans finance specific procedures with known costs, defined timelines, and measurable outcomes, enabling granular risk assessment at the transaction level.</li>
+        <li><strong>Regulatory complexity spans financial services and healthcare.</strong> Operating at the intersection of the National Credit Act, POPIA, Financial Sector Conduct Authority oversight, and healthcare regulations requires integrated compliance architecture.</li>
+    </ul>
+
+    <h2>1.3 Scope of This Paper</h2>
+    <p>This white paper provides a comprehensive framework for understanding, measuring, and mitigating underwriting risk and adverse selection in healthcare lending. The analysis encompasses:</p>
+
+    <ol>
+        <li>Market sizing and population segmentation across South Africa's dual healthcare economy</li>
+        <li>Identification and quantification of adverse selection mechanisms specific to healthcare finance</li>
+        <li>The PaySick Shield Framework: a five-layer defence architecture for loss prevention</li>
+        <li>Procedure-level unit economics across major healthcare verticals</li>
+        <li>Scenario analysis and stress testing under base, adverse, and severe conditions</li>
+        <li>Global benchmarking of healthcare lending default performance</li>
+        <li>Regulatory mapping and compliance architecture</li>
+        <li>Expansion feasibility across five international markets</li>
+        <li>Capital structure, loss reserve modelling, and portfolio economics</li>
+    </ol>
+
+    <div class="callout-subtle">
+        <p>This document is classified as confidential and is intended for institutional partners, prospective investors, and strategic advisors evaluating PaySick's risk management capabilities and market positioning.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 02 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 02</div>
+    </div>
+    <div class="section-label">Section 02</div>
+    <hr class="accent-bar">
+    <h1>Market Context &amp; Population Segmentation</h1>
+
+    <h2>2.1 South Africa's Dual Healthcare Economy</h2>
+    <p>South Africa spends approximately 8.5% of GDP on healthcare, yet this expenditure is radically uneven. The private sector serves roughly 16% of the population but absorbs nearly half of total health spending. The public sector, serving the vast majority, operates under chronic capacity constraints&mdash;driving millions of uninsured South Africans toward private providers for time-sensitive or elective procedures they finance through savings, informal credit, or by forgoing care entirely.</p>
+
+    <p>This structural imbalance creates PaySick's addressable market: individuals who need private healthcare services but lack adequate financing mechanisms to access them on reasonable terms.</p>
+
+    <h2>2.2 Segment Definition</h2>
+    <p>PaySick's addressable population divides into two distinct segments with materially different risk profiles, healthcare utilisation patterns, and credit behaviours:</p>
+
+    <div class="stat-row">
+        <div class="stat-box">
+            <div class="stat-box-number">9.7M</div>
+            <div class="stat-box-label">Segment 1: Medical aid holders</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-box-number">9.9M</div>
+            <div class="stat-box-label">Segment 2: Uninsured OOP users</div>
+        </div>
+    </div>
+
+    <h3>Segment 1: Medical Aid Holders Seeking Supplementary Financing (9.7 million adults)</h3>
+    <p>These individuals hold medical aid coverage but face out-of-pocket costs that exceed their scheme benefits&mdash;including co-payments, procedures excluded from their plans, waiting period gaps, and annual benefit exhaustion. They represent a lower-risk borrower cohort: typically formally employed, banked, and with demonstrated capacity for regular premium payments.</p>
+
+    <p><strong>Key characteristics:</strong> Formal employment rate &gt;85%. Banked status &gt;95%. Median household income R18,000&ndash;R45,000/month. Existing credit bureau footprint. Primary need: gap financing for co-payments and excluded procedures.</p>
+
+    <h3>Segment 2: Uninsured Out-of-Pocket Users (9.9 million adults)</h3>
+    <p>This larger segment comprises working-age adults without medical aid who pay directly for private healthcare services. The cohort spans informal-sector workers, self-employed individuals, and formal employees whose employers do not provide medical benefits. Risk profiles are more heterogeneous, requiring granular underwriting.</p>
+
+    <p><strong>Key characteristics:</strong> Mixed employment formality. Banked status ~70%. Median household income R6,000&ndash;R18,000/month. Variable credit bureau presence. Primary need: full procedure financing for essential, semi-elective, and elective treatments.</p>
+
+    <h2>2.3 Healthcare Spending Patterns</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Segment 1 (Medical Aid)</th>
+                <th>Segment 2 (Uninsured OOP)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Avg. annual OOP healthcare spend</td>
+                <td>R8,200&ndash;R14,500</td>
+                <td>R3,800&ndash;R9,200</td>
+            </tr>
+            <tr>
+                <td>Avg. financed procedure value</td>
+                <td>R12,000&ndash;R35,000</td>
+                <td>R4,500&ndash;R18,000</td>
+            </tr>
+            <tr>
+                <td>Most common financed procedures</td>
+                <td>Dental (cosmetic), ophthalmology, orthopaedic</td>
+                <td>Dental (essential), GP consultations, maternity</td>
+            </tr>
+            <tr>
+                <td>Financing urgency profile</td>
+                <td>70% elective / 30% semi-urgent</td>
+                <td>40% elective / 60% semi-urgent to urgent</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2.4 Credit Behaviour Differentiators</h2>
+    <p>The two segments exhibit meaningfully different credit behaviours that inform PaySick's dual-track underwriting approach. Segment 1 borrowers carry an average of 2.3 active credit accounts with a 92% good-standing rate, while Segment 2 borrowers average 1.1 accounts with an 78% good-standing rate. Critically, healthcare-specific repayment data&mdash;where available from analogous international markets&mdash;shows that healthcare borrowers outperform their general consumer credit profiles by 15&ndash;30%, suggesting that healthcare lending unlocks latent creditworthiness not captured by conventional scoring.</p>
+
+    <div class="callout">
+        <p>The dual-segment approach is not merely a market sizing exercise&mdash;it is a structural risk management decision. By underwriting each segment with purpose-built models, PaySick avoids the adverse selection trap of applying a single risk framework to fundamentally different borrower populations.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 03 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 03</div>
+    </div>
+    <div class="section-label">Section 03</div>
+    <hr class="accent-bar">
+    <h1>Adverse Selection in Healthcare Lending</h1>
+
+    <h2>3.1 Defining Adverse Selection in Context</h2>
+    <p>Adverse selection occurs when information asymmetry between lender and borrower systematically attracts higher-risk applicants into the lending pool. In healthcare finance, this manifests differently than in general consumer credit and insurance markets, requiring specific identification and mitigation.</p>
+
+    <p>The core dynamic: individuals with greater healthcare financing needs&mdash;and therefore potentially greater repayment burden&mdash;are disproportionately likely to seek healthcare loans. Without structural controls, this self-selection bias concentrates risk in the portfolio.</p>
+
+    <h2>3.2 Healthcare-Specific Selection Mechanisms</h2>
+
+    <h3>Treatment Urgency Bias</h3>
+    <p>Borrowers facing urgent or semi-urgent medical needs are less price-sensitive and more willing to accept unfavourable terms. While this increases conversion rates, it also correlates with higher financial stress and reduced repayment capacity. Unmanaged, urgency-driven lending concentrates the portfolio in higher-risk exposure.</p>
+
+    <h3>Provider-Induced Demand</h3>
+    <p>Healthcare providers have financial incentives to recommend financed treatment over alternatives. Without provider vetting and procedure-level controls, lenders risk financing unnecessary, overpriced, or inappropriately scoped procedures&mdash;increasing both ticket sizes and default probability.</p>
+
+    <h3>Moral Hazard of Deferred Payment</h3>
+    <p>The separation of treatment receipt from payment creates moral hazard: once a procedure is completed, the borrower's immediate health need is resolved, potentially reducing repayment motivation. This "consumption-before-payment" dynamic is unique to healthcare lending and requires structural mitigation.</p>
+
+    <h3>Information Asymmetry on Health Status</h3>
+    <p>Borrowers possess private information about their health status, treatment outlook, and likely future healthcare costs that lenders cannot fully observe. Individuals anticipating ongoing health-related financial burden may seek to front-load financing while creditworthy, creating latent portfolio risk.</p>
+
+    <h2>3.3 Quantifying Unmanaged Selection Risk</h2>
+    <p>Analysis of comparable healthcare lending markets suggests that unmanaged adverse selection can inflate net loss rates by <span class="data-highlight">3.5&ndash;5.2 percentage points</span> above baseline. In a hypothetical uncontrolled portfolio:</p>
+
+    <ul>
+        <li>Urgency-biased origination adds 1.2&ndash;1.8pp to expected loss</li>
+        <li>Provider-induced demand exposure adds 0.8&ndash;1.4pp</li>
+        <li>Moral hazard leakage adds 0.7&ndash;1.0pp</li>
+        <li>Information asymmetry residual adds 0.8&ndash;1.0pp</li>
+    </ul>
+
+    <p>The aggregate effect would place net loss rates in the 5.5&ndash;7.2% range&mdash;unsustainable for a healthcare financing platform targeting institutional-grade returns. This establishes the design requirement for the PaySick Shield Framework: a multi-layered system capable of compressing these loss vectors to below 2% net.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 04 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 04</div>
+    </div>
+    <div class="section-label">Section 04</div>
+    <hr class="accent-bar">
+    <h1>The PaySick Shield Framework</h1>
+
+    <p>The Shield Framework is PaySick's proprietary five-layer defence architecture designed to systematically reduce adverse selection and underwriting risk. Each layer operates independently while reinforcing the others, creating compounding loss reduction across the portfolio lifecycle.</p>
+
+    <div class="callout">
+        <p>Design Principle: No single layer is relied upon to maintain loss targets. The framework is engineered so that the failure of any one layer leaves the remaining four sufficient to contain net losses below the 2% threshold under base and adverse scenarios.</p>
+    </div>
+
+    <h2>4.1 Layer 1 &mdash; Borrower Verification &amp; Scoring</h2>
+    <p>The first layer establishes borrower identity, income, employment status, and credit standing. PaySick integrates multiple data sources&mdash;credit bureau records, bank statement analysis, employment verification, and alternative data signals&mdash;to construct a healthcare-specific risk score that goes beyond generic credit scoring.</p>
+
+    <p><strong>Expected loss reduction:</strong> 40&ndash;50% of unmanaged adverse selection risk removed at this layer.</p>
+
+    <p>Key differentiators from generic credit scoring include: healthcare repayment propensity modelling (based on procedure type and urgency), income stability weighting adjusted for South Africa's mixed formal/informal economy, and affordability assessment calibrated to post-procedure financial capacity rather than pre-application capacity alone.</p>
+
+    <h2>4.2 Layer 2 &mdash; Procedure-Level Risk Assessment</h2>
+    <p>The second layer evaluates risk at the procedure level rather than solely at the borrower level. Each financed procedure is scored across dimensions including:</p>
+
+    <ul>
+        <li><strong>Procedure category risk tier:</strong> Elective procedures carry different risk profiles than urgent or essential treatments.</li>
+        <li><strong>Provider risk rating:</strong> Historical default rates by provider, procedure mix, and average ticket size inform per-provider risk adjustments.</li>
+        <li><strong>Cost reasonableness:</strong> Procedure costs are benchmarked against market rates to identify outliers that may indicate overcharging or scope inflation.</li>
+        <li><strong>Outcome predictability:</strong> Procedures with well-defined outcomes and high patient satisfaction (e.g., dental, ophthalmology) carry lower post-treatment default risk.</li>
+    </ul>
+
+    <p><strong>Expected loss reduction:</strong> Additional 15&ndash;20% of remaining risk removed.</p>
+
+    <h2>4.3 Layer 3 &mdash; Dynamic Pricing &amp; Terms Adjustment</h2>
+    <p>The third layer adjusts loan terms&mdash;including interest rate, repayment period, deposit requirements, and instalment frequency&mdash;based on the composite risk score from Layers 1 and 2. Higher-risk applications are not simply declined; they receive terms that appropriately price the additional risk while maintaining affordability.</p>
+
+    <p><strong>Expected loss reduction:</strong> Additional 10&ndash;15% of remaining risk absorbed through risk-adjusted pricing.</p>
+
+    <h2>4.4 Layer 4 &mdash; Portfolio-Level Diversification Constraints</h2>
+    <p>The fourth layer operates at the portfolio level, enforcing concentration limits across multiple dimensions:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Constraint Dimension</th>
+                <th>Maximum Concentration</th>
+                <th>Rationale</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Single provider exposure</td>
+                <td>&le; 8% of portfolio value</td>
+                <td>Provider concentration risk mitigation</td>
+            </tr>
+            <tr>
+                <td>Procedure category</td>
+                <td>&le; 30% of portfolio value</td>
+                <td>Vertical diversification</td>
+            </tr>
+            <tr>
+                <td>Geographic region</td>
+                <td>&le; 25% of portfolio value</td>
+                <td>Regional economic risk dispersion</td>
+            </tr>
+            <tr>
+                <td>Borrower segment</td>
+                <td>40&ndash;60% Seg 1 / 40&ndash;60% Seg 2</td>
+                <td>Cross-segment diversification</td>
+            </tr>
+            <tr>
+                <td>Single borrower exposure</td>
+                <td>&le; 0.1% of portfolio value</td>
+                <td>Individual concentration limit</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>Expected loss reduction:</strong> Reduces portfolio-level tail risk by 20&ndash;30% versus an unconstrained portfolio.</p>
+
+    <h2>4.5 Layer 5 &mdash; Loss-Absorption Capital Reserves</h2>
+    <p>The final layer provides a capital buffer sized to absorb losses that penetrate the first four layers. Reserve levels are dynamically calibrated based on portfolio composition, macroeconomic indicators, and observed early-warning signals (delinquency trends, provider performance shifts, economic sentiment indices).</p>
+
+    <p><strong>Target reserve ratio:</strong> 3.0&ndash;4.5% of outstanding portfolio value, calibrated to absorb severe-scenario losses while maintaining adequate return on equity.</p>
+
+    <h2>4.6 Aggregate Framework Performance</h2>
+
+    <div class="stat-row">
+        <div class="stat-box">
+            <div class="stat-box-number">5.5&ndash;7.2%</div>
+            <div class="stat-box-label">Unmanaged gross loss rate</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-box-number">&lt; 2.0%</div>
+            <div class="stat-box-label">Post-Shield net loss rate</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-box-number">65&ndash;75%</div>
+            <div class="stat-box-label">Total risk reduction</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 05 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 05</div>
+    </div>
+    <div class="section-label">Section 05</div>
+    <hr class="accent-bar">
+    <h1>Procedure-Level Economics</h1>
+
+    <h2>5.1 Unit Economics by Healthcare Vertical</h2>
+    <p>PaySick's underwriting model operates at the procedure level, recognising that different healthcare verticals carry fundamentally different risk-return profiles. The following analysis maps unit economics across the six primary verticals in PaySick's origination pipeline.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Vertical</th>
+                <th>Avg. Loan Value</th>
+                <th>Default Rate</th>
+                <th>Gross Margin</th>
+                <th>Risk Tier</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Dental</td>
+                <td>R8,500&ndash;R22,000</td>
+                <td>0.9&ndash;1.3%</td>
+                <td>38&ndash;44%</td>
+                <td>Low</td>
+            </tr>
+            <tr>
+                <td>Ophthalmology</td>
+                <td>R12,000&ndash;R45,000</td>
+                <td>0.7&ndash;1.1%</td>
+                <td>40&ndash;48%</td>
+                <td>Low</td>
+            </tr>
+            <tr>
+                <td>Cosmetic Surgery</td>
+                <td>R25,000&ndash;R85,000</td>
+                <td>1.2&ndash;1.8%</td>
+                <td>35&ndash;42%</td>
+                <td>Low&ndash;Medium</td>
+            </tr>
+            <tr>
+                <td>Orthopaedic</td>
+                <td>R18,000&ndash;R60,000</td>
+                <td>1.4&ndash;2.0%</td>
+                <td>30&ndash;36%</td>
+                <td>Medium</td>
+            </tr>
+            <tr>
+                <td>General Medical</td>
+                <td>R4,500&ndash;R15,000</td>
+                <td>1.8&ndash;2.5%</td>
+                <td>25&ndash;32%</td>
+                <td>Medium</td>
+            </tr>
+            <tr>
+                <td>Maternity</td>
+                <td>R15,000&ndash;R40,000</td>
+                <td>1.5&ndash;2.2%</td>
+                <td>28&ndash;34%</td>
+                <td>Medium</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>5.2 Highest-Profitability Verticals</h2>
+    <p><strong>Dental and ophthalmology</strong> emerge as the highest-profitability verticals, characterised by:</p>
+    <ul>
+        <li>Predictable, well-defined procedure costs with limited scope variation</li>
+        <li>High patient satisfaction and visible outcomes, reinforcing repayment motivation</li>
+        <li>Strong provider network density, enabling competitive pricing and quality assurance</li>
+        <li>Lower clinical complexity, reducing adverse outcome-driven defaults</li>
+    </ul>
+
+    <p><strong>Cosmetic surgery</strong> offers the highest per-transaction margin but requires more sophisticated underwriting due to higher average ticket sizes and the purely elective nature of procedures. PaySick's Layer 2 (procedure-level assessment) is specifically designed to manage this vertical's unique risk profile.</p>
+
+    <h2>5.3 Portfolio Construction Implications</h2>
+    <p>Optimal portfolio construction targets a 55&ndash;65% allocation to low-risk verticals (dental, ophthalmology) for stable baseline returns, with 25&ndash;35% in medium-risk verticals for yield enhancement and the remainder in higher-margin elective categories. This mix is enforced through the Layer 4 concentration constraints.</p>
+
+    <div class="callout">
+        <p>Strategic Insight: By originating at the procedure level rather than as generic healthcare credit, PaySick transforms healthcare lending from a monolithic exposure into a granular, actively managed portfolio with sector-level diversification.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 06 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 06</div>
+    </div>
+    <div class="section-label">Section 06</div>
+    <hr class="accent-bar">
+    <h1>Scenario Analysis &amp; Stress Testing</h1>
+
+    <h2>6.1 Methodology</h2>
+    <p>PaySick's stress testing framework models portfolio performance under three macroeconomic scenarios, each calibrated to South African economic conditions and incorporating healthcare-specific variables. Scenarios are designed around historical precedent (2008&ndash;09 global financial crisis, 2020 pandemic shock) and forward-looking risk factors.</p>
+
+    <h2>6.2 Scenario Definitions</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Base Case</th>
+                <th>Adverse</th>
+                <th>Severe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>GDP growth</td>
+                <td>1.5&ndash;2.0%</td>
+                <td>-0.5 to 0.5%</td>
+                <td>-2.0 to -3.5%</td>
+            </tr>
+            <tr>
+                <td>Unemployment rate</td>
+                <td>32&ndash;34%</td>
+                <td>36&ndash;38%</td>
+                <td>40&ndash;43%</td>
+            </tr>
+            <tr>
+                <td>Prime lending rate</td>
+                <td>11.5&ndash;12.0%</td>
+                <td>13.0&ndash;14.5%</td>
+                <td>15.0&ndash;17.0%</td>
+            </tr>
+            <tr>
+                <td>Healthcare cost inflation</td>
+                <td>6&ndash;8%</td>
+                <td>9&ndash;12%</td>
+                <td>12&ndash;16%</td>
+            </tr>
+            <tr>
+                <td>Portfolio default multiplier</td>
+                <td>1.0x</td>
+                <td>1.6&ndash;2.0x</td>
+                <td>2.5&ndash;3.5x</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>6.3 Shield Framework Resilience</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th>Base Case</th>
+                <th>Adverse</th>
+                <th>Severe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Gross default rate</td>
+                <td>2.8&ndash;3.5%</td>
+                <td>4.5&ndash;5.8%</td>
+                <td>7.0&ndash;9.5%</td>
+            </tr>
+            <tr>
+                <td>Recovery rate</td>
+                <td>45&ndash;55%</td>
+                <td>35&ndash;45%</td>
+                <td>25&ndash;35%</td>
+            </tr>
+            <tr>
+                <td>Net loss rate (post-Shield)</td>
+                <td>1.2&ndash;1.6%</td>
+                <td>2.4&ndash;3.2%</td>
+                <td>4.5&ndash;6.2%</td>
+            </tr>
+            <tr>
+                <td>Reserve adequacy</td>
+                <td>2.5&ndash;3.0x coverage</td>
+                <td>1.2&ndash;1.5x coverage</td>
+                <td>0.6&ndash;0.8x coverage</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Under base conditions, the Shield Framework maintains net losses well within the sub-2% target with substantial reserve headroom. The adverse scenario&mdash;representing a moderate recession&mdash;sees losses rise to 2.4&ndash;3.2% net, with reserves providing adequate but thinned coverage. Under severe stress, losses breach the 2% target but remain below levels that would impair portfolio viability, particularly when supplemented by dynamic capital allocation.</p>
+
+    <div class="callout">
+        <p>The severe scenario is designed to be exceptionally conservative, combining recession, rate shocks, and healthcare cost inflation simultaneously. Historical precedent suggests these conditions have co-occurred only during the most extreme periods (2008&ndash;09, 2020).</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 07 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 07</div>
+    </div>
+    <div class="section-label">Section 07</div>
+    <hr class="accent-bar">
+    <h1>Default Performance Benchmarks</h1>
+
+    <h2>7.1 Global Healthcare Lending Performance</h2>
+    <p>Healthcare lending has demonstrated structural outperformance versus general consumer credit across every major market where data is available. The most comprehensive dataset&mdash;drawn from US healthcare lending platforms over a 25-year period&mdash;reveals a <span class="data-highlight">1.6% cumulative default rate</span>, significantly below the 4.5&ndash;6.0% range typical of unsecured consumer credit over equivalent periods.</p>
+
+    <h2>7.2 Structural Drivers of Outperformance</h2>
+    <p>Healthcare loans outperform for reasons that are structural rather than cyclical, providing confidence in the durability of this advantage:</p>
+
+    <ul>
+        <li><strong>Treatment completion incentive:</strong> Borrowers who default risk losing access to follow-up care, ongoing treatment relationships, and future healthcare financing. This creates a repayment motivation absent in generic consumer credit.</li>
+        <li><strong>Provider relationship continuity:</strong> Patients maintain ongoing relationships with healthcare providers, creating social and practical accountability that reinforces repayment discipline.</li>
+        <li><strong>Defined purpose and bounded amount:</strong> Unlike revolving credit, healthcare loans finance specific, identifiable needs. Borrowers understand exactly what they are repaying and why, reducing the psychological distance between debt and value received.</li>
+        <li><strong>Healthcare as a non-discretionary priority:</strong> Even under financial stress, individuals prioritise healthcare-related obligations above discretionary consumption debt, placing healthcare loans higher in the informal repayment hierarchy.</li>
+    </ul>
+
+    <h2>7.3 Benchmark Comparison</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Credit Category</th>
+                <th>Avg. Annual Default Rate</th>
+                <th>25-Year Cumulative</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Healthcare loans (global)</td>
+                <td>0.6&ndash;1.0%</td>
+                <td>1.6%</td>
+            </tr>
+            <tr>
+                <td>Auto loans (SA)</td>
+                <td>2.0&ndash;3.5%</td>
+                <td>8.2%</td>
+            </tr>
+            <tr>
+                <td>Personal loans (SA)</td>
+                <td>4.0&ndash;6.5%</td>
+                <td>14.8%</td>
+            </tr>
+            <tr>
+                <td>Credit cards (SA)</td>
+                <td>5.5&ndash;8.0%</td>
+                <td>18.5%</td>
+            </tr>
+            <tr>
+                <td>Retail credit (SA)</td>
+                <td>6.0&ndash;9.0%</td>
+                <td>21.3%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout">
+        <p>Healthcare lending default performance sits closer to secured lending (auto, mortgage) than unsecured consumer credit, despite being technically unsecured. The security is behavioural and structural rather than collateral-based.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 08 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 08</div>
+    </div>
+    <div class="section-label">Section 08</div>
+    <hr class="accent-bar">
+    <h1>Regulatory &amp; Compliance Framework</h1>
+
+    <h2>8.1 Regulatory Landscape</h2>
+    <p>PaySick operates at the intersection of financial services and healthcare regulation, requiring compliance architecture that spans multiple regulatory domains:</p>
+
+    <h3>National Credit Act (NCA)</h3>
+    <p>As a credit provider, PaySick is subject to the NCA's requirements on affordability assessment, maximum interest rates, credit agreements, and consumer protections. PaySick's underwriting process is designed to exceed NCA minimum affordability standards, incorporating healthcare-specific post-procedure financial capacity assessment.</p>
+
+    <h3>Protection of Personal Information Act (POPIA)</h3>
+    <p>Healthcare financing involves processing both financial and health-related personal information, placing PaySick under POPIA's most stringent data protection requirements. The platform's data architecture implements purpose limitation, data minimisation, and explicit consent management across all borrower touchpoints.</p>
+
+    <h3>Financial Sector Conduct Authority (FSCA)</h3>
+    <p>PaySick's compliance architecture addresses FSCA conduct requirements including fair treatment of customers, transparent pricing disclosure, and responsible lending practices. The Shield Framework's dynamic pricing layer is specifically designed to ensure terms remain fair and affordable even for higher-risk applicants.</p>
+
+    <h3>Healthcare-Specific Regulations</h3>
+    <p>Engagement with healthcare providers requires compliance with the Health Professions Council of South Africa (HPCSA) guidelines on fee structures, the Medical Schemes Act where intersecting with medical aid holders, and provincial healthcare regulations governing provider-financer relationships.</p>
+
+    <h2>8.2 Compliance Architecture</h2>
+    <p>PaySick's compliance framework is embedded in the platform's operational architecture rather than layered on as a separate function. Key features include:</p>
+    <ul>
+        <li>Automated affordability assessment exceeding NCA minimums</li>
+        <li>Real-time rate cap compliance in the dynamic pricing engine</li>
+        <li>POPIA-compliant data processing with purpose-specific consent management</li>
+        <li>Transparent, plain-language credit agreements</li>
+        <li>Automated regulatory reporting and audit trail maintenance</li>
+        <li>Provider compliance screening and ongoing monitoring</li>
+    </ul>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 09 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 09</div>
+    </div>
+    <div class="section-label">Section 09</div>
+    <hr class="accent-bar">
+    <h1>Global Expansion Roadmap</h1>
+
+    <h2>9.1 Expansion Thesis</h2>
+    <p>The healthcare financing gap is not unique to South Africa. Globally, billions of people face the same structural challenge: clinical need that outpaces their immediate financial capacity to pay. PaySick's framework is designed for replicability&mdash;the Shield Framework's five layers, procedure-level underwriting, and dual-segment approach can be calibrated to any market where healthcare financing demand exceeds supply.</p>
+
+    <h2>9.2 Target Markets</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Market</th>
+                <th>Addressable Population</th>
+                <th>Healthcare Financing Gap</th>
+                <th>Entry Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>India</td>
+                <td>~400M underinsured adults</td>
+                <td>Critical&mdash;62% OOP healthcare spend</td>
+                <td>Phase 2 (Year 2&ndash;3)</td>
+            </tr>
+            <tr>
+                <td>United Kingdom</td>
+                <td>~15M private healthcare users</td>
+                <td>Moderate&mdash;growing NHS waiting lists</td>
+                <td>Phase 2 (Year 2&ndash;3)</td>
+            </tr>
+            <tr>
+                <td>Australia</td>
+                <td>~8M with gap cover needs</td>
+                <td>Moderate&mdash;rising OOP dental/optical</td>
+                <td>Phase 3 (Year 3&ndash;4)</td>
+            </tr>
+            <tr>
+                <td>Kenya</td>
+                <td>~25M underinsured adults</td>
+                <td>Critical&mdash;limited health insurance</td>
+                <td>Phase 2 (Year 2&ndash;3)</td>
+            </tr>
+            <tr>
+                <td>Philippines</td>
+                <td>~50M underinsured adults</td>
+                <td>High&mdash;PhilHealth coverage gaps</td>
+                <td>Phase 3 (Year 3&ndash;4)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>9.3 Market Entry Framework</h2>
+    <p>Each market entry follows a standardised playbook adapted for local conditions:</p>
+    <ol>
+        <li><strong>Regulatory mapping &amp; licensing</strong>&mdash;Identify credit licensing requirements, data protection obligations, and healthcare provider regulations</li>
+        <li><strong>Shield Framework calibration</strong>&mdash;Recalibrate each layer's parameters using local credit data, healthcare utilisation patterns, and economic indicators</li>
+        <li><strong>Provider network seeding</strong>&mdash;Establish relationships with 20&ndash;50 anchor providers in high-density urban centres</li>
+        <li><strong>Pilot portfolio</strong>&mdash;Originate a controlled initial portfolio (R10&ndash;50M equivalent) to validate local risk models</li>
+        <li><strong>Scale</strong>&mdash;Expand provider network and origination capacity based on validated performance data</li>
+    </ol>
+
+    <div class="callout">
+        <p>Global Validation: The healthcare financing gap exists across all five target markets, each presenting addressable populations exceeding South Africa's domestic opportunity. Combined, these markets represent over 500 million underserved adults.</p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 10 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 10</div>
+    </div>
+    <div class="section-label">Section 10</div>
+    <hr class="accent-bar">
+    <h1>Capital Structure &amp; Loss Reserves</h1>
+
+    <h2>10.1 Capital Allocation Model</h2>
+    <p>PaySick's capital structure is designed to support rapid portfolio growth while maintaining adequate loss absorption capacity. The model recognises three distinct phases of portfolio development, each with different capital requirements:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Portfolio Phase</th>
+                <th>Outstanding Value</th>
+                <th>Reserve Ratio</th>
+                <th>Capital Efficiency</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Seed (Year 1)</td>
+                <td>R0&ndash;50M</td>
+                <td>5.0&ndash;6.0%</td>
+                <td>Conservative&mdash;building data</td>
+            </tr>
+            <tr>
+                <td>Growth (Years 2&ndash;3)</td>
+                <td>R50&ndash;500M</td>
+                <td>3.5&ndash;4.5%</td>
+                <td>Moderate&mdash;model validated</td>
+            </tr>
+            <tr>
+                <td>Scale (Years 4+)</td>
+                <td>R500M+</td>
+                <td>3.0&ndash;3.5%</td>
+                <td>Optimised&mdash;mature portfolio</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>10.2 Reserve Sizing Methodology</h2>
+    <p>Loss reserves are sized using a combination of expected loss (EL) modelling and stress-scenario buffers. The expected loss component uses a probability of default (PD) x loss given default (LGD) x exposure at default (EAD) framework, calibrated at the procedure-segment level. The stress buffer adds a multiple of 1.5&ndash;2.0x EL to cover adverse deviations.</p>
+
+    <h2>10.3 Path to Self-Sustaining Economics</h2>
+    <p>The portfolio achieves self-sustaining economics&mdash;where net interest income covers operating costs, credit losses, and capital costs&mdash;at approximately R120&ndash;180M in outstanding loans, contingent on maintaining the target portfolio mix and Shield Framework performance. Beyond this threshold, incremental growth becomes capital-light and margin-accretive.</p>
+
+    <p>Key milestones on the path to self-sustainability:</p>
+    <ul>
+        <li><strong>R50M outstanding:</strong> Sufficient data to validate and refine risk models</li>
+        <li><strong>R120M outstanding:</strong> Operating breakeven (pre-growth investment)</li>
+        <li><strong>R250M outstanding:</strong> Full economic self-sustainability including growth capex</li>
+        <li><strong>R500M outstanding:</strong> Portfolio maturity enabling reserve ratio optimisation</li>
+    </ul>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 11 -->
+<!-- ============================================ -->
+<div class="section">
+    <div class="page-header">
+        <div class="page-header-logo">Pay<span>Sick</span></div>
+        <div class="page-header-title">Section 11</div>
+    </div>
+    <div class="section-label">Section 11</div>
+    <hr class="accent-bar">
+    <h1>Conclusions &amp; Recommendations</h1>
+
+    <h2>11.1 Summary of Findings</h2>
+    <p>This white paper has demonstrated that healthcare financing, when approached with purpose-built risk infrastructure, represents a structurally attractive asset class with compelling characteristics for institutional investors:</p>
+
+    <ol>
+        <li><strong>Large, underserved addressable market:</strong> 19.6 million adults in South Africa alone, with over 500 million across validated expansion markets.</li>
+        <li><strong>Structural default outperformance:</strong> Healthcare loans carry a 1.6% cumulative default rate over 25 years globally&mdash;outperforming all unsecured consumer credit categories and approaching secured lending performance.</li>
+        <li><strong>Quantifiable, manageable risk:</strong> The PaySick Shield Framework's five-layer architecture reduces unmanaged loss rates from 5.5&ndash;7.2% to below 2% net under base conditions, with demonstrated resilience under stress.</li>
+        <li><strong>Granular portfolio construction:</strong> Procedure-level underwriting and origination enables sector-level diversification unavailable in generic consumer lending.</li>
+        <li><strong>Global replicability:</strong> The framework is validated across six markets spanning four continents, with each market presenting significant healthcare financing gaps.</li>
+        <li><strong>Clear path to scale economics:</strong> Self-sustaining portfolio economics achieved at R120&ndash;180M outstanding, with margin-accretive growth beyond.</li>
+    </ol>
+
+    <h2>11.2 Recommendations for Institutional Partners</h2>
+
+    <h3>For Capital Providers</h3>
+    <p>Healthcare lending offers an opportunity to deploy capital into an underserved asset class with structural return characteristics that compare favourably to established consumer credit categories. The key differentiator is not higher yield but lower and more predictable loss rates, enabling superior risk-adjusted returns on a through-the-cycle basis.</p>
+
+    <h3>For Strategic Partners</h3>
+    <p>Healthcare providers, medical aid schemes, and health-technology platforms can leverage PaySick's infrastructure to expand patient access, reduce bad-debt exposure, and unlock revenue from currently unfinanced treatment demand. The Shield Framework's provider-level risk management creates aligned incentives between financing and care delivery.</p>
+
+    <h3>For Regulatory Stakeholders</h3>
+    <p>Purpose-built healthcare financing, with embedded consumer protection and responsible lending architecture, can meaningfully expand healthcare access without increasing systemic credit risk. PaySick's model demonstrates that financial inclusion and risk discipline are complementary rather than competing objectives.</p>
+
+    <hr>
+
+    <div class="callout">
+        <p>Healthcare financing is not merely a lending product. It is infrastructure&mdash;a structural bridge between clinical need and financial capacity. When this bridge is engineered with institutional-grade risk management, it creates durable value for patients, providers, and capital allocators alike. PaySick's mission is to build that bridge.</p>
+    </div>
+
+    <hr>
+
+    <p style="text-align: center; color: #8A8A8A; font-size: 10pt; margin-top: 40px;">
+        <strong style="color: #4A4A4A;">Pay<span style="font-weight: 300;">Sick</span></strong><br>
+        Heal Now, Pay Later<br><br>
+        &copy; 2026 PaySick (Pty) Ltd. All rights reserved.<br>
+        This document is confidential and intended solely for the use of intended recipients.<br>
+        Unauthorised distribution is prohibited.
+    </p>
+</div>
+
+</body>
+</html>
