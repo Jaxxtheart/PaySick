@@ -31,6 +31,7 @@ const paymentRoutes = require('./routes/payments');
 const providerRoutes = require('./routes/providers');
 const marketplaceRoutes = require('./routes/marketplace');
 const riskRoutes = require('./routes/risk');
+const shieldRoutes = require('./routes/shield');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -191,6 +192,9 @@ app.use('/api/providers', providerRoutes);
 app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/risk', riskRoutes);
 
+// Shield Underwriting Framework (v2 endpoints)
+app.use('/v2/shield', shieldRoutes);
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -205,7 +209,8 @@ app.get('/', (req, res) => {
       payments: '/api/payments',
       providers: '/api/providers',
       marketplace: '/api/marketplace',
-      risk: '/api/risk'
+      risk: '/api/risk',
+      shield: '/v2/shield'
     }
   });
 });
