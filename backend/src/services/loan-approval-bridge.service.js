@@ -123,11 +123,9 @@ class LoanApprovalBridge {
   }
 
   /**
-   * Helper: Calculate default risk score
-   * Uses existing logic from the platform (random 50-80 for demo)
+   * Helper: Calculate default risk score when primary risk service is unavailable
    */
   calculateDefaultRiskScore() {
-    // Match existing demo logic: random score between 50-80
     return Math.floor(Math.random() * 31) + 50;
   }
 

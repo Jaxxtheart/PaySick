@@ -3,8 +3,18 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+// Validate database name format to prevent SQL injection
+function validateDbName(name) {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+    throw new Error(`Invalid database name: ${name}. Only alphanumeric characters and underscores allowed.`);
+  }
+  return name;
+}
+
 async function setupDatabase() {
-  console.log('🚀 Starting PaySick Database Setup...\n');
+  console.log('Starting PaySick Database Setup...\n');
+
+  const dbName = validateDbName(process.env.DB_NAME || 'paysick_db');
 
   // First, connect to postgres database to create our database
   const adminPool = new Pool({
@@ -19,15 +29,16 @@ async function setupDatabase() {
     // Check if database exists
     const dbCheckResult = await adminPool.query(
       "SELECT 1 FROM pg_database WHERE datname = $1",
-      [process.env.DB_NAME || 'paysick_db']
+      [dbName]
     );
 
     if (dbCheckResult.rows.length === 0) {
-      console.log(`📦 Creating database: ${process.env.DB_NAME || 'paysick_db'}...`);
-      await adminPool.query(`CREATE DATABASE ${process.env.DB_NAME || 'paysick_db'}`);
-      console.log('✅ Database created successfully\n');
+      console.log(`Creating database: ${dbName}...`);
+      // DB name validated above to be safe for interpolation
+      await adminPool.query(`CREATE DATABASE "${dbName}"`);
+      console.log('Database created successfully\n');
     } else {
-      console.log('ℹ️  Database already exists\n');
+      console.log('Database already exists\n');
     }
 
     await adminPool.end();
@@ -36,70 +47,77 @@ async function setupDatabase() {
     const appPool = new Pool({
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME || 'paysick_db',
+      database: dbName,
       user: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD,
     });
 
-    console.log('📋 Running database schema...');
+    // Run core schema
+    console.log('Running database schema...');
     const schemaPath = path.join(__dirname, '../../database/schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
-
     await appPool.query(schema);
-    console.log('✅ Schema executed successfully\n');
+    console.log('Schema executed successfully\n');
+
+    // Collect migrations from both directories
+    const migrationDirs = [
+      path.join(__dirname, '../migrations'),
+      path.join(__dirname, '../../database/migrations')
+    ];
+
+    const allMigrations = [];
+
+    for (const dir of migrationDirs) {
+      if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir)
+          .filter(f => f.endsWith('.sql'))
+          .map(f => ({ name: f, path: path.join(dir, f) }));
+        allMigrations.push(...files);
+      }
+    }
+
+    // Sort migrations by filename (numeric prefix ordering)
+    allMigrations.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Deduplicate by filename (prefer first occurrence)
+    const seen = new Set();
+    const uniqueMigrations = allMigrations.filter(m => {
+      if (seen.has(m.name)) return false;
+      seen.add(m.name);
+      return true;
+    });
 
     // Run migrations
-    console.log('📋 Running migrations...');
-    const migrationsDir = path.join(__dirname, '../migrations');
-    if (fs.existsSync(migrationsDir)) {
-      const migrations = fs.readdirSync(migrationsDir)
-        .filter(f => f.endsWith('.sql'))
-        .sort();
-
-      for (const migration of migrations) {
-        try {
-          console.log(`   Running ${migration}...`);
-          const sql = fs.readFileSync(path.join(migrationsDir, migration), 'utf8');
-          await appPool.query(sql);
-          console.log(`   ✅ ${migration} completed`);
-        } catch (err) {
-          // Ignore errors for "already exists" type issues
-          if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
-            console.warn(`   ⚠️  ${migration}: ${err.message}`);
-          } else {
-            console.log(`   ℹ️  ${migration} (already applied)`);
-          }
+    console.log(`Running ${uniqueMigrations.length} migrations...`);
+    for (const migration of uniqueMigrations) {
+      try {
+        console.log(`  Running ${migration.name}...`);
+        const sql = fs.readFileSync(migration.path, 'utf8');
+        await appPool.query(sql);
+        console.log(`  ${migration.name} completed`);
+      } catch (err) {
+        // Ignore errors for "already exists" type issues
+        if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+          console.warn(`  Warning: ${migration.name}: ${err.message}`);
+        } else {
+          console.log(`  ${migration.name} (already applied)`);
         }
       }
     }
-    console.log('✅ Migrations completed\n');
+    console.log('Migrations completed\n');
 
-    // Insert sample data
-    console.log('📝 Inserting sample providers...');
-    await appPool.query(`
-      INSERT INTO providers (provider_name, provider_type, provider_group, contact_email, contact_phone, city, province, network_partner, partnership_tier, commission_rate)
-      VALUES
-        ('Netcare Milpark Hospital', 'hospital', 'Netcare', 'milpark@netcare.co.za', '0118001500', 'Johannesburg', 'Gauteng', true, 'platinum', 5.00),
-        ('Life Healthcare Fourways', 'hospital', 'Life Healthcare', 'fourways@lifehealthcare.co.za', '0116771000', 'Johannesburg', 'Gauteng', true, 'gold', 5.50),
-        ('Mediclinic Cape Town', 'hospital', 'Mediclinic', 'capetown@mediclinic.co.za', '0214644911', 'Cape Town', 'Western Cape', true, 'platinum', 5.00),
-        ('Cape Town Dental Studio', 'clinic', 'Independent', 'info@ctdentalstudio.co.za', '0214651234', 'Cape Town', 'Western Cape', true, 'silver', 6.00),
-        ('Spec-Savers Optometrists', 'clinic', 'Spec-Savers', 'info@specsavers.co.za', '0800022020', 'Johannesburg', 'Gauteng', true, 'gold', 5.50)
-      ON CONFLICT DO NOTHING;
-    `);
-    console.log('✅ Sample providers added\n');
-
-    // Test connection
+    // Verify database connection
     const testResult = await appPool.query('SELECT NOW() as current_time');
-    console.log('🔗 Database connection test successful!');
-    console.log(`   Current time: ${testResult.rows[0].current_time}\n`);
+    console.log('Database connection verified');
+    console.log(`  Server time: ${testResult.rows[0].current_time}\n`);
 
     await appPool.end();
 
-    console.log('✨ Database setup completed successfully!\n');
-    console.log('You can now start the server with: npm start\n');
+    console.log('Database setup completed successfully!\n');
+    console.log('Start the server with: npm start\n');
 
   } catch (error) {
-    console.error('❌ Error setting up database:', error);
+    console.error('Error setting up database:', error);
     process.exit(1);
   }
 }

@@ -225,7 +225,7 @@ CREATE TABLE applications (
     ip_address INET,
     user_agent TEXT,
 
-    CONSTRAINT chk_bill_amount CHECK (bill_amount >= 500 AND bill_amount <= 850),
+    CONSTRAINT chk_bill_amount CHECK (bill_amount >= 500 AND bill_amount <= 500000),
     CONSTRAINT chk_risk_score CHECK (risk_score >= 0 AND risk_score <= 100)
 );
 

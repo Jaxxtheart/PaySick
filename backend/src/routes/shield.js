@@ -54,6 +54,29 @@ const { healthLineService } = require('../services/health-line.service');
 const { humanReviewService } = require('../services/human-review.service');
 
 // ═══════════════════════════════════════════════════════════════
+// INPUT VALIDATION HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUUID(value) {
+  return typeof value === 'string' && UUID_REGEX.test(value);
+}
+
+function isPositiveNumber(value) {
+  return typeof value === 'number' && isFinite(value) && value > 0;
+}
+
+function validateUUIDParam(req, res, paramName) {
+  const value = req.params[paramName] || req.body[paramName];
+  if (!isValidUUID(value)) {
+    res.status(400).json({ error: `Invalid ${paramName} format` });
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // GATE 1: PROVIDER GATE
 // ═══════════════════════════════════════════════════════════════
 
@@ -66,6 +89,9 @@ router.post('/provider-gate/assess', authenticateToken, requireAdmin, async (req
     const { provider_id } = req.body;
     if (!provider_id) {
       return res.status(400).json({ error: 'provider_id is required' });
+    }
+    if (!isValidUUID(provider_id)) {
+      return res.status(400).json({ error: 'Invalid provider_id format' });
     }
     const result = await providerGateService.assessProvider(provider_id);
     res.json(result);
@@ -81,6 +107,7 @@ router.post('/provider-gate/assess', authenticateToken, requireAdmin, async (req
  */
 router.get('/provider-gate/tier-check/:providerId', authenticateToken, requireAdmin, async (req, res) => {
   try {
+    if (!validateUUIDParam(req, res, 'providerId')) return;
     const result = await providerGateService.checkTierUpgradeEligibility(req.params.providerId);
     if (!result) return res.status(404).json({ error: 'Provider not found' });
     res.json(result);
@@ -99,6 +126,16 @@ router.post('/provider-gate/tier-upgrade', authenticateToken, requireAdmin, asyn
     const { provider_id, new_tier, reason } = req.body;
     if (!provider_id || !new_tier || !reason) {
       return res.status(400).json({ error: 'provider_id, new_tier, and reason are required' });
+    }
+    if (!isValidUUID(provider_id)) {
+      return res.status(400).json({ error: 'Invalid provider_id format' });
+    }
+    const validTiers = ['probation', 'standard', 'trusted', 'preferred'];
+    if (!validTiers.includes(new_tier)) {
+      return res.status(400).json({ error: `new_tier must be one of: ${validTiers.join(', ')}` });
+    }
+    if (typeof reason !== 'string' || reason.length < 3 || reason.length > 500) {
+      return res.status(400).json({ error: 'reason must be between 3 and 500 characters' });
     }
     const result = await providerGateService.upgradeProviderTier(
       provider_id, new_tier, req.user.userId, reason
@@ -159,7 +196,8 @@ router.get('/provider-gate/providers', authenticateToken, requireAdmin, async (r
  */
 router.get('/provider-gate/score-history/:providerId', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const months = parseInt(req.query.months) || 12;
+    if (!validateUUIDParam(req, res, 'providerId')) return;
+    const months = Math.min(Math.max(parseInt(req.query.months) || 12, 1), 60);
     const result = await providerGateService.getProviderScoreHistory(req.params.providerId, months);
     res.json({ scores: result });
   } catch (error) {
@@ -187,9 +225,29 @@ router.post('/patient-gate/assess', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}` });
     }
 
+    // Type and range validation
+    if (!isValidUUID(application.patient_id)) {
+      return res.status(400).json({ error: 'Invalid patient_id format' });
+    }
+    const loanAmount = parseFloat(application.loan_amount_requested);
+    if (!isFinite(loanAmount) || loanAmount < 500 || loanAmount > 500000) {
+      return res.status(400).json({ error: 'loan_amount_requested must be between 500 and 500000' });
+    }
+    const termMonths = parseInt(application.loan_term_months);
+    if (!isFinite(termMonths) || termMonths < 3 || termMonths > 60) {
+      return res.status(400).json({ error: 'loan_term_months must be between 3 and 60' });
+    }
+    const income = parseFloat(application.monthly_income_verified);
+    if (!isFinite(income) || income <= 0) {
+      return res.status(400).json({ error: 'monthly_income_verified must be a positive number' });
+    }
+
     // Run Gate 1 first if provider_id is present
     let gate1Result = null;
     if (application.provider_id) {
+      if (!isValidUUID(application.provider_id)) {
+        return res.status(400).json({ error: 'Invalid provider_id format' });
+      }
       gate1Result = await providerGateService.assessProvider(application.provider_id);
       if (!gate1Result.passed) {
         return res.json({
@@ -229,6 +287,9 @@ router.post('/lender-gate/match', authenticateToken, requireAdmin, async (req, r
     const { assessment_id } = req.body;
     if (!assessment_id) {
       return res.status(400).json({ error: 'assessment_id is required' });
+    }
+    if (!isValidUUID(assessment_id)) {
+      return res.status(400).json({ error: 'Invalid assessment_id format' });
     }
     const result = await lenderGateService.matchLoan(assessment_id);
     res.json(result);
@@ -554,6 +615,7 @@ router.get('/dashboard/providers', authenticateToken, requireAdmin, async (req, 
  */
 router.get('/health-line/eligibility/:patientId', authenticateToken, async (req, res) => {
   try {
+    if (!validateUUIDParam(req, res, 'patientId')) return;
     const result = await healthLineService.checkEligibility(req.params.patientId);
     res.json(result);
   } catch (error) {
@@ -572,8 +634,15 @@ router.post('/health-line/activate', authenticateToken, requireAdmin, async (req
     if (!patient_id || !original_loan_amount) {
       return res.status(400).json({ error: 'patient_id and original_loan_amount are required' });
     }
+    if (!isValidUUID(patient_id)) {
+      return res.status(400).json({ error: 'Invalid patient_id format' });
+    }
+    const loanAmount = parseFloat(original_loan_amount);
+    if (!isFinite(loanAmount) || loanAmount <= 0) {
+      return res.status(400).json({ error: 'original_loan_amount must be a positive number' });
+    }
     const result = await healthLineService.activate(
-      patient_id, req.user.userId, parseFloat(original_loan_amount)
+      patient_id, req.user.userId, loanAmount
     );
 
     if (result.success) {
@@ -602,6 +671,13 @@ router.post('/health-line/draw', authenticateToken, async (req, res) => {
     if (!account_id || !drawRequest.draw_amount) {
       return res.status(400).json({ error: 'account_id and draw_amount are required' });
     }
+    if (!isValidUUID(account_id)) {
+      return res.status(400).json({ error: 'Invalid account_id format' });
+    }
+    const drawAmount = parseFloat(drawRequest.draw_amount);
+    if (!isFinite(drawAmount) || drawAmount <= 0) {
+      return res.status(400).json({ error: 'draw_amount must be a positive number' });
+    }
     const result = await healthLineService.drawDown(account_id, drawRequest);
     res.json(result);
   } catch (error) {
@@ -616,6 +692,7 @@ router.post('/health-line/draw', authenticateToken, async (req, res) => {
  */
 router.get('/health-line/account/:patientId', authenticateToken, async (req, res) => {
   try {
+    if (!validateUUIDParam(req, res, 'patientId')) return;
     const account = await healthLineService.getAccount(req.params.patientId);
     if (!account) return res.status(404).json({ error: 'No Health Line account found' });
 
@@ -637,8 +714,8 @@ router.get('/health-line/account/:patientId', authenticateToken, async (req, res
  */
 router.get('/human-review/queue', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 50;
-    const offset = parseInt(req.query.offset) || 0;
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 50, 1), 200);
+    const offset = Math.max(parseInt(req.query.offset) || 0, 0);
     const result = await humanReviewService.getReviewQueue({ limit, offset });
     res.json(result);
   } catch (error) {
@@ -653,6 +730,7 @@ router.get('/human-review/queue', authenticateToken, requireAdmin, async (req, r
  */
 router.get('/human-review/detail/:assessmentId', authenticateToken, requireAdmin, async (req, res) => {
   try {
+    if (!validateUUIDParam(req, res, 'assessmentId')) return;
     const result = await humanReviewService.getReviewDetail(req.params.assessmentId);
     if (!result) return res.status(404).json({ error: 'Assessment not found' });
     res.json(result);
@@ -671,6 +749,13 @@ router.post('/human-review/decide', authenticateToken, requireAdmin, async (req,
     const { assessment_id, decision, rationale } = req.body;
     if (!assessment_id || !decision) {
       return res.status(400).json({ error: 'assessment_id and decision are required' });
+    }
+    if (!isValidUUID(assessment_id)) {
+      return res.status(400).json({ error: 'Invalid assessment_id format' });
+    }
+    const validDecisions = ['approved', 'declined', 'escalated', 'deferred'];
+    if (!validDecisions.includes(decision)) {
+      return res.status(400).json({ error: `decision must be one of: ${validDecisions.join(', ')}` });
     }
     const result = await humanReviewService.recordDecision(
       assessment_id, decision, req.user.userId, rationale || ''
@@ -704,8 +789,8 @@ router.get('/human-review/audit/:entityType/:entityId', authenticateToken, requi
  */
 router.get('/human-review/overrides', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 100;
-    const offset = parseInt(req.query.offset) || 0;
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 100, 1), 500);
+    const offset = Math.max(parseInt(req.query.offset) || 0, 0);
     const result = await humanReviewService.getOverrideHistory({ limit, offset });
     res.json(result);
   } catch (error) {

@@ -44,7 +44,10 @@ const validateWebhookSignature = async (req, res, next) => {
       return res.status(401).json({ error: 'Unknown lender' });
     }
 
-    const apiKey = result.rows[0].api_key_encrypted || 'default-key';
+    const apiKey = result.rows[0].api_key_encrypted;
+    if (!apiKey) {
+      return res.status(401).json({ error: 'Lender API key not configured' });
+    }
 
     // Verify signature
     const payload = JSON.stringify(req.body);
@@ -53,8 +56,11 @@ const validateWebhookSignature = async (req, res, next) => {
       .update(payload)
       .digest('hex');
 
-    // For demo/development, allow requests without valid signature
-    if (process.env.NODE_ENV === 'production' && signature !== expectedSignature) {
+    // Always validate signatures - timing-safe comparison
+    if (!crypto.timingSafeEqual(
+      Buffer.from(signature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    )) {
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
@@ -141,73 +147,23 @@ router.post('/applications', authenticateToken, async (req, res) => {
       marketplaceReady = false;
     }
 
-    // If no active lenders or marketplace not ready, return demo/preview response
+    // If no active lenders or marketplace not ready, return queued response
     if (!marketplaceReady || !hasActiveLenders) {
-      // Generate a demo application ID
-      const demoApplicationId = `DEMO-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-
-      return res.status(200).json({
+      return res.status(202).json({
         success: true,
-        demo: true,
-        message: 'Application received - Marketplace Preview Mode',
-        applicationId: demoApplicationId,
-        status: 'PREVIEW',
+        message: 'Application received - awaiting lender availability',
+        status: 'QUEUED',
         marketplaceStatus: {
           ready: marketplaceReady,
-          activeLenders: hasActiveLenders ? 'Available' : 'Coming Soon',
-          message: 'Our lending partners are currently being onboarded. Your application has been saved and you will be notified when lenders are available to make offers.'
+          activeLenders: hasActiveLenders,
+          message: 'Your application has been saved. You will be notified when lending partners are available to review your application.'
         },
         applicationSummary: {
           procedureType,
-          procedureDescription: procedureDescription || procedureType,
           loanAmount,
           requestedTerm,
-          monthlyIncome: monthlyIncome || 'Not provided',
-          employmentStatus: employmentStatus || 'Not provided',
           submittedAt: new Date().toISOString()
-        },
-        // Show what offers would look like
-        previewOffers: [
-          {
-            lenderName: 'MediFinance SA',
-            lenderLogo: null,
-            interestRate: 0.165,
-            interestRateDisplay: '16.5%',
-            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.165, requestedTerm),
-            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.165, requestedTerm) * requestedTerm),
-            term: requestedTerm,
-            status: 'PREVIEW',
-            features: ['No early settlement fees', 'Flexible payment dates', 'Healthcare specialist']
-          },
-          {
-            lenderName: 'HealthCredit Plus',
-            lenderLogo: null,
-            interestRate: 0.185,
-            interestRateDisplay: '18.5%',
-            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.185, requestedTerm),
-            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.185, requestedTerm) * requestedTerm),
-            term: requestedTerm,
-            status: 'PREVIEW',
-            features: ['Same-day approval', 'Direct provider payment', 'Rewards program']
-          },
-          {
-            lenderName: 'CareCapital',
-            lenderLogo: null,
-            interestRate: 0.195,
-            interestRateDisplay: '19.5%',
-            monthlyPayment: calculateMonthlyPayment(loanAmount, 0.195, requestedTerm),
-            totalRepayment: Math.round(calculateMonthlyPayment(loanAmount, 0.195, requestedTerm) * requestedTerm),
-            term: requestedTerm,
-            status: 'PREVIEW',
-            features: ['Payment holiday option', '24/7 support', 'Family plans available']
-          }
-        ],
-        nextSteps: [
-          'We are currently onboarding lending partners to our marketplace',
-          'Your application details have been saved',
-          'You will receive an email notification when lenders are ready to make offers',
-          'Expected launch: Q2 2026'
-        ]
+        }
       });
     }
 
@@ -230,7 +186,6 @@ router.post('/applications', authenticateToken, async (req, res) => {
 
     res.status(201).json({
       success: true,
-      demo: false,
       message: 'Application submitted to marketplace',
       applicationId,
       status: 'PENDING',
