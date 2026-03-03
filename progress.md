@@ -257,6 +257,90 @@ baseURL: window.location.hostname === 'localhost' || window.location.hostname ==
 
 ---
 
+### 2026-03-03 - Legal Pages, Footer Hygiene & Comprehensive Compliance Docs
+
+Added all required legal and compliance pages and permanently fixed footer navigation so dead links can never ship again.
+
+#### Problem (Mistakes Never to Repeat)
+
+**Rule: Every footer link must point to a real, committed file. Dead `#anchor` links in the footer are launch-blockers — always verify each link resolves before committing.**
+
+The `index.html` footer listed 4 Legal pages (Privacy Policy, Terms of Service, Licenses, Accessibility) and several Company links. Every single one was either:
+1. Pointing to `#about` — a section ID that does not exist on `index.html`
+2. Pointing to pages (`accessibility.html`, `privacy-policy.html`, `terms-of-service.html`, `licenses.html`) that did not exist in the repository
+
+Additionally the footer advertised "Careers" and "Press" links — pages that were never built and never planned.
+
+**Secondary Rule: Never create an external link to a page that does not exist. If the page is not built, remove the link entirely rather than leaving a dead anchor.**
+
+#### What Was Fixed
+
+**`index.html` footer:**
+- Product: "Mobile App" (`#about`) → "Get Started" (`#start`)
+- Company: Removed "Careers" and "Press" entries entirely (pages never existed); "About Us" → `#how-it-works`; "Contact" → `mailto:hello@paysick.co.za`
+- Legal: All 4 links fixed from dead `#about` to real pages: `privacy-policy.html`, `terms-of-service.html`, `licenses.html`, `accessibility.html`
+
+**`register.html`:**
+- Terms link fixed from dead `index.html#terms` → `terms-of-service.html`
+- Privacy link fixed from dead `index.html#privacy` → `privacy-policy.html`
+
+#### Legal Pages Created
+
+All four pages built to production standard for a South African fintech company:
+
+**`privacy-policy.html`** — POPIA-comprehensive (18 sections):
+- Prominent Non-Credit Liability notice (first content shown)
+- POPIA 8 Conditions of Lawful Processing with card grid
+- Legal framework table: POPIA, NCA, FICA, CPA, ECTA, PAIA
+- Special personal information (POPIA s26 health data)
+- Data processing purposes with POPIA s11 legal bases
+- Cross-border data transfer compliance (POPIA s72) for Vercel/Neon
+- Retention periods table with statutory citations
+- Security safeguards (AES-256-GCM, scrypt, opaque tokens)
+- Breach notification obligations (POPIA s22)
+- Data subject rights grid — all 8 rights with section references
+- FICA obligations, Information Regulator contact
+
+**`terms-of-service.html`** — Strong financial services tone (18 sections):
+- Prominent Non-Credit Liability dark callout box (PaySick as payment facilitator, not a bank)
+- Eligibility criteria card grid (6 cards)
+- Underwriting Policy section — proprietary PD/LGD models as trade secrets; NCA affordability assessment ss80-82; explicit policy to decline borderline applications
+- Fees table with NCA regulatory cap references
+- DebiCheck mandate section and reversal consequences
+- IP section protecting platform, risk models, brand, data
+- Limitation of liability (aggregate cap = 12-month fees paid)
+- Indemnification clause
+- Dispute resolution: NCR, Credit Ombud, NCT, AFSA arbitration
+
+**`licenses.html`** — SaaS IP protection (6 sections):
+- Proprietary software ownership notice (dark callout box)
+- 6 IP category cards: Platform Software, Risk Scoring Models (trade secrets), Trademarks, Database Contents, UI Design, Documentation
+- SaaS usage grant — what users ARE permitted to do
+- POPIA operator agreement context for SaaS data handling
+- Third-party open source components with full MIT and BSD-2-Clause license text
+
+**`accessibility.html`** — WCAG 2.1 Level AA commitment:
+- 4-card conformance status grid (Perceivable/Operable/Understandable/Robust)
+- Known limitations documented (screen reader gaps, keyboard trap, contrast)
+- Alternative formats and telephone assistance (0800 000 000)
+- accessibility@paysick.co.za with 2-business-day SLA
+
+#### Files Changed
+- `index.html` — Footer links fixed, Careers/Press removed
+- `register.html` — Legal links fixed
+- `privacy-policy.html` — New file (comprehensive POPIA-compliant)
+- `terms-of-service.html` — New file (financial services tone, non-credit liability)
+- `licenses.html` — New file (SaaS IP protections + OSS attributions)
+- `accessibility.html` — New file (WCAG 2.1 AA commitment)
+
+#### Lessons Learned
+1. **Footer links must be verified against real files before every commit.** Run `git ls-files | grep -E "\.html$"` and cross-check against every href in the footer.
+2. **Never ship a footer link to a page that does not exist.** Remove the link; do not leave a dead anchor.
+3. **Legal pages are not optional.** POPIA requires a public privacy policy. NCA and CPA require accessible terms. These are compliance obligations, not marketing copy.
+4. **Proprietary IP (especially risk models) must be explicitly designated as trade secrets** in both the ToS and licenses page to receive legal protection.
+
+---
+
 ### 2026-03-03 - New User Registration Flow
 
 Added production-ready registration page so new users can self-onboard without any demo credentials or back-door workarounds.
