@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS encrypted_banking_details (
 CREATE INDEX IF NOT EXISTS idx_encrypted_banking_user ON encrypted_banking_details(user_id);
 
 -- Banking Details Table (NCA Compliant)
-CREATE TABLE banking_details (
+CREATE TABLE IF NOT EXISTS banking_details (
     banking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 
@@ -145,11 +145,11 @@ CREATE TABLE banking_details (
     CONSTRAINT chk_debit_day CHECK (debit_order_day IN (1, 7, 15, 25))
 );
 
-CREATE INDEX idx_banking_user ON banking_details(user_id);
-CREATE INDEX idx_banking_verification ON banking_details(verification_status);
+CREATE INDEX IF NOT EXISTS idx_banking_user ON banking_details(user_id);
+CREATE INDEX IF NOT EXISTS idx_banking_verification ON banking_details(verification_status);
 
 -- Healthcare Providers Directory
-CREATE TABLE providers (
+CREATE TABLE IF NOT EXISTS providers (
     provider_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Provider Information
@@ -184,16 +184,16 @@ CREATE TABLE providers (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_providers_name ON providers(provider_name);
-CREATE INDEX idx_providers_group ON providers(provider_group);
-CREATE INDEX idx_providers_network ON providers(network_partner);
+CREATE INDEX IF NOT EXISTS idx_providers_name ON providers(provider_name);
+CREATE INDEX IF NOT EXISTS idx_providers_group ON providers(provider_group);
+CREATE INDEX IF NOT EXISTS idx_providers_network ON providers(network_partner);
 
 -- =============================================
 -- APPLICATION TABLES
 -- =============================================
 
 -- Payment Applications
-CREATE TABLE applications (
+CREATE TABLE IF NOT EXISTS applications (
     application_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     provider_id UUID REFERENCES providers(provider_id),
@@ -225,7 +225,7 @@ CREATE TABLE applications (
     ip_address INET,
     user_agent TEXT,
 
-    CONSTRAINT chk_bill_amount CHECK (bill_amount >= 500 AND bill_amount <= 850),
+    CONSTRAINT chk_bill_amount CHECK (bill_amount >= 500 AND bill_amount <= 500000),
     CONSTRAINT chk_risk_score CHECK (risk_score >= 0 AND risk_score <= 100)
 );
 
@@ -239,7 +239,7 @@ CREATE INDEX idx_applications_created ON applications(created_at);
 -- =============================================
 
 -- Payment Plans
-CREATE TABLE payment_plans (
+CREATE TABLE IF NOT EXISTS payment_plans (
     plan_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     application_id UUID NOT NULL REFERENCES applications(application_id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
@@ -272,7 +272,7 @@ CREATE INDEX idx_payment_plans_user ON payment_plans(user_id);
 CREATE INDEX idx_payment_plans_status ON payment_plans(status);
 
 -- Individual Payments
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
     payment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     plan_id UUID NOT NULL REFERENCES payment_plans(plan_id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
@@ -312,7 +312,7 @@ CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_due_date ON payments(due_date);
 
 -- Payment Transactions (Ledger)
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     transaction_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     payment_id UUID REFERENCES payments(payment_id),
     user_id UUID NOT NULL REFERENCES users(user_id),
@@ -349,7 +349,7 @@ CREATE INDEX idx_transactions_created ON transactions(created_at);
 -- =============================================
 
 -- Collections Cases
-CREATE TABLE collections (
+CREATE TABLE IF NOT EXISTS collections (
     collection_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     payment_id UUID NOT NULL REFERENCES payments(payment_id),
     user_id UUID NOT NULL REFERENCES users(user_id),
@@ -384,7 +384,7 @@ CREATE INDEX idx_collections_status ON collections(status);
 CREATE INDEX idx_collections_stage ON collections(collection_stage);
 
 -- Collection Actions Log
-CREATE TABLE collection_actions (
+CREATE TABLE IF NOT EXISTS collection_actions (
     action_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     collection_id UUID NOT NULL REFERENCES collections(collection_id),
 
@@ -414,7 +414,7 @@ CREATE INDEX idx_collection_actions_type ON collection_actions(action_type);
 -- =============================================
 
 -- Provider Settlements
-CREATE TABLE settlements (
+CREATE TABLE IF NOT EXISTS settlements (
     settlement_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_id UUID NOT NULL REFERENCES providers(provider_id),
 
@@ -444,7 +444,7 @@ CREATE INDEX idx_settlements_status ON settlements(status);
 CREATE INDEX idx_settlements_period ON settlements(period_start, period_end);
 
 -- Settlement Line Items
-CREATE TABLE settlement_items (
+CREATE TABLE IF NOT EXISTS settlement_items (
     item_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     settlement_id UUID NOT NULL REFERENCES settlements(settlement_id),
     application_id UUID NOT NULL REFERENCES applications(application_id),
@@ -469,7 +469,7 @@ CREATE INDEX idx_settlement_items_application ON settlement_items(application_id
 -- =============================================
 
 -- Notifications
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     notification_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(user_id),
 
@@ -505,7 +505,7 @@ CREATE INDEX idx_notifications_created ON notifications(created_at);
 -- =============================================
 
 -- Audit Log
-CREATE TABLE audit_log (
+CREATE TABLE IF NOT EXISTS audit_log (
     audit_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Entity
@@ -534,7 +534,7 @@ CREATE INDEX idx_audit_action ON audit_log(action);
 CREATE INDEX idx_audit_created ON audit_log(created_at);
 
 -- POPIA Compliance Log
-CREATE TABLE popia_access_log (
+CREATE TABLE IF NOT EXISTS popia_access_log (
     access_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- Access Details
@@ -567,7 +567,7 @@ CREATE INDEX idx_popia_timestamp ON popia_access_log(access_timestamp);
 -- =============================================
 
 -- Active Payment Plans Summary
-CREATE VIEW vw_active_payment_plans AS
+CREATE OR REPLACE VIEW vw_active_payment_plans AS
 SELECT
     pp.plan_id,
     pp.user_id,
@@ -588,7 +588,7 @@ JOIN applications a ON pp.application_id = a.application_id
 WHERE pp.status = 'active';
 
 -- Overdue Payments
-CREATE VIEW vw_overdue_payments AS
+CREATE OR REPLACE VIEW vw_overdue_payments AS
 SELECT
     p.payment_id,
     p.user_id,
@@ -608,7 +608,7 @@ WHERE p.status IN ('overdue', 'failed')
   AND p.due_date < CURRENT_DATE;
 
 -- Provider Performance
-CREATE VIEW vw_provider_performance AS
+CREATE OR REPLACE VIEW vw_provider_performance AS
 SELECT
     pr.provider_id,
     pr.provider_name,
@@ -620,6 +620,34 @@ SELECT
 FROM providers pr
 LEFT JOIN applications a ON pr.provider_id = a.provider_id
 GROUP BY pr.provider_id, pr.provider_name, pr.provider_group;
+
+-- Lender Performance (used by GET /api/marketplace/admin/lender-stats)
+-- Depends on lenders/lender_offers/marketplace_loans from migration 001.
+-- Uses IF EXISTS guards so the schema is safe to run before migrations.
+CREATE OR REPLACE VIEW vw_lender_performance AS
+SELECT
+    l.lender_id,
+    l.name,
+    l.active,
+    COUNT(DISTINCT lo.offer_id)                                               AS total_offers,
+    COUNT(DISTINCT CASE WHEN lo.status = 'ACCEPTED' THEN lo.offer_id END)    AS accepted_offers,
+    COUNT(DISTINCT ml.loan_id)                                                AS active_loans,
+    COALESCE(SUM(CASE WHEN ml.status = 'ACTIVE' THEN ml.principal_amount ELSE 0 END), 0)
+                                                                              AS total_loaned,
+    ROUND(
+        CASE WHEN COUNT(lo.offer_id) > 0
+            THEN COUNT(CASE WHEN lo.status = 'ACCEPTED' THEN 1 END)::NUMERIC
+                 / COUNT(lo.offer_id) * 100
+            ELSE 0
+        END, 2
+    )                                                                         AS acceptance_rate_pct,
+    l.base_rate,
+    l.min_loan_amount,
+    l.max_loan_amount
+FROM lenders l
+LEFT JOIN lender_offers   lo ON l.lender_id = lo.lender_id
+LEFT JOIN marketplace_loans ml ON l.lender_id = ml.lender_id
+GROUP BY l.lender_id, l.name, l.active, l.base_rate, l.min_loan_amount, l.max_loan_amount;
 
 -- =============================================
 -- FUNCTIONS & TRIGGERS

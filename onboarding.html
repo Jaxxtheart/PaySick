@@ -1069,9 +1069,9 @@
 
                 const data = await response.json();
 
-                if (response.ok && data.token) {
-                    // Store real JWT token
-                    localStorage.setItem('paysick_auth_token', data.token);
+                if (response.ok && (data.accessToken || data.token)) {
+                    // Store real access token (API returns accessToken; fall back to token)
+                    localStorage.setItem('paysick_auth_token', data.accessToken || data.token);
                     localStorage.setItem('paysick_user', JSON.stringify({
                         ...data.user,
                         role: existingUser.role || 'user',

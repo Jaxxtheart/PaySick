@@ -382,8 +382,8 @@
                     const demoData = await demoResponse.json();
 
                     if (demoResponse.ok && (demoData.accessToken || demoData.token)) {
-                        // Store real JWT token from demo endpoint
-                        localStorage.setItem('paysick_auth_token', demoData.token);
+                        // Store token — API returns accessToken; fall back to token for safety
+                        localStorage.setItem('paysick_auth_token', demoData.accessToken || demoData.token);
                         localStorage.setItem('paysick_user', JSON.stringify({
                             ...demoData.user,
                             name: demoData.user.full_name
@@ -395,7 +395,8 @@
                                 window.location.href = 'admin-dashboard.html';
                                 break;
                             case 'provider':
-                                window.location.href = 'provider-dashboard.html';
+                                // provider-dashboard not yet built; send to main dashboard
+                                window.location.href = 'dashboard.html';
                                 break;
                             case 'lender':
                                 window.location.href = 'lender-dashboard.html';
@@ -425,27 +426,6 @@
                 submitBtn.textContent = 'Sign In';
             }
         });
-
-        // Auto-fill demo credentials based on role selection
-        document.getElementById('role').addEventListener('change', function(e) {
-            const role = e.target.value;
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-
-            const credentials = {
-                user: { email: 'user@paysick.com', password: 'password123' },
-                provider: { email: 'provider@paysick.com', password: 'provider123' },
-                lender: { email: 'lender@paysick.com', password: 'lender123' },
-                admin: { email: 'admin@paysick.com', password: 'admin123' }
-            };
-
-            const creds = credentials[role] || credentials.user;
-            emailInput.value = creds.email;
-            passwordInput.value = creds.password;
-        });
-
-        // Note: demo auto-fill removed for production security.
-        // Use the demo credentials table below if you need to test.
     </script>
 </body>
 </html>

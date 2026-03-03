@@ -111,7 +111,7 @@ router.post('/', authenticateToken, async (req, res) => {
     const status = riskAssessment.decision.decision === 'approve' ? 'approved' :
                    riskAssessment.decision.decision === 'decline' ? 'declined' : 'under_review';
     const approved_amount = status === 'approved' ? bill_amount : null;
-    const monthly_payment = status === 'approved' ? (bill_amount / 3).toFixed(2) : null;
+    const monthly_payment = status === 'approved' ? Math.round((bill_amount / 3) * 100) / 100 : null;
 
     // Convert PD score to 0-100 scale for legacy risk_score field
     const risk_score = Math.round((1 - riskAssessment.pd.score) * 100);
