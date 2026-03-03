@@ -255,4 +255,52 @@ baseURL: window.location.hostname === 'localhost' || window.location.hostname ==
 
 ---
 
-**Last Updated**: 2026-02-06
+---
+
+### 2026-03-03 - New User Registration Flow
+
+Added production-ready registration page so new users can self-onboard without any demo credentials or back-door workarounds.
+
+#### Problem (Mistake Never to Repeat)
+
+The platform had **no self-service registration path for real users**. The only way to access any dashboard was via hardcoded demo credentials exposed in the HTML source of `login.html`. The `POST /api/users/register` backend endpoint was fully implemented and secured but completely unreachable from the frontend — a gap that would have forced every launch user to be manually seeded in the database.
+
+**Rule**: Every authenticated endpoint must have a corresponding, accessible frontend entry point before launch. Backend-only features are not shipped features.
+
+#### What Was Built
+
+**`register.html`** — Complete self-service registration page:
+
+- Collects all fields required by `POST /api/users/register`:
+  - Full name, email, SA cell number
+  - 13-digit SA ID number (with Luhn checksum validation client-side)
+  - Date of birth (auto-extracted from ID number), postal code
+  - Password (min 8 chars, uppercase + lowercase + numeric enforced)
+  - Confirm password
+  - Terms & Conditions acceptance
+  - POPIA consent (required by South African law)
+- **Live SA ID validation**: Luhn algorithm verifies checksum before submission
+- **Auto-fill DOB**: When a valid ID number is entered, date of birth is extracted and pre-populated
+- **Password strength meter**: Real-time feedback (Very Weak → Very Strong) with colour coding
+- **Inline field errors**: Each field shows specific, contextual error text without a full-page reload
+- **API integration**: POSTs to `/api/users/register`, stores `accessToken` in `localStorage`, redirects new users to `onboarding.html`
+- **409 conflict handling**: Clear message if email/ID already registered ("Try signing in instead")
+- **18+ age gate**: Date-of-birth input has `max` set to today minus 18 years
+
+**`login.html`** fixes for production safety:
+
+- Added **"New to PaySick? Create an account"** link pointing to `register.html`
+- Removed **auto-fill of demo credentials** on page load — previously the form loaded with `user@paysick.com` / `password123` pre-populated, which is misleading and insecure in production. Demo credentials table remains visible for developers/testers but no longer auto-injects values into the live form.
+
+#### Files Changed
+- `register.html` — New file (production registration page)
+- `login.html` — Added register CTA, removed credential auto-fill
+
+#### Lessons Learned
+1. **Never launch a guarded page without a registration path.** If users need an account to use the app, they need a way to create one.
+2. **Hardcoded credential auto-fill is a production bug.** Demo helpers must be clearly separated from production UX flows.
+3. **Backend endpoints are not features until the frontend exposes them.** Always cross-check every API route against whether it is reachable by an end user.
+
+---
+
+**Last Updated**: 2026-03-03

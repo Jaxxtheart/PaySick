@@ -193,6 +193,24 @@
             opacity: 0.8;
         }
 
+        .register-cta {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        .register-cta a {
+            color: #FF4757;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .register-cta a:hover {
+            opacity: 0.8;
+        }
+
         .error-message {
             background: #FFE5E8;
             color: #E01E37;
@@ -283,6 +301,10 @@
             <p><strong>Provider:</strong> provider@paysick.com / provider123</p>
             <p><strong>Lender:</strong> lender@paysick.com / lender123</p>
             <p><strong>Admin:</strong> admin@paysick.com / admin123</p>
+        </div>
+
+        <div class="register-cta">
+            New to PaySick? <a href="register.html">Create an account</a>
         </div>
 
         <div class="back-home">
@@ -422,11 +444,8 @@
             passwordInput.value = creds.password;
         });
 
-        // Set default credentials on page load
-        window.addEventListener('load', function() {
-            document.getElementById('email').value = 'user@paysick.com';
-            document.getElementById('password').value = 'password123';
-        });
+        // Note: demo auto-fill removed for production security.
+        // Use the demo credentials table below if you need to test.
     </script>
 </body>
 </html>
