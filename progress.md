@@ -255,6 +255,48 @@ baseURL: window.location.hostname === 'localhost' || window.location.hostname ==
 
 ---
 
+### 2026-03-07 - Email Verification & Optimized Onboarding Journey
+
+Added a mandatory email confirmation step to the 'Get Started' flow and split the onboarding into two optimized paths based on how the user arrived.
+
+#### Problems (Mistakes Never to Repeat)
+
+**Rule: Never issue an authenticated session to an unverified email address.**
+The original registration endpoint created an `active` account and issued an `accessToken` immediately — with no proof the user owned the email. This allows impersonation.
+
+**Rule: Never call `POST /api/users/register` from the onboarding page when the user is already registered.**
+`onboarding.html` submitted a second registration at the end — which 409s for users arriving via `register.html`. The onboarding must branch based on source.
+
+**Rule: Never use `data.token` when the API returns `data.accessToken`.**
+The banking API call used `Authorization: Bearer ${data.token}` — always `undefined`.
+
+#### New Get-Started Flow
+```
+register.html → [status='pending', verification email sent]
+             → verify-email.html?email=...   (check inbox)
+             ← user clicks link in email
+             → verify-email.html?token=...   (auto-verify → session issued)
+             → onboarding.html?from=register  (pre-populated mode)
+             → dashboard.html
+```
+
+#### What Changed
+- `POST /api/users/register` — creates user as `status='pending'`, sends email, returns `requiresEmailVerification: true` (no token)
+- `POST /api/users/verify-email` (new) — validates token, activates account, issues session
+- `POST /api/users/resend-verification` (new) — resends link, generic response (no user enumeration)
+- `POST /api/users/login` — blocks `status='pending'` with `EMAIL_UNVERIFIED` code
+- `backend/src/services/email.service.js` (new) — branded HTML email via nodemailer; Ethereal fallback in dev
+- `verify-email.html` (new) — 4-state page: check inbox / verifying / success / error; 60s resend countdown
+- `register.html` — saves `paysick_registration_data` + redirects to `verify-email.html`
+- `onboarding.html` — dual-mode: post-registration (pre-filled, no re-register, uses stored token) vs legacy (full form, existing behaviour); token bug fixed (`data.accessToken`)
+- Schema: `email_verified`, `email_verification_token`, `email_verification_expires` added to users table
+- `backend/.env.example` — SMTP_* and APP_URL vars documented
+
+#### Files Changed
+`backend/package.json`, `backend/.env.example`, `backend/database/schema.sql`,
+`backend/src/migrations/004_email_verification.sql`, `backend/src/services/email.service.js`,
+`backend/src/routes/users.js`, `verify-email.html`, `register.html`, `onboarding.html`, `login.html`
+
 ---
 
 ### 2026-03-03 - Legal Pages, Footer Hygiene & Comprehensive Compliance Docs

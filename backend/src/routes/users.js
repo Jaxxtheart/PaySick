@@ -5,6 +5,7 @@
  * Uses opaque tokens instead of JWT for enhanced security.
  */
 
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const { query } = require('../config/database');
@@ -21,6 +22,7 @@ const {
   isIPBlocked,
   recordFailedLogin
 } = require('../services/security.service');
+const { sendVerificationEmail } = require('../services/email.service');
 const {
   authenticateToken,
   requireAdmin,
@@ -136,12 +138,21 @@ router.post('/register', async (req, res) => {
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Insert new user
+    // Generate email verification token (raw sent by email; hash stored in DB)
+    const rawToken  = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Insert new user (status='pending' until email is verified)
     const result = await query(
       `INSERT INTO users (
         full_name, email, password_hash, cell_number, sa_id_number, postal_code,
-        date_of_birth, terms_accepted, popia_consent, popia_consent_date, status, role
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, 'active', 'user')
+        date_of_birth, terms_accepted, popia_consent, popia_consent_date,
+        status, role,
+        email_verified, email_verification_token, email_verification_expires
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP,
+                'pending', 'user',
+                false, $10, $11)
       RETURNING user_id, full_name, email, cell_number, status, role, created_at`,
       [
         sanitizeObject({ full_name }).full_name,
@@ -152,37 +163,29 @@ router.post('/register', async (req, res) => {
         postal_code,
         date_of_birth,
         terms_accepted,
-        popia_consent
+        popia_consent,
+        tokenHash,
+        tokenExpires
       ]
     );
 
     const user = result.rows[0];
 
-    // Create session with opaque tokens
-    const session = await createSession(
-      { user_id: user.user_id, email: user.email, role: user.role },
-      ipAddress,
-      req.get('User-Agent')
-    );
-
-    // Update last login
-    await query('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1', [user.user_id]);
-
     await logSecurityEvent('REGISTRATION', user.user_id, ipAddress, req.get('User-Agent'), {
       email: user.email
     });
 
+    // Send verification email (non-blocking — a delivery failure doesn't fail registration)
+    try {
+      await sendVerificationEmail(user.email, user.full_name, rawToken);
+    } catch (emailErr) {
+      console.error('Verification email send failed (non-fatal):', emailErr.message);
+    }
+
     res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        user_id: user.user_id,
-        full_name: user.full_name,
-        email: user.email,
-        role: user.role
-      },
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-      expiresIn: session.expiresIn
+      message: 'Account created. Please check your email to verify your address.',
+      requiresEmailVerification: true,
+      email: user.email
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -194,6 +197,153 @@ router.post('/register', async (req, res) => {
     }
 
     res.status(500).json({ error: 'Failed to register user' });
+  }
+});
+
+// ============================================
+// EMAIL VERIFICATION
+// ============================================
+
+/**
+ * POST /api/users/verify-email
+ * Verify a user's email using the token from the verification link.
+ * On success, activates the account and issues a session.
+ */
+router.post('/verify-email', async (req, res) => {
+  const ipAddress = getClientIP(req);
+  const { token } = req.body;
+
+  if (!token || typeof token !== 'string' || token.length !== 64) {
+    return res.status(400).json({
+      error: 'Invalid verification token.',
+      code: 'INVALID_TOKEN'
+    });
+  }
+
+  try {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    const result = await query(
+      `SELECT user_id, full_name, email, role, email_verification_expires
+       FROM users
+       WHERE email_verification_token = $1
+         AND email_verified = false`,
+      [tokenHash]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        error: 'Verification link is invalid or has already been used.',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const user = result.rows[0];
+
+    if (new Date(user.email_verification_expires) < new Date()) {
+      return res.status(400).json({
+        error: 'Verification link has expired. Please request a new one.',
+        code: 'TOKEN_EXPIRED',
+        email: user.email
+      });
+    }
+
+    // Activate account
+    await query(
+      `UPDATE users
+       SET email_verified             = true,
+           email_verification_token   = NULL,
+           email_verification_expires = NULL,
+           status                     = 'active',
+           last_login                 = NOW()
+       WHERE user_id = $1`,
+      [user.user_id]
+    );
+
+    // Issue session now that the email is confirmed
+    const session = await createSession(
+      { user_id: user.user_id, email: user.email, role: user.role },
+      ipAddress,
+      req.get('User-Agent')
+    );
+
+    await logSecurityEvent('EMAIL_VERIFIED', user.user_id, ipAddress, req.get('User-Agent'), {
+      email: user.email
+    });
+
+    res.json({
+      message: 'Email verified. Welcome to PaySick!',
+      user: {
+        user_id:   user.user_id,
+        full_name: user.full_name,
+        email:     user.email,
+        role:      user.role
+      },
+      accessToken:  session.accessToken,
+      refreshToken: session.refreshToken,
+      expiresIn:    session.expiresIn
+    });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({ error: 'Failed to verify email.' });
+  }
+});
+
+/**
+ * POST /api/users/resend-verification
+ * Resend the verification email for an unverified account.
+ * Always returns a generic message to avoid user enumeration.
+ */
+router.post('/resend-verification', async (req, res) => {
+  const ipAddress = getClientIP(req);
+  const { email } = req.body;
+
+  // Generic response — don't reveal whether an account exists
+  const ok = { message: 'If this email is registered and unverified, a new verification link has been sent.' };
+
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Email address required.' });
+  }
+
+  try {
+    const result = await query(
+      `SELECT user_id, full_name, email FROM users
+       WHERE email = $1 AND email_verified = false`,
+      [email.toLowerCase().trim()]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json(ok);
+    }
+
+    const user = result.rows[0];
+
+    const rawToken  = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const expires   = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await query(
+      `UPDATE users
+       SET email_verification_token   = $1,
+           email_verification_expires = $2
+       WHERE user_id = $3`,
+      [tokenHash, expires, user.user_id]
+    );
+
+    try {
+      await sendVerificationEmail(user.email, user.full_name, rawToken);
+    } catch (emailErr) {
+      console.error('Resend verification email failed:', emailErr.message);
+    }
+
+    await logSecurityEvent('VERIFICATION_RESENT', user.user_id, ipAddress, req.get('User-Agent'), {
+      email: user.email
+    });
+
+    res.json(ok);
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({ error: 'Failed to resend verification email.' });
   }
 });
 
@@ -255,6 +405,14 @@ router.post('/login', async (req, res) => {
     }
 
     // Check account status
+    if (user.status === 'pending') {
+      return res.status(403).json({
+        error: 'Please verify your email address before signing in. Check your inbox for the verification link.',
+        code: 'EMAIL_UNVERIFIED',
+        email: user.email
+      });
+    }
+
     if (user.status === 'suspended') {
       return res.status(403).json({
         error: 'Account suspended. Please contact support.',

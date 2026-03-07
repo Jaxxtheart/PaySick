@@ -285,6 +285,28 @@
             color: #FF4757;
         }
 
+        /* Pre-filled (locked) fields from registration */
+        .pre-filled-field {
+            background: #F7F7F7;
+            color: #6A6A6A;
+            cursor: not-allowed;
+            border-color: #E8E8E8 !important;
+        }
+        .reg-info-banner {
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            background: #EFF8FF;
+            border: 1px solid #BEE3F8;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #1A5276;
+            line-height: 1.5;
+        }
+        .reg-info-banner svg { flex-shrink: 0; margin-top: 2px; }
+
         /* Payment Method Cards */
         .payment-methods {
             display: grid;
@@ -521,28 +543,37 @@
         <form id="onboardingForm">
             <!-- Step 1: Personal Information -->
             <div class="form-section active" data-section="1">
-                <h2 class="section-title">Personal Information</h2>
-                <p class="section-description">Help us verify your identity and set up your account</p>
+                <h2 class="section-title" id="step1Title">Personal Information</h2>
+                <p class="section-description" id="step1Desc">Help us verify your identity and set up your account</p>
+
+                <!-- Shown only in post-registration mode -->
+                <div class="reg-info-banner" id="regInfoBanner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="#1A5276" stroke-width="2" fill="none"/>
+                        <path d="M12 8v4M12 16h.01" stroke="#1A5276" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Your personal details were carried over from registration. Only your address is needed below.</span>
+                </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>First Name <span class="required">*</span></label>
-                        <input type="text" name="firstName" required placeholder="John">
+                        <input type="text" name="firstName" id="fieldFirstName" required placeholder="John">
                     </div>
                     <div class="form-group">
                         <label>Last Name <span class="required">*</span></label>
-                        <input type="text" name="lastName" required placeholder="Doe">
+                        <input type="text" name="lastName" id="fieldLastName" required placeholder="Doe">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Date of Birth <span class="required">*</span></label>
-                        <input type="date" name="dob" required>
+                        <input type="date" name="dob" id="fieldDob" required>
                     </div>
                     <div class="form-group">
                         <label>Phone Number <span class="required">*</span></label>
-                        <input type="tel" name="phone" required placeholder="082 123 4567" pattern="^(0|\+27)[0-9]{9}$" title="Please enter a valid South African phone number (e.g., 0821234567)">
+                        <input type="tel" name="phone" id="fieldPhone" required placeholder="082 123 4567" pattern="^(0|\+27)[0-9]{9}$" title="Please enter a valid South African phone number (e.g., 0821234567)">
                     </div>
                 </div>
 
@@ -576,11 +607,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Postal Code <span class="required">*</span></label>
-                        <input type="text" name="postalCode" required placeholder="2001" pattern="[0-9]{4}">
+                        <input type="text" name="postalCode" id="fieldPostalCode" required placeholder="2001" pattern="[0-9]{4}">
                     </div>
                     <div class="form-group">
                         <label>ID Number (Last 4 digits) <span class="required">*</span></label>
-                        <input type="text" name="idNumber" required placeholder="1234" pattern="[0-9]{4}" maxlength="4">
+                        <input type="text" name="idNumber" id="fieldIdNumber" required placeholder="1234" pattern="[0-9]{4}" maxlength="4">
                     </div>
                 </div>
 
@@ -817,6 +848,14 @@
             return user;
         }
 
+        // Detect whether the user arrived from the register → verify-email flow
+        const regData = (function() {
+            try { return JSON.parse(localStorage.getItem('paysick_registration_data') || 'null'); }
+            catch (_) { return null; }
+        })();
+        const fromRegister = regData !== null ||
+            new URLSearchParams(window.location.search).get('from') === 'register';
+
         // Initialize
         window.addEventListener('load', function() {
             const user = checkAuth();
@@ -828,7 +867,47 @@
                 window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'dashboard.html';
             }
 
-            // Restore onboarding progress if exists
+            // ── Post-registration mode: pre-populate from registration data ──
+            if (fromRegister && regData) {
+                document.getElementById('step1Title').textContent = 'Complete Your Profile';
+                document.getElementById('step1Desc').textContent =
+                    'Your personal details are pre-filled. Just add your address below.';
+                document.getElementById('regInfoBanner').style.display = 'flex';
+
+                // Split full_name into first / last
+                const parts = (regData.full_name || '').trim().split(' ');
+                const firstName = parts[0] || '';
+                const lastName  = parts.slice(1).join(' ') || '';
+
+                // Pre-fill & lock fields that were collected at registration
+                const locked = {
+                    fieldFirstName:  firstName,
+                    fieldLastName:   lastName,
+                    fieldDob:        regData.date_of_birth || '',
+                    fieldPhone:      regData.cell_number   || '',
+                    fieldPostalCode: regData.postal_code   || '',
+                    fieldIdNumber:   regData.sa_id_number ? regData.sa_id_number.slice(-4) : ''
+                };
+
+                Object.entries(locked).forEach(function([id, value]) {
+                    const el = document.getElementById(id);
+                    if (!el || !value) return;
+                    el.value    = value;
+                    el.readOnly = true;
+                    el.classList.add('pre-filled-field');
+                });
+
+                // Seed formData so nextStep() validation passes for locked fields
+                Object.assign(formData, {
+                    firstName, lastName,
+                    dob:        regData.date_of_birth || '',
+                    phone:      regData.cell_number   || '',
+                    postalCode: regData.postal_code   || '',
+                    idNumber:   regData.sa_id_number ? regData.sa_id_number.slice(-4) : ''
+                });
+            }
+
+            // ── Restore saved progress (works for both modes) ──
             const savedProgress = localStorage.getItem('paysick_onboarding_progress');
             if (savedProgress) {
                 try {
@@ -838,7 +917,7 @@
                         // Restore form field values
                         Object.keys(progress.formData).forEach(key => {
                             const input = document.querySelector(`[name="${key}"]`);
-                            if (input) {
+                            if (input && !input.readOnly) {
                                 if (input.type === 'radio') {
                                     const radio = document.querySelector(`[name="${key}"][value="${progress.formData[key]}"]`);
                                     if (radio) radio.checked = true;
@@ -1045,67 +1124,115 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating your account...';
 
+            const authToken = localStorage.getItem('paysick_auth_token');
+
             try {
-                // Get existing user data
-                const existingUser = JSON.parse(localStorage.getItem('paysick_user') || '{}');
+                if (fromRegister && authToken) {
+                    // ── Post-registration path ────────────────────────────────
+                    // User is already in the DB and email-verified.
+                    // Just update profile (cell/postal) — no re-registration.
+                    try {
+                        await fetch('/api/users/profile', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`
+                            },
+                            body: JSON.stringify({
+                                cell_number: formData.phone,
+                                postal_code: formData.postalCode
+                            })
+                        });
+                    } catch (profileErr) {
+                        console.warn('Profile update failed (non-fatal):', profileErr);
+                    }
 
-                // Register user with the API
-                const response = await fetch('/api/users/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        full_name: `${formData.firstName} ${formData.lastName}`,
-                        email: existingUser.email || `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@example.com`,
-                        cell_number: formData.phone,
-                        sa_id_number: formData.idNumber || formData.phone.replace(/\D/g, '').slice(-13).padStart(13, '0'),
-                        postal_code: formData.postalCode,
-                        date_of_birth: formData.dob,
-                        terms_accepted: true,
-                        popia_consent: true
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && (data.accessToken || data.token)) {
-                    // Store real access token (API returns accessToken; fall back to token)
-                    localStorage.setItem('paysick_auth_token', data.accessToken || data.token);
-                    localStorage.setItem('paysick_user', JSON.stringify({
-                        ...data.user,
-                        role: existingUser.role || 'user',
-                        name: data.user.full_name
-                    }));
-
-                    // Add banking details if provided
+                    // Save banking details if bank method selected
                     if (formData.paymentMethod === 'bank' && formData.bankName) {
                         try {
                             await fetch('/api/users/banking', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${data.token}`
+                                    'Authorization': `Bearer ${authToken}`
                                 },
                                 body: JSON.stringify({
                                     bank_name: formData.bankName,
-                                    account_type: formData.accountType || 'current',
+                                    account_type: formData.accountType || 'cheque',
                                     account_number: formData.accountNumber,
                                     branch_code: formData.branchCode,
                                     account_holder_name: `${formData.firstName} ${formData.lastName}`,
-                                    debit_order_day: parseInt(formData.paymentDate) || 1
+                                    debit_order_day: parseInt(formData.paymentDate, 10) || 1
                                 })
                             });
-                        } catch (bankError) {
-                            console.warn('Banking details not saved:', bankError);
+                        } catch (bankErr) {
+                            console.warn('Banking details not saved (non-fatal):', bankErr);
                         }
                     }
+
+                    // Clear registration data — no longer needed
+                    localStorage.removeItem('paysick_registration_data');
+                    localStorage.removeItem('paysick_pending_email');
+
                 } else {
-                    console.warn('Registration failed, continuing in demo mode:', data.error);
+                    // ── Legacy direct-onboarding path ─────────────────────────
+                    // User arrived at onboarding without prior registration.
+                    const existingUser = JSON.parse(localStorage.getItem('paysick_user') || '{}');
+
+                    const response = await fetch('/api/users/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            full_name:     `${formData.firstName} ${formData.lastName}`,
+                            email:         existingUser.email ||
+                                           `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@example.com`,
+                            cell_number:   formData.phone,
+                            sa_id_number:  formData.idNumber || formData.phone.replace(/\D/g, '').slice(-13).padStart(13, '0'),
+                            postal_code:   formData.postalCode,
+                            date_of_birth: formData.dob,
+                            terms_accepted: true,
+                            popia_consent:  true
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.accessToken) {
+                        localStorage.setItem('paysick_auth_token', data.accessToken);
+                        localStorage.setItem('paysick_user', JSON.stringify({
+                            ...data.user,
+                            role: existingUser.role || 'user',
+                            name: data.user.full_name
+                        }));
+
+                        if (formData.paymentMethod === 'bank' && formData.bankName) {
+                            try {
+                                await fetch('/api/users/banking', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${data.accessToken}`
+                                    },
+                                    body: JSON.stringify({
+                                        bank_name:           formData.bankName,
+                                        account_type:        formData.accountType || 'cheque',
+                                        account_number:      formData.accountNumber,
+                                        branch_code:         formData.branchCode,
+                                        account_holder_name: `${formData.firstName} ${formData.lastName}`,
+                                        debit_order_day:     parseInt(formData.paymentDate, 10) || 1
+                                    })
+                                });
+                            } catch (bankErr) {
+                                console.warn('Banking details not saved (non-fatal):', bankErr);
+                            }
+                        }
+                    } else {
+                        console.warn('Registration failed in legacy mode:', data.error);
+                    }
                 }
             } catch (error) {
-                console.error('API registration error:', error);
-                // Continue with demo mode if API fails
+                console.error('Onboarding API error:', error);
+                // Continue regardless — local progress is saved
             }
 
             // Save onboarding data

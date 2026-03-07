@@ -40,6 +40,11 @@ CREATE TABLE IF NOT EXISTS users (
     credit_limit DECIMAL(10,2) DEFAULT 850.00,
     debit_order_day INTEGER,
 
+    -- Email verification
+    email_verified             BOOLEAN DEFAULT false,
+    email_verification_token   VARCHAR(64),
+    email_verification_expires TIMESTAMP WITH TIME ZONE,
+
     -- Audit
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

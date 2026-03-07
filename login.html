@@ -366,6 +366,14 @@
                                 window.location.href = 'onboarding.html';
                             }
                     }
+                } else if (response.status === 403 && data.code === 'EMAIL_UNVERIFIED') {
+                    // Unverified account — redirect to verification page
+                    errorMessage.textContent = 'Please verify your email address first.';
+                    errorMessage.classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = `verify-email.html?email=${encodeURIComponent(data.email || email)}`;
+                    }, 1800);
+                    return;
                 } else {
                     // API login failed - try demo login endpoint
                     console.warn('API login failed, trying demo login:', data.error);

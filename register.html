@@ -743,20 +743,29 @@
 
                 const data = await response.json();
 
-                if (response.ok && data.accessToken) {
-                    // Store tokens and user data
-                    localStorage.setItem('paysick_auth_token', data.accessToken);
-                    localStorage.setItem('paysick_user', JSON.stringify({
-                        ...data.user,
-                        name: data.user.full_name
+                if (response.ok && data.requiresEmailVerification) {
+                    // Save registration data so onboarding can pre-populate fields
+                    localStorage.setItem('paysick_pending_email', data.email);
+                    localStorage.setItem('paysick_registration_data', JSON.stringify({
+                        full_name, email, cell_number, sa_id_number, postal_code, date_of_birth
                     }));
 
-                    showAlert('success', 'Account created! Redirecting you now…');
+                    showAlert('success', 'Account created! Please check your email for a verification link.');
 
-                    // New users always go to onboarding
                     setTimeout(() => {
-                        window.location.href = 'onboarding.html';
-                    }, 1200);
+                        window.location.href = `verify-email.html?email=${encodeURIComponent(data.email)}`;
+                    }, 1500);
+
+                } else if (response.ok) {
+                    // Fallback: if server already verified (shouldn't happen, but handle gracefully)
+                    if (data.accessToken) {
+                        localStorage.setItem('paysick_auth_token', data.accessToken);
+                        localStorage.setItem('paysick_user', JSON.stringify({
+                            ...data.user, name: data.user.full_name
+                        }));
+                    }
+                    showAlert('success', 'Account created! Redirecting…');
+                    setTimeout(() => { window.location.href = 'onboarding.html?from=register'; }, 1200);
 
                 } else {
                     // Surface API validation errors clearly
