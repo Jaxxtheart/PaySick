@@ -429,4 +429,59 @@ The platform had **no self-service registration path for real users**. The only 
 
 ---
 
-**Last Updated**: 2026-03-03
+---
+
+### 2026-03-07 - Legal Documentation Cleanup: IP Protection, Credit Licensing, Writing Rules
+
+Rewrote all four legal pages to remove internal IP methodology details, remove references implying a credit provider licence, and remove all em dashes throughout.
+
+#### Problem (Mistakes Never to Repeat)
+
+**Rule: Never use em dashes (-- or &mdash;) in any written content, ever.** Use colons, commas, parentheses, or restructure the sentence. This applies to all HTML pages, markdown, email templates, and any other written output.
+
+**Rule: Never describe PaySick as a registered credit provider, NCR-registered entity, or imply credit licensing obligations that do not apply.** PaySick is a healthcare payment facilitation platform. Use NCA references only with "where applicable" or "where a payment arrangement constitutes a credit agreement" qualifiers. Never cite NCR, Credit Ombud, NCT, or NCA Section 80-82/129/130 as mandatory PaySick obligations.
+
+**Rule: Never disclose specific risk model names, parameters, or methodology in public-facing legal or marketing documents.** Describe internal models only as "proprietary assessment models, scoring methodology, and decision logic." Never publish PD, LGD, HPS, EL model names, weighting matrices, calibration data, or scoring bands in any public document.
+
+#### What Changed
+
+**`terms-of-service.html`** (v1.2 to v1.3):
+- Section 1: Removed "registered credit provider under NCA / regulated by NCR"
+- Section 4: Renamed "Underwriting Policy and Credit Assessment" to "Application Assessment"; all model specifics removed; rewritten to high-level only
+- Section 4.4: Renamed from "Pre-Agreement Statement and Quotation" to "Pre-Agreement Disclosure"; NCA s92 reference removed
+- Fees table: "NCA cap" column renamed to "Limit"; NCA regulation references removed
+- Section 10: Renamed "Credit Bureau Reporting" to "Payment Conduct Reporting"; reframed as conditional
+- Section 11.3: NCA Section 129/130 specific references removed
+- Section 15: Removed NCT, NCR, Credit Ombud; replaced with NCC, CGSO
+- Footer: Removed "Registered Credit Provider | NCA Compliant"
+- All em dashes removed throughout
+
+**`privacy-policy.html`** (v1.2 to v1.3):
+- Section 1: Removed "registered credit provider under NCA" bullet; replaced with payment facilitation description
+- Legal framework table: All em dashes in legislation names removed
+- NCA table entry: Softened to "where applicable" qualifier
+- Section 5: Removed "specifically, NCA affordability assessment" from legal basis
+- Section 6: Removed "Legal obligation - NCA s80" and "NCR" references
+- Section 7: Removed "National Credit Regulator (NCR)" from third-party recipients
+- Security section: Removed specific implementation parameters
+- Contact box: NCR removed entirely
+- All em dashes removed throughout
+
+**`licenses.html`**:
+- IP Notice box: Removed em dash; removed "underwriting algorithms, pricing engine" from description
+- Healthcare Risk Scoring section: Removed PD, LGD, HPS, EL model names; replaced with "proprietary application assessment models, scoring methodology, and decision logic"
+- SaaS heading: Em dash removed
+- SaaS body: Em dash removed
+- Node.js description: Em dash removed
+
+**`accessibility.html`**:
+- "Partial - In Progress" x2: Changed to "Partial (In Progress)"
+- "Colour contrast - secondary text": Changed to "Colour contrast (secondary text)"
+- "alternative format - such as large print": Changed to parenthetical
+
+#### Files Changed
+`terms-of-service.html`, `privacy-policy.html`, `licenses.html`, `accessibility.html`
+
+---
+
+**Last Updated**: 2026-03-07
