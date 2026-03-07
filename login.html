@@ -375,51 +375,8 @@
                     }, 1800);
                     return;
                 } else {
-                    // API login failed - try demo login endpoint
-                    console.warn('API login failed, trying demo login:', data.error);
-
-                    // Try the demo login endpoint which creates a real JWT
-                    const demoResponse = await fetch('/api/users/demo-login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email, role })
-                    });
-
-                    const demoData = await demoResponse.json();
-
-                    if (demoResponse.ok && (demoData.accessToken || demoData.token)) {
-                        // Store token — API returns accessToken; fall back to token for safety
-                        localStorage.setItem('paysick_auth_token', demoData.accessToken || demoData.token);
-                        localStorage.setItem('paysick_user', JSON.stringify({
-                            ...demoData.user,
-                            name: demoData.user.full_name
-                        }));
-
-                        // Redirect to appropriate page based on role
-                        switch (role) {
-                            case 'admin':
-                                window.location.href = 'admin-dashboard.html';
-                                break;
-                            case 'provider':
-                                // provider-dashboard not yet built; send to main dashboard
-                                window.location.href = 'dashboard.html';
-                                break;
-                            case 'lender':
-                                window.location.href = 'lender-dashboard.html';
-                                break;
-                            default:
-                                const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                                if (onboardingComplete === 'true') {
-                                    window.location.href = 'dashboard.html';
-                                } else {
-                                    window.location.href = 'onboarding.html';
-                                }
-                        }
-                    } else {
-                        throw new Error(demoData.error || 'Invalid credentials');
-                    }
+                    // Show the error from the API directly
+                    throw new Error(data.error || data.message || 'Invalid email or password.');
                 }
             } catch (error) {
                 console.error('Login error:', error);
