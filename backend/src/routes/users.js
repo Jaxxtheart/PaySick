@@ -589,13 +589,15 @@ router.post('/demo-login', async (req, res) => {
     );
 
     if (userRow.rows.length === 0) {
+      // ON CONFLICT DO NOTHING (no target) suppresses ALL unique constraint
+      // violations — including sa_id_number — so this never throws.
       await query(
         `INSERT INTO users (
           full_name, email, cell_number, sa_id_number, postal_code,
           date_of_birth, status, credit_limit, risk_tier, role,
           terms_accepted, popia_consent, popia_consent_date, email_verified
         ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true,true,NOW(),true)
-        ON CONFLICT (email) DO NOTHING`,
+        ON CONFLICT DO NOTHING`,
         [
           demoProfile.full_name, demoProfile.email, demoProfile.cell_number,
           demoProfile.sa_id_number, demoProfile.postal_code, demoProfile.date_of_birth,
@@ -606,6 +608,10 @@ router.post('/demo-login', async (req, res) => {
         'SELECT user_id FROM users WHERE email = $1',
         [demoProfile.email]
       );
+    }
+
+    if (!userRow.rows.length) {
+      return res.status(500).json({ error: 'Demo account could not be seeded — SA ID number conflict in database.' });
     }
 
     const dbUserId = userRow.rows[0].user_id;
@@ -636,7 +642,9 @@ router.post('/demo-login', async (req, res) => {
     });
   } catch (error) {
     console.error('Demo login error:', error);
-    res.status(500).json({ error: 'Failed to process demo login' });
+    // Return the real error so it's visible in the demo UI — this endpoint
+    // is internal-only and the detail helps diagnose deployment issues.
+    res.status(500).json({ error: `Demo login failed: ${error.message}` });
   }
 });
 
