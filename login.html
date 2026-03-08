@@ -125,6 +125,29 @@
             transform: translateY(0);
         }
 
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #FF4757;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            font-weight: 400;
+            color: #4A4A4A;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
         .back-home {
             text-align: center;
             margin-top: 24px;
@@ -218,7 +241,12 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+                <input type="password" id="password" autocomplete="current-password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Remember me</label>
             </div>
 
             <button type="submit" class="btn">Sign In</button>
@@ -230,12 +258,29 @@
     </div>
 
     <script>
+        // Load remembered credentials on page load
+        (function loadRemembered() {
+            try {
+                const saved = localStorage.getItem('paysick_remember');
+                if (saved) {
+                    const { email, pw, role } = JSON.parse(saved);
+                    document.getElementById('email').value = email || '';
+                    document.getElementById('password').value = atob(pw || '');
+                    if (role) document.getElementById('role').value = role;
+                    document.getElementById('rememberMe').checked = true;
+                }
+            } catch (e) {
+                localStorage.removeItem('paysick_remember');
+            }
+        })();
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
             const errorMessage = document.getElementById('errorMessage');
             const submitBtn = this.querySelector('button[type="submit"]');
 
@@ -259,6 +304,17 @@
                 const data = await response.json();
 
                 if (response.ok && data.accessToken) {
+                    // Handle Remember Me
+                    if (rememberMe) {
+                        localStorage.setItem('paysick_remember', JSON.stringify({
+                            email: email,
+                            pw: btoa(password),
+                            role: role
+                        }));
+                    } else {
+                        localStorage.removeItem('paysick_remember');
+                    }
+
                     localStorage.setItem('paysick_auth_token', data.accessToken);
                     localStorage.setItem('paysick_user', JSON.stringify({
                         ...data.user,
