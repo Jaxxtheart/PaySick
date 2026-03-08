@@ -218,7 +218,7 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const { email, sa_id_number, password } = req.body;
+    const { email, sa_id_number, password, rememberMe } = req.body;
 
     if ((!email && !sa_id_number) || !password) {
       return res.status(400).json({
@@ -310,11 +310,12 @@ router.post('/login', async (req, res) => {
       [user.user_id]
     );
 
-    // Create session
+    // Create session (extended lifetime if Remember Me checked)
     const session = await createSession(
       { user_id: user.user_id, email: user.email, role: user.role },
       ipAddress,
-      req.get('User-Agent')
+      req.get('User-Agent'),
+      { rememberMe: !!rememberMe }
     );
 
     res.json({

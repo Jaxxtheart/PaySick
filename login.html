@@ -258,18 +258,76 @@
     </div>
 
     <script>
-        // Load remembered credentials on page load
-        (function loadRemembered() {
+        function redirectByRole(role) {
+            switch (role) {
+                case 'admin':
+                    window.location.href = 'admin-dashboard.html';
+                    break;
+                case 'provider':
+                    window.location.href = 'dashboard.html';
+                    break;
+                case 'lender':
+                    window.location.href = 'lender-dashboard.html';
+                    break;
+                default:
+                    const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                    window.location.href = onboardingComplete === 'true' ? 'dashboard.html' : 'onboarding.html';
+            }
+        }
+
+        // Attempt auto-login via stored refresh token (Remember Me)
+        (async function attemptAutoLogin() {
             try {
                 const saved = localStorage.getItem('paysick_remember');
-                if (saved) {
-                    const { email, pw, role } = JSON.parse(saved);
-                    document.getElementById('email').value = email || '';
-                    document.getElementById('password').value = atob(pw || '');
-                    if (role) document.getElementById('role').value = role;
-                    document.getElementById('rememberMe').checked = true;
+                if (!saved) return;
+
+                const { refreshToken, email, role } = JSON.parse(saved);
+                if (!refreshToken) {
+                    // Clear legacy data (old format stored passwords)
+                    localStorage.removeItem('paysick_remember');
+                    return;
+                }
+
+                // Prepopulate email and role while we attempt auto-login
+                if (email) document.getElementById('email').value = email;
+                if (role) document.getElementById('role').value = role;
+                document.getElementById('rememberMe').checked = true;
+
+                // Try to get a new access token using the refresh token
+                const response = await fetch('/api/users/refresh-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                if (!response.ok) {
+                    // Refresh token expired or revoked — clear and show login form
+                    localStorage.removeItem('paysick_remember');
+                    return;
+                }
+
+                const tokens = await response.json();
+                localStorage.setItem('paysick_auth_token', tokens.accessToken);
+
+                // Fetch user profile with the new access token
+                const profileRes = await fetch('/api/users/profile', {
+                    headers: { 'Authorization': 'Bearer ' + tokens.accessToken }
+                });
+
+                if (profileRes.ok) {
+                    const profileData = await profileRes.json();
+                    const user = profileData.user || profileData;
+                    localStorage.setItem('paysick_user', JSON.stringify({
+                        ...user,
+                        name: user.full_name
+                    }));
+                    redirectByRole(user.role || role);
+                } else {
+                    // Profile fetch failed — let user log in manually
+                    localStorage.removeItem('paysick_remember');
                 }
             } catch (e) {
+                // Network error or parse error — clear stale data
                 localStorage.removeItem('paysick_remember');
             }
         })();
@@ -298,18 +356,18 @@
                 const response = await fetch('/api/users/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password, rememberMe })
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.accessToken) {
-                    // Handle Remember Me
-                    if (rememberMe) {
+                    // Handle Remember Me — store refresh token, never the password
+                    if (rememberMe && data.refreshToken) {
                         localStorage.setItem('paysick_remember', JSON.stringify({
+                            refreshToken: data.refreshToken,
                             email: email,
-                            pw: btoa(password),
-                            role: role
+                            role: data.user.role || role
                         }));
                     } else {
                         localStorage.removeItem('paysick_remember');
@@ -322,25 +380,7 @@
                         name: data.user.full_name
                     }));
 
-                    const userRole = data.user.role || role;
-                    switch (userRole) {
-                        case 'admin':
-                            window.location.href = 'admin-dashboard.html';
-                            break;
-                        case 'provider':
-                            window.location.href = 'dashboard.html';
-                            break;
-                        case 'lender':
-                            window.location.href = 'lender-dashboard.html';
-                            break;
-                        default:
-                            const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                            if (onboardingComplete === 'true') {
-                                window.location.href = 'dashboard.html';
-                            } else {
-                                window.location.href = 'onboarding.html';
-                            }
-                    }
+                    redirectByRole(data.user.role || role);
                 } else {
                     throw new Error(data.error || 'Invalid credentials');
                 }
