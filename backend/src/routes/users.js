@@ -581,30 +581,33 @@ router.post('/demo-login', async (req, res) => {
 
     const effectiveRole = role || demoProfile.role;
 
-    // Upsert the demo user so the FK in user_sessions is always satisfied.
-    // ON CONFLICT leaves existing rows untouched (preserves any real data if
-    // a demo account was previously seeded with a different flow).
-    await query(
-      `INSERT INTO users (
-        full_name, email, cell_number, sa_id_number, postal_code,
-        date_of_birth, status, credit_limit, risk_tier, role,
-        terms_accepted, popia_consent, popia_consent_date, email_verified
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true,true,NOW(),true)
-      ON CONFLICT (email) DO UPDATE SET
-        status = EXCLUDED.status,
-        role   = EXCLUDED.role`,
-      [
-        demoProfile.full_name, demoProfile.email, demoProfile.cell_number,
-        demoProfile.sa_id_number, demoProfile.postal_code, demoProfile.date_of_birth,
-        demoProfile.status, demoProfile.credit_limit, demoProfile.risk_tier, effectiveRole
-      ]
-    );
-
-    // Fetch the real UUID assigned by the database
-    const userRow = await query(
+    // Look up the demo user; insert only if they don't exist yet.
+    // SELECT-first avoids unique-constraint collisions on sa_id_number.
+    let userRow = await query(
       'SELECT user_id FROM users WHERE email = $1',
       [demoProfile.email]
     );
+
+    if (userRow.rows.length === 0) {
+      await query(
+        `INSERT INTO users (
+          full_name, email, cell_number, sa_id_number, postal_code,
+          date_of_birth, status, credit_limit, risk_tier, role,
+          terms_accepted, popia_consent, popia_consent_date, email_verified
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true,true,NOW(),true)
+        ON CONFLICT (email) DO NOTHING`,
+        [
+          demoProfile.full_name, demoProfile.email, demoProfile.cell_number,
+          demoProfile.sa_id_number, demoProfile.postal_code, demoProfile.date_of_birth,
+          demoProfile.status, demoProfile.credit_limit, demoProfile.risk_tier, effectiveRole
+        ]
+      );
+      userRow = await query(
+        'SELECT user_id FROM users WHERE email = $1',
+        [demoProfile.email]
+      );
+    }
+
     const dbUserId = userRow.rows[0].user_id;
 
     // Create session using the real DB user_id
