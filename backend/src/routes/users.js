@@ -525,42 +525,48 @@ router.post('/demo-login', async (req, res) => {
     // Only allow specific demo accounts
     const demoAccounts = {
       'user@paysick.com': {
-        user_id: 'demo-user-001',
         full_name: 'John Doe',
         email: 'user@paysick.com',
         cell_number: '0821234567',
+        sa_id_number: '9001015009087',
+        postal_code: '2000',
+        date_of_birth: '1990-01-01',
         status: 'active',
         credit_limit: 50000,
         risk_tier: 'standard',
         role: 'user'
       },
       'provider@paysick.com': {
-        user_id: 'demo-provider-001',
         full_name: 'Dr. Sarah Smith',
         email: 'provider@paysick.com',
         cell_number: '0823456789',
+        sa_id_number: '8505025800082',
+        postal_code: '2196',
+        date_of_birth: '1985-05-02',
         status: 'active',
         credit_limit: 0,
         risk_tier: 'low',
-        role: 'provider',
-        practice_name: 'Smith Medical Centre'
+        role: 'provider'
       },
       'lender@paysick.com': {
-        user_id: 'demo-lender-001',
         full_name: 'Capital Finance',
         email: 'lender@paysick.com',
         cell_number: '0824567890',
+        sa_id_number: '7803035100083',
+        postal_code: '4001',
+        date_of_birth: '1978-03-03',
         status: 'active',
         credit_limit: 0,
         risk_tier: 'low',
-        role: 'lender',
-        company_name: 'Capital Finance SA'
+        role: 'lender'
       },
       'admin@paysick.com': {
-        user_id: 'demo-admin-001',
         full_name: 'Admin User',
         email: 'admin@paysick.com',
         cell_number: '0829876543',
+        sa_id_number: '8012126100086',
+        postal_code: '0001',
+        date_of_birth: '1980-12-12',
         status: 'active',
         credit_limit: 100000,
         risk_tier: 'low',
@@ -568,29 +574,58 @@ router.post('/demo-login', async (req, res) => {
       }
     };
 
-    const demoUser = demoAccounts[email];
-    if (!demoUser) {
+    const demoProfile = demoAccounts[email];
+    if (!demoProfile) {
       return res.status(401).json({ error: 'Invalid demo credentials' });
     }
 
-    // Create session
+    const effectiveRole = role || demoProfile.role;
+
+    // Upsert the demo user so the FK in user_sessions is always satisfied.
+    // ON CONFLICT leaves existing rows untouched (preserves any real data if
+    // a demo account was previously seeded with a different flow).
+    await query(
+      `INSERT INTO users (
+        full_name, email, cell_number, sa_id_number, postal_code,
+        date_of_birth, status, credit_limit, risk_tier, role,
+        terms_accepted, popia_consent, popia_consent_date, email_verified
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,true,true,NOW(),true)
+      ON CONFLICT (email) DO UPDATE SET
+        status = EXCLUDED.status,
+        role   = EXCLUDED.role`,
+      [
+        demoProfile.full_name, demoProfile.email, demoProfile.cell_number,
+        demoProfile.sa_id_number, demoProfile.postal_code, demoProfile.date_of_birth,
+        demoProfile.status, demoProfile.credit_limit, demoProfile.risk_tier, effectiveRole
+      ]
+    );
+
+    // Fetch the real UUID assigned by the database
+    const userRow = await query(
+      'SELECT user_id FROM users WHERE email = $1',
+      [demoProfile.email]
+    );
+    const dbUserId = userRow.rows[0].user_id;
+
+    // Create session using the real DB user_id
     const session = await createSession(
-      { user_id: demoUser.user_id, email: demoUser.email, role: role || demoUser.role },
+      { user_id: dbUserId, email: demoProfile.email, role: effectiveRole },
       ipAddress,
       req.get('User-Agent')
     );
 
-    await logSecurityEvent('DEMO_LOGIN', demoUser.user_id, ipAddress, req.get('User-Agent'), {
-      email: demoUser.email,
-      role: role || demoUser.role
+    await logSecurityEvent('DEMO_LOGIN', dbUserId, ipAddress, req.get('User-Agent'), {
+      email: demoProfile.email,
+      role: effectiveRole
     });
 
     res.json({
       message: 'Demo login successful',
       demo: true,
       user: {
-        ...demoUser,
-        role: role || demoUser.role
+        ...demoProfile,
+        user_id: dbUserId,
+        role: effectiveRole
       },
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
