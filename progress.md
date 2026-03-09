@@ -2,90 +2,56 @@
 
 This document tracks the development progress of the PaySick healthcare payment platform.
 
+## CORE FUNCTIONALITY - DO NOT REMOVE
+
+### Demo Access System (Password-Gated)
+This is production-critical functionality for investor demos, partner onboarding, and development.
+
+**Architecture:**
+- `login.html` - Clean production login page for real users. Contains only a subtle, near-invisible "Demo" link at the very bottom pointing to `demo-login.html`.
+- `demo-login.html` - Password-gated demo page. Password: `PaySick-demo-2026`. After correct password entry, reveals one-click role buttons (Patient, Provider, Lender, Admin) that call `/api/users/demo-login`.
+- `backend/src/routes/users.js` - `POST /api/users/demo-login` endpoint with 4 hardcoded demo accounts. Controlled by `ALLOW_DEMO_LOGIN=true` env var (auto-enabled in non-production).
+- `backend/src/server.js` - Demo-login rate limiter applied.
+
+**Marketplace Preview Mode:**
+- `backend/src/routes/marketplace.js` - When no active lenders exist, returns preview offers (MediFinance SA 16.5%, HealthCredit Plus 18.5%, CareCapital 19.5%) with `demo: true` flag.
+- `marketplace-apply.html` - Renders preview offer cards with "Preview Only - Not a Real Offer" disclaimers, next steps, and "Notify Me" button.
+
+**Dashboard defaults:**
+- `dashboard.html` - Default sidebar: John Doe / user@paysick.com
+- `admin-dashboard.html` - Default sidebar: Admin User / admin@paysick.com
+- `onboarding.html` - Falls back gracefully in demo mode if API registration fails
+
+---
+
 ## Latest Updates
 
-### 2026-03-09 - Demo Access Functionality Restored (Production Push)
+### 2026-03-09 - Demo Access Redesign (Production Push)
 
-Restored all demo/preview functionality that was incorrectly removed in the "Remove all demo content" commit (cb932d8). Demo access is critical for demonstrations, investor walkthroughs, and development testing.
+Upgraded demo access from exposed credentials on login page to a proper password-gated system per the design from `claude/add-login-functionality-FEn61`.
 
-**Rule established:** progress.md MUST be updated with every production promotion.
+#### Changes
+1. **`login.html`** - Cleaned for real users. Removed all demo credentials display, auto-fill, and demo-login fallback. Added subtle "Demo" link at bottom (color: #D0D0D0, 11px) pointing to `demo-login.html`.
+2. **`demo-login.html`** (NEW) - Password-gated demo page:
+   - Dark theme (#2C3E50) to visually distinguish from production login
+   - Password gate: `PaySick-demo-2026` required to reveal role buttons
+   - 4 one-click role buttons (Patient, Provider, Lender, Admin) with custom SVG icons
+   - Calls `POST /api/users/demo-login` directly
+   - Shake animation on wrong password
+   - Loading states and error handling
 
-#### Restored Components
+#### Backend (Preserved from previous commit)
+- `POST /api/users/demo-login` endpoint in users.js (4 demo accounts)
+- Demo-login rate limiter in server.js
+- Marketplace preview offers in marketplace.js (3 preview lenders)
+- Preview container rendering in marketplace-apply.html
 
-**Backend - Demo Login Endpoint (`backend/src/routes/users.js`)**
-- `POST /api/users/demo-login` endpoint restored
-- 4 demo accounts: Patient (user@paysick.com), Provider (provider@paysick.com), Lender (lender@paysick.com), Admin (admin@paysick.com)
-- Controlled by `ALLOW_DEMO_LOGIN=true` env var (auto-enabled in non-production)
-- Full session creation with opaque tokens
-- Security event logging for demo logins
+#### Files Modified
+1. `login.html` - Removed demo section, added subtle demo link
+2. `demo-login.html` - NEW: password-gated demo access page
 
-**Backend - Marketplace Preview Mode (`backend/src/routes/marketplace.js`)**
-- Preview offers restored when no active lenders are onboarded
-- 3 preview lenders: MediFinance SA (16.5%), HealthCredit Plus (18.5%), CareCapital (19.5%)
-- Preview offers include features, monthly payments, and total repayment calculations
-- Next steps guidance for users
-- `demo: true` flag in API responses for frontend differentiation
-
-**Backend - Rate Limiter (`backend/src/server.js`)**
-- Demo-login endpoint added back to auth rate limiter
-
-**Frontend - Login Page (`login.html`)**
-- "Demo Access" divider section restored
-- Demo credentials display (all 4 roles with passwords)
-- Auto-fill credentials on role selection change
-- Default credentials pre-populated on page load
-- Demo-login fallback: if real `/api/users/login` fails, falls back to `/api/users/demo-login`
-- Remember Me integration preserved for demo login flow
-
-**Frontend - Marketplace Application (`marketplace-apply.html`)**
-- Preview Offers container restored (hidden by default, shown in demo mode)
-- "Marketplace Preview Mode" banner with orange styling
-- Preview offer cards with Best Rate badge, interest rates, monthly payments, terms
-- "Preview Only - Not a Real Offer" disclaimer on each card
-- Next Steps list rendering
-- "Notify Me When Lenders Are Available" button behavior
-
-**Frontend - Dashboard Pages**
-- `dashboard.html`: Restored default user info (John Doe / user@paysick.com)
-- `admin-dashboard.html`: Restored default admin info (Admin User / admin@paysick.com)
-
-**Frontend - Onboarding (`onboarding.html`)**
-- Restored "demo mode" fallback comments for when API registration fails
-
-#### What Was Preserved from Production Hardening
-The following security improvements from cb932d8 were intentionally KEPT:
-- Timing-safe webhook signature comparison in marketplace.js
-- Graceful shutdown with connection draining in server.js
-- Production-safe 404 responses (no route details in production)
-- Tighter CORS (Vercel wildcard restricted in production)
-- Shield route input validation (UUID, numeric ranges, pagination)
-- Production-safe query logging
-
-#### Files Modified (8)
-1. `backend/src/routes/users.js` - Demo login endpoint added
-2. `backend/src/routes/marketplace.js` - Preview offers restored
-3. `backend/src/server.js` - Demo login rate limiter
-4. `login.html` - Demo UI, credentials, auto-fill, fallback
-5. `marketplace-apply.html` - Preview container and rendering
-6. `dashboard.html` - Default user info
-7. `admin-dashboard.html` - Default admin info
-8. `onboarding.html` - Demo mode fallback comments
-
-#### Full App Audit Results
-| Check | Status |
-|-------|--------|
-| HTML pages (13) | OK |
-| Backend routes (7) | OK |
-| Backend services (11) | OK |
-| Backend middleware (1) | OK |
-| api-client.js | OK |
-| All internal links | OK |
-| Server syntax check | OK |
-| Demo login endpoint | Restored |
-| Demo credentials UI | Restored |
-| Marketplace previews | Restored |
-| Preview container UI | Restored |
-| Demo rate limiter | Restored |
+#### Security Hardening Preserved
+- Timing-safe webhook signatures, graceful shutdown, production CORS, Shield validation
 
 ---
 
