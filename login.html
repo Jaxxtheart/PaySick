@@ -148,6 +148,57 @@
             cursor: pointer;
         }
 
+        .divider {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+            color: #8A8A8A;
+            font-size: 14px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #E5E5E5;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .demo-credentials {
+            background: #FAFAFA;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .demo-credentials h3 {
+            color: #1A1A1A;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .demo-credentials p {
+            color: #4A4A4A;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .demo-credentials strong {
+            color: #FF4757;
+        }
+
         .back-home {
             text-align: center;
             margin-top: 24px;
@@ -251,6 +302,16 @@
 
             <button type="submit" class="btn">Sign In</button>
         </form>
+
+        <div class="divider">Demo Access</div>
+
+        <div class="demo-credentials">
+            <h3>Demo Credentials</h3>
+            <p><strong>Patient:</strong> user@paysick.com / password123</p>
+            <p><strong>Provider:</strong> provider@paysick.com / provider123</p>
+            <p><strong>Lender:</strong> lender@paysick.com / lender123</p>
+            <p><strong>Admin:</strong> admin@paysick.com / admin123</p>
+        </div>
 
         <div class="back-home">
             <a href="index.html"><svg style="width:16px;height:16px;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke="#FF4757" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to Home</a>
@@ -382,7 +443,39 @@
 
                     redirectByRole(data.user.role || role);
                 } else {
-                    throw new Error(data.error || 'Invalid credentials');
+                    // API login failed - try demo login endpoint
+                    console.warn('API login failed, trying demo login:', data.error);
+
+                    const demoResponse = await fetch('/api/users/demo-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, role })
+                    });
+
+                    const demoData = await demoResponse.json();
+
+                    if (demoResponse.ok && demoData.accessToken) {
+                        // Handle Remember Me for demo login too
+                        if (rememberMe && demoData.refreshToken) {
+                            localStorage.setItem('paysick_remember', JSON.stringify({
+                                refreshToken: demoData.refreshToken,
+                                email: email,
+                                role: demoData.user.role || role
+                            }));
+                        } else {
+                            localStorage.removeItem('paysick_remember');
+                        }
+
+                        localStorage.setItem('paysick_auth_token', demoData.accessToken);
+                        localStorage.setItem('paysick_user', JSON.stringify({
+                            ...demoData.user,
+                            name: demoData.user.full_name
+                        }));
+
+                        redirectByRole(demoData.user.role || role);
+                    } else {
+                        throw new Error(demoData.error || 'Invalid credentials');
+                    }
                 }
             } catch (error) {
                 errorMessage.textContent = error.message || 'Login failed. Please try again.';
@@ -391,6 +484,32 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Auto-fill demo credentials based on role selection
+        document.getElementById('role').addEventListener('change', function(e) {
+            const role = e.target.value;
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            const credentials = {
+                user: { email: 'user@paysick.com', password: 'password123' },
+                provider: { email: 'provider@paysick.com', password: 'provider123' },
+                lender: { email: 'lender@paysick.com', password: 'lender123' },
+                admin: { email: 'admin@paysick.com', password: 'admin123' }
+            };
+
+            const creds = credentials[role] || credentials.user;
+            emailInput.value = creds.email;
+            passwordInput.value = creds.password;
+        });
+
+        // Set default credentials on page load (only if no auto-login in progress)
+        window.addEventListener('load', function() {
+            if (!localStorage.getItem('paysick_remember')) {
+                document.getElementById('email').value = 'user@paysick.com';
+                document.getElementById('password').value = 'password123';
             }
         });
     </script>

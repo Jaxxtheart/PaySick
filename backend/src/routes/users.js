@@ -341,6 +341,111 @@ router.post('/login', async (req, res) => {
 });
 
 // ============================================
+// DEMO LOGIN (Development Only)
+// ============================================
+
+/**
+ * POST /api/users/demo-login
+ * Demo login for development/testing
+ * Can be enabled in production via ALLOW_DEMO_LOGIN=true
+ */
+router.post('/demo-login', async (req, res) => {
+  // Allow demo login if explicitly enabled or not in production
+  const allowDemo = process.env.ALLOW_DEMO_LOGIN === 'true' || process.env.NODE_ENV !== 'production';
+
+  if (!allowDemo) {
+    return res.status(403).json({
+      error: 'Demo login is disabled in production',
+      code: 'DEMO_DISABLED'
+    });
+  }
+
+  const ipAddress = getClientIP(req);
+
+  try {
+    const { email, role } = req.body;
+
+    // Only allow specific demo accounts
+    const demoAccounts = {
+      'user@paysick.com': {
+        user_id: 'demo-user-001',
+        full_name: 'John Doe',
+        email: 'user@paysick.com',
+        cell_number: '0821234567',
+        status: 'active',
+        credit_limit: 50000,
+        risk_tier: 'standard',
+        role: 'user'
+      },
+      'provider@paysick.com': {
+        user_id: 'demo-provider-001',
+        full_name: 'Dr. Sarah Smith',
+        email: 'provider@paysick.com',
+        cell_number: '0823456789',
+        status: 'active',
+        credit_limit: 0,
+        risk_tier: 'low',
+        role: 'provider',
+        practice_name: 'Smith Medical Centre'
+      },
+      'lender@paysick.com': {
+        user_id: 'demo-lender-001',
+        full_name: 'Capital Finance',
+        email: 'lender@paysick.com',
+        cell_number: '0824567890',
+        status: 'active',
+        credit_limit: 0,
+        risk_tier: 'low',
+        role: 'lender',
+        company_name: 'Capital Finance SA'
+      },
+      'admin@paysick.com': {
+        user_id: 'demo-admin-001',
+        full_name: 'Admin User',
+        email: 'admin@paysick.com',
+        cell_number: '0829876543',
+        status: 'active',
+        credit_limit: 100000,
+        risk_tier: 'low',
+        role: 'admin'
+      }
+    };
+
+    const demoUser = demoAccounts[email];
+    if (!demoUser) {
+      return res.status(401).json({ error: 'Invalid demo credentials' });
+    }
+
+    // Create session
+    const session = await createSession(
+      { user_id: demoUser.user_id, email: demoUser.email, role: role || demoUser.role },
+      ipAddress,
+      req.get('User-Agent')
+    );
+
+    await logSecurityEvent('DEMO_LOGIN', demoUser.user_id, ipAddress, req.get('User-Agent'), {
+      email: demoUser.email,
+      role: role || demoUser.role
+    });
+
+    res.json({
+      message: 'Demo login successful',
+      demo: true,
+      user: {
+        ...demoUser,
+        role: role || demoUser.role
+      },
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+      expiresIn: session.expiresIn
+    });
+  } catch (error) {
+    console.error('Demo login error:', error);
+    res.status(500).json({ error: 'Failed to process demo login' });
+  }
+});
+
+// ============================================
 // TOKEN REFRESH
 // ============================================
 

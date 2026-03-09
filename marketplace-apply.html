@@ -946,6 +946,31 @@
                         You'll receive offers shortly.
                     </p>
 
+                    <!-- Preview Offers Container (shown in demo mode) -->
+                    <div id="previewOffersContainer" style="display: none; margin-top: 32px; text-align: left; max-width: 600px;">
+                        <div style="background: linear-gradient(135deg, #FFF5E6 0%, #FFE0B3 100%); border-radius: 12px; padding: 16px; margin-bottom: 24px; border: 1px solid #FFB347;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" fill="none" stroke="#FF9F40" stroke-width="2"/>
+                                    <path d="M12 8v4M12 16h.01" stroke="#FF9F40" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span style="font-weight: 600; color: #CC6600;">Marketplace Preview Mode</span>
+                            </div>
+                            <p style="font-size: 14px; color: #8B4513; margin: 0;" id="previewMessage">
+                                Our lending partners are being onboarded. Below is a preview of what offers would look like.
+                            </p>
+                        </div>
+
+                        <h3 style="font-size: 18px; margin-bottom: 16px; color: #1A1A1A;">Preview Offers</h3>
+                        <div id="previewOffersList"></div>
+
+                        <div style="margin-top: 24px; padding: 20px; background: #F8F9FA; border-radius: 12px;">
+                            <h4 style="font-size: 16px; margin-bottom: 12px; color: #1A1A1A;">What happens next?</h4>
+                            <ul id="nextStepsList" style="list-style: none; padding: 0; margin: 0;">
+                            </ul>
+                        </div>
+                    </div>
+
                     <button class="btn btn-primary" onclick="viewOffers()" id="viewOffersBtn" style="margin-top: 24px;">View My Offers</button>
                     <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'" style="margin-top: 12px;">Back to Dashboard</button>
                 </div>
@@ -1124,20 +1149,82 @@
 
                 applicationId = response.applicationId;
 
-                // Handle queued vs live marketplace responses
-                if (response.status === 'QUEUED') {
-                    document.getElementById('successTitle').textContent = 'Application Received';
+                // Check if this is a preview/demo response
+                if (response.demo || response.status === 'PREVIEW') {
+                    // Update UI for preview mode
+                    document.getElementById('successTitle').textContent = 'Application Received!';
                     document.getElementById('successMessage').innerHTML =
                         response.marketplaceStatus?.message ||
-                        'Your application has been saved. You will be notified when lending partners are available.';
+                        'Our lending marketplace is currently being set up. Below is a preview of what your offers would look like.';
 
-                    document.getElementById('viewOffersBtn').textContent = 'Back to Dashboard';
+                    // Show preview offers container
+                    const previewContainer = document.getElementById('previewOffersContainer');
+                    previewContainer.style.display = 'block';
+
+                    // Render preview offers
+                    if (response.previewOffers && response.previewOffers.length > 0) {
+                        const offersHTML = response.previewOffers.map((offer, idx) => `
+                            <div style="background: white; border: 2px solid ${idx === 0 ? '#2ED573' : '#E5E5E5'}; border-radius: 12px; padding: 20px; margin-bottom: 16px; ${idx === 0 ? 'box-shadow: 0 4px 12px rgba(46, 213, 115, 0.15);' : ''}">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 16px; color: #1A1A1A;">${offer.lenderName}</div>
+                                        ${idx === 0 ? '<span style="background: #2ED573; color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 4px; display: inline-block;">Best Rate</span>' : ''}
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #FF4757;">${offer.interestRateDisplay || (offer.interestRate * 100).toFixed(1) + '%'}</div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Interest Rate</div>
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 12px; border-top: 1px solid #E5E5E5;">
+                                    <div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Monthly</div>
+                                        <div style="font-weight: 600;">R${offer.monthlyPayment.toLocaleString()}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Term</div>
+                                        <div style="font-weight: 600;">${offer.term} months</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Total</div>
+                                        <div style="font-weight: 600;">R${offer.totalRepayment.toLocaleString()}</div>
+                                    </div>
+                                </div>
+                                ${offer.features ? `
+                                    <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;">
+                                        ${offer.features.map(f => `<span style="background: #F0F0F0; color: #4A4A4A; font-size: 11px; padding: 4px 8px; border-radius: 4px;">${f}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                                <div style="margin-top: 12px; text-align: center;">
+                                    <span style="background: #FFF3CD; color: #856404; font-size: 12px; padding: 4px 12px; border-radius: 4px;">Preview Only - Not a Real Offer</span>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('previewOffersList').innerHTML = offersHTML;
+                    }
+
+                    // Render next steps
+                    if (response.nextSteps && response.nextSteps.length > 0) {
+                        const stepsHTML = response.nextSteps.map(step => `
+                            <li style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                                <svg style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" fill="#2ED573"/>
+                                    <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none"/>
+                                </svg>
+                                <span style="font-size: 14px; color: #4A4A4A;">${step}</span>
+                            </li>
+                        `).join('');
+                        document.getElementById('nextStepsList').innerHTML = stepsHTML;
+                    }
+
+                    // Update button
+                    document.getElementById('viewOffersBtn').textContent = 'Notify Me When Lenders Are Available';
                     document.getElementById('viewOffersBtn').onclick = function() {
-                        window.location.href = 'dashboard.html';
+                        showToast('You will be notified when lenders are available!', 'success');
                     };
 
-                    showToast('Application saved successfully.', 'success');
+                    showToast('Application saved! You\'ll be notified when lenders are available.', 'success');
                 } else {
+                    // Normal success - marketplace is live
                     showToast('Application submitted successfully!', 'success');
                 }
 

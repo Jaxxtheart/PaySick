@@ -1101,10 +1101,11 @@
                         }
                     }
                 } else {
-                    console.warn('Registration response:', data.error);
+                    console.warn('Registration failed, continuing in demo mode:', data.error);
                 }
             } catch (error) {
                 console.error('API registration error:', error);
+                // Continue with demo mode if API fails
             }
 
             // Save onboarding data

@@ -4,6 +4,91 @@ This document tracks the development progress of the PaySick healthcare payment 
 
 ## Latest Updates
 
+### 2026-03-09 - Demo Access Functionality Restored (Production Push)
+
+Restored all demo/preview functionality that was incorrectly removed in the "Remove all demo content" commit (cb932d8). Demo access is critical for demonstrations, investor walkthroughs, and development testing.
+
+**Rule established:** progress.md MUST be updated with every production promotion.
+
+#### Restored Components
+
+**Backend - Demo Login Endpoint (`backend/src/routes/users.js`)**
+- `POST /api/users/demo-login` endpoint restored
+- 4 demo accounts: Patient (user@paysick.com), Provider (provider@paysick.com), Lender (lender@paysick.com), Admin (admin@paysick.com)
+- Controlled by `ALLOW_DEMO_LOGIN=true` env var (auto-enabled in non-production)
+- Full session creation with opaque tokens
+- Security event logging for demo logins
+
+**Backend - Marketplace Preview Mode (`backend/src/routes/marketplace.js`)**
+- Preview offers restored when no active lenders are onboarded
+- 3 preview lenders: MediFinance SA (16.5%), HealthCredit Plus (18.5%), CareCapital (19.5%)
+- Preview offers include features, monthly payments, and total repayment calculations
+- Next steps guidance for users
+- `demo: true` flag in API responses for frontend differentiation
+
+**Backend - Rate Limiter (`backend/src/server.js`)**
+- Demo-login endpoint added back to auth rate limiter
+
+**Frontend - Login Page (`login.html`)**
+- "Demo Access" divider section restored
+- Demo credentials display (all 4 roles with passwords)
+- Auto-fill credentials on role selection change
+- Default credentials pre-populated on page load
+- Demo-login fallback: if real `/api/users/login` fails, falls back to `/api/users/demo-login`
+- Remember Me integration preserved for demo login flow
+
+**Frontend - Marketplace Application (`marketplace-apply.html`)**
+- Preview Offers container restored (hidden by default, shown in demo mode)
+- "Marketplace Preview Mode" banner with orange styling
+- Preview offer cards with Best Rate badge, interest rates, monthly payments, terms
+- "Preview Only - Not a Real Offer" disclaimer on each card
+- Next Steps list rendering
+- "Notify Me When Lenders Are Available" button behavior
+
+**Frontend - Dashboard Pages**
+- `dashboard.html`: Restored default user info (John Doe / user@paysick.com)
+- `admin-dashboard.html`: Restored default admin info (Admin User / admin@paysick.com)
+
+**Frontend - Onboarding (`onboarding.html`)**
+- Restored "demo mode" fallback comments for when API registration fails
+
+#### What Was Preserved from Production Hardening
+The following security improvements from cb932d8 were intentionally KEPT:
+- Timing-safe webhook signature comparison in marketplace.js
+- Graceful shutdown with connection draining in server.js
+- Production-safe 404 responses (no route details in production)
+- Tighter CORS (Vercel wildcard restricted in production)
+- Shield route input validation (UUID, numeric ranges, pagination)
+- Production-safe query logging
+
+#### Files Modified (8)
+1. `backend/src/routes/users.js` - Demo login endpoint added
+2. `backend/src/routes/marketplace.js` - Preview offers restored
+3. `backend/src/server.js` - Demo login rate limiter
+4. `login.html` - Demo UI, credentials, auto-fill, fallback
+5. `marketplace-apply.html` - Preview container and rendering
+6. `dashboard.html` - Default user info
+7. `admin-dashboard.html` - Default admin info
+8. `onboarding.html` - Demo mode fallback comments
+
+#### Full App Audit Results
+| Check | Status |
+|-------|--------|
+| HTML pages (13) | OK |
+| Backend routes (7) | OK |
+| Backend services (11) | OK |
+| Backend middleware (1) | OK |
+| api-client.js | OK |
+| All internal links | OK |
+| Server syntax check | OK |
+| Demo login endpoint | Restored |
+| Demo credentials UI | Restored |
+| Marketplace previews | Restored |
+| Preview container UI | Restored |
+| Demo rate limiter | Restored |
+
+---
+
 ### 2026-02-06 - Healthcare Risk Scoring System Implementation
 
 Built comprehensive proprietary PD (Probability of Default) and LGD (Loss Given Default) models specifically designed for healthcare financing.
@@ -255,4 +340,13 @@ baseURL: window.location.hostname === 'localhost' || window.location.hostname ==
 
 ---
 
-**Last Updated**: 2026-02-06
+---
+
+## Standing Rules
+
+1. **progress.md MUST be updated every time we promote to production.** No exceptions. Every production push must have a corresponding entry documenting what changed, what was added/removed, and the audit results.
+2. **Never remove functionality without explicit permission.** Demo access, preview modes, and fallback behaviors are features — not technical debt.
+
+---
+
+**Last Updated**: 2026-03-09
