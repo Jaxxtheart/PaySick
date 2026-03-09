@@ -28,6 +28,16 @@ This is production-critical functionality for investor demos, partner onboarding
 
 ### 2026-03-09 - Demo Access Redesign (Production Push)
 
+**Deployment:** Branch `claude/build-underwriting-framework-6vtDR` pushed to remote. Merge to `main` required (branch protection active — cannot push directly to main). PR needed to deploy to website.
+
+**Branch contains 6 commits ahead of main:**
+1. `c19f5d7` - PaySick Shield Underwriting Framework (Five-Gate system)
+2. `cb932d8` - Production hardening (security improvements kept, demo removal reverted)
+3. `3f1d10e` - Remember Me checkbox on login page
+4. `228e60f` - Secure Remember Me (server-side refresh tokens)
+5. `7ba6520` - Restore all demo access functionality
+6. `6cf65a0` - Redesign demo access: password-gated demo-login.html
+
 Upgraded demo access from exposed credentials on login page to a proper password-gated system per the design from `claude/add-login-functionality-FEn61`.
 
 #### Changes
