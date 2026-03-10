@@ -48,27 +48,43 @@ async function setupDatabase() {
     await appPool.query(schema);
     console.log('✅ Schema executed successfully\n');
 
-    // Run migrations
+    // Run migrations — check both migration directories:
+    //   src/migrations/      (security tables, etc.)
+    //   database/migrations/ (marketplace tables, risk scoring, etc.)
     console.log('📋 Running migrations...');
-    const migrationsDir = path.join(__dirname, '../migrations');
-    if (fs.existsSync(migrationsDir)) {
-      const migrations = fs.readdirSync(migrationsDir)
-        .filter(f => f.endsWith('.sql'))
-        .sort();
+    const migrationDirs = [
+      path.join(__dirname, '../migrations'),          // src/migrations
+      path.join(__dirname, '../../database/migrations') // database/migrations
+    ];
 
-      for (const migration of migrations) {
-        try {
-          console.log(`   Running ${migration}...`);
-          const sql = fs.readFileSync(path.join(migrationsDir, migration), 'utf8');
-          await appPool.query(sql);
-          console.log(`   ✅ ${migration} completed`);
-        } catch (err) {
-          // Ignore errors for "already exists" type issues
-          if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
-            console.warn(`   ⚠️  ${migration}: ${err.message}`);
-          } else {
-            console.log(`   ℹ️  ${migration} (already applied)`);
+    // Collect all .sql files from both dirs, deduplicate by filename, sort globally
+    const seenNames = new Set();
+    const allMigrations = [];
+    for (const dir of migrationDirs) {
+      if (fs.existsSync(dir)) {
+        for (const file of fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort()) {
+          if (!seenNames.has(file)) {
+            seenNames.add(file);
+            allMigrations.push({ dir, file });
           }
+        }
+      }
+    }
+    // Sort by filename so numeric prefixes (001_, 002_…) run in order
+    allMigrations.sort((a, b) => a.file.localeCompare(b.file));
+
+    for (const { dir, file } of allMigrations) {
+      try {
+        console.log(`   Running ${file}...`);
+        const sql = fs.readFileSync(path.join(dir, file), 'utf8');
+        await appPool.query(sql);
+        console.log(`   ✅ ${file} completed`);
+      } catch (err) {
+        // Ignore errors for "already exists" type issues
+        if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+          console.warn(`   ⚠️  ${file}: ${err.message}`);
+        } else {
+          console.log(`   ℹ️  ${file} (already applied)`);
         }
       }
     }

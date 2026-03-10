@@ -39,26 +39,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single provider
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await query(
-      'SELECT * FROM providers WHERE provider_id = $1',
-      [req.params.id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Provider not found' });
-    }
-
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Provider fetch error:', error);
-    res.status(500).json({ error: 'Failed to fetch provider' });
-  }
-});
-
-// Search providers
+// Search providers — must be defined BEFORE /:id so Express doesn't
+// match the literal string "search" as a provider UUID.
 router.get('/search/:term', async (req, res) => {
   try {
     const searchTerm = `%${req.params.term}%`;
@@ -75,6 +57,25 @@ router.get('/search/:term', async (req, res) => {
   } catch (error) {
     console.error('Provider search error:', error);
     res.status(500).json({ error: 'Failed to search providers' });
+  }
+});
+
+// Get single provider
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await query(
+      'SELECT * FROM providers WHERE provider_id = $1',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Provider not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Provider fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch provider' });
   }
 });
 
