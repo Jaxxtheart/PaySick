@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.1.0] — 2026-03-12
+
+**Type**: MINOR — Bug fixes + test suite
+
+### Summary
+Production cleanup for the live `paysick.co.za` domain launch. Fixed critical login token storage bug, added CORS for the production domain, and introduced a comprehensive test suite (59 unit tests, integration test stubs for all 6 route modules).
+
+### Fixed
+- `api-client.js`: login response used `response.token` but backend returns `response.accessToken` — tokens were never stored
+- `api-client.js`: logout now clears `paysick_refresh_token` from localStorage
+- CORS: added `https://paysick.co.za` and `https://www.paysick.co.za` to allow-list in `server.js`
+- `vercel.json`: added `CORS_ORIGIN` env variable pointing to production domain
+
+### Added
+- `tests/unit/security.service.test.js` — 19 tests for crypto functions
+- `tests/unit/security-utils.test.js` — 40 tests for frontend security utilities
+- `tests/integration/health.test.js` — health endpoint and 404 handler
+- `tests/integration/users.test.js` — user auth flows
+- `tests/integration/applications.test.js` — application CRUD + validation
+- `tests/integration/payments.test.js` — payment plan flows
+- `tests/integration/providers.test.js` — provider directory (public)
+- `tests/integration/risk.test.js` — risk analytics (admin-only)
+- `tests/setup.js`, `tests/__mocks__/database.js`, `tests/__mocks__/email.service.js`
+
+---
+
 ## [v1.0.0] — 2026-03-09
 
 **Type**: Initial Official Release

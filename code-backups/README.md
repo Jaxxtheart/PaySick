@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.1.0](./v1.1.0/) | 2026-03-12 | Production cleanup: CORS fix for paysick.co.za, login token bug fix, full test suite (59 unit tests) |
 | [v1.0.0](./v1.0.0/) | 2026-03-09 | Initial official release — full platform including marketplace, risk engine, provider network, admin dashboards |
 
 ---
