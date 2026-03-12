@@ -6,6 +6,62 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.0] — 2026-03-12
+
+**Type**: MINOR — Generic provider statement, new public pages, production compliance fixes
+
+### Summary
+Removed third-party healthcare brand names from the landing page (generic compliant language). Added About and Contact pages. Fixed Vercel guard pattern, root package.json bloat, and legacy page link references.
+
+### Added
+- `about.html` — About Us page with company mission, stats, team section
+- `contact.html` — Contact page with async form submission (fetch POST)
+
+### Fixed
+- **Compliance**: `index.html` provider network statement no longer names specific SA healthcare brands
+- **Serverless**: `server.js` VERCEL guard fixed from `NODE_ENV !== 'production' || !process.env.VERCEL` to correct `VERCEL !== '1'`
+- **Deployment**: `vercel.json` serverless destination fixed to `/api/index.js`
+- **package.json**: Removed duplicate Express dependencies from root; restored `node >= 18.0.0`
+- **Legacy pages**: `privacy.html` / `terms.html` footer links corrected to `privacy-policy.html` / `terms-of-service.html`
+- **UX**: `contact.html` form submit replaced `alert()` with inline success/error divs + `fetch()` POST
+
+---
+
+## [v1.2.0] — 2026-03-12
+
+**Type**: MINOR — new pages, extended provider API, serverless deployment fix
+
+### Summary
+Added complete payments UI (payments.html, make-payment.html, payment-success.html), extended the provider API with self-service application and full admin CRUD, added Vercel serverless entry point (api/index.js), fixed critical security bug (base64 → AES-256-GCM for provider banking data), and added auth protection to all admin routes.
+
+### Added
+- `payments.html` — My Payments page (active plans, upcoming, history tabs)
+- `make-payment.html` — Payment execution flow
+- `payment-success.html` — Post-payment confirmation
+- `api/index.js` — Vercel serverless function entry point
+- `POST /api/providers/apply` — self-service provider application
+- `POST /api/providers/track-cta` — CTA analytics (never fails caller)
+- `GET /api/providers/admin/all` — admin: all providers
+- `GET /api/providers/admin/stats` — admin: aggregate statistics
+- `PUT /api/providers/admin/:id/approve` — admin: approve with tier
+- `PUT /api/providers/admin/:id/status` — admin: activate/suspend
+- `PUT /api/providers/admin/:id` — admin: update details
+- `DELETE /api/providers/admin/:id` — admin: delete
+- `backend/database/seed-providers.sql` — fictional SA provider seed data
+- Provider network section on `index.html` homepage
+- 24 new integration tests for providers routes (now 27 total)
+
+### Fixed
+- **Security**: `/api/providers/apply` used `Buffer.from(...).toString('base64')` as "encryption" — replaced with `encryptBankingData()` (AES-256-GCM)
+- **Auth**: All 6 admin provider routes were unauthenticated — added `authenticateToken + requireRole('admin')`
+- **Serverless**: `server.js` now guards `app.listen()` with `VERCEL !== '1'`
+- **vercel.json**: Updated to `rewrites` syntax (deprecated `routes`/`builds` removed); restored CORS_ORIGIN + ALLOW_DEMO_LOGIN env vars
+- **Navigation**: `index.html` nav "For Providers" linked to `provider-apply.html` → corrected to `providers.html`
+- **Footer links**: `providers.html` footer used `privacy.html`/`terms.html` → fixed to `privacy-policy.html`/`terms-of-service.html`; removed dead Careers/Press links
+- **Dashboard icons**: Replaced emoji icons (💳 📅 📊 🏠) with SVG design-system icons
+
+---
+
 ## [v1.1.0] — 2026-03-12
 
 **Type**: MINOR — Bug fixes + test suite
