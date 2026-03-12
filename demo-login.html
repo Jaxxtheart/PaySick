@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Access - PaySick</title>
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 420px;
+            padding: 48px;
+            animation: up 0.4s ease-out;
+        }
+        @keyframes up {
+            from { opacity:0; transform: translateY(24px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .logo svg { width: 52px; height: 52px; }
+        .logo-text { font-size: 28px; font-weight: 400; color: #1A1A1A; letter-spacing: -0.5px; }
+        .logo-text span { font-weight: 300; color: #8A8A8A; }
+        .badge {
+            display: inline-block;
+            background: #1A1A1A;
+            color: #FFA502;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        h2 { font-size: 18px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
+        p.sub { font-size: 14px; color: #8A8A8A; margin-bottom: 28px; }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 16px;
+        }
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #FFA502;
+            box-shadow: 0 0 0 4px rgba(255,165,2,0.12);
+        }
+        .btn-unlock {
+            width: 100%;
+            padding: 14px;
+            background: #1A1A1A;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-unlock:hover { background: #333; }
+        .error {
+            background: #FFE5E8;
+            color: #E01E37;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .error.show { display: block; }
+
+        /* Role panel (hidden until unlocked) */
+        #rolePanel { display: none; }
+        #rolePanel.show { display: block; animation: up 0.3s ease-out; }
+        .role-grid { display: grid; gap: 12px; }
+        .role-btn {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            background: #FAFAFA;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .role-btn:hover { border-color: #FF4757; background: #FFF5F6; }
+        .role-btn.loading { opacity: 0.6; pointer-events: none; }
+        .role-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+        .role-info { flex: 1; }
+        .role-name { font-size: 14px; font-weight: 700; color: #1A1A1A; }
+        .role-email { font-size: 12px; color: #8A8A8A; margin-top: 2px; font-family: 'Courier New', monospace; }
+        .demo-error {
+            background: #FFE5E8;
+            color: #E01E37;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+        .demo-error.show { display: block; }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 28px;
+            font-size: 13px;
+            color: #8A8A8A;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #FF4757; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="dg" cx="40%" cy="40%">
+                    <stop offset="0%" style="stop-color:#FF4757"/>
+                    <stop offset="100%" style="stop-color:#E01E37"/>
+                </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="40" fill="rgba(255,71,87,0.08)"/>
+            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#dg)"/>
+            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#dg)"/>
+            <circle cx="50" cy="50" r="8" fill="#fff"/>
+            <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+        </svg>
+        <div class="logo-text">Pay<span>Sick</span></div>
+        <span class="badge">Demo Environment</span>
+    </div>
+
+    <!-- Password gate -->
+    <div id="gatePanel">
+        <h2>Demo Access</h2>
+        <p class="sub">Enter the demo password to explore PaySick with pre-loaded test data.</p>
+        <div class="error" id="gateError">Incorrect password. Please try again.</div>
+        <label for="demoPassword">Demo Password</label>
+        <input type="password" id="demoPassword" placeholder="Enter demo password" autocomplete="off">
+        <button class="btn-unlock" id="unlockBtn" onclick="unlock()">Unlock Demo</button>
+    </div>
+
+    <!-- Role selector (shown after unlock) -->
+    <div id="rolePanel">
+        <h2>Choose a Demo Role</h2>
+        <p class="sub">Click any role to sign in instantly with test data. No real data is affected.</p>
+        <div class="role-grid">
+            <button class="role-btn" onclick="demoLogin('user@paysick.com','user')">
+                <div class="role-icon" style="background:#EFF8FF;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </div>
+                <div class="role-info">
+                    <div class="role-name">Patient</div>
+                    <div class="role-email">user@paysick.com</div>
+                </div>
+            </button>
+            <button class="role-btn" onclick="demoLogin('provider@paysick.com','provider')">
+                <div class="role-icon" style="background:#F0FDF4;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="role-info">
+                    <div class="role-name">Healthcare Provider</div>
+                    <div class="role-email">provider@paysick.com</div>
+                </div>
+            </button>
+            <button class="role-btn" onclick="demoLogin('lender@paysick.com','lender')">
+                <div class="role-icon" style="background:#FFFBEB;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M12 12v4M10 14h4"/></svg>
+                </div>
+                <div class="role-info">
+                    <div class="role-name">Lender</div>
+                    <div class="role-email">lender@paysick.com</div>
+                </div>
+            </button>
+            <button class="role-btn" onclick="demoLogin('admin@paysick.com','admin')">
+                <div class="role-icon" style="background:#FDF4FF;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+                </div>
+                <div class="role-info">
+                    <div class="role-name">Admin</div>
+                    <div class="role-email">admin@paysick.com</div>
+                </div>
+            </button>
+        </div>
+        <div class="demo-error" id="demoError"></div>
+    </div>
+
+    <a class="back-link" href="login.html">← Back to sign in</a>
+</div>
+
+<script>
+    // Hash the demo password client-side for the gate check.
+    // The actual authorisation is enforced by the backend ALLOW_DEMO_LOGIN flag.
+    const DEMO_HASH = '846deb5aa58c9b58a5ea11242b2428e1c3f245cb3e02dd816401e954e9a91e84';
+
+    async function sha256(str) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    document.getElementById('demoPassword').addEventListener('keydown', e => {
+        if (e.key === 'Enter') unlock();
+    });
+
+    async function unlock() {
+        const pw = document.getElementById('demoPassword').value.trim();
+        const hash = await sha256(pw);
+        if (hash === DEMO_HASH) {
+            document.getElementById('gatePanel').style.display = 'none';
+            document.getElementById('rolePanel').classList.add('show');
+        } else {
+            const err = document.getElementById('gateError');
+            err.classList.add('show');
+            document.getElementById('demoPassword').value = '';
+            setTimeout(() => err.classList.remove('show'), 3000);
+        }
+    }
+
+    async function demoLogin(email, role) {
+        const btns = document.querySelectorAll('.role-btn');
+        btns.forEach(b => b.classList.add('loading'));
+        const errEl = document.getElementById('demoError');
+        errEl.classList.remove('show');
+
+        try {
+            const res = await fetch('/api/users/demo-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, role })
+            });
+            const data = await res.json();
+
+            if (res.ok && (data.accessToken || data.token)) {
+                localStorage.setItem('paysick_auth_token', data.accessToken || data.token);
+                localStorage.setItem('paysick_user', JSON.stringify({
+                    ...data.user,
+                    role,
+                    name: data.user.full_name
+                }));
+                // Mark onboarding complete for demo users so they land on the dashboard
+                localStorage.setItem('paysick_onboarding_complete', 'true');
+
+                switch (role) {
+                    case 'admin':    window.location.href = 'admin-dashboard.html'; break;
+                    case 'lender':   window.location.href = 'lender-dashboard.html'; break;
+                    default:         window.location.href = 'dashboard.html';
+                }
+            } else {
+                throw new Error(data.error || 'Demo login failed. Ensure ALLOW_DEMO_LOGIN=true is set on the server.');
+            }
+        } catch (err) {
+            errEl.textContent = err.message;
+            errEl.classList.add('show');
+            btns.forEach(b => b.classList.remove('loading'));
+        }
+    }
+</script>
+
+</body>
+</html>

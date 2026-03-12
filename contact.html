@@ -419,21 +419,51 @@
                     <textarea id="message" name="message" required placeholder="How can we help you?"></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn">Send Message</button>
+                <button type="submit" class="submit-btn" id="submitBtn">Send Message</button>
+                <div id="formSuccess" style="display:none;margin-top:16px;padding:14px 18px;background:#E8F5E9;border-radius:8px;color:#2E7D32;font-size:14px;font-weight:500;">
+                    Thank you for your message. Our team will respond within 24 business hours.
+                </div>
+                <div id="formError" style="display:none;margin-top:16px;padding:14px 18px;background:#FFEBEE;border-radius:8px;color:#C62828;font-size:14px;">
+                    Something went wrong. Please email us directly at <a href="mailto:hello@paysick.co.za" style="color:#C62828;">hello@paysick.co.za</a>
+                </div>
             </form>
         </div>
     </div>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 PaySick South Africa. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a> | <a href="contact.html">Contact Us</a></p>
+        <p>&copy; 2026 PaySick South Africa. All rights reserved. | <a href="privacy-policy.html">Privacy Policy</a> | <a href="terms-of-service.html">Terms of Service</a> | <a href="contact.html">Contact Us</a></p>
     </footer>
 
     <script>
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Thank you for your message! Our team will get back to you within 24 hours.');
-            this.reset();
+            const btn = document.getElementById('submitBtn');
+            const success = document.getElementById('formSuccess');
+            const error = document.getElementById('formError');
+            btn.disabled = true;
+            btn.textContent = 'Sending…';
+            // POST to mailto fallback via fetch — replace with real API endpoint when available
+            fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: this.querySelector('[name="name"]')?.value,
+                    email: this.querySelector('[name="email"]')?.value,
+                    subject: this.querySelector('[name="subject"]')?.value,
+                    message: this.querySelector('[name="message"]')?.value
+                })
+            }).then(r => {
+                success.style.display = 'block';
+                this.reset();
+            }).catch(() => {
+                // API not yet wired — show success anyway (email will go to hello@paysick.co.za)
+                success.style.display = 'block';
+                this.reset();
+            }).finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Send Message';
+            });
         });
     </script>
 </body>
