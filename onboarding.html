@@ -285,6 +285,28 @@
             color: #FF4757;
         }
 
+        /* Pre-filled (locked) fields from registration */
+        .pre-filled-field {
+            background: #F7F7F7;
+            color: #6A6A6A;
+            cursor: not-allowed;
+            border-color: #E8E8E8 !important;
+        }
+        .reg-info-banner {
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            background: #EFF8FF;
+            border: 1px solid #BEE3F8;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #1A5276;
+            line-height: 1.5;
+        }
+        .reg-info-banner svg { flex-shrink: 0; margin-top: 2px; }
+
         /* Payment Method Cards */
         .payment-methods {
             display: grid;
@@ -317,8 +339,74 @@
         }
 
         .payment-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-icon svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .payment-icon svg .icon-stroke {
+            stroke: #8A8A8A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .payment-icon svg .icon-fill {
+            fill: #8A8A8A;
+            transition: fill 0.3s ease;
+        }
+
+        .payment-method-card:hover .payment-icon svg .icon-stroke,
+        .payment-method-card.selected .payment-icon svg .icon-stroke {
+            stroke: #FF4757;
+        }
+
+        .payment-method-card:hover .payment-icon svg .icon-fill,
+        .payment-method-card.selected .payment-icon svg .icon-fill {
+            fill: #FF4757;
+        }
+
+        .success-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .success-icon svg .icon-stroke {
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .lock-icon {
+            display: inline;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .lock-icon .icon-stroke {
+            stroke: #3498DB;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .lock-icon .icon-fill {
+            fill: #3498DB;
         }
 
         .payment-method-card h4 {
@@ -557,28 +645,37 @@
         <form id="onboardingForm">
             <!-- Step 1: Personal Information -->
             <div class="form-section active" data-section="1">
-                <h2 class="section-title">Personal Information</h2>
-                <p class="section-description">Help us verify your identity and set up your account</p>
+                <h2 class="section-title" id="step1Title">Personal Information</h2>
+                <p class="section-description" id="step1Desc">Help us verify your identity and set up your account</p>
+
+                <!-- Shown only in post-registration mode -->
+                <div class="reg-info-banner" id="regInfoBanner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="#1A5276" stroke-width="2" fill="none"/>
+                        <path d="M12 8v4M12 16h.01" stroke="#1A5276" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Your personal details were carried over from registration. Only your address is needed below.</span>
+                </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>First Name <span class="required">*</span></label>
-                        <input type="text" name="firstName" required placeholder="John">
+                        <input type="text" name="firstName" id="fieldFirstName" required placeholder="John">
                     </div>
                     <div class="form-group">
                         <label>Last Name <span class="required">*</span></label>
-                        <input type="text" name="lastName" required placeholder="Doe">
+                        <input type="text" name="lastName" id="fieldLastName" required placeholder="Doe">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Date of Birth <span class="required">*</span></label>
-                        <input type="date" name="dob" required>
+                        <input type="date" name="dob" id="fieldDob" required>
                     </div>
                     <div class="form-group">
                         <label>Phone Number <span class="required">*</span></label>
-                        <input type="tel" name="phone" required placeholder="082 123 4567">
+                        <input type="tel" name="phone" id="fieldPhone" required placeholder="082 123 4567" pattern="^(0|\+27)[0-9]{9}$" title="Please enter a valid South African phone number (e.g., 0821234567)">
                     </div>
                 </div>
 
@@ -612,11 +709,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Postal Code <span class="required">*</span></label>
-                        <input type="text" name="postalCode" required placeholder="2001" pattern="[0-9]{4}">
+                        <input type="text" name="postalCode" id="fieldPostalCode" required placeholder="2001" pattern="[0-9]{4}">
                     </div>
                     <div class="form-group">
                         <label>ID Number (Last 4 digits) <span class="required">*</span></label>
-                        <input type="text" name="idNumber" required placeholder="1234" pattern="[0-9]{4}" maxlength="4">
+                        <input type="text" name="idNumber" id="fieldIdNumber" required placeholder="1234" pattern="[0-9]{4}" maxlength="4">
                     </div>
                 </div>
 
@@ -632,7 +729,7 @@
                 <p class="section-description">Set up your preferred payment method for automatic monthly payments</p>
 
                 <div class="info-box">
-                    <p><strong>🔒 Your information is secure.</strong> We use bank-level encryption to protect your payment details. POPIA compliant. Your information will never be shared without your consent.</p>
+                    <p><strong><svg class="lock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="5" y="11" width="14" height="10" rx="2"/><path class="icon-stroke" d="M8 11V7a4 4 0 018 0v4"/><circle class="icon-fill" cx="12" cy="16" r="1.5"/></svg>Your information is secure.</strong> We use bank-level encryption to protect your payment details. POPIA compliant. Your information will never be shared without your consent.</p>
                 </div>
 
                 <div class="form-group">
@@ -642,19 +739,41 @@
                 <div class="payment-methods">
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="bank" required>
-                        <div class="payment-icon">🏦</div>
+                        <div class="payment-icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M4 16l16-10 16 10"/>
+                                <path class="icon-stroke" d="M8 16v14"/>
+                                <path class="icon-stroke" d="M16 16v14"/>
+                                <path class="icon-stroke" d="M24 16v14"/>
+                                <path class="icon-stroke" d="M32 16v14"/>
+                                <path class="icon-stroke" d="M4 30h32"/>
+                                <path class="icon-stroke" d="M2 34h36"/>
+                                <rect class="icon-fill" x="18" y="10" width="4" height="4" rx="0.5"/>
+                            </svg>
+                        </div>
                         <h4>Bank Account</h4>
                         <p>Direct debit order</p>
                     </label>
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="card" required>
-                        <div class="payment-icon">💳</div>
+                        <div class="payment-icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <rect class="icon-stroke" x="4" y="8" width="32" height="24" rx="3"/>
+                                <path class="icon-stroke" d="M4 16h32"/>
+                                <path class="icon-stroke" d="M10 26h8"/>
+                                <path class="icon-stroke" d="M10 22h4"/>
+                            </svg>
+                        </div>
                         <h4>Debit Card</h4>
                         <p>Instant verification</p>
                     </label>
                     <label class="payment-method-card">
                         <input type="radio" name="paymentMethod" value="payshap" required>
-                        <div class="payment-icon">⚡</div>
+                        <div class="payment-icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M24 4L12 22h8l-2 14L32 18h-8l2-14z"/>
+                            </svg>
+                        </div>
                         <h4>PayShap</h4>
                         <p>Instant payment</p>
                     </label>
@@ -680,11 +799,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Branch Code <span class="required">*</span></label>
-                            <input type="text" name="branchCode" placeholder="250655" pattern="[0-9]{6}" maxlength="6">
+                            <input type="text" name="branchCode" placeholder="250655" pattern="[0-9]{6}" maxlength="6" title="Please enter a valid 6-digit branch code">
                         </div>
                         <div class="form-group">
                             <label>Account Number <span class="required">*</span></label>
-                            <input type="text" name="accountNumber" placeholder="1234567890">
+                            <input type="text" name="accountNumber" placeholder="1234567890" pattern="[0-9]{8,11}" maxlength="11" title="Please enter a valid account number (8-11 digits)">
                         </div>
                     </div>
 
@@ -702,23 +821,23 @@
                 <div id="cardDetails" style="display: none;">
                     <div class="form-group">
                         <label>Card Number <span class="required">*</span></label>
-                        <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                        <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" pattern="[0-9\s]{13,19}" title="Please enter a valid card number (13-19 digits)">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>Expiry Date <span class="required">*</span></label>
-                            <input type="text" name="cardExpiry" placeholder="MM/YY" maxlength="5">
+                            <input type="text" name="cardExpiry" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/[0-9]{2}" title="Please enter expiry in MM/YY format (e.g., 12/25)">
                         </div>
                         <div class="form-group">
                             <label>CVV <span class="required">*</span></label>
-                            <input type="text" name="cardCvv" placeholder="123" maxlength="4">
+                            <input type="text" name="cardCvv" placeholder="123" maxlength="4" pattern="[0-9]{3,4}" title="Please enter a valid 3 or 4 digit CVV">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Name on Card <span class="required">*</span></label>
-                        <input type="text" name="cardName" placeholder="John Doe">
+                        <input type="text" name="cardName" placeholder="John Doe" pattern="[A-Za-z\s]{2,}" title="Please enter the name as it appears on the card">
                     </div>
                 </div>
 
@@ -726,17 +845,9 @@
                 <div id="payshapDetails" style="display: none;">
                     <div class="form-group">
                         <label>PayShap Mobile Number <span class="required">*</span></label>
-                        <input type="tel" name="payshapMobile" placeholder="082 123 4567">
+                        <input type="tel" name="payshapMobile" placeholder="082 123 4567" pattern="^(0|\+27)[0-9]{9}$" title="Please enter a valid South African phone number (e.g., 0821234567)">
                         <small style="color: #8A8A8A; font-size: 13px; display: block; margin-top: 8px;">
-                            This is the mobile number linked to your PayShap profile
-                        </small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>ShapID (Optional)</label>
-                        <input type="text" name="shapId" placeholder="@username or email@example.com">
-                        <small style="color: #8A8A8A; font-size: 13px; display: block; margin-top: 8px;">
-                            Your PayShap alias (if you have one set up)
+                            This mobile number will be used as your ShapID for PayShap transactions
                         </small>
                     </div>
 
@@ -760,8 +871,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Preferred Payment Date</label>
-                    <select name="paymentDate">
+                    <label>Preferred Payment Date <span class="required">*</span></label>
+                    <select name="paymentDate" required>
+                        <option value="">Select Payment Date</option>
                         <option value="1">1st of each month</option>
                         <option value="5">5th of each month</option>
                         <option value="10">10th of each month</option>
@@ -809,7 +921,11 @@
 
         <!-- Success View -->
         <div class="success-view" id="successView">
-            <div class="success-icon">✓</div>
+            <div class="success-icon">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path class="icon-stroke" d="M8 20l8 8L32 12"/>
+                </svg>
+            </div>
             <h2>Setup Complete!</h2>
             <p>Your account has been successfully configured. You can now start managing your healthcare payments.</p>
             <button class="btn btn-primary" onclick="goToDashboard()">Go to Dashboard</button>
@@ -834,6 +950,14 @@
             return user;
         }
 
+        // Detect whether the user arrived from the register → verify-email flow
+        const regData = (function() {
+            try { return JSON.parse(localStorage.getItem('paysick_registration_data') || 'null'); }
+            catch (_) { return null; }
+        })();
+        const fromRegister = regData !== null ||
+            new URLSearchParams(window.location.search).get('from') === 'register';
+
         // Initialize
         window.addEventListener('load', function() {
             const user = checkAuth();
@@ -843,6 +967,73 @@
             const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
             if (onboardingComplete === 'true') {
                 window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'dashboard.html';
+            }
+
+            // ── Post-registration mode: pre-populate from registration data ──
+            if (fromRegister && regData) {
+                document.getElementById('step1Title').textContent = 'Complete Your Profile';
+                document.getElementById('step1Desc').textContent =
+                    'Your personal details are pre-filled. Just add your address below.';
+                document.getElementById('regInfoBanner').style.display = 'flex';
+
+                // Split full_name into first / last
+                const parts = (regData.full_name || '').trim().split(' ');
+                const firstName = parts[0] || '';
+                const lastName  = parts.slice(1).join(' ') || '';
+
+                // Pre-fill & lock fields that were collected at registration
+                const locked = {
+                    fieldFirstName:  firstName,
+                    fieldLastName:   lastName,
+                    fieldDob:        regData.date_of_birth || '',
+                    fieldPhone:      regData.cell_number   || '',
+                    fieldPostalCode: regData.postal_code   || '',
+                    fieldIdNumber:   regData.sa_id_number ? regData.sa_id_number.slice(-4) : ''
+                };
+
+                Object.entries(locked).forEach(function([id, value]) {
+                    const el = document.getElementById(id);
+                    if (!el || !value) return;
+                    el.value    = value;
+                    el.readOnly = true;
+                    el.classList.add('pre-filled-field');
+                });
+
+                // Seed formData so nextStep() validation passes for locked fields
+                Object.assign(formData, {
+                    firstName, lastName,
+                    dob:        regData.date_of_birth || '',
+                    phone:      regData.cell_number   || '',
+                    postalCode: regData.postal_code   || '',
+                    idNumber:   regData.sa_id_number ? regData.sa_id_number.slice(-4) : ''
+                });
+            }
+
+            // ── Restore saved progress (works for both modes) ──
+            const savedProgress = localStorage.getItem('paysick_onboarding_progress');
+            if (savedProgress) {
+                try {
+                    const progress = JSON.parse(savedProgress);
+                    if (progress.formData) {
+                        Object.assign(formData, progress.formData);
+                        // Restore form field values
+                        Object.keys(progress.formData).forEach(key => {
+                            const input = document.querySelector(`[name="${key}"]`);
+                            if (input && !input.readOnly) {
+                                if (input.type === 'radio') {
+                                    const radio = document.querySelector(`[name="${key}"][value="${progress.formData[key]}"]`);
+                                    if (radio) radio.checked = true;
+                                } else if (input.type === 'checkbox') {
+                                    input.checked = progress.formData[key];
+                                } else {
+                                    input.value = progress.formData[key];
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error restoring onboarding progress:', e);
+                }
             }
 
             updateProgressBar();
@@ -939,6 +1130,12 @@
                 }
             });
 
+            // Save progress to localStorage to prevent data loss
+            localStorage.setItem('paysick_onboarding_progress', JSON.stringify({
+                currentStep: currentStep,
+                formData: formData
+            }));
+
             // Move to next step
             if (currentStep < totalSteps) {
                 currentSection.classList.remove('active');
@@ -990,8 +1187,7 @@
             } else if (formData.paymentMethod === 'card') {
                 paymentDetails = `Card ending in ${formData.cardNumber.replace(/\s/g, '').slice(-4)}`;
             } else if (formData.paymentMethod === 'payshap') {
-                const shapIdDisplay = formData.shapId ? ` (${formData.shapId})` : '';
-                paymentDetails = `${formData.payshapMobile}${shapIdDisplay} - ${formData.payshapBank}`;
+                paymentDetails = `${formData.payshapMobile} (ShapID) - ${formData.payshapBank}`;
             }
 
             reviewContent.innerHTML = `
@@ -1023,17 +1219,138 @@
         }
 
         // Form submission
-        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
+        document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating your account...';
+
+            const authToken = localStorage.getItem('paysick_auth_token');
+
+            try {
+                if (fromRegister && authToken) {
+                    // ── Post-registration path ────────────────────────────────
+                    // User is already in the DB and email-verified.
+                    // Just update profile (cell/postal) — no re-registration.
+                    try {
+                        await fetch('/api/users/profile', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`
+                            },
+                            body: JSON.stringify({
+                                cell_number: formData.phone,
+                                postal_code: formData.postalCode
+                            })
+                        });
+                    } catch (profileErr) {
+                        console.warn('Profile update failed (non-fatal):', profileErr);
+                    }
+
+                    // Save banking details if bank method selected
+                    if (formData.paymentMethod === 'bank' && formData.bankName) {
+                        try {
+                            await fetch('/api/users/banking', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify({
+                                    bank_name: formData.bankName,
+                                    account_type: formData.accountType || 'cheque',
+                                    account_number: formData.accountNumber,
+                                    branch_code: formData.branchCode,
+                                    account_holder_name: `${formData.firstName} ${formData.lastName}`,
+                                    debit_order_day: parseInt(formData.paymentDate, 10) || 1
+                                })
+                            });
+                        } catch (bankErr) {
+                            console.warn('Banking details not saved (non-fatal):', bankErr);
+                        }
+                    }
+
+                    // Clear registration data — no longer needed
+                    localStorage.removeItem('paysick_registration_data');
+                    localStorage.removeItem('paysick_pending_email');
+
+                } else {
+                    // ── Legacy direct-onboarding path ─────────────────────────
+                    // User arrived at onboarding without prior registration.
+                    const existingUser = JSON.parse(localStorage.getItem('paysick_user') || '{}');
+
+                    const response = await fetch('/api/users/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            full_name:     `${formData.firstName} ${formData.lastName}`,
+                            email:         existingUser.email ||
+                                           `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@example.com`,
+                            cell_number:   formData.phone,
+                            sa_id_number:  formData.idNumber || formData.phone.replace(/\D/g, '').slice(-13).padStart(13, '0'),
+                            postal_code:   formData.postalCode,
+                            date_of_birth: formData.dob,
+                            terms_accepted: true,
+                            popia_consent:  true
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.accessToken) {
+                        localStorage.setItem('paysick_auth_token', data.accessToken);
+                        localStorage.setItem('paysick_user', JSON.stringify({
+                            ...data.user,
+                            role: existingUser.role || 'user',
+                            name: data.user.full_name
+                        }));
+
+                        if (formData.paymentMethod === 'bank' && formData.bankName) {
+                            try {
+                                await fetch('/api/users/banking', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${data.accessToken}`
+                                    },
+                                    body: JSON.stringify({
+                                        bank_name:           formData.bankName,
+                                        account_type:        formData.accountType || 'cheque',
+                                        account_number:      formData.accountNumber,
+                                        branch_code:         formData.branchCode,
+                                        account_holder_name: `${formData.firstName} ${formData.lastName}`,
+                                        debit_order_day:     parseInt(formData.paymentDate, 10) || 1
+                                    })
+                                });
+                            } catch (bankErr) {
+                                console.warn('Banking details not saved (non-fatal):', bankErr);
+                            }
+                        }
+                    } else {
+                        console.warn('Registration failed in legacy mode:', data.error);
+                    }
+                }
+            } catch (error) {
+                console.error('Onboarding API error:', error);
+                // Continue regardless — local progress is saved
+            }
 
             // Save onboarding data
             localStorage.setItem('paysick_onboarding_data', JSON.stringify(formData));
             localStorage.setItem('paysick_onboarding_complete', 'true');
 
+            // Clear progress since onboarding is complete
+            localStorage.removeItem('paysick_onboarding_progress');
+
             // Show success view
             document.querySelector('.form-section.active').style.display = 'none';
             document.querySelector('.progress-steps').style.display = 'none';
             document.getElementById('successView').classList.add('active');
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Complete Registration';
         });
 
         // Go to dashboard

@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../config/database');
+const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
+const { encryptBankingData } = require('../services/security.service');
 
-// Get all providers
+// Get all providers (public — active only, no banking details)
 router.get('/', async (req, res) => {
   try {
     const { network_partner, provider_type, city } = req.query;
@@ -39,26 +41,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single provider
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await query(
-      'SELECT * FROM providers WHERE provider_id = $1',
-      [req.params.id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Provider not found' });
-    }
-
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Provider fetch error:', error);
-    res.status(500).json({ error: 'Failed to fetch provider' });
-  }
-});
-
-// Search providers
+// Search providers — must be defined BEFORE /:id so Express doesn't
+// match the literal string "search" as a provider UUID.
 router.get('/search/:term', async (req, res) => {
   try {
     const searchTerm = `%${req.params.term}%`;
@@ -78,12 +62,11 @@ router.get('/search/:term', async (req, res) => {
   }
 });
 
-// Track CTA clicks for analytics and conversion optimization
+// Track CTA clicks for analytics (public — no auth required, never fails the caller)
 router.post('/track-cta', async (req, res) => {
   try {
     const { source, timestamp, page } = req.body;
 
-    // Log CTA click to audit_log table for analytics
     await query(
       `INSERT INTO audit_log (
         user_id, action, table_name, record_id, details, ip_address
@@ -92,12 +75,11 @@ router.post('/track-cta', async (req, res) => {
       )`,
       [
         JSON.stringify({ source, page, timestamp }),
-        req.ip || req.connection.remoteAddress
+        req.ip || req.connection?.remoteAddress
       ]
     );
 
-    // Update provider_cta_stats table (if exists) or just return success
-    // This could be used to track conversion rates and optimize messaging
+    // Best-effort stats — table may not exist yet
     try {
       await query(
         `INSERT INTO provider_cta_stats (source, clicks, date)
@@ -106,20 +88,18 @@ router.post('/track-cta', async (req, res) => {
          DO UPDATE SET clicks = provider_cta_stats.clicks + 1`,
         [source]
       );
-    } catch (statsError) {
-      // Table might not exist yet - that's okay, audit log captured it
-      console.log('CTA stats table not available:', statsError.message);
+    } catch (_) {
+      // Silently skip — audit_log already captured the event
     }
 
-    res.json({ success: true, message: 'CTA click tracked' });
+    res.json({ success: true });
   } catch (error) {
     console.error('CTA tracking error:', error);
-    // Don't fail the request if tracking fails
-    res.json({ success: true, message: 'Tracking skipped' });
+    res.json({ success: true }); // Never block the caller
   }
 });
 
-// Provider Application - Submit new provider application
+// Provider application — submit new provider for review
 router.post('/apply', async (req, res) => {
   try {
     const {
@@ -136,15 +116,11 @@ router.post('/apply', async (req, res) => {
       branch_code,
       account_number,
       account_holder,
-      patient_volume,
-      years_operating,
-      services_offered,
       terms_accepted,
       popia_consent,
       commission_agreement
     } = req.body;
 
-    // Validation
     if (!provider_name || !provider_type || !contact_email || !contact_phone ||
         !address || !city || !province || !postal_code ||
         !bank_name || !branch_code || !account_number || !account_holder) {
@@ -155,10 +131,9 @@ router.post('/apply', async (req, res) => {
       return res.status(400).json({ error: 'All consents must be accepted' });
     }
 
-    // Encrypt account number (in production, use proper encryption)
-    const account_number_encrypted = Buffer.from(account_number).toString('base64');
+    // AES-256-GCM encryption for banking data (same key as user banking data)
+    const account_number_encrypted = encryptBankingData(account_number);
 
-    // Insert provider with pending status
     const result = await query(
       `INSERT INTO providers (
         provider_name, provider_type, provider_group,
@@ -179,7 +154,7 @@ router.post('/apply', async (req, res) => {
     res.status(201).json({
       success: true,
       provider_id: result.rows[0].provider_id,
-      message: 'Application submitted successfully'
+      message: 'Application submitted. We will contact you within 2 business days.'
     });
 
   } catch (error) {
@@ -188,10 +163,31 @@ router.post('/apply', async (req, res) => {
   }
 });
 
-// Admin Routes
+// Get single provider (public — active only)
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await query(
+      'SELECT * FROM providers WHERE provider_id = $1 AND status = $2',
+      [req.params.id, 'active']
+    );
 
-// Get all providers (admin only)
-router.get('/admin/all', async (req, res) => {
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Provider not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Provider fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch provider' });
+  }
+});
+
+// ============================================
+// ADMIN ROUTES — require authentication + admin role
+// ============================================
+
+// Get all providers including pending (admin only)
+router.get('/admin/all', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const result = await query(
       `SELECT
@@ -209,8 +205,32 @@ router.get('/admin/all', async (req, res) => {
   }
 });
 
+// Provider statistics (admin only)
+router.get('/admin/stats', authenticateToken, requireRole('admin'), async (req, res) => {
+  try {
+    const result = await query(`
+      SELECT
+        COUNT(*) AS total_providers,
+        COUNT(*) FILTER (WHERE status = 'active') AS active_providers,
+        COUNT(*) FILTER (WHERE status = 'pending') AS pending_applications,
+        COUNT(*) FILTER (WHERE network_partner = true) AS network_partners,
+        COUNT(DISTINCT province) AS provinces_covered,
+        COUNT(*) FILTER (WHERE provider_type = 'hospital') AS hospitals,
+        COUNT(*) FILTER (WHERE provider_type = 'clinic') AS clinics,
+        COUNT(*) FILTER (WHERE provider_type = 'gp_practice') AS gp_practices,
+        COUNT(*) FILTER (WHERE provider_type = 'specialist') AS specialists
+      FROM providers
+    `);
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Provider stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch provider statistics' });
+  }
+});
+
 // Approve provider application (admin only)
-router.put('/admin/:id/approve', async (req, res) => {
+router.put('/admin/:id/approve', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const { network_partner = false, partnership_tier = 'basic' } = req.body;
@@ -243,7 +263,7 @@ router.put('/admin/:id/approve', async (req, res) => {
 });
 
 // Update provider status (admin only)
-router.put('/admin/:id/status', async (req, res) => {
+router.put('/admin/:id/status', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -274,7 +294,7 @@ router.put('/admin/:id/status', async (req, res) => {
 });
 
 // Update provider details (admin only)
-router.put('/admin/:id', async (req, res) => {
+router.put('/admin/:id', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -334,7 +354,7 @@ router.put('/admin/:id', async (req, res) => {
 });
 
 // Delete provider (admin only)
-router.delete('/admin/:id', async (req, res) => {
+router.delete('/admin/:id', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -355,30 +375,6 @@ router.delete('/admin/:id', async (req, res) => {
   } catch (error) {
     console.error('Provider deletion error:', error);
     res.status(500).json({ error: 'Failed to delete provider' });
-  }
-});
-
-// Get provider statistics (admin only)
-router.get('/admin/stats', async (req, res) => {
-  try {
-    const result = await query(`
-      SELECT
-        COUNT(*) as total_providers,
-        COUNT(*) FILTER (WHERE status = 'active') as active_providers,
-        COUNT(*) FILTER (WHERE status = 'pending') as pending_applications,
-        COUNT(*) FILTER (WHERE network_partner = true) as network_partners,
-        COUNT(DISTINCT province) as provinces_covered,
-        COUNT(*) FILTER (WHERE provider_type = 'hospital') as hospitals,
-        COUNT(*) FILTER (WHERE provider_type = 'clinic') as clinics,
-        COUNT(*) FILTER (WHERE provider_type = 'gp_practice') as gp_practices,
-        COUNT(*) FILTER (WHERE provider_type = 'specialist') as specialists
-      FROM providers
-    `);
-
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error('Provider stats error:', error);
-    res.status(500).json({ error: 'Failed to fetch provider statistics' });
   }
 });
 

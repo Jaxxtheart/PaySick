@@ -193,6 +193,24 @@
             opacity: 0.8;
         }
 
+        .register-cta {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        .register-cta a {
+            color: #FF4757;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .register-cta a:hover {
+            opacity: 0.8;
+        }
+
         .error-message {
             background: #FFE5E8;
             color: #E01E37;
@@ -357,7 +375,9 @@
             <div class="form-group">
                 <label for="role">Login As</label>
                 <select id="role" required>
-                    <option value="user">User</option>
+                    <option value="user">Patient / User</option>
+                    <option value="provider">Healthcare Provider</option>
+                    <option value="lender">Lender</option>
                     <option value="admin">Admin</option>
                 </select>
             </div>
@@ -375,98 +395,97 @@
             <button type="submit" class="btn">Sign In</button>
         </form>
 
-        <div class="divider">Demo Access</div>
-
-        <div class="demo-credentials">
-            <h3>Demo Credentials</h3>
-            <p><strong>User:</strong> user@paysick.com / password123</p>
-            <p><strong>Admin:</strong> admin@paysick.com / admin123</p>
+        <div class="register-cta">
+            New to PaySick? <a href="register.html">Create an account</a>
         </div>
 
         <div class="back-home">
-            <a href="index.html">← Back to Home</a>
+            <a href="index.html"><svg style="width:16px;height:16px;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke="#FF4757" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to Home</a>
+        </div>
+
+        <div style="text-align:center;margin-top:32px;">
+            <a href="demo-login.html" style="font-size:11px;color:#D0D0D0;text-decoration:none;" tabindex="-1">Demo access</a>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
             const errorMessage = document.getElementById('errorMessage');
+            const submitBtn = this.querySelector('button[type="submit"]');
 
-            // Demo authentication logic
-            let isValid = false;
-            let userData = null;
+            // Disable button during request
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
 
-            if (role === 'user' && email === 'user@paysick.com' && password === 'password123') {
-                isValid = true;
-                userData = {
-                    email: email,
-                    role: 'user',
-                    name: 'John Doe',
-                    userId: 'USR001'
-                };
-            } else if (role === 'admin' && email === 'admin@paysick.com' && password === 'admin123') {
-                isValid = true;
-                userData = {
-                    email: email,
-                    role: 'admin',
-                    name: 'Admin User',
-                    userId: 'ADM001'
-                };
-            }
+            try {
+                // Call the real API for authentication
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
-            if (isValid) {
-                // Store user session
-                localStorage.setItem('paysick_user', JSON.stringify(userData));
-                localStorage.setItem('paysick_auth_token', 'demo_token_' + Date.now());
+                const data = await response.json();
 
-                // Check if onboarding is complete (admins skip onboarding)
-                const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                if (response.ok && (data.accessToken || data.token)) {
+                    // Store real JWT token and user data
+                    localStorage.setItem('paysick_auth_token', data.accessToken || data.token);
+                    localStorage.setItem('paysick_user', JSON.stringify({
+                        ...data.user,
+                        role: role,
+                        name: data.user.full_name
+                    }));
 
-                // Redirect to appropriate page
-                if (role === 'admin') {
-                    window.location.href = 'admin-dashboard.html';
-                } else {
-                    // Regular users need to complete onboarding first
-                    if (onboardingComplete === 'true') {
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        window.location.href = 'onboarding.html';
+                    // Redirect to appropriate page based on role
+                    switch (role) {
+                        case 'admin':
+                            window.location.href = 'admin-dashboard.html';
+                            break;
+                        case 'provider':
+                            window.location.href = 'dashboard.html'; // Provider dashboard coming soon
+                            break;
+                        case 'lender':
+                            window.location.href = 'lender-dashboard.html';
+                            break;
+                        default:
+                            const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                            if (onboardingComplete === 'true') {
+                                window.location.href = 'dashboard.html';
+                            } else {
+                                window.location.href = 'onboarding.html';
+                            }
                     }
+                } else if (response.status === 403 && data.code === 'EMAIL_UNVERIFIED') {
+                    // Unverified account — redirect to verification page
+                    errorMessage.textContent = 'Please verify your email address first.';
+                    errorMessage.classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = `verify-email.html?email=${encodeURIComponent(data.email || email)}`;
+                    }, 1800);
+                    return;
+                } else {
+                    // Show the error from the API directly
+                    throw new Error(data.error || data.message || 'Invalid email or password.');
                 }
-            } else {
-                errorMessage.textContent = 'Invalid credentials. Please check your email, password, and role selection.';
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = error.message || 'Login failed. Please try again.';
                 errorMessage.classList.add('show');
 
                 setTimeout(() => {
                     errorMessage.classList.remove('show');
                 }, 3000);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
             }
-        });
-
-        // Auto-fill demo credentials based on role selection
-        document.getElementById('role').addEventListener('change', function(e) {
-            const role = e.target.value;
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-
-            if (role === 'admin') {
-                emailInput.value = 'admin@paysick.com';
-                passwordInput.value = 'admin123';
-            } else {
-                emailInput.value = 'user@paysick.com';
-                passwordInput.value = 'password123';
-            }
-        });
-
-        // Set default credentials on page load
-        window.addEventListener('load', function() {
-            document.getElementById('email').value = 'user@paysick.com';
-            document.getElementById('password').value = 'password123';
         });
     </script>
 
