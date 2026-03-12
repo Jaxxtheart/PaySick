@@ -125,55 +125,27 @@
             transform: translateY(0);
         }
 
-        .divider {
-            text-align: center;
-            margin: 32px 0;
-            position: relative;
-            color: #8A8A8A;
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #FF4757;
+            cursor: pointer;
+        }
+
+        .remember-me label {
             font-size: 14px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 40%;
-            height: 1px;
-            background: #E5E5E5;
-        }
-
-        .divider::before {
-            left: 0;
-        }
-
-        .divider::after {
-            right: 0;
-        }
-
-        .demo-credentials {
-            background: #FAFAFA;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 24px;
-        }
-
-        .demo-credentials h3 {
-            color: #1A1A1A;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .demo-credentials p {
+            font-weight: 400;
             color: #4A4A4A;
-            font-size: 13px;
-            margin-bottom: 8px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .demo-credentials strong {
-            color: #FF4757;
+            margin-bottom: 0;
+            cursor: pointer;
         }
 
         .back-home {
@@ -287,7 +259,12 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+                <input type="password" id="password" autocomplete="current-password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Remember me</label>
             </div>
 
             <button type="submit" class="btn">Sign In</button>
@@ -299,6 +276,7 @@
 
         <div class="back-home">
             <a href="index.html"><svg style="width:16px;height:16px;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke="#FF4757" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to Home</a>
+            <br><a href="demo-login.html" style="color: #D0D0D0; font-size: 11px; text-decoration: none; margin-top: 16px; display: inline-block;">Demo</a>
         </div>
 
         <div style="text-align:center;margin-top:32px;">
@@ -307,59 +285,129 @@
     </div>
 
     <script>
+        function redirectByRole(role) {
+            switch (role) {
+                case 'admin':
+                    window.location.href = 'admin-dashboard.html';
+                    break;
+                case 'provider':
+                    window.location.href = 'dashboard.html';
+                    break;
+                case 'lender':
+                    window.location.href = 'lender-dashboard.html';
+                    break;
+                default:
+                    const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                    window.location.href = onboardingComplete === 'true' ? 'dashboard.html' : 'onboarding.html';
+            }
+        }
+
+        // Attempt auto-login via stored refresh token (Remember Me)
+        (async function attemptAutoLogin() {
+            try {
+                const saved = localStorage.getItem('paysick_remember');
+                if (!saved) return;
+
+                const { refreshToken, email, role } = JSON.parse(saved);
+                if (!refreshToken) {
+                    // Clear legacy data (old format stored passwords)
+                    localStorage.removeItem('paysick_remember');
+                    return;
+                }
+
+                // Prepopulate email and role while we attempt auto-login
+                if (email) document.getElementById('email').value = email;
+                if (role) document.getElementById('role').value = role;
+                document.getElementById('rememberMe').checked = true;
+
+                // Try to get a new access token using the refresh token
+                const response = await fetch('/api/users/refresh-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                if (!response.ok) {
+                    // Refresh token expired or revoked — clear and show login form
+                    localStorage.removeItem('paysick_remember');
+                    return;
+                }
+
+                const tokens = await response.json();
+                localStorage.setItem('paysick_auth_token', tokens.accessToken);
+
+                // Fetch user profile with the new access token
+                const profileRes = await fetch('/api/users/profile', {
+                    headers: { 'Authorization': 'Bearer ' + tokens.accessToken }
+                });
+
+                if (profileRes.ok) {
+                    const profileData = await profileRes.json();
+                    const user = profileData.user || profileData;
+                    localStorage.setItem('paysick_user', JSON.stringify({
+                        ...user,
+                        name: user.full_name
+                    }));
+                    redirectByRole(user.role || role);
+                } else {
+                    // Profile fetch failed — let user log in manually
+                    localStorage.removeItem('paysick_remember');
+                }
+            } catch (e) {
+                // Network error or parse error — clear stale data
+                localStorage.removeItem('paysick_remember');
+            }
+        })();
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
             const errorMessage = document.getElementById('errorMessage');
             const submitBtn = this.querySelector('button[type="submit"]');
 
-            // Disable button during request
+            if (!email || !password) {
+                errorMessage.textContent = 'Please enter your email and password.';
+                errorMessage.classList.add('show');
+                setTimeout(() => errorMessage.classList.remove('show'), 3000);
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'Signing in...';
 
             try {
-                // Call the real API for authentication
                 const response = await fetch('/api/users/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, rememberMe })
                 });
 
                 const data = await response.json();
 
-                if (response.ok && (data.accessToken || data.token)) {
-                    // Store real JWT token and user data
-                    localStorage.setItem('paysick_auth_token', data.accessToken || data.token);
+                if (response.ok && data.accessToken) {
+                    // Handle Remember Me — store refresh token, never the password
+                    if (rememberMe && data.refreshToken) {
+                        localStorage.setItem('paysick_remember', JSON.stringify({
+                            refreshToken: data.refreshToken,
+                            email: email,
+                            role: data.user.role || role
+                        }));
+                    } else {
+                        localStorage.removeItem('paysick_remember');
+                    }
+
+                    localStorage.setItem('paysick_auth_token', data.accessToken);
                     localStorage.setItem('paysick_user', JSON.stringify({
                         ...data.user,
-                        role: role,
+                        role: data.user.role || role,
                         name: data.user.full_name
                     }));
 
-                    // Redirect to appropriate page based on role
-                    switch (role) {
-                        case 'admin':
-                            window.location.href = 'admin-dashboard.html';
-                            break;
-                        case 'provider':
-                            window.location.href = 'dashboard.html'; // Provider dashboard coming soon
-                            break;
-                        case 'lender':
-                            window.location.href = 'lender-dashboard.html';
-                            break;
-                        default:
-                            const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                            if (onboardingComplete === 'true') {
-                                window.location.href = 'dashboard.html';
-                            } else {
-                                window.location.href = 'onboarding.html';
-                            }
-                    }
+                    redirectByRole(data.user.role || role);
                 } else if (response.status === 403 && data.code === 'EMAIL_UNVERIFIED') {
                     // Unverified account — redirect to verification page
                     errorMessage.textContent = 'Please verify your email address first.';
@@ -369,17 +417,12 @@
                     }, 1800);
                     return;
                 } else {
-                    // Show the error from the API directly
                     throw new Error(data.error || data.message || 'Invalid email or password.');
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 errorMessage.textContent = error.message || 'Login failed. Please try again.';
                 errorMessage.classList.add('show');
-
-                setTimeout(() => {
-                    errorMessage.classList.remove('show');
-                }, 3000);
+                setTimeout(() => errorMessage.classList.remove('show'), 4000);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';

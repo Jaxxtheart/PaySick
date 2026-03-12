@@ -219,6 +219,8 @@ function decryptBankingData(encryptedData) {
 const TOKEN_LENGTH = 64; // 512 bits of entropy
 const TOKEN_EXPIRY_HOURS = 24;
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
+const REMEMBER_ME_ACCESS_HOURS = 7 * 24;     // 7 days
+const REMEMBER_ME_REFRESH_DAYS = 90;          // 90 days
 
 /**
  * Generate a cryptographically secure opaque token
@@ -245,17 +247,22 @@ function hashToken(token) {
  * @param {Object} user - User object with user_id, email, role
  * @param {string} ipAddress - Client IP address
  * @param {string} userAgent - Client user agent
+ * @param {Object} [options] - Session options
+ * @param {boolean} [options.rememberMe] - Extend session lifetime
  * @returns {Promise<Object>} - { accessToken, refreshToken, expiresAt }
  */
-async function createSession(user, ipAddress, userAgent) {
+async function createSession(user, ipAddress, userAgent, options = {}) {
   const accessToken = generateOpaqueToken();
   const refreshToken = generateOpaqueToken();
 
   const accessTokenHash = hashToken(accessToken);
   const refreshTokenHash = hashToken(refreshToken);
 
-  const accessExpiresAt = new Date(Date.now() + TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
-  const refreshExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  const accessHours = options.rememberMe ? REMEMBER_ME_ACCESS_HOURS : TOKEN_EXPIRY_HOURS;
+  const refreshDays = options.rememberMe ? REMEMBER_ME_REFRESH_DAYS : REFRESH_TOKEN_EXPIRY_DAYS;
+
+  const accessExpiresAt = new Date(Date.now() + accessHours * 60 * 60 * 1000);
+  const refreshExpiresAt = new Date(Date.now() + refreshDays * 24 * 60 * 60 * 1000);
 
   try {
     // Store session in database
@@ -295,7 +302,7 @@ async function createSession(user, ipAddress, userAgent) {
     accessToken,
     refreshToken,
     expiresAt: accessExpiresAt,
-    expiresIn: TOKEN_EXPIRY_HOURS * 60 * 60 // seconds
+    expiresIn: accessHours * 60 * 60 // seconds
   };
 }
 

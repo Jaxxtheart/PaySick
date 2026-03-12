@@ -2,7 +2,68 @@
 
 This document tracks the development progress of the PaySick healthcare payment platform.
 
+## CORE FUNCTIONALITY - DO NOT REMOVE
+
+### Demo Access System (Password-Gated)
+This is production-critical functionality for investor demos, partner onboarding, and development.
+
+**Architecture:**
+- `login.html` - Clean production login page for real users. Contains only a subtle, near-invisible "Demo" link at the very bottom pointing to `demo-login.html`.
+- `demo-login.html` - Password-gated demo page. Password: `PaySick-demo-2026`. After correct password entry, reveals one-click role buttons (Patient, Provider, Lender, Admin) that call `/api/users/demo-login`.
+- `backend/src/routes/users.js` - `POST /api/users/demo-login` endpoint with 4 hardcoded demo accounts. Controlled by `ALLOW_DEMO_LOGIN=true` env var (auto-enabled in non-production).
+- `backend/src/server.js` - Demo-login rate limiter applied.
+
+**Marketplace Preview Mode:**
+- `backend/src/routes/marketplace.js` - When no active lenders exist, returns preview offers (MediFinance SA 16.5%, HealthCredit Plus 18.5%, CareCapital 19.5%) with `demo: true` flag.
+- `marketplace-apply.html` - Renders preview offer cards with "Preview Only - Not a Real Offer" disclaimers, next steps, and "Notify Me" button.
+
+**Dashboard defaults:**
+- `dashboard.html` - Default sidebar: John Doe / user@paysick.com
+- `admin-dashboard.html` - Default sidebar: Admin User / admin@paysick.com
+- `onboarding.html` - Falls back gracefully in demo mode if API registration fails
+
+---
+
 ## Latest Updates
+
+### 2026-03-09 - Demo Access Redesign (Production Push)
+
+**Deployment:** Branch `claude/build-underwriting-framework-6vtDR` pushed to remote. Merge to `main` required (branch protection active — cannot push directly to main). PR needed to deploy to website.
+
+**Branch contains 6 commits ahead of main:**
+1. `c19f5d7` - PaySick Shield Underwriting Framework (Five-Gate system)
+2. `cb932d8` - Production hardening (security improvements kept, demo removal reverted)
+3. `3f1d10e` - Remember Me checkbox on login page
+4. `228e60f` - Secure Remember Me (server-side refresh tokens)
+5. `7ba6520` - Restore all demo access functionality
+6. `6cf65a0` - Redesign demo access: password-gated demo-login.html
+
+Upgraded demo access from exposed credentials on login page to a proper password-gated system per the design from `claude/add-login-functionality-FEn61`.
+
+#### Changes
+1. **`login.html`** - Cleaned for real users. Removed all demo credentials display, auto-fill, and demo-login fallback. Added subtle "Demo" link at bottom (color: #D0D0D0, 11px) pointing to `demo-login.html`.
+2. **`demo-login.html`** (NEW) - Password-gated demo page:
+   - Dark theme (#2C3E50) to visually distinguish from production login
+   - Password gate: `PaySick-demo-2026` required to reveal role buttons
+   - 4 one-click role buttons (Patient, Provider, Lender, Admin) with custom SVG icons
+   - Calls `POST /api/users/demo-login` directly
+   - Shake animation on wrong password
+   - Loading states and error handling
+
+#### Backend (Preserved from previous commit)
+- `POST /api/users/demo-login` endpoint in users.js (4 demo accounts)
+- Demo-login rate limiter in server.js
+- Marketplace preview offers in marketplace.js (3 preview lenders)
+- Preview container rendering in marketplace-apply.html
+
+#### Files Modified
+1. `login.html` - Removed demo section, added subtle demo link
+2. `demo-login.html` - NEW: password-gated demo access page
+
+#### Security Hardening Preserved
+- Timing-safe webhook signatures, graceful shutdown, production CORS, Shield validation
+
+---
 
 ### 2026-02-06 - Healthcare Risk Scoring System Implementation
 
@@ -485,3 +546,14 @@ Rewrote all four legal pages to remove internal IP methodology details, remove r
 ---
 
 **Last Updated**: 2026-03-07
+
+---
+
+## Standing Rules
+
+1. **progress.md MUST be updated every time we promote to production.** No exceptions. Every production push must have a corresponding entry documenting what changed, what was added/removed, and the audit results.
+2. **Never remove functionality without explicit permission.** Demo access, preview modes, and fallback behaviors are features — not technical debt.
+
+---
+
+**Last Updated**: 2026-03-12

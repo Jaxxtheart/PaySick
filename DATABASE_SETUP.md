@@ -101,7 +101,7 @@ This will:
 - Create the `paysick_db` database
 - Run all schema migrations
 - Create all tables, indexes, views, and triggers
-- Insert sample provider data
+- Run all database migrations (including Shield underwriting tables)
 
 ### 6. Start the Backend Server
 

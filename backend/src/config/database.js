@@ -42,10 +42,24 @@ const query = async (text, params) => {
   try {
     const res = await pool.query(text, params);
     const duration = Date.now() - start;
-    console.log('Executed query', { text, duration, rows: res.rowCount });
+
+    // In production, only log slow queries (>500ms) without query text
+    if (process.env.NODE_ENV === 'production') {
+      if (duration > 500) {
+        console.warn('Slow query detected', { duration, rows: res.rowCount });
+      }
+    } else {
+      console.log('Executed query', { duration, rows: res.rowCount });
+    }
+
     return res;
   } catch (error) {
-    console.error('Database query error:', error);
+    // Never log query text in production (may contain sensitive data)
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Database query error:', error.message);
+    } else {
+      console.error('Database query error:', error);
+    }
     throw error;
   }
 };
@@ -68,17 +82,20 @@ const transaction = async (callback) => {
 
 // Health check
 const healthCheck = async () => {
+  const start = Date.now();
   try {
-    const result = await query('SELECT NOW()');
+    const result = await pool.query('SELECT NOW()');
+    const responseTime = Date.now() - start;
     return {
       status: 'healthy',
       timestamp: result.rows[0].now,
-      database: process.env.DB_NAME
+      responseTime
     };
   } catch (error) {
     return {
       status: 'unhealthy',
-      error: error.message
+      error: process.env.NODE_ENV === 'production' ? 'Database unavailable' : error.message,
+      responseTime: Date.now() - start
     };
   }
 };

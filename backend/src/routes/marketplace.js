@@ -44,7 +44,10 @@ const validateWebhookSignature = async (req, res, next) => {
       return res.status(401).json({ error: 'Unknown lender' });
     }
 
-    const apiKey = result.rows[0].api_key_encrypted || 'default-key';
+    const apiKey = result.rows[0].api_key_encrypted;
+    if (!apiKey) {
+      return res.status(401).json({ error: 'Lender API key not configured' });
+    }
 
     // Verify signature
     const payload = JSON.stringify(req.body);
@@ -53,8 +56,11 @@ const validateWebhookSignature = async (req, res, next) => {
       .update(payload)
       .digest('hex');
 
-    // For demo/development, allow requests without valid signature
-    if (process.env.NODE_ENV === 'production' && signature !== expectedSignature) {
+    // Always validate signatures - timing-safe comparison
+    if (!crypto.timingSafeEqual(
+      Buffer.from(signature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    )) {
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
