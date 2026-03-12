@@ -11,7 +11,9 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const { healthCheck } = require('./config/database');
+const fs = require('fs');
+const path = require('path');
+const { query, healthCheck } = require('./config/database');
 const { validateEnvironment } = require('./services/security.service');
 
 // Validate security configuration on startup
@@ -23,6 +25,23 @@ try {
     process.exit(1);
   }
 }
+
+// Run pending migrations on startup (all use IF NOT EXISTS so safe to re-run)
+async function runMigrations() {
+  const migrationsDir = path.join(__dirname, 'migrations');
+  if (!fs.existsSync(migrationsDir)) return;
+  const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
+  for (const file of files) {
+    try {
+      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
+      await query(sql);
+      console.log(`Migration applied: ${file}`);
+    } catch (err) {
+      console.error(`Migration failed (${file}):`, err.message);
+    }
+  }
+}
+runMigrations().catch(err => console.error('Migration runner error:', err.message));
 
 // Import routes
 const userRoutes = require('./routes/users');
@@ -75,7 +94,12 @@ const corsOptions = {
       }
     }
 
-    // Allow localhost in development only
+    // Allow production domain
+    if (origin === 'https://paysick.co.za' || origin === 'https://www.paysick.co.za') {
+      return callback(null, true);
+    }
+
+    // Allow localhost in development
     if (process.env.NODE_ENV !== 'production' && origin.includes('localhost')) {
       return callback(null, true);
     }

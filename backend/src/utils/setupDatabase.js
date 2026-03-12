@@ -87,24 +87,47 @@ async function setupDatabase() {
       return true;
     });
 
-    // Run migrations
-    console.log(`Running ${uniqueMigrations.length} migrations...`);
-    for (const migration of uniqueMigrations) {
-      try {
-        console.log(`  Running ${migration.name}...`);
-        const sql = fs.readFileSync(migration.path, 'utf8');
-        await appPool.query(sql);
-        console.log(`  ${migration.name} completed`);
-      } catch (err) {
-        // Ignore errors for "already exists" type issues
-        if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
-          console.warn(`  Warning: ${migration.name}: ${err.message}`);
-        } else {
-          console.log(`  ${migration.name} (already applied)`);
+    // Run migrations — check both migration directories:
+    //   src/migrations/      (security tables, etc.)
+    //   database/migrations/ (marketplace tables, risk scoring, Shield, etc.)
+    console.log('📋 Running migrations...');
+    const migrationDirs = [
+      path.join(__dirname, '../migrations'),          // src/migrations
+      path.join(__dirname, '../../database/migrations') // database/migrations
+    ];
+
+    // Collect all .sql files from both dirs, deduplicate by filename, sort globally
+    const seenNames = new Set();
+    const allMigrations = [];
+    for (const dir of migrationDirs) {
+      if (fs.existsSync(dir)) {
+        for (const file of fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort()) {
+          if (!seenNames.has(file)) {
+            seenNames.add(file);
+            allMigrations.push({ dir, file });
+          }
         }
       }
     }
-    console.log('Migrations completed\n');
+    // Sort by filename so numeric prefixes (001_, 002_…) run in order
+    allMigrations.sort((a, b) => a.file.localeCompare(b.file));
+
+    for (const { dir, file } of allMigrations) {
+      try {
+        console.log(`   Running ${file}...`);
+        const sql = fs.readFileSync(path.join(dir, file), 'utf8');
+        await appPool.query(sql);
+        console.log(`   ✅ ${file} completed`);
+      } catch (err) {
+        // Ignore errors for "already exists" type issues
+        if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+          console.warn(`   ⚠️  ${file}: ${err.message}`);
+        } else {
+          console.log(`   ℹ️  ${file} (already applied)`);
+        }
+      }
+    }
+    console.log('✅ Migrations completed\n');
 
     // Verify database connection
     const testResult = await appPool.query('SELECT NOW() as current_time');
