@@ -298,48 +298,53 @@ app.use((err, req, res, next) => {
 // SERVER STARTUP
 // ============================================
 
-const server = app.listen(PORT, () => {
-  const isProduction = process.env.NODE_ENV === 'production';
+// Guard: don't start HTTP server when running as Vercel serverless function
+if (process.env.VERCEL !== '1') {
+  const server = app.listen(PORT, () => {
+    const isProduction = process.env.NODE_ENV === 'production';
 
-  console.log(`PaySick API Server v1.0.0 started`);
-  console.log(`  Port: ${PORT}`);
-  console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`  Auth: Opaque Tokens`);
-  console.log(`  Security: ${isProduction ? 'Production' : 'Development'}`);
-
-  if (!isProduction) {
-    console.log(`  Health: http://localhost:${PORT}/health`);
-  }
-});
-
-// Graceful shutdown handler
-function gracefulShutdown(signal) {
-  console.log(`${signal} received: starting graceful shutdown`);
-
-  // Stop accepting new connections
-  server.close(async () => {
-    console.log('HTTP server closed');
-
-    try {
-      // Close database connection pool
-      const { pool } = require('./config/database');
-      await pool.end();
-      console.log('Database pool closed');
-    } catch (err) {
-      console.error('Error closing database pool:', err.message);
-    }
-
-    process.exit(0);
+    console.log(`
+╔═══════════════════════════════════════════════════╗
+║                                                   ║
+║         PaySick API Server v1.2.0                 ║
+║         Banking-Grade Security Enabled            ║
+║                                                   ║
+║  Port: ${PORT}                                      ║
+║  Environment: ${(process.env.NODE_ENV || 'development').padEnd(14)}              ║
+║  Auth: Opaque Tokens (No JWT)                     ║
+║  Encryption: AES-256-GCM                          ║
+║                                                   ║
+║  Security Status:                                 ║
+║  ${isProduction ? '[✓] Production mode' : '[!] Development mode - NOT FOR PRODUCTION'}            ║
+║  ${process.env.TOKEN_SECRET ? '[✓] Token secret configured' : '[!] Using dev token secret'}           ║
+║  ${process.env.ENCRYPTION_KEY ? '[✓] Encryption key configured' : '[!] Using dev encryption key'}        ║
+║  ${process.env.CORS_ORIGIN ? '[✓] CORS origins configured' : '[!] Using dev CORS origins'}          ║
+║                                                   ║
+║  Health: http://localhost:${PORT}/health              ║
+║                                                   ║
+╚═══════════════════════════════════════════════════╝
+    `);
   });
 
-  // Force shutdown after 30 seconds if graceful shutdown fails
-  setTimeout(() => {
-    console.error('Forced shutdown after timeout');
-    process.exit(1);
-  }, 30000);
-}
+  // Graceful shutdown — closes server, drains DB pool, then exits
+  function gracefulShutdown(signal) {
+    console.log(`${signal} received: starting graceful shutdown`);
+    server.close(async () => {
+      console.log('HTTP server closed');
+      try {
+        const { pool } = require('./config/database');
+        await pool.end();
+        console.log('Database pool closed');
+      } catch (err) {
+        console.error('Error closing database pool:', err.message);
+      }
+      process.exit(0);
+    });
+    setTimeout(() => { console.error('Forced shutdown after timeout'); process.exit(1); }, 30000);
+  }
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+}
 
 module.exports = app;
