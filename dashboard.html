@@ -767,7 +767,7 @@
     <!-- Main Content -->
     <main class="container">
         <div class="welcome-section">
-            <h1>Welcome back, <span id="welcomeName">John</span>! 👋</h1>
+            <h1>Welcome back, <span id="welcomeName">there</span>!</h1>
             <p>Here's an overview of your payment plans and upcoming payments</p>
         </div>
 
@@ -784,8 +784,8 @@
                         </svg>
                     </div>
                 </div>
-                <div class="stat-value">R24,500</div>
-                <div class="stat-description">Across 3 active plans</div>
+                <div class="stat-value" id="statTotalBalance">—</div>
+                <div class="stat-description" id="statBalanceDesc">Loading...</div>
             </div>
 
             <div class="stat-card">
@@ -801,8 +801,8 @@
                         </svg>
                     </div>
                 </div>
-                <div class="stat-value">R3,500</div>
-                <div class="stat-description">Due in 5 days</div>
+                <div class="stat-value" id="statNextPayment">—</div>
+                <div class="stat-description" id="statNextDesc">Loading...</div>
             </div>
 
             <div class="stat-card">
@@ -815,8 +815,8 @@
                         </svg>
                     </div>
                 </div>
-                <div class="stat-value">R18,900</div>
-                <div class="stat-description">6 payments completed</div>
+                <div class="stat-value" id="statPaidYear">—</div>
+                <div class="stat-description" id="statPaidDesc">Loading...</div>
             </div>
 
             <div class="stat-card">
@@ -830,8 +830,8 @@
                         </svg>
                     </div>
                 </div>
-                <div class="stat-value">3</div>
-                <div class="stat-description">All in good standing</div>
+                <div class="stat-value" id="statActivePlans">—</div>
+                <div class="stat-description" id="statPlansDesc">Loading...</div>
             </div>
         </div>
 
@@ -844,88 +844,8 @@
                     <a href="#" class="view-all">View All →</a>
                 </div>
 
-                <div class="payment-plan">
-                    <div class="plan-header">
-                        <span class="plan-provider">Netcare Milpark Hospital</span>
-                        <span class="plan-status status-active">Active</span>
-                    </div>
-                    <div class="plan-details">
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Total Amount</span>
-                            <span class="plan-detail-value">R15,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Remaining</span>
-                            <span class="plan-detail-value">R10,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Monthly Payment</span>
-                            <span class="plan-detail-value">R5,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Next Due</span>
-                            <span class="plan-detail-value">Jan 20, 2026</span>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 33%"></div>
-                    </div>
-                </div>
-
-                <div class="payment-plan">
-                    <div class="plan-header">
-                        <span class="plan-provider">Cape Town Dental Studio</span>
-                        <span class="plan-status status-active">Active</span>
-                    </div>
-                    <div class="plan-details">
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Total Amount</span>
-                            <span class="plan-detail-value">R7,500</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Remaining</span>
-                            <span class="plan-detail-value">R5,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Monthly Payment</span>
-                            <span class="plan-detail-value">R2,500</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Next Due</span>
-                            <span class="plan-detail-value">Jan 15, 2026</span>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 33%"></div>
-                    </div>
-                </div>
-
-                <div class="payment-plan">
-                    <div class="plan-header">
-                        <span class="plan-provider">Spec-Savers Optometrists</span>
-                        <span class="plan-status status-upcoming">Starting Soon</span>
-                    </div>
-                    <div class="plan-details">
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Total Amount</span>
-                            <span class="plan-detail-value">R6,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Remaining</span>
-                            <span class="plan-detail-value">R6,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Monthly Payment</span>
-                            <span class="plan-detail-value">R2,000</span>
-                        </div>
-                        <div class="plan-detail">
-                            <span class="plan-detail-label">Starts</span>
-                            <span class="plan-detail-value">Feb 1, 2026</span>
-                        </div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%"></div>
-                    </div>
+                <div id="activePlansList">
+                    <p style="color:#888;padding:8px 0">Loading your payment plans...</p>
                 </div>
             </div>
 
@@ -936,48 +856,8 @@
                     <a href="payments.html" class="view-all">View All →</a>
                 </div>
 
-                <div class="payment-item">
-                    <div class="payment-info">
-                        <div class="payment-date">January 15, 2026</div>
-                        <div class="payment-provider">Cape Town Dental Studio</div>
-                    </div>
-                    <div class="payment-actions">
-                        <div class="payment-amount">R2,500</div>
-                        <a href="make-payment.html?id=sample-id-1" class="pay-now-btn">Pay Now</a>
-                    </div>
-                </div>
-
-                <div class="payment-item">
-                    <div class="payment-info">
-                        <div class="payment-date">January 20, 2026</div>
-                        <div class="payment-provider">Netcare Milpark Hospital</div>
-                    </div>
-                    <div class="payment-actions">
-                        <div class="payment-amount">R5,000</div>
-                        <a href="make-payment.html?id=sample-id-2" class="pay-now-btn">Pay Now</a>
-                    </div>
-                </div>
-
-                <div class="payment-item">
-                    <div class="payment-info">
-                        <div class="payment-date">February 1, 2026</div>
-                        <div class="payment-provider">Spec-Savers Optometrists</div>
-                    </div>
-                    <div class="payment-actions">
-                        <div class="payment-amount">R2,000</div>
-                        <a href="make-payment.html?id=sample-id-3" class="pay-now-btn">Pay Now</a>
-                    </div>
-                </div>
-
-                <div class="payment-item">
-                    <div class="payment-info">
-                        <div class="payment-date">February 15, 2026</div>
-                        <div class="payment-provider">Cape Town Dental Studio</div>
-                    </div>
-                    <div class="payment-actions">
-                        <div class="payment-amount">R2,500</div>
-                        <a href="make-payment.html?id=sample-id-4" class="pay-now-btn">Pay Now</a>
-                    </div>
+                <div id="upcomingPaymentsList">
+                    <p style="color:#888;padding:8px 0">Loading upcoming payments...</p>
                 </div>
             </div>
 
@@ -1034,6 +914,7 @@
         </div>
     </main>
 
+    <script src="api-client.js"></script>
     <script>
         // Check authentication
         function checkAuth() {
@@ -1059,6 +940,7 @@
         function logout() {
             localStorage.removeItem('paysick_user');
             localStorage.removeItem('paysick_auth_token');
+            localStorage.removeItem('paysick_refresh_token');
             localStorage.removeItem('paysick_onboarding_complete');
             localStorage.removeItem('paysick_onboarding_data');
             window.location.href = 'login.html';
@@ -1068,27 +950,131 @@
         function toggleMenu() {
             const menu = document.getElementById('sideMenu');
             const overlay = document.getElementById('menuOverlay');
-
             menu.classList.toggle('active');
             overlay.classList.toggle('active');
         }
 
-        // Initialize dashboard
-        function initDashboard() {
+        function fmt(amount) {
+            return 'R\u202f' + parseFloat(amount || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Initialize dashboard — loads all data from live API
+        async function initDashboard() {
             const user = checkAuth();
-            if (user) {
-                // Update user info in header
-                document.getElementById('userName').textContent = user.name;
-                document.getElementById('welcomeName').textContent = user.name.split(' ')[0];
+            if (!user) return;
 
-                // Update avatar with initials
-                const initials = user.name.split(' ').map(n => n[0]).join('');
-                document.getElementById('userAvatar').textContent = initials;
+            // Set user info in header
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('welcomeName').textContent = user.name.split(' ')[0];
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials;
+            document.getElementById('menuAvatar').textContent = initials;
+            document.getElementById('menuUserName').textContent = user.name;
+            document.getElementById('menuUserEmail').textContent = user.email;
 
-                // Update menu user info
-                document.getElementById('menuAvatar').textContent = initials;
-                document.getElementById('menuUserName').textContent = user.name;
-                document.getElementById('menuUserEmail').textContent = user.email;
+            // ── Load dashboard stats ──────────────────────────────────────
+            try {
+                const data = await PaySickAPI.users.getDashboard();
+
+                document.getElementById('statTotalBalance').textContent = fmt(data.total_balance);
+                document.getElementById('statBalanceDesc').textContent =
+                    'Across ' + data.active_plans + ' active plan' + (data.active_plans !== 1 ? 's' : '');
+
+                if (data.next_payment) {
+                    document.getElementById('statNextPayment').textContent = fmt(data.next_payment.amount);
+                    const daysUntil = Math.ceil((new Date(data.next_payment.due_date) - new Date()) / 86400000);
+                    document.getElementById('statNextDesc').textContent =
+                        daysUntil > 0 ? 'Due in ' + daysUntil + ' day' + (daysUntil !== 1 ? 's' : '') : 'Due today';
+                } else {
+                    document.getElementById('statNextPayment').textContent = 'None';
+                    document.getElementById('statNextDesc').textContent = 'No payments due';
+                }
+
+                const hist = data.payment_history || {};
+                document.getElementById('statPaidYear').textContent = fmt(hist.total_paid_this_year);
+                document.getElementById('statPaidDesc').textContent =
+                    (hist.completed_payments || 0) + ' payment' + (hist.completed_payments !== 1 ? 's' : '') + ' completed';
+
+                document.getElementById('statActivePlans').textContent = data.active_plans;
+                document.getElementById('statPlansDesc').textContent =
+                    data.active_plans > 0 ? 'All in good standing' : 'No active plans';
+            } catch (err) {
+                console.error('Dashboard stats error:', err);
+                ['statTotalBalance', 'statNextPayment', 'statPaidYear', 'statActivePlans'].forEach(id => {
+                    document.getElementById(id).textContent = '—';
+                });
+                ['statBalanceDesc', 'statNextDesc', 'statPaidDesc', 'statPlansDesc'].forEach(id => {
+                    document.getElementById(id).textContent = 'Unable to load';
+                });
+            }
+
+            // ── Load active payment plans ─────────────────────────────────
+            try {
+                const plans = await PaySickAPI.payments.getPlans();
+                const list = document.getElementById('activePlansList');
+
+                if (!plans || plans.length === 0) {
+                    list.innerHTML = '<p style="color:#888;padding:8px 0">No active payment plans yet. <a href="onboarding.html">Apply now</a>.</p>';
+                } else {
+                    list.innerHTML = plans.slice(0, 3).map(function(plan) {
+                        const progress = plan.number_of_payments > 0
+                            ? Math.round((plan.payments_made / plan.number_of_payments) * 100)
+                            : 0;
+                        const statusLabel = plan.status.charAt(0).toUpperCase() + plan.status.slice(1);
+                        const nextDue = plan.first_payment_date
+                            ? new Date(new Date(plan.first_payment_date).setMonth(
+                                new Date(plan.first_payment_date).getMonth() + plan.payments_made
+                              )).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : '—';
+                        return '<div class="payment-plan">' +
+                            '<div class="plan-header">' +
+                                '<span class="plan-provider">' + (plan.provider_name || 'Healthcare Provider') + '</span>' +
+                                '<span class="plan-status status-' + plan.status + '">' + statusLabel + '</span>' +
+                            '</div>' +
+                            '<div class="plan-details">' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Total Amount</span><span class="plan-detail-value">' + fmt(plan.total_amount) + '</span></div>' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Remaining</span><span class="plan-detail-value">' + fmt(plan.outstanding_balance) + '</span></div>' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Monthly Payment</span><span class="plan-detail-value">' + fmt(plan.monthly_amount) + '</span></div>' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Next Due</span><span class="plan-detail-value">' + nextDue + '</span></div>' +
+                            '</div>' +
+                            '<div class="progress-bar"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+                        '</div>';
+                    }).join('');
+                }
+            } catch (err) {
+                console.error('Plans load error:', err);
+                document.getElementById('activePlansList').innerHTML =
+                    '<p style="color:#888;padding:8px 0">Unable to load payment plans. Please try again later.</p>';
+            }
+
+            // ── Load upcoming payments ────────────────────────────────────
+            try {
+                const upcoming = await PaySickAPI.payments.getUpcoming();
+                const list = document.getElementById('upcomingPaymentsList');
+
+                if (!upcoming || upcoming.length === 0) {
+                    list.innerHTML = '<p style="color:#888;padding:8px 0">No upcoming payments due.</p>';
+                } else {
+                    list.innerHTML = upcoming.slice(0, 4).map(function(payment) {
+                        const dateStr = new Date(payment.due_date).toLocaleDateString('en-ZA', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        });
+                        return '<div class="payment-item">' +
+                            '<div class="payment-info">' +
+                                '<div class="payment-date">' + dateStr + '</div>' +
+                                '<div class="payment-provider">' + (payment.provider_name || 'Healthcare Provider') + '</div>' +
+                            '</div>' +
+                            '<div class="payment-actions">' +
+                                '<div class="payment-amount">' + fmt(payment.amount) + '</div>' +
+                                '<a href="make-payment.html?id=' + payment.payment_id + '" class="pay-now-btn">Pay Now</a>' +
+                            '</div>' +
+                        '</div>';
+                    }).join('');
+                }
+            } catch (err) {
+                console.error('Upcoming payments error:', err);
+                document.getElementById('upcomingPaymentsList').innerHTML =
+                    '<p style="color:#888;padding:8px 0">Unable to load upcoming payments. Please try again later.</p>';
             }
         }
 

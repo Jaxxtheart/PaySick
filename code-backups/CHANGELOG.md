@@ -6,6 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.0] — 2026-03-12
+
+**Type**: MINOR — Generic provider statement, new public pages, production compliance fixes
+
+### Summary
+Removed third-party healthcare brand names from the landing page (generic compliant language). Added About and Contact pages. Fixed Vercel guard pattern, root package.json bloat, and legacy page link references.
+
+### Added
+- `about.html` — About Us page with company mission, stats, team section
+- `contact.html` — Contact page with async form submission (fetch POST)
+
+### Fixed
+- **Compliance**: `index.html` provider network statement no longer names specific SA healthcare brands
+- **Serverless**: `server.js` VERCEL guard fixed from `NODE_ENV !== 'production' || !process.env.VERCEL` to correct `VERCEL !== '1'`
+- **Deployment**: `vercel.json` serverless destination fixed to `/api/index.js`
+- **package.json**: Removed duplicate Express dependencies from root; restored `node >= 18.0.0`
+- **Legacy pages**: `privacy.html` / `terms.html` footer links corrected to `privacy-policy.html` / `terms-of-service.html`
+- **UX**: `contact.html` form submit replaced `alert()` with inline success/error divs + `fetch()` POST
+
+---
+
 ## [v1.2.0] — 2026-03-12
 
 **Type**: MINOR — new pages, extended provider API, serverless deployment fix
