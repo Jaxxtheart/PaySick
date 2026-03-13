@@ -1,0 +1,15 @@
+{
+  "name": "paysick",
+  "version": "1.0.0",
+  "description": "PaySick - Healthcare Payment Platform",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "postinstall": "cd backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

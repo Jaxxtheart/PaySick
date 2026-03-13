@@ -6,6 +6,47 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.6] — 2026-03-13
+
+**Type**: MINOR — Shield underwriting activation
+
+### Summary
+Activated the PaySick Shield underwriting framework on the live patient application flow. Three missing form fields were added to the marketplace application (procedure urgency, existing monthly obligations, medical aid cover). The backend marketplace route now calls Shield Gate 2 (patient affordability assessment) before any lender matching occurs. Declined applications surface a detailed decline card with rationale and an alternative loan suggestion.
+
+### Added
+- **Application form**: New required fields on Step 3 — procedure urgency (elective/planned/semi_urgent/urgent), existing monthly debt repayments, and medical aid cover amount. All three feed directly into the Shield affordability engine.
+- **Shield Gate 2 integration**: `POST /api/marketplace/applications` now calls `patientGateService.assessApplication()` for every application that includes income data. DECLINE outcomes return `{ shield_declined: true, shield }` and stop processing. Amber and green outcomes proceed to marketplace.
+- **Decline UX**: `showShieldDecline()` in marketplace-apply.html renders a decline card with the Shield engine's rationale bullets and, when available, an alternative loan amount that fits within the 18% RTI comfort ceiling.
+- **Demo Shield simulation**: `buildDemoResponse()` now computes and returns a simulated Shield assessment (RTI, DTI, borrower profile, risk tier) from the user's demo inputs.
+
+---
+
+## [v1.3.5] — 2026-03-13
+
+**Type**: PATCH — Bug fix / Demo hardening
+
+### Summary
+Made the demo site fully self-contained and independent of the backend API. Demo login, dashboard data, and marketplace application submission all now resolve locally from hardcoded data — no network requests are made in demo mode.
+
+### Fixed
+- **Demo login**: Replaced `fetch('/api/users/demo-login', ...)` with a synchronous hardcoded `DEMO_USERS` lookup in `demo-login.html`. Token, user profile, and onboarding flag written directly to `localStorage`.
+- **Demo dashboard**: `dashboard.html` now detects demo mode via `isDemoMode()` (checks `paysick_auth_token` prefix). When true, `loadDemoData()` populates all stat cards and renders a hardcoded active plan (Netcare Dental Centre, R18,500, 3 months) and upcoming payment (R6,167, 15 April 2026) without any API call.
+- **Demo marketplace**: `marketplace-apply.html` now detects demo mode and calls `buildDemoResponse()` instead of the API. Returns computed preview offers for 3 lenders (MediFinance SA 16.5%, HealthCredit Plus 18.5%, CareCapital 19.5%) using standard amortisation on the user-selected loan amount and term.
+
+---
+
+## [v1.3.4] — 2026-03-13
+
+**Type**: PATCH — UI fix
+
+### Summary
+Cleaned up the demo access entry point on the login page. Removed the duplicate "Demo" link; the single remaining "Demo access" link is now positioned below the fold.
+
+### Fixed
+- **Login page**: Removed duplicate "Demo" link from `.back-home` row. Single "Demo access" link repositioned with 80px top margin so it is below the fold and does not compete with the primary login CTA.
+
+---
+
 ## [v1.3.3] — 2026-03-13
 
 **Type**: PATCH — Bug fix
