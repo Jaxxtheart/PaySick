@@ -416,7 +416,12 @@
                     body: JSON.stringify({ email, role })
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    throw new Error(`Server error (${response.status}). Is the server running?`);
+                }
 
                 if (response.ok && data.accessToken) {
                     localStorage.setItem('paysick_auth_token', data.accessToken);

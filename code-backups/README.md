@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.3.3](./v1.3.3/) | 2026-03-13 | Bug fix: demo site broken after procedure type — dashboard Apply for Funding linked to onboarding (now marketplace-apply), api-client.js and demo-login.html non-JSON error handling |
 | [v1.3.2](./v1.3.2/) | 2026-03-13 | Bug fix: applied same server-resilience fixes to provider-apply.html — inline error banner replaces alert(), response.json() non-JSON protection |
 | [v1.3.1](./v1.3.1/) | 2026-03-13 | Bug fix: account creation "Unable to connect" — removed process.exit(-1) from DB pool error handler, fixed register.html JSON parse error masking |
 | [v1.3.0](./v1.3.0/) | 2026-03-12 | Generic provider statement, About/Contact pages, Vercel guard fix, package.json cleanup, legacy link fixes |

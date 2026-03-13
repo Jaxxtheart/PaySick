@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.3] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed demo site breaking after selecting a procedure type. Three bugs combined to make the marketplace funding flow unreachable or non-functional.
+
+### Fixed
+- **Navigation**: `dashboard.html` "Apply for Funding" nav link and "Apply now" inline link both pointed to `onboarding.html`. A user who had already completed onboarding was bounced straight back to the dashboard, with no path to `marketplace-apply.html` (the procedure-type selection). Both links now point to `marketplace-apply.html`.
+- **API client resilience**: `api-client.js` `response.json()` was inside the same `try/catch` as `fetch()`. Non-JSON responses (HTML error pages) produced a raw `SyntaxError` toast. `response.json()` is now wrapped in its own inner try/catch; non-JSON responses surface as `Server error (N)`.
+- **Demo login resilience**: `demo-login.html` had the same non-JSON pattern — if the API returned HTML, the catch message was a raw `SyntaxError`, and the auth token was never stored, making all subsequent API calls fail with 401. Same fix applied.
+
+---
+
 ## [v1.3.2] — 2026-03-13
 
 **Type**: PATCH — Bug fix
