@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - PaySick</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAFAFA; color: #1A1A1A; }
+
+        .site-header { background: #1A1A1A; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo-text { font-size: 22px; font-weight: 400; color: #fff; letter-spacing: -0.5px; }
+        .logo-text span { font-weight: 300; color: #8A8A8A; }
+        .back-link { color: #FF4757; text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+        .back-link:hover { opacity: .75; }
+
+        .hero { background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%); padding: 64px 40px 56px; text-align: center; color: #fff; }
+        .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; }
+        .hero p { font-size: 16px; opacity: .88; }
+
+        .page-layout { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 40px; gap: 48px; }
+
+        .toc { width: 220px; flex-shrink: 0; padding: 48px 0 80px; }
+        .toc-sticky { position: sticky; top: 72px; }
+        .toc h4 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #8A8A8A; margin-bottom: 12px; }
+        .toc ol { padding-left: 0; list-style: none; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { font-size: 13px; color: #4A4A4A; text-decoration: none; line-height: 1.4; display: block; transition: color .2s; }
+        .toc a:hover { color: #FF4757; }
+
+        .content { flex: 1; padding: 48px 0 80px; min-width: 0; }
+
+        .effective { background: #FFF5F6; border-left: 3px solid #FF4757; padding: 14px 18px; border-radius: 0 6px 6px 0; margin-bottom: 40px; font-size: 14px; color: #4A4A4A; line-height: 1.6; }
+        .effective strong { color: #E01E37; }
+
+        .liability-box { background: #FFF5F6; border: 1px solid #FFCDD2; border-left: 4px solid #FF4757; border-radius: 0 8px 8px 0; padding: 24px 28px; margin-bottom: 40px; }
+        .liability-box .lb-title { font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #E01E37; margin-bottom: 10px; }
+        .liability-box p { font-size: 14px; line-height: 1.7; color: #2A2A2A; margin-bottom: 0; }
+        .liability-box p + p { margin-top: 8px; }
+
+        h2 { font-size: 20px; font-weight: 700; color: #1A1A1A; margin: 44px 0 14px; padding-bottom: 10px; border-bottom: 2px solid #F0F0F0; scroll-margin-top: 80px; }
+        h2:first-of-type { margin-top: 0; }
+        h3 { font-size: 16px; font-weight: 600; color: #1A1A1A; margin: 26px 0 10px; }
+        p { font-size: 15px; line-height: 1.8; color: #3A3A3A; margin-bottom: 14px; }
+        ul, ol { padding-left: 22px; margin-bottom: 14px; }
+        li { font-size: 15px; line-height: 1.8; color: #3A3A3A; margin-bottom: 7px; }
+        a { color: #FF4757; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { color: #1A1A1A; }
+
+        .conditions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin: 16px 0 28px; }
+        .condition-card { background: #fff; border: 1px solid #E5E5E5; border-radius: 8px; padding: 16px; }
+        .condition-card .num { font-size: 11px; font-weight: 700; color: #FF4757; letter-spacing: 0.8px; margin-bottom: 6px; }
+        .condition-card .name { font-size: 14px; font-weight: 600; color: #1A1A1A; margin-bottom: 6px; }
+        .condition-card .desc { font-size: 13px; color: #6A6A6A; line-height: 1.5; }
+
+        table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+        th { background: #F8F9FA; font-weight: 700; text-align: left; padding: 10px 14px; border-bottom: 2px solid #E5E5E5; color: #1A1A1A; }
+        td { padding: 10px 14px; border-bottom: 1px solid #F0F0F0; color: #3A3A3A; vertical-align: top; line-height: 1.5; }
+        tr:last-child td { border-bottom: none; }
+
+        .rights-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+        .right-card { background: #fff; border: 1px solid #E5E5E5; border-radius: 8px; padding: 16px; border-top: 3px solid #FF4757; }
+        .right-card .right-name { font-size: 14px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
+        .right-card .right-desc { font-size: 13px; color: #6A6A6A; line-height: 1.5; }
+
+        .contact-box { background: #F8F9FA; border-radius: 10px; padding: 28px; margin-top: 48px; }
+        .contact-box h3 { margin-top: 0; margin-bottom: 16px; }
+        .contact-box p { margin-bottom: 8px; font-size: 14px; }
+        .contact-box .regulator { margin-top: 16px; padding-top: 16px; border-top: 1px solid #E5E5E5; font-size: 13px; color: #6A6A6A; line-height: 1.7; }
+
+        .site-footer { background: #1A1A1A; text-align: center; padding: 28px; color: #8A8A8A; font-size: 13px; }
+        .site-footer a { color: #FF4757; text-decoration: none; }
+
+        @media (max-width: 860px) { .toc { display: none; } .page-layout { padding: 0 20px; } }
+        @media (max-width: 600px) { .site-header { padding: 14px 20px; } .hero { padding: 48px 20px 40px; } }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a class="logo" href="index.html" aria-label="PaySick home">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><radialGradient id="ppCross" cx="40%" cy="40%"><stop offset="0%" style="stop-color:#FF4757"/><stop offset="100%" style="stop-color:#E01E37"/></radialGradient></defs>
+            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#ppCross)"/>
+            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#ppCross)"/>
+            <circle cx="50" cy="50" r="7" fill="#1A1A1A"/>
+            <circle cx="50" cy="50" r="5" fill="#E01E37"/>
+        </svg>
+        <div class="logo-text">Pay<span>Sick</span></div>
+    </a>
+    <a class="back-link" href="index.html">&#8592; Back to Home</a>
+</header>
+
+<div class="hero">
+    <h1>Privacy Policy</h1>
+    <p>How PaySick collects, processes, and protects your personal information under South African law</p>
+</div>
+
+<div class="page-layout">
+
+    <nav class="toc" aria-label="Page contents">
+        <div class="toc-sticky">
+            <h4>Contents</h4>
+            <ol>
+                <li><a href="#s1">1. Who We Are</a></li>
+                <li><a href="#s2">2. Non-Credit Liability</a></li>
+                <li><a href="#s3">3. Legal Framework</a></li>
+                <li><a href="#s4">4. POPIA Eight Conditions</a></li>
+                <li><a href="#s5">5. What We Collect</a></li>
+                <li><a href="#s6">6. Special Personal Information</a></li>
+                <li><a href="#s7">7. Why We Process Your Data</a></li>
+                <li><a href="#s8">8. Who We Share Data With</a></li>
+                <li><a href="#s9">9. Cross-Border Transfers</a></li>
+                <li><a href="#s10">10. Retention Periods</a></li>
+                <li><a href="#s11">11. Security Safeguards</a></li>
+                <li><a href="#s12">12. Your POPIA Rights</a></li>
+                <li><a href="#s13">13. Direct Marketing</a></li>
+                <li><a href="#s14">14. Cookies</a></li>
+                <li><a href="#s15">15. Children</a></li>
+                <li><a href="#s16">16. FICA Obligations</a></li>
+                <li><a href="#s17">17. Policy Changes</a></li>
+                <li><a href="#s18">18. Contact</a></li>
+            </ol>
+        </div>
+    </nav>
+
+    <main class="content">
+
+        <div class="effective">
+            <strong>Effective Date:</strong> 3 March 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.3 &nbsp;|&nbsp; <strong>Next review:</strong> 3 March 2027<br>
+            This policy is issued in terms of <strong>Section 18 of POPIA</strong> (duty to notify data subjects at time of collection) and must be read together with our <a href="terms-of-service.html">Terms of Service</a>.
+        </div>
+
+        <div class="liability-box" id="s2">
+            <div class="lb-title">Important: Non-Credit Liability Notice</div>
+            <p>PaySick is a <strong>payment facilitation platform</strong>, not a bank or deposit-taking institution. The collection and processing of your personal information described in this policy does not constitute, and shall not be construed as, an offer of credit, a guarantee of approval, or the assumption of any financial liability by PaySick beyond the specific payment arrangement confirmed to you in writing.</p>
+            <p>The processing of your personal information, including any suitability or affordability assessment carried out before approving a payment plan, does not create any entitlement to a payment plan, does not imply approval of your application, and does not give rise to any claim against PaySick in respect of an assessment decision. Assessment decisions are communicated separately and this privacy policy governs <em>information processing only</em>.</p>
+            <p>PaySick is not liable for the quality, safety, or outcome of any medical treatment, healthcare service, or advice provided by healthcare providers whose bills are facilitated through our platform. Our role is strictly financial: we facilitate payment. We do not endorse, certify, or take responsibility for clinical services.</p>
+        </div>
+
+        <h2 id="s1">1. Who We Are</h2>
+        <p><strong>PaySick South Africa (Pty) Ltd</strong> ("PaySick", "we", "us", "our") is a private company incorporated under the laws of the Republic of South Africa. We operate a healthcare payment facilitation service that allows eligible patients to spread approved medical bills over structured monthly instalments via debit order.</p>
+        <p>PaySick is:</p>
+        <ul>
+            <li>A <strong>payment facilitation platform</strong> operating in compliance with applicable South African law</li>
+            <li>The <strong>Responsible Party</strong> as defined in Section 1 of POPIA in respect of all personal information processed through our platform</li>
+            <li>An <strong>accountable institution</strong> for purposes of FICA in respect of financial services offered</li>
+        </ul>
+        <p>Our duly appointed <strong>Information Officer</strong>, as required by Section 55 of POPIA, is contactable at <a href="mailto:privacy@paysick.co.za">privacy@paysick.co.za</a>.</p>
+
+        <h2 id="s3">2. South African Legal Framework</h2>
+        <p>This policy is crafted to comply with the following South African legislation:</p>
+        <table>
+            <thead><tr><th>Legislation</th><th>Relevance to PaySick</th></tr></thead>
+            <tbody>
+                <tr><td><strong>POPIA</strong> (Protection of Personal Information Act 4 of 2013)</td><td>Primary framework governing all personal information processing. Eight lawful processing conditions apply.</td></tr>
+                <tr><td><strong>NCA</strong> (National Credit Act 34 of 2005)</td><td>Applies where our payment arrangements constitute credit agreements as defined by the NCA. Governs affordability assessment and related obligations.</td></tr>
+                <tr><td><strong>FICA</strong> (Financial Intelligence Centre Act 38 of 2001)</td><td>Requires identity verification (KYC) and reporting of suspicious transactions to the Financial Intelligence Centre.</td></tr>
+                <tr><td><strong>CPA</strong> (Consumer Protection Act 68 of 2008)</td><td>Protects consumers from unfair information practices and governs direct marketing opt-out rights.</td></tr>
+                <tr><td><strong>ECTA</strong> (Electronic Communications and Transactions Act 25 of 2002)</td><td>Governs electronic contracts, authentication, and data messages.</td></tr>
+                <tr><td><strong>PAIA</strong> (Promotion of Access to Information Act 2 of 2000)</td><td>Section 32 of the Constitution and PAIA grant access to information held by juristic persons.</td></tr>
+            </tbody>
+        </table>
+
+        <h2 id="s4">3. The Eight POPIA Conditions for Lawful Processing</h2>
+        <p>PaySick processes your personal information only where all applicable conditions of Chapter 3 of POPIA are satisfied:</p>
+        <div class="conditions-grid">
+            <div class="condition-card"><div class="num">Condition 1</div><div class="name">Accountability</div><div class="desc">PaySick takes responsibility for compliance with all eight conditions. Our Information Officer oversees this.</div></div>
+            <div class="condition-card"><div class="num">Condition 2</div><div class="name">Processing Limitation</div><div class="desc">We collect only what is adequate, relevant, and not excessive for the stated purpose. We obtain your consent where required.</div></div>
+            <div class="condition-card"><div class="num">Condition 3</div><div class="name">Purpose Specification</div><div class="desc">We collect information for specific, explicitly defined, and lawful purposes, and we notify you at the time of collection.</div></div>
+            <div class="condition-card"><div class="num">Condition 4</div><div class="name">Further Processing Limitation</div><div class="desc">We do not process your information in a manner incompatible with the original purpose without fresh consent.</div></div>
+            <div class="condition-card"><div class="num">Condition 5</div><div class="name">Information Quality</div><div class="desc">We take reasonable steps to ensure personal information is complete, accurate, not misleading, and updated where necessary.</div></div>
+            <div class="condition-card"><div class="num">Condition 6</div><div class="name">Openness</div><div class="desc">We maintain a PAIA manual as required and document all processing activities in a record of processing.</div></div>
+            <div class="condition-card"><div class="num">Condition 7</div><div class="name">Security Safeguards</div><div class="desc">We apply appropriate technical and organisational measures to secure your personal information against loss, damage, and unauthorised access.</div></div>
+            <div class="condition-card"><div class="num">Condition 8</div><div class="name">Data Subject Participation</div><div class="desc">You have the right to request access to, correction of, or deletion of your personal information held by us.</div></div>
+        </div>
+
+        <h2 id="s5">4. Personal Information We Collect</h2>
+
+        <h3>4.1 Information You Provide Directly</h3>
+        <table>
+            <thead><tr><th>Category</th><th>Specific fields</th><th>Why collected</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Identity</strong></td><td>Full name, 13-digit SA ID number, date of birth</td><td>FICA KYC, suitability assessment, fraud prevention</td></tr>
+                <tr><td><strong>Contact</strong></td><td>Email address, cell phone number, postal code</td><td>Service delivery, payment reminders, account notifications</td></tr>
+                <tr><td><strong>Financial</strong></td><td>Bank account details (encrypted), declared monthly income, existing obligations, debit order date preference</td><td>Affordability assessment, debit order collection</td></tr>
+                <tr><td><strong>Healthcare</strong></td><td>Medical bill amount, treatment type, healthcare provider, medical aid scheme and option</td><td>Application assessment, bill settlement, pricing</td></tr>
+                <tr><td><strong>Credentials</strong></td><td>Password (stored as a secure hash only, never in plain text)</td><td>Account authentication</td></tr>
+                <tr><td><strong>Consent records</strong></td><td>Terms acceptance flag, POPIA consent flag, consent timestamp, IP address at consent</td><td>Regulatory audit trail and evidence of lawful processing basis</td></tr>
+            </tbody>
+        </table>
+
+        <h3>4.2 Information Collected Automatically</h3>
+        <ul>
+            <li>IP address at registration, login, and each application submission (fraud prevention and security audit logging)</li>
+            <li>Browser user-agent string (device type detection)</li>
+            <li>Session token hashes (no raw tokens are stored)</li>
+            <li>Application completion timestamps (security and fraud signals)</li>
+        </ul>
+
+        <h3>4.3 Information from Third Parties</h3>
+        <ul>
+            <li><strong>Credit bureaus</strong> (registered South African bureaus): where relevant and with your consent, we may obtain information to assist with affordability assessment</li>
+            <li><strong>Medical aid administrators</strong>: claims history and benefit status, only where you have consented to disclosure by your scheme</li>
+        </ul>
+
+        <h2 id="s6">5. Special Personal Information</h2>
+        <p>Section 26 of POPIA prohibits the processing of <strong>"special personal information"</strong> except in limited circumstances. PaySick processes the following special categories:</p>
+        <ul>
+            <li><strong>Health information</strong> (s26(1)(c)): Treatment type and medical bill context. We process this on the basis of your <strong>explicit consent</strong> (s27(1)(a)) and because it is <strong>necessary for the establishment, exercise, or defence of a right or obligation in law</strong> (s27(1)(b)), specifically for the purpose of facilitating payment of a lawfully rendered medical service.</li>
+            <li><strong>Financial information:</strong> Processed on the basis of contractual necessity and your express consent.</li>
+        </ul>
+        <p>We apply heightened security controls to all special personal information, including field-level AES-256-GCM encryption and access restricted to authorised personnel on a need-to-know basis only.</p>
+
+        <h2 id="s7">6. Why We Process Your Information</h2>
+        <table>
+            <thead><tr><th>Purpose</th><th>Legal basis under POPIA s11</th></tr></thead>
+            <tbody>
+                <tr><td>Account registration and identity verification</td><td>Contractual necessity (s11(1)(b)); Legal obligation under FICA (s11(1)(c))</td></tr>
+                <tr><td>Suitability and affordability assessment</td><td>Contractual necessity (s11(1)(b)); Legal obligation where applicable (s11(1)(c)); Consent (s11(1)(a))</td></tr>
+                <tr><td>Processing and settling your healthcare payment application</td><td>Contractual necessity (s11(1)(b))</td></tr>
+                <tr><td>Collecting monthly instalments via debit order</td><td>Contractual necessity (s11(1)(b)); Your express debit order authorisation</td></tr>
+                <tr><td>Payment conduct reporting where required by law</td><td>Legal obligation (s11(1)(c)) where applicable</td></tr>
+                <tr><td>Fraud detection and prevention</td><td>Legitimate interest (s11(1)(f)); balancing test conducted; our interest does not override yours</td></tr>
+                <tr><td>Security event logging and audit trails</td><td>Legal obligation (POPIA s19, FICA); Legitimate interest (s11(1)(f))</td></tr>
+                <tr><td>Transactional communications (payment reminders, status updates)</td><td>Contractual necessity (s11(1)(b))</td></tr>
+                <tr><td>Direct marketing communications</td><td>Consent only (s11(1)(a)); opt out at any time (see Section 13)</td></tr>
+                <tr><td>Regulatory reporting to applicable authorities</td><td>Legal obligation (s11(1)(c))</td></tr>
+                <tr><td>Improving our service using anonymised, aggregated data</td><td>Legitimate interest (s11(1)(f)); data is fully anonymised before use and no individual can be re-identified</td></tr>
+            </tbody>
+        </table>
+
+        <h2 id="s8">7. Disclosure of Personal Information</h2>
+        <p>We do not sell, rent, or trade your personal information. We disclose it only as follows:</p>
+
+        <h3>7.1 Operators (POPIA s20-22)</h3>
+        <p>We engage the following <strong>operators</strong> under written data processing agreements imposing equivalent POPIA obligations:</p>
+        <ul>
+            <li><strong>Vercel Inc.</strong>: hosting and serverless compute (USA; see Section 9 on cross-border transfers)</li>
+            <li><strong>Neon Inc.</strong>: PostgreSQL database hosting (USA; see Section 9)</li>
+            <li><strong>SMS and email delivery providers</strong>: transactional notifications only</li>
+        </ul>
+
+        <h3>7.2 Third-Party Recipients</h3>
+        <ul>
+            <li><strong>Credit bureaus</strong> (registered South African bureaus): where applicable, for assessment purposes and payment conduct reporting</li>
+            <li><strong>Healthcare providers</strong>: only the minimum information necessary to confirm your treatment and effect settlement</li>
+            <li><strong>Debit order processing bureau</strong>: bank account details for DebiCheck collection, subject to equivalent security controls</li>
+            <li><strong>Financial Intelligence Centre (FIC)</strong>: suspicious transaction reports (FICA s29) and cash threshold reports (FICA s28A) where required</li>
+            <li><strong>Applicable regulators</strong>: information as required by law</li>
+            <li><strong>Law enforcement and courts</strong>: only when compelled by a valid court order, warrant, or statutory obligation</li>
+        </ul>
+        <p><strong>We will never disclose your personal information to any political party, political organisation, or for political profiling purposes.</strong></p>
+
+        <h2 id="s9">8. Cross-Border Transfers</h2>
+        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes.</p>
+        <p>These transfers are permissible because:</p>
+        <ul>
+            <li>Recipient entities are bound by data processing agreements imposing obligations <strong>substantially equivalent to POPIA's conditions</strong> (s72(1)(a)); and</li>
+            <li>The transfers are necessary for performance of the contract between you and PaySick (s72(1)(d))</li>
+        </ul>
+        <p>All data is encrypted in transit (TLS 1.2+) and at rest (AES-256). Banking details are additionally encrypted at the application layer before transmission. We never transfer personal information to a country solely to avoid South African law.</p>
+
+        <h2 id="s10">9. Retention Periods</h2>
+        <table>
+            <thead><tr><th>Data type</th><th>Retention period</th><th>Legal basis</th></tr></thead>
+            <tbody>
+                <tr><td>Payment arrangement records</td><td>5 years after account closure</td><td>Applicable statutory requirements</td></tr>
+                <tr><td>FICA KYC records</td><td>5 years after business relationship ends</td><td>FICA Section 23</td></tr>
+                <tr><td>Security audit logs</td><td>3 years</td><td>POPIA Section 19</td></tr>
+                <tr><td>POPIA consent records</td><td>Duration of processing plus 3 years</td><td>POPIA Section 11(1)(a): evidence of lawful basis</td></tr>
+                <tr><td>Payment transaction records</td><td>5 years</td><td>Applicable statutory requirements</td></tr>
+                <tr><td>Inactive accounts (no payment arrangement)</td><td>3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
+                <tr><td>Anonymised analytics</td><td>Indefinite (no personal data retained)</td><td>POPIA s1: anonymised data falls outside definition of personal information</td></tr>
+            </tbody>
+        </table>
+        <p>At the end of each retention period, personal information is <strong>securely deleted or de-identified</strong> per POPIA Section 14.</p>
+
+        <h2 id="s11">10. Security Safeguards</h2>
+        <p>In compliance with <strong>POPIA Section 19</strong>, we maintain the following technical and organisational measures:</p>
+
+        <h3>Technical controls</h3>
+        <ul>
+            <li><strong>AES-256-GCM encryption</strong> for all banking details at rest (field-level; encryption keys stored separately from data)</li>
+            <li><strong>Secure password hashing</strong> using a strong, slow hashing algorithm; passwords are never stored, logged, or recoverable in plain text</li>
+            <li><strong>Opaque session tokens</strong> stored only as cryptographic hashes; raw tokens are never persisted</li>
+            <li><strong>TLS 1.2+ in transit</strong> enforced via HSTS with a 1-year max-age</li>
+            <li><strong>Rate limiting</strong> on login and registration endpoints to prevent brute-force attacks</li>
+            <li><strong>Account lockout</strong> after repeated failed authentication attempts</li>
+            <li><strong>Immutable security audit log</strong> covering all authentication and data access events</li>
+        </ul>
+
+        <h3>Organisational controls</h3>
+        <ul>
+            <li>Principle of least privilege: employees access only data necessary for their role</li>
+            <li>Confidentiality obligations in all employment and contractor agreements</li>
+            <li>Annual security awareness training for all staff with access to personal information</li>
+            <li>Incident response plan maintained and tested annually</li>
+        </ul>
+
+        <h3>Security breach notification (POPIA s22)</h3>
+        <p>If we reasonably believe your personal information has been accessed by an unauthorised person, we will <strong>notify the Information Regulator and affected data subjects as soon as reasonably possible</strong>, including the nature of the breach, categories of information involved, and steps you can take to protect yourself.</p>
+
+        <h2 id="s12">11. Your Rights as a Data Subject</h2>
+        <div class="rights-grid">
+            <div class="right-card"><div class="right-name">Access (s23)</div><div class="right-desc">Request a copy of the personal information PaySick holds about you.</div></div>
+            <div class="right-card"><div class="right-name">Correction (s24)</div><div class="right-desc">Request correction, deletion, or destruction of inaccurate, irrelevant, or incomplete information.</div></div>
+            <div class="right-card"><div class="right-name">Objection (s11(3))</div><div class="right-desc">Object to processing based on legitimate interest at any time.</div></div>
+            <div class="right-card"><div class="right-name">Withdraw Consent (s11(2))</div><div class="right-desc">Withdraw consent at any time. Does not affect prior lawful processing.</div></div>
+            <div class="right-card"><div class="right-name">No Automated Decisions (s71)</div><div class="right-desc">Request human review of any automated decision that significantly affects you.</div></div>
+            <div class="right-card"><div class="right-name">Lodge Complaint (s56)</div><div class="right-desc">Complain to the Information Regulator if your rights have been infringed.</div></div>
+            <div class="right-card"><div class="right-name">Civil Remedies (s99)</div><div class="right-desc">Apply to a court for damages if we breach POPIA and you suffer loss as a result.</div></div>
+            <div class="right-card"><div class="right-name">PAIA Access (s50)</div><div class="right-desc">Request access to records under the Promotion of Access to Information Act 2 of 2000.</div></div>
+        </div>
+        <p>To exercise any right, email <a href="mailto:privacy@paysick.co.za">privacy@paysick.co.za</a> with the subject <strong>"POPIA Request: [Right]"</strong>. We will acknowledge within <strong>3 business days</strong> and respond within <strong>30 days</strong> as required by Section 23(3) of POPIA.</p>
+
+        <h2 id="s13">12. Direct Marketing</h2>
+        <p>We send promotional communications only to existing customers who have not opted out, per <strong>POPIA Section 69</strong> and <strong>CPA Section 11</strong>. You may opt out at any time by:</p>
+        <ul>
+            <li>Clicking the unsubscribe link in any marketing email</li>
+            <li>Replying "STOP" to any marketing SMS</li>
+            <li>Emailing <a href="mailto:privacy@paysick.co.za">privacy@paysick.co.za</a> with subject "Opt-Out"</li>
+        </ul>
+        <p>Opting out of marketing will not affect transactional communications necessary for the performance of your agreement.</p>
+
+        <h2 id="s14">13. Cookies</h2>
+        <p>PaySick does not use advertising cookies, cross-site tracking pixels, browser fingerprinting, or social media tracking. We use only <strong>strictly necessary session cookies</strong> that enable authentication and are deleted when you close your browser or after your 24-hour session expires. No consent banner is required for strictly necessary cookies under POPIA or ECTA.</p>
+
+        <h2 id="s15">14. Children</h2>
+        <p>Our platform is restricted to persons aged <strong>18 years and older</strong>. We do not knowingly collect personal information from minors. If we discover that a minor's information has been collected, we will immediately delete it and notify the Information Regulator if required.</p>
+
+        <h2 id="s16">15. FICA Compliance</h2>
+        <p>As an accountable institution under Schedule 1 of FICA, PaySick must:</p>
+        <ul>
+            <li><strong>Verify your identity</strong> using your SA ID number before providing services (FICA s21)</li>
+            <li>Maintain <strong>records of identity verification</strong> for a minimum of 5 years (FICA s23)</li>
+            <li>Report <strong>suspicious transactions</strong> to the Financial Intelligence Centre (FICA s29); we are not permitted to disclose if such a report has been made</li>
+            <li>Report <strong>cash transactions</strong> above the prescribed threshold (FICA s28)</li>
+        </ul>
+        <p>These obligations exist independently of your consent and cannot be waived. Compliance with FICA overrides conflicting data subject requests where the law requires retention.</p>
+
+        <h2 id="s17">16. Changes to This Policy</h2>
+        <p>We may update this policy to reflect changes in law, our services, or our processing activities. We will:</p>
+        <ul>
+            <li>Post the updated policy with a revised effective date</li>
+            <li>Notify registered users by email of material changes at least <strong>14 calendar days</strong> before they take effect</li>
+            <li>Obtain fresh consent where a change requires it</li>
+        </ul>
+
+        <div class="contact-box" id="s18">
+            <h3>17. Contact Our Information Officer</h3>
+            <p><strong>Email:</strong> <a href="mailto:privacy@paysick.co.za">privacy@paysick.co.za</a></p>
+            <p><strong>Subject line:</strong> "POPIA Request: [Access / Correction / Deletion / Objection / Complaint]"</p>
+            <p><strong>Postal:</strong> Information Officer, PaySick South Africa (Pty) Ltd, Cape Town, South Africa</p>
+            <p><strong>Response time:</strong> 3 business days acknowledgement; 30-day substantive response (POPIA s23(3))</p>
+            <div class="regulator">
+                <strong>Information Regulator of South Africa</strong> (if unsatisfied with our response):<br>
+                Email: <a href="mailto:inforeg@justice.gov.za">inforeg@justice.gov.za</a> | Website: <a href="https://www.justice.gov.za/inforeg/" target="_blank" rel="noopener">www.justice.gov.za/inforeg</a><br>
+                Address: JD House, 27 Stiemens Street, Braamfontein, Johannesburg 2001
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<footer class="site-footer">
+    <p>&copy; 2026 PaySick South Africa. All rights reserved. &nbsp;|&nbsp;
+        <a href="terms-of-service.html">Terms of Service</a> &nbsp;|&nbsp;
+        <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="licenses.html">Licenses</a> &nbsp;|&nbsp;
+        <a href="accessibility.html">Accessibility</a>
+    </p>
+</footer>
+
+</body>
+</html>
