@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.1] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed "Unable to connect to the server" failure on new account creation. Root cause: `pool.on('error')` called `process.exit(-1)` in a serverless context, killing the function process. A secondary frontend issue masked the real server error as a misleading network error.
+
+### Fixed
+- **Database**: `pool.on('error')` in `database.js` called `process.exit(-1)` — removed the exit call. In Vercel serverless this terminated the function handler, causing the next request to receive a non-JSON HTML error page and trigger the frontend's catch block.
+- **Registration UX**: `register.html` `response.json()` was in the same try/catch as `fetch()`. When the server returned a non-JSON body, a `SyntaxError` was caught and shown as "Unable to connect to the server." — wrapping `response.json()` in its own try/catch now surfaces the actual HTTP status code instead.
+
+---
+
 ## [v1.3.0] — 2026-03-12
 
 **Type**: MINOR — Generic provider statement, new public pages, production compliance fixes
