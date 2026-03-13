@@ -338,6 +338,23 @@
             display: block;
         }
 
+        .error-banner {
+            background: #FFF5F6;
+            border: 1px solid #FFCDD2;
+            border-left: 4px solid #FF4757;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #C0392B;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
         .success-message svg {
             width: 80px;
             height: 80px;
@@ -725,6 +742,8 @@
                     </div>
                 </div>
 
+                <div class="error-banner" id="errorBanner"></div>
+
                 <div class="btn-container">
                     <button type="submit" class="btn btn-primary" id="submitBtn">Submit Application</button>
                     <a href="providers.html" class="btn btn-secondary">Cancel</a>
@@ -747,12 +766,25 @@
     </div>
 
     <script>
+        function showFormError(message) {
+            const banner = document.getElementById('errorBanner');
+            banner.textContent = message;
+            banner.classList.add('show');
+            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideFormError() {
+            const banner = document.getElementById('errorBanner');
+            banner.classList.remove('show');
+        }
+
         async function submitApplication(event) {
             event.preventDefault();
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
+            hideFormError();
 
             try {
                 const formData = new FormData(event.target);
@@ -771,20 +803,32 @@
                     body: JSON.stringify(data)
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Application submission failed');
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    // Server returned a non-JSON body (e.g. an HTML error page from the
+                    // hosting layer when the API process failed to start).
+                    showFormError(`Server error (${response.status}). Please try again shortly.`);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    return;
                 }
 
-                const result = await response.json();
+                if (!response.ok) {
+                    showFormError(result.error || 'Application submission failed. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    return;
+                }
 
                 // Show success message
                 document.getElementById('applicationForm').style.display = 'none';
                 document.getElementById('successMessage').classList.add('show');
 
-            } catch (error) {
-                console.error('Application error:', error);
-                alert('Failed to submit application: ' + error.message + '\n\nPlease try again or contact support.');
+            } catch (err) {
+                console.error('Application error:', err);
+                showFormError('Unable to connect to the server. Please check your connection and try again.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Application';
             }

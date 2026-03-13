@@ -27,7 +27,14 @@ const PaySickAPI = {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        // Server returned a non-JSON body (e.g. HTML error page from hosting layer).
+        throw new Error(`Server error (${response.status}). Please try again shortly.`);
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Request failed');

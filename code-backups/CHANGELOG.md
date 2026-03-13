@@ -6,6 +6,47 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.3] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed demo site breaking after selecting a procedure type. Three bugs combined to make the marketplace funding flow unreachable or non-functional.
+
+### Fixed
+- **Navigation**: `dashboard.html` "Apply for Funding" nav link and "Apply now" inline link both pointed to `onboarding.html`. A user who had already completed onboarding was bounced straight back to the dashboard, with no path to `marketplace-apply.html` (the procedure-type selection). Both links now point to `marketplace-apply.html`.
+- **API client resilience**: `api-client.js` `response.json()` was inside the same `try/catch` as `fetch()`. Non-JSON responses (HTML error pages) produced a raw `SyntaxError` toast. `response.json()` is now wrapped in its own inner try/catch; non-JSON responses surface as `Server error (N)`.
+- **Demo login resilience**: `demo-login.html` had the same non-JSON pattern — if the API returned HTML, the catch message was a raw `SyntaxError`, and the auth token was never stored, making all subsequent API calls fail with 401. Same fix applied.
+
+---
+
+## [v1.3.2] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Applied the same server-resilience and error-display fixes from v1.3.1 to the provider registration flow (`provider-apply.html`).
+
+### Fixed
+- **Provider application**: `response.json()` now wrapped in its own try/catch — non-JSON server responses (e.g. HTML error page from hosting layer) surface as `Server error (N)` instead of a raw SyntaxError
+- **Provider application**: `alert()` replaced with `#errorBanner` inline element for all error paths
+- **Provider application**: Eliminated double `response.json()` call (was called once for error path and once for success path); now called once and result used for both
+
+---
+
+## [v1.3.1] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed "Unable to connect to the server" failure on new account creation. Root cause: `pool.on('error')` called `process.exit(-1)` in a serverless context, killing the function process. A secondary frontend issue masked the real server error as a misleading network error.
+
+### Fixed
+- **Database**: `pool.on('error')` in `database.js` called `process.exit(-1)` — removed the exit call. In Vercel serverless this terminated the function handler, causing the next request to receive a non-JSON HTML error page and trigger the frontend's catch block.
+- **Registration UX**: `register.html` `response.json()` was in the same try/catch as `fetch()`. When the server returned a non-JSON body, a `SyntaxError` was caught and shown as "Unable to connect to the server." — wrapping `response.json()` in its own try/catch now surfaces the actual HTTP status code instead.
+
+---
+
 ## [v1.3.0] — 2026-03-12
 
 **Type**: MINOR — Generic provider statement, new public pages, production compliance fixes

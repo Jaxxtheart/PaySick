@@ -741,7 +741,15 @@
                     })
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    // Server returned a non-JSON body (e.g. an HTML error page from the
+                    // hosting layer when the API process failed to start).
+                    showAlert('error', `Server error (${response.status}). Please try again shortly.`);
+                    return;
+                }
 
                 if (response.ok && data.requiresEmailVerification) {
                     // Save registration data so onboarding can pre-populate fields

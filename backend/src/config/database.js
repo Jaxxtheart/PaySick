@@ -33,7 +33,8 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('❌ Unexpected error on idle client', err);
-  process.exit(-1);
+  // Do not call process.exit() — in a serverless environment this would kill
+  // the function handler and leave subsequent requests with no JSON response.
 });
 
 // Query helper function

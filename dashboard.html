@@ -680,7 +680,7 @@
                 <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M4 20h16"/><rect class="icon-stroke" x="6" y="10" width="3" height="10"/><rect class="icon-stroke" x="11" y="6" width="3" height="14"/><rect class="icon-stroke" x="16" y="12" width="3" height="8"/></svg></span>
                 <span class="menu-item-text">Payment History</span>
             </a>
-            <a href="onboarding.html" class="menu-item">
+            <a href="marketplace-apply.html" class="menu-item">
                 <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path class="icon-stroke" d="M14 2v6h6"/><path class="icon-stroke" d="M8 13h8M8 17h6"/></svg></span>
                 <span class="menu-item-text">Apply for Funding</span>
             </a>
@@ -1014,7 +1014,7 @@
                 const list = document.getElementById('activePlansList');
 
                 if (!plans || plans.length === 0) {
-                    list.innerHTML = '<p style="color:#888;padding:8px 0">No active payment plans yet. <a href="onboarding.html">Apply now</a>.</p>';
+                    list.innerHTML = '<p style="color:#888;padding:8px 0">No active payment plans yet. <a href="marketplace-apply.html">Apply now</a>.</p>';
                 } else {
                     list.innerHTML = plans.slice(0, 3).map(function(plan) {
                         const progress = plan.number_of_payments > 0
