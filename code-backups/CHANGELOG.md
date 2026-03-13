@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.2] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Applied the same server-resilience and error-display fixes from v1.3.1 to the provider registration flow (`provider-apply.html`).
+
+### Fixed
+- **Provider application**: `response.json()` now wrapped in its own try/catch — non-JSON server responses (e.g. HTML error page from hosting layer) surface as `Server error (N)` instead of a raw SyntaxError
+- **Provider application**: `alert()` replaced with `#errorBanner` inline element for all error paths
+- **Provider application**: Eliminated double `response.json()` call (was called once for error path and once for success path); now called once and result used for both
+
+---
+
 ## [v1.3.1] — 2026-03-13
 
 **Type**: PATCH — Bug fix
