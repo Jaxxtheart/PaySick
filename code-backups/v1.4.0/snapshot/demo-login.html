@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Access - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #2C3E50 0%, #1A1A2E 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .demo-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 480px;
+            padding: 48px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .logo-badge {
+            display: inline-block;
+            background: #2C3E50;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+
+        /* Password Gate */
+        #passwordGate {
+            text-align: center;
+        }
+
+        #passwordGate p {
+            color: #8A8A8A;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #FF4757;
+            box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1);
+        }
+
+        .password-input.error {
+            border-color: #E01E37;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .unlock-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2C3E50 0%, #1A1A2E 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .unlock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(44, 62, 80, 0.4);
+        }
+
+        /* Role Buttons (hidden until unlocked) */
+        #rolePanel {
+            display: none;
+        }
+
+        #rolePanel.visible {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #rolePanel p {
+            color: #8A8A8A;
+            font-size: 14px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .role-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 24px 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-btn:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.03);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .role-btn:active {
+            transform: translateY(0);
+        }
+
+        .role-btn .role-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .role-btn .role-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .role-btn .role-icon svg .icon-stroke {
+            stroke: #8A8A8A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .role-btn:hover .role-icon svg .icon-stroke {
+            stroke: #FF4757;
+        }
+
+        .role-btn .role-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .role-btn .role-email {
+            font-size: 12px;
+            color: #8A8A8A;
+            font-family: 'Courier New', monospace;
+        }
+
+        .role-btn.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .status-msg {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #2ED573;
+            min-height: 20px;
+        }
+
+        .status-msg.error {
+            color: #E01E37;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .back-link a {
+            color: #8A8A8A;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #FF4757;
+        }
+
+        @media (max-width: 480px) {
+            .demo-container {
+                padding: 32px 24px;
+            }
+
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="logo">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="demoCrossGradient" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="demoBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#demoBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#demoCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#demoCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+            <div class="logo-badge">Demo Access</div>
+        </div>
+
+        <!-- Password Gate -->
+        <div id="passwordGate">
+            <p>Enter the demo access code to continue</p>
+            <input type="password" class="password-input" id="demoPassword" placeholder="Access code" autocomplete="off">
+            <button class="unlock-btn" id="unlockBtn" onclick="unlockDemo()">Unlock</button>
+        </div>
+
+        <!-- Role Selection (hidden until unlocked) -->
+        <div id="rolePanel">
+            <p>Select a role to log in instantly</p>
+
+            <div class="role-grid">
+                <button class="role-btn" onclick="demoLogin('user@paysick.com', 'user')">
+                    <div class="role-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="icon-stroke" cx="20" cy="14" r="8"/>
+                            <path class="icon-stroke" d="M6 36c0-8 6-14 14-14s14 6 14 14"/>
+                        </svg>
+                    </div>
+                    <div class="role-name">Patient</div>
+                    <div class="role-email">user@paysick.com</div>
+                </button>
+
+                <button class="role-btn" onclick="demoLogin('provider@paysick.com', 'provider')">
+                    <div class="role-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect class="icon-stroke" x="8" y="6" width="24" height="28" rx="3"/>
+                            <path class="icon-stroke" d="M20 14v8M16 18h8"/>
+                            <path class="icon-stroke" d="M14 28h12"/>
+                        </svg>
+                    </div>
+                    <div class="role-name">Provider</div>
+                    <div class="role-email">provider@paysick.com</div>
+                </button>
+
+                <button class="role-btn" onclick="demoLogin('lender@paysick.com', 'lender')">
+                    <div class="role-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <path class="icon-stroke" d="M4 34h32"/>
+                            <path class="icon-stroke" d="M6 14l14-8 14 8"/>
+                            <path class="icon-stroke" d="M8 14v16M16 14v16M24 14v16M32 14v16"/>
+                            <rect class="icon-stroke" x="4" y="30" width="32" height="4"/>
+                        </svg>
+                    </div>
+                    <div class="role-name">Lender</div>
+                    <div class="role-email">lender@paysick.com</div>
+                </button>
+
+                <button class="role-btn" onclick="demoLogin('admin@paysick.com', 'admin')">
+                    <div class="role-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="icon-stroke" cx="20" cy="20" r="14"/>
+                            <path class="icon-stroke" d="M20 12v8l6 3"/>
+                            <path class="icon-stroke" d="M28 8l2-2M12 8l-2-2"/>
+                        </svg>
+                    </div>
+                    <div class="role-name">Admin</div>
+                    <div class="role-email">admin@paysick.com</div>
+                </button>
+            </div>
+
+            <div class="status-msg" id="statusMsg"></div>
+        </div>
+
+        <div class="back-link">
+            <a href="login.html">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        const DEMO_PASSWORD = 'PaySick-demo-2026';
+
+        // Allow Enter key to unlock
+        document.getElementById('demoPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') unlockDemo();
+        });
+
+        function unlockDemo() {
+            const input = document.getElementById('demoPassword');
+            const value = input.value.trim();
+
+            if (value === DEMO_PASSWORD) {
+                document.getElementById('passwordGate').style.display = 'none';
+                document.getElementById('rolePanel').classList.add('visible');
+            } else {
+                input.classList.add('error');
+                input.value = '';
+                input.placeholder = 'Incorrect code';
+                setTimeout(() => {
+                    input.classList.remove('error');
+                    input.placeholder = 'Access code';
+                }, 1500);
+            }
+        }
+
+        // Hardcoded demo profiles — no API required
+        const DEMO_USERS = {
+            'user@paysick.com':     { user_id: 'demo-1', full_name: 'John Doe',       name: 'John Doe',       email: 'user@paysick.com',     role: 'user',     cell_number: '0821234567', status: 'active' },
+            'provider@paysick.com': { user_id: 'demo-2', full_name: 'Dr. Sarah Smith', name: 'Dr. Sarah Smith', email: 'provider@paysick.com', role: 'provider', cell_number: '0823456789', status: 'active' },
+            'lender@paysick.com':   { user_id: 'demo-3', full_name: 'Capital Finance', name: 'Capital Finance', email: 'lender@paysick.com',   role: 'lender',   cell_number: '0824567890', status: 'active' },
+            'admin@paysick.com':    { user_id: 'demo-4', full_name: 'Admin User',      name: 'Admin User',      email: 'admin@paysick.com',    role: 'admin',    cell_number: '0829876543', status: 'active' }
+        };
+
+        function redirectByRole(role) {
+            switch (role) {
+                case 'admin':    window.location.href = 'admin-dashboard.html'; break;
+                case 'lender':   window.location.href = 'lender-dashboard.html'; break;
+                default:         window.location.href = 'dashboard.html';
+            }
+        }
+
+        function demoLogin(email, role) {
+            const profile = DEMO_USERS[email];
+            if (!profile) return;
+
+            const user = Object.assign({}, profile, { role: role || profile.role });
+
+            localStorage.setItem('paysick_auth_token', 'demo-' + user.role);
+            localStorage.setItem('paysick_user', JSON.stringify(user));
+            localStorage.setItem('paysick_onboarding_complete', 'true');
+
+            const statusMsg = document.getElementById('statusMsg');
+            statusMsg.textContent = 'Signing in...';
+            setTimeout(() => redirectByRole(user.role), 250);
+        }
+    </script>
+</body>
+</html>
