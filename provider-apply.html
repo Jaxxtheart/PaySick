@@ -338,6 +338,23 @@
             display: block;
         }
 
+        .error-banner {
+            background: #FFF5F6;
+            border: 1px solid #FFCDD2;
+            border-left: 4px solid #FF4757;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #C0392B;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
         .success-message svg {
             width: 80px;
             height: 80px;
@@ -372,6 +389,108 @@
 
             .benefits-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            footer .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
             }
         }
     </style>
@@ -623,6 +742,8 @@
                     </div>
                 </div>
 
+                <div class="error-banner" id="errorBanner"></div>
+
                 <div class="btn-container">
                     <button type="submit" class="btn btn-primary" id="submitBtn">Submit Application</button>
                     <a href="providers.html" class="btn btn-secondary">Cancel</a>
@@ -645,12 +766,25 @@
     </div>
 
     <script>
+        function showFormError(message) {
+            const banner = document.getElementById('errorBanner');
+            banner.textContent = message;
+            banner.classList.add('show');
+            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideFormError() {
+            const banner = document.getElementById('errorBanner');
+            banner.classList.remove('show');
+        }
+
         async function submitApplication(event) {
             event.preventDefault();
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
+            hideFormError();
 
             try {
                 const formData = new FormData(event.target);
@@ -669,24 +803,95 @@
                     body: JSON.stringify(data)
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Application submission failed');
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    // Server returned a non-JSON body (e.g. an HTML error page from the
+                    // hosting layer when the API process failed to start).
+                    showFormError(`Server error (${response.status}). Please try again shortly.`);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    return;
                 }
 
-                const result = await response.json();
+                if (!response.ok) {
+                    showFormError(result.error || 'Application submission failed. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    return;
+                }
 
                 // Show success message
                 document.getElementById('applicationForm').style.display = 'none';
                 document.getElementById('successMessage').classList.add('show');
 
-            } catch (error) {
-                console.error('Application error:', error);
-                alert('Failed to submit application: ' + error.message + '\n\nPlease try again or contact support.');
+            } catch (err) {
+                console.error('Application error:', err);
+                showFormError('Unable to connect to the server. Please check your connection and try again.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Application';
             }
         }
     </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li><a href="index.html#about">Careers</a></li>
+                    <li><a href="index.html#about">Press</a></li>
+                    <li><a href="index.html#about">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
 </body>
 </html>

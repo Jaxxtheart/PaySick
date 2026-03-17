@@ -6,6 +6,170 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.3.6] — 2026-03-13
+
+**Type**: MINOR — Shield underwriting activation
+
+### Summary
+Activated the PaySick Shield underwriting framework on the live patient application flow. Three missing form fields were added to the marketplace application (procedure urgency, existing monthly obligations, medical aid cover). The backend marketplace route now calls Shield Gate 2 (patient affordability assessment) before any lender matching occurs. Declined applications surface a detailed decline card with rationale and an alternative loan suggestion.
+
+### Added
+- **Application form**: New required fields on Step 3 — procedure urgency (elective/planned/semi_urgent/urgent), existing monthly debt repayments, and medical aid cover amount. All three feed directly into the Shield affordability engine.
+- **Shield Gate 2 integration**: `POST /api/marketplace/applications` now calls `patientGateService.assessApplication()` for every application that includes income data. DECLINE outcomes return `{ shield_declined: true, shield }` and stop processing. Amber and green outcomes proceed to marketplace.
+- **Decline UX**: `showShieldDecline()` in marketplace-apply.html renders a decline card with the Shield engine's rationale bullets and, when available, an alternative loan amount that fits within the 18% RTI comfort ceiling.
+- **Demo Shield simulation**: `buildDemoResponse()` now computes and returns a simulated Shield assessment (RTI, DTI, borrower profile, risk tier) from the user's demo inputs.
+
+---
+
+## [v1.3.5] — 2026-03-13
+
+**Type**: PATCH — Bug fix / Demo hardening
+
+### Summary
+Made the demo site fully self-contained and independent of the backend API. Demo login, dashboard data, and marketplace application submission all now resolve locally from hardcoded data — no network requests are made in demo mode.
+
+### Fixed
+- **Demo login**: Replaced `fetch('/api/users/demo-login', ...)` with a synchronous hardcoded `DEMO_USERS` lookup in `demo-login.html`. Token, user profile, and onboarding flag written directly to `localStorage`.
+- **Demo dashboard**: `dashboard.html` now detects demo mode via `isDemoMode()` (checks `paysick_auth_token` prefix). When true, `loadDemoData()` populates all stat cards and renders a hardcoded active plan (Netcare Dental Centre, R18,500, 3 months) and upcoming payment (R6,167, 15 April 2026) without any API call.
+- **Demo marketplace**: `marketplace-apply.html` now detects demo mode and calls `buildDemoResponse()` instead of the API. Returns computed preview offers for 3 lenders (MediFinance SA 16.5%, HealthCredit Plus 18.5%, CareCapital 19.5%) using standard amortisation on the user-selected loan amount and term.
+
+---
+
+## [v1.3.4] — 2026-03-13
+
+**Type**: PATCH — UI fix
+
+### Summary
+Cleaned up the demo access entry point on the login page. Removed the duplicate "Demo" link; the single remaining "Demo access" link is now positioned below the fold.
+
+### Fixed
+- **Login page**: Removed duplicate "Demo" link from `.back-home` row. Single "Demo access" link repositioned with 80px top margin so it is below the fold and does not compete with the primary login CTA.
+
+---
+
+## [v1.3.3] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed demo site breaking after selecting a procedure type. Three bugs combined to make the marketplace funding flow unreachable or non-functional.
+
+### Fixed
+- **Navigation**: `dashboard.html` "Apply for Funding" nav link and "Apply now" inline link both pointed to `onboarding.html`. A user who had already completed onboarding was bounced straight back to the dashboard, with no path to `marketplace-apply.html` (the procedure-type selection). Both links now point to `marketplace-apply.html`.
+- **API client resilience**: `api-client.js` `response.json()` was inside the same `try/catch` as `fetch()`. Non-JSON responses (HTML error pages) produced a raw `SyntaxError` toast. `response.json()` is now wrapped in its own inner try/catch; non-JSON responses surface as `Server error (N)`.
+- **Demo login resilience**: `demo-login.html` had the same non-JSON pattern — if the API returned HTML, the catch message was a raw `SyntaxError`, and the auth token was never stored, making all subsequent API calls fail with 401. Same fix applied.
+
+---
+
+## [v1.3.2] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Applied the same server-resilience and error-display fixes from v1.3.1 to the provider registration flow (`provider-apply.html`).
+
+### Fixed
+- **Provider application**: `response.json()` now wrapped in its own try/catch — non-JSON server responses (e.g. HTML error page from hosting layer) surface as `Server error (N)` instead of a raw SyntaxError
+- **Provider application**: `alert()` replaced with `#errorBanner` inline element for all error paths
+- **Provider application**: Eliminated double `response.json()` call (was called once for error path and once for success path); now called once and result used for both
+
+---
+
+## [v1.3.1] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed "Unable to connect to the server" failure on new account creation. Root cause: `pool.on('error')` called `process.exit(-1)` in a serverless context, killing the function process. A secondary frontend issue masked the real server error as a misleading network error.
+
+### Fixed
+- **Database**: `pool.on('error')` in `database.js` called `process.exit(-1)` — removed the exit call. In Vercel serverless this terminated the function handler, causing the next request to receive a non-JSON HTML error page and trigger the frontend's catch block.
+- **Registration UX**: `register.html` `response.json()` was in the same try/catch as `fetch()`. When the server returned a non-JSON body, a `SyntaxError` was caught and shown as "Unable to connect to the server." — wrapping `response.json()` in its own try/catch now surfaces the actual HTTP status code instead.
+
+---
+
+## [v1.3.0] — 2026-03-12
+
+**Type**: MINOR — Generic provider statement, new public pages, production compliance fixes
+
+### Summary
+Removed third-party healthcare brand names from the landing page (generic compliant language). Added About and Contact pages. Fixed Vercel guard pattern, root package.json bloat, and legacy page link references.
+
+### Added
+- `about.html` — About Us page with company mission, stats, team section
+- `contact.html` — Contact page with async form submission (fetch POST)
+
+### Fixed
+- **Compliance**: `index.html` provider network statement no longer names specific SA healthcare brands
+- **Serverless**: `server.js` VERCEL guard fixed from `NODE_ENV !== 'production' || !process.env.VERCEL` to correct `VERCEL !== '1'`
+- **Deployment**: `vercel.json` serverless destination fixed to `/api/index.js`
+- **package.json**: Removed duplicate Express dependencies from root; restored `node >= 18.0.0`
+- **Legacy pages**: `privacy.html` / `terms.html` footer links corrected to `privacy-policy.html` / `terms-of-service.html`
+- **UX**: `contact.html` form submit replaced `alert()` with inline success/error divs + `fetch()` POST
+
+---
+
+## [v1.2.0] — 2026-03-12
+
+**Type**: MINOR — new pages, extended provider API, serverless deployment fix
+
+### Summary
+Added complete payments UI (payments.html, make-payment.html, payment-success.html), extended the provider API with self-service application and full admin CRUD, added Vercel serverless entry point (api/index.js), fixed critical security bug (base64 → AES-256-GCM for provider banking data), and added auth protection to all admin routes.
+
+### Added
+- `payments.html` — My Payments page (active plans, upcoming, history tabs)
+- `make-payment.html` — Payment execution flow
+- `payment-success.html` — Post-payment confirmation
+- `api/index.js` — Vercel serverless function entry point
+- `POST /api/providers/apply` — self-service provider application
+- `POST /api/providers/track-cta` — CTA analytics (never fails caller)
+- `GET /api/providers/admin/all` — admin: all providers
+- `GET /api/providers/admin/stats` — admin: aggregate statistics
+- `PUT /api/providers/admin/:id/approve` — admin: approve with tier
+- `PUT /api/providers/admin/:id/status` — admin: activate/suspend
+- `PUT /api/providers/admin/:id` — admin: update details
+- `DELETE /api/providers/admin/:id` — admin: delete
+- `backend/database/seed-providers.sql` — fictional SA provider seed data
+- Provider network section on `index.html` homepage
+- 24 new integration tests for providers routes (now 27 total)
+
+### Fixed
+- **Security**: `/api/providers/apply` used `Buffer.from(...).toString('base64')` as "encryption" — replaced with `encryptBankingData()` (AES-256-GCM)
+- **Auth**: All 6 admin provider routes were unauthenticated — added `authenticateToken + requireRole('admin')`
+- **Serverless**: `server.js` now guards `app.listen()` with `VERCEL !== '1'`
+- **vercel.json**: Updated to `rewrites` syntax (deprecated `routes`/`builds` removed); restored CORS_ORIGIN + ALLOW_DEMO_LOGIN env vars
+- **Navigation**: `index.html` nav "For Providers" linked to `provider-apply.html` → corrected to `providers.html`
+- **Footer links**: `providers.html` footer used `privacy.html`/`terms.html` → fixed to `privacy-policy.html`/`terms-of-service.html`; removed dead Careers/Press links
+- **Dashboard icons**: Replaced emoji icons (💳 📅 📊 🏠) with SVG design-system icons
+
+---
+
+## [v1.1.0] — 2026-03-12
+
+**Type**: MINOR — Bug fixes + test suite
+
+### Summary
+Production cleanup for the live `paysick.co.za` domain launch. Fixed critical login token storage bug, added CORS for the production domain, and introduced a comprehensive test suite (59 unit tests, integration test stubs for all 6 route modules).
+
+### Fixed
+- `api-client.js`: login response used `response.token` but backend returns `response.accessToken` — tokens were never stored
+- `api-client.js`: logout now clears `paysick_refresh_token` from localStorage
+- CORS: added `https://paysick.co.za` and `https://www.paysick.co.za` to allow-list in `server.js`
+- `vercel.json`: added `CORS_ORIGIN` env variable pointing to production domain
+
+### Added
+- `tests/unit/security.service.test.js` — 19 tests for crypto functions
+- `tests/unit/security-utils.test.js` — 40 tests for frontend security utilities
+- `tests/integration/health.test.js` — health endpoint and 404 handler
+- `tests/integration/users.test.js` — user auth flows
+- `tests/integration/applications.test.js` — application CRUD + validation
+- `tests/integration/payments.test.js` — payment plan flows
+- `tests/integration/providers.test.js` — provider directory (public)
+- `tests/integration/risk.test.js` — risk analytics (admin-only)
+- `tests/setup.js`, `tests/__mocks__/database.js`, `tests/__mocks__/email.service.js`
+
+---
+
 ## [v1.0.0] — 2026-03-09
 
 **Type**: Initial Official Release
