@@ -6,6 +6,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.4.0] — 2026-03-16
+
+**Type**: MINOR — Provider charge and patient late-payment fee
+
+### Summary
+Introduced the platform's fee model. A central `fee.service.js` module defines all fee rates. Providers are charged a flat 5% service fee on every settlement payout. Patients pay zero interest on regular instalments; if a payment is missed, a 5% late fee is charged per full calendar month overdue (compounding). Frontend pages updated with full fee disclosure.
+
+### Added
+- `backend/src/services/fee.service.js` — `PROVIDER_SERVICE_FEE_PCT` (5%), `PATIENT_LATE_FEE_PCT_PER_MONTH` (5%), `PATIENT_BASE_INTEREST_RATE` (0%), `calculateLateFee()`, `calculateProviderSettlement()`
+- `POST /api/payments/:id/pay` — calculates and applies late fee if payment is overdue; logs fee as separate transaction
+- `GET /api/payments/:id/fee-preview` — returns late fee preview for any payment
+- `POST /api/payments/admin/process-overdue` — bulk overdue marking and late fee update (admin/cron)
+- `GET /api/providers/admin/:id/settlements` — list settlements with service fee pct
+- `POST /api/providers/admin/:id/settle` — create settlement with 5% deduction per line item
+- `provider-apply.html` — "How You Get Paid" section: provider tier table, 5% fee disclosure, updated consent checkbox
+- `payments.html` — fee policy banner (0% interest, 5% late fee), overdue card late fee display, history late fee line
+
+---
+
 ## [v1.3.6] — 2026-03-13
 
 **Type**: MINOR — Shield underwriting activation
