@@ -46,3 +46,33 @@ When a feature is removed from the live platform:
 - Never edit a snapshot folder after it has been committed — snapshots are read-only archives
 - Every version folder must contain all four files: `RELEASE_NOTES.md`, `REQUIREMENTS.md`, `ARCHITECTURE.md`, and a `snapshot/` directory
 - Always update `CHANGELOG.md` and `code-backups/README.md` as part of the same commit
+
+---
+
+## Bot Crawling Prevention
+
+All pages and API routes must be protected against automated crawling and content scraping — regardless of whether the bot identifies itself as legitimate.
+
+### Required protections
+
+- **`robots.txt`** — maintain a `public/robots.txt` that disallows all crawlers from all paths:
+  ```
+  User-agent: *
+  Disallow: /
+  ```
+- **`X-Robots-Tag` HTTP header** — every response must include:
+  ```
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  ```
+- **Rate limiting** — all routes must enforce per-IP rate limiting. Requests exceeding the threshold must receive `429 Too Many Requests` and be temporarily blocked.
+- **Bot fingerprinting** — detect and block known bot signatures via `User-Agent` analysis. Maintain a blocklist of known scraper and crawler user-agent strings.
+- **JavaScript rendering requirement** — pages must require client-side JS execution to render meaningful content, so that headless HTTP scrapers receive no usable payload.
+- **Honeypot traps** — include hidden links or fields invisible to real users. Any client that follows a honeypot link must be permanently blocked for that session.
+- **No public source maps** — never serve `.map` files in production. Set `productionBrowserSourceMaps: false` (or equivalent) in the build config.
+- **API authentication** — every API endpoint must require authentication. No endpoint may return business logic, source structure, or sensitive data to an unauthenticated caller.
+
+### Rules
+
+- Every new page or API route added must be reviewed to confirm all protections above apply before merging.
+- Rate limit thresholds and the bot `User-Agent` blocklist must be reviewed and updated with each MINOR or MAJOR version bump.
+- Violations of any protection above must be treated as a bug and assigned a PATCH version fix.
