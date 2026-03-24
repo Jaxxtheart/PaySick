@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.4.2](./v1.4.2/) | 2026-03-24 | Critical fix: removed process.exit(1) from server.js startup validation — was crashing Vercel serverless function and causing HTML 404 on all registration attempts |
 | [v1.4.1](./v1.4.1/) | 2026-03-24 | Footer Company section removed site-wide (pending content); login page mobile layout improved with 768px/480px breakpoints and iOS zoom fix |
 | [v1.4.0](./v1.4.0/) | 2026-03-16 | Fee model: 5% provider service fee on settlements; 0% patient interest; 5% late fee per overdue month; fee.service.js; fee disclosure in provider-apply.html and payments.html |
 | [v1.3.6](./v1.3.6/) | 2026-03-13 | Shield activation: Gate 2 wired into marketplace applications; urgency, monthly obligations, and medical aid fields added to form; decline UX with rationale and alternative offer |

@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.4.2] — 2026-03-24
+
+**Type**: PATCH — Critical bug fix: registration returning "Server error (404)"
+
+### Summary
+Removed `process.exit(1)` from the startup `validateEnvironment()` error handler in `server.js`. In Vercel serverless, calling `process.exit()` during module initialization kills the function before it can send any response — Vercel then returns an HTML error page. The frontend's `response.json()` call throws on the HTML body, triggering the misleading "Server error (404)" message. Same class of bug as the `process.exit(-1)` fixed in v1.3.1 (database pool), but in the startup validation path.
+
+### Fixed
+- `backend/src/server.js` — removed `process.exit(1)` from `validateEnvironment()` catch block; startup errors are now logged only; routes that require `TOKEN_SECRET` / `ENCRYPTION_KEY` return JSON 500 from their own error handlers
+
+---
+
 ## [v1.4.1] — 2026-03-24
 
 **Type**: PATCH — Footer Company section removed; login page mobile layout improved
