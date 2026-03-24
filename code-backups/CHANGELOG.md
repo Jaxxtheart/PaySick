@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.4.3] — 2026-03-24
+
+**Type**: PATCH — Bug fix: lender webhook HMAC used ciphertext instead of plaintext key
+
+### Summary
+Fixed marketplace.js webhook signature middleware. The AES-encrypted API key ciphertext was being passed directly to `crypto.createHmac()` as the signing secret. Lenders sign requests with the plaintext key; the server was verifying with the ciphertext — so all webhook signatures for external lenders would fail with 401. Fixed by decrypting before HMAC. Also imported `decryptBankingData` which was missing from the import.
+
+### Fixed
+- `backend/src/routes/marketplace.js` — decrypt `api_key_encrypted` before using as HMAC key in webhook validation middleware
+
+---
+
 ## [v1.4.2] — 2026-03-24
 
 **Type**: PATCH — Critical bug fix: registration returning "Server error (404)"

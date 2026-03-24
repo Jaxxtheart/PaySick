@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join PaySick Network - Provider Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-svg {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #1A1A1A;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #FF4757;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 80px auto 0;
+            padding-top: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .benefits-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .benefits-section h2 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .benefit-card {
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            border-color: #FF4757;
+            transform: translateY(-3px);
+        }
+
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .benefit-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .benefit-icon.red { background: rgba(255, 71, 87, 0.1); color: #FF4757; }
+        .benefit-icon.green { background: rgba(46, 213, 115, 0.1); color: #2ED573; }
+        .benefit-icon.blue { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+
+        .benefit-card h3 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .benefit-card p {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ── How You Get Paid section ── */
+        .payout-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .payout-section h2 {
+            color: #FF4757;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .payout-section > p {
+            color: #4a5568;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+
+        .payout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 22px;
+            font-size: 15px;
+        }
+
+        .payout-table th {
+            background: #1a2340;
+            color: white;
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+        }
+
+        .payout-table th:first-child { border-radius: 8px 0 0 0; }
+        .payout-table th:last-child  { border-radius: 0 8px 0 0; }
+
+        .payout-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        .payout-table tr:nth-child(even) td {
+            background: #f8f9fc;
+        }
+
+        .payout-table td:first-child {
+            font-weight: 700;
+        }
+
+        .payout-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .payout-table tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        .payout-table tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+
+        .fee-notice {
+            background: #fff8e6;
+            border: 1px solid #f6c040;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 14px;
+            color: #7a5100;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .fee-notice strong {
+            color: #5a3b00;
+        }
+
+        .payout-footnote {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ── Application form ── */
+        .application-form {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            margin-bottom: 30px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .form-section h3 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #FF4757;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FF4757;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .success-message {
+            background: white;
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .error-banner {
+            background: #FFF5F6;
+            border: 1px solid #FFCDD2;
+            border-left: 4px solid #FF4757;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #C0392B;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
+        .success-message svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            color: #2ED573;
+        }
+
+        .success-message h2 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .success-message p {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+            color: white;
+            padding: 60px 60px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo-svg {
+            width: 45px;
+            height: 45px;
+        }
+
+        .footer-logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .footer-logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .footer-tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FF4757;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            footer .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 40px 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="navCrossGradient" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="navBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#navBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#navCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#navCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="providers.html">Browse Providers</a>
+            <a href="dashboard.html">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Join the PaySick Network</h1>
+            <p>Partner with South Africa's leading healthcare payment platform</p>
+        </div>
+
+        <div class="benefits-section">
+            <h2>Why Partner with PaySick?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Faster Payments</h3>
+                    <p>Receive payments within 24 hours of treatment with our streamlined settlement process.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>More Patients</h3>
+                    <p>Access our growing network of patients who can now afford quality healthcare.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Reduced Risk</h3>
+                    <p>PaySick assumes the credit risk - you get paid upfront, we collect from patients.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How You Get Paid -->
+        <div class="payout-section">
+            <h2>How You Get Paid</h2>
+            <p>
+                Once the procedure is completed and confirmed, PaySick pays your practice directly into your
+                nominated bank account. Payment timelines depend on your provider tier:
+            </p>
+
+            <table class="payout-table">
+                <thead>
+                    <tr>
+                        <th>Provider Tier</th>
+                        <th>Payout Timeline</th>
+                        <th>How to Reach This Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>New Provider</td>
+                        <td>Within 5 business days</td>
+                        <td>All new partners start here</td>
+                    </tr>
+                    <tr>
+                        <td>Standard</td>
+                        <td>Within 3 business days</td>
+                        <td>After 6 months of strong performance</td>
+                    </tr>
+                    <tr>
+                        <td>Trusted</td>
+                        <td>Within 24 hours</td>
+                        <td>After 12 months of excellent performance</td>
+                    </tr>
+                    <tr>
+                        <td>Premium</td>
+                        <td>Same-day payment</td>
+                        <td>By invitation, 18+ months</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="fee-notice">
+                <strong>Service fee:</strong> A flat <strong>5% service fee</strong> is deducted from each
+                settlement payout. This covers PaySick's payment processing, credit risk absorption, and
+                administration costs. There are no hidden charges — the 5% is the only fee your practice pays.
+            </div>
+
+            <p class="payout-footnote">
+                Payout speed is earned through a track record of successful outcomes. As your patients
+                consistently repay on time, your practice earns faster payouts and higher per-patient financing
+                limits. This system rewards the practices that deliver excellent care and attract financially
+                responsible patients.
+            </p>
+        </div>
+
+        <div class="application-form" id="applicationForm">
+            <div class="form-header">
+                <h2>Provider Application</h2>
+                <p>Complete the form below to join our network</p>
+            </div>
+
+            <form id="providerForm" onsubmit="submitApplication(event)">
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+
+                    <div class="form-group">
+                        <label>Provider/Practice Name <span class="required">*</span></label>
+                        <input type="text" name="provider_name" required placeholder="e.g., Cape Town Medical Centre">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Provider Type <span class="required">*</span></label>
+                            <select name="provider_type" required>
+                                <option value="">Select type</option>
+                                <option value="hospital">Hospital</option>
+                                <option value="clinic">Clinic</option>
+                                <option value="gp_practice">GP Practice</option>
+                                <option value="specialist">Specialist</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Provider Group (if applicable)</label>
+                            <input type="text" name="provider_group" placeholder="e.g., Netcare, Mediclinic, Life Healthcare">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h3>Contact Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Email <span class="required">*</span></label>
+                            <input type="email" name="contact_email" required placeholder="contact@provider.co.za">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contact Phone <span class="required">*</span></label>
+                            <input type="tel" name="contact_phone" required placeholder="021 123 4567">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Physical Address <span class="required">*</span></label>
+                        <input type="text" name="address" required placeholder="Street address">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City <span class="required">*</span></label>
+                            <input type="text" name="city" required placeholder="e.g., Cape Town">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Province <span class="required">*</span></label>
+                            <select name="province" required>
+                                <option value="">Select province</option>
+                                <option value="Gauteng">Gauteng</option>
+                                <option value="Western Cape">Western Cape</option>
+                                <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                                <option value="Eastern Cape">Eastern Cape</option>
+                                <option value="Free State">Free State</option>
+                                <option value="Limpopo">Limpopo</option>
+                                <option value="Mpumalanga">Mpumalanga</option>
+                                <option value="North West">North West</option>
+                                <option value="Northern Cape">Northern Cape</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Postal Code <span class="required">*</span></label>
+                        <input type="text" name="postal_code" required pattern="[0-9]{4}" placeholder="8001">
+                    </div>
+                </div>
+
+                <!-- Banking Information -->
+                <div class="form-section">
+                    <h3>Banking Information</h3>
+
+                    <div class="info-box">
+                        <p>Banking details are required for settlements. All information is encrypted and stored securely in compliance with POPIA.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bank Name <span class="required">*</span></label>
+                            <select name="bank_name" required>
+                                <option value="">Select bank</option>
+                                <option value="Standard Bank">Standard Bank</option>
+                                <option value="FNB">FNB</option>
+                                <option value="ABSA">ABSA</option>
+                                <option value="Nedbank">Nedbank</option>
+                                <option value="Capitec">Capitec</option>
+                                <option value="Discovery Bank">Discovery Bank</option>
+                                <option value="Investec">Investec</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Branch Code <span class="required">*</span></label>
+                            <input type="text" name="branch_code" required pattern="[0-9]{6}" placeholder="123456">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Account Number <span class="required">*</span></label>
+                        <input type="text" name="account_number" required pattern="[0-9]{8,11}" placeholder="Account number">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Account Holder Name <span class="required">*</span></label>
+                        <input type="text" name="account_holder" required placeholder="As it appears on bank statement">
+                    </div>
+                </div>
+
+                <!-- Practice Information -->
+                <div class="form-section">
+                    <h3>Practice Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Average Monthly Patient Volume</label>
+                            <select name="patient_volume">
+                                <option value="">Select range</option>
+                                <option value="0-50">0-50 patients</option>
+                                <option value="51-200">51-200 patients</option>
+                                <option value="201-500">201-500 patients</option>
+                                <option value="501+">501+ patients</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Years in Operation</label>
+                            <input type="number" name="years_operating" min="0" max="100" placeholder="e.g., 5">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Services Offered</label>
+                        <textarea name="services_offered" placeholder="Describe the primary healthcare services you offer..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="form-section">
+                    <h3>Terms & Conditions</h3>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="terms_accepted" id="terms" required>
+                        <label for="terms">I accept the <a href="#" style="color: #FF4757;">PaySick Provider Terms & Conditions</a> <span class="required">*</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="popia_consent" id="popia" required>
+                        <label for="popia">I consent to PaySick processing my information in accordance with POPIA <span class="required">*</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="commission_agreement" id="commission" required>
+                        <label for="commission">I understand and agree to the 5% service fee deducted from each settlement payout <span class="required">*</span></label>
+                    </div>
+                </div>
+
+                <div class="error-banner" id="errorBanner"></div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit Application</button>
+                    <a href="providers.html" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2>Application Submitted Successfully!</h2>
+            <p>Thank you for your interest in joining the PaySick network. Our team will review your application and contact you within 2-3 business days.</p>
+            <div class="btn-container">
+                <a href="providers.html" class="btn btn-primary">Browse Providers</a>
+                <a href="index.html" class="btn btn-secondary">Return Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showFormError(message) {
+            const banner = document.getElementById('errorBanner');
+            banner.textContent = message;
+            banner.classList.add('show');
+            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideFormError() {
+            const banner = document.getElementById('errorBanner');
+            banner.classList.remove('show');
+        }
+
+        async function submitApplication(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            hideFormError();
+
+            try {
+                const formData = new FormData(event.target);
+                const data = Object.fromEntries(formData.entries());
+
+                // Convert checkboxes to boolean
+                data.terms_accepted = !!data.terms_accepted;
+                data.popia_consent = !!data.popia_consent;
+                data.commission_agreement = !!data.commission_agreement;
+
+                const response = await fetch('/api/providers/apply', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    // Server returned a non-JSON body (e.g. an HTML error page from the
+                    // hosting layer when the API process failed to start).
+                    showFormError(`Server error (${response.status}). Please try again shortly.`);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    return;
+                }
+
+                if (!response.ok) {
+                    showFormError(result.error || 'Application submission failed. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    return;
+                }
+
+                // Show success message
+                document.getElementById('applicationForm').style.display = 'none';
+                document.getElementById('successMessage').classList.add('show');
+
+            } catch (err) {
+                console.error('Application error:', err);
+                showFormError('Unable to connect to the server. Please check your connection and try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+            }
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                </div>
+                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#how-it-works">How It Works</a></li>
+                    <li><a href="index.html#features">Payment Terms</a></li>
+                    <li><a href="providers.html">Find Providers</a></li>
+                    <li><a href="index.html#about">Mobile App</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-of-service.html">Terms of Service</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+        </div>
+    </footer>
+</body>
+</html>
