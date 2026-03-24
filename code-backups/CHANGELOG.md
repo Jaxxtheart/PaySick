@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.4.1] — 2026-03-24
+
+**Type**: PATCH — Footer Company section removed; login page mobile layout improved
+
+### Summary
+Removed the placeholder "Company" footer section site-wide (index, login, onboarding, provider-apply, providers). The section will be restored in a future version once content is defined. Improved login page mobile UX with new 768px and 480px breakpoints: top-aligned layout, reduced padding, 16px input font-size to prevent iOS zoom, and scaled-down logo for small screens.
+
+### Changed
+- `index.html` — removed Company footer section
+- `login.html` — removed Company footer section; added mobile CSS breakpoints (768px, 480px)
+- `onboarding.html` — removed Company footer section
+- `provider-apply.html` — removed Company footer section
+- `providers.html` — removed Company footer section
+
+---
+
 ## [v1.4.0] — 2026-03-16
 
 **Type**: MINOR — Provider charge and patient late-payment fee
