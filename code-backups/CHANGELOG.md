@@ -6,6 +6,46 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.4.3] — 2026-03-24
+
+**Type**: PATCH — Bug fix: lender webhook HMAC used ciphertext instead of plaintext key
+
+### Summary
+Fixed marketplace.js webhook signature middleware. The AES-encrypted API key ciphertext was being passed directly to `crypto.createHmac()` as the signing secret. Lenders sign requests with the plaintext key; the server was verifying with the ciphertext — so all webhook signatures for external lenders would fail with 401. Fixed by decrypting before HMAC. Also imported `decryptBankingData` which was missing from the import.
+
+### Fixed
+- `backend/src/routes/marketplace.js` — decrypt `api_key_encrypted` before using as HMAC key in webhook validation middleware
+
+---
+
+## [v1.4.2] — 2026-03-24
+
+**Type**: PATCH — Critical bug fix: registration returning "Server error (404)"
+
+### Summary
+Removed `process.exit(1)` from the startup `validateEnvironment()` error handler in `server.js`. In Vercel serverless, calling `process.exit()` during module initialization kills the function before it can send any response — Vercel then returns an HTML error page. The frontend's `response.json()` call throws on the HTML body, triggering the misleading "Server error (404)" message. Same class of bug as the `process.exit(-1)` fixed in v1.3.1 (database pool), but in the startup validation path.
+
+### Fixed
+- `backend/src/server.js` — removed `process.exit(1)` from `validateEnvironment()` catch block; startup errors are now logged only; routes that require `TOKEN_SECRET` / `ENCRYPTION_KEY` return JSON 500 from their own error handlers
+
+---
+
+## [v1.4.1] — 2026-03-24
+
+**Type**: PATCH — Footer Company section removed; login page mobile layout improved
+
+### Summary
+Removed the placeholder "Company" footer section site-wide (index, login, onboarding, provider-apply, providers). The section will be restored in a future version once content is defined. Improved login page mobile UX with new 768px and 480px breakpoints: top-aligned layout, reduced padding, 16px input font-size to prevent iOS zoom, and scaled-down logo for small screens.
+
+### Changed
+- `index.html` — removed Company footer section
+- `login.html` — removed Company footer section; added mobile CSS breakpoints (768px, 480px)
+- `onboarding.html` — removed Company footer section
+- `provider-apply.html` — removed Company footer section
+- `providers.html` — removed Company footer section
+
+---
+
 ## [v1.4.0] — 2026-03-16
 
 **Type**: MINOR — Provider charge and patient late-payment fee
