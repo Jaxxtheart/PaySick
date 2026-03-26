@@ -542,7 +542,17 @@
                     body: JSON.stringify({ email, password, rememberMe })
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    // Server returned a non-JSON body (e.g. Vercel HTML error page).
+                    // Show a friendly message rather than the raw SyntaxError.
+                    errorMessage.textContent = `Server error (${response.status}). Please try again shortly.`;
+                    errorMessage.classList.add('show');
+                    setTimeout(() => errorMessage.classList.remove('show'), 4000);
+                    return;
+                }
 
                 if (response.ok && data.accessToken) {
                     // Handle Remember Me — store refresh token, never the password
