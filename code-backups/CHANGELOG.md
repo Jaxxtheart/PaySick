@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.1] — 2026-03-26
+
+**Type**: PATCH — Bug fix: API routes returning HTML 404 in Vercel production
+
+### Summary
+All `/api/*` routes were returning Vercel's HTML 404 page instead of JSON responses in production. Root cause: backend production dependencies lived only in `backend/package.json`. Vercel's `postinstall` script (`cd backend && npm install`) could fail silently, leaving `backend/node_modules` empty. With no `express` discoverable, `@vercel/nft` could not bundle the serverless functions, so Vercel had no function to invoke and returned HTML 404.
+
+### Fixed
+- Moved all backend production dependencies (`express`, `pg`, `helmet`, `cors`, `morgan`, `dotenv`, `express-rate-limit`, `helmet`, `jsonwebtoken`, `nodemailer`, `uuid`) to root `package.json`
+- Removed `postinstall` script from root `package.json` — no longer needed
+
+---
+
 ## [v1.5.0] — 2026-03-26
 
 **Type**: MINOR — New feature: forgot password / reset password flow
