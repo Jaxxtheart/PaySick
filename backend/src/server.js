@@ -58,6 +58,9 @@ const shieldRoutes = require('./routes/shield');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust Vercel's reverse proxy so express-rate-limit reads X-Forwarded-For correctly
+app.set('trust proxy', 1);
+
 // ============================================
 // SECURITY MIDDLEWARE
 // ============================================
