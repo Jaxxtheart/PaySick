@@ -162,6 +162,37 @@ function requireProvider(req, res, next) {
 }
 
 /**
+ * Require a specific role (factory function)
+ * Returns middleware that requires the given role (or admin)
+ * Must be used AFTER authenticateToken
+ */
+function requireRole(role) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        code: 'NO_AUTH'
+      });
+    }
+
+    if (req.user.role !== role && req.user.role !== 'admin') {
+      logSecurityEvent('UNAUTHORIZED_ACCESS', req.user.userId, req.clientIP, req.get('User-Agent'), {
+        requiredRole: role,
+        userRole: req.user.role,
+        attemptedRoute: req.originalUrl
+      });
+
+      return res.status(403).json({
+        error: `${role} access required`,
+        code: 'FORBIDDEN'
+      });
+    }
+
+    next();
+  };
+}
+
+/**
  * Optional authentication - doesn't fail if no token
  * Attaches user if valid token present
  */
@@ -241,6 +272,7 @@ function createUserRateLimit(options = {}) {
 module.exports = {
   authenticateToken,
   requireAdmin,
+  requireRole,
   requireLender,
   requireProvider,
   optionalAuth,
