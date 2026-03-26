@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.4.4] — 2026-03-26
+
+**Type**: PATCH — Bug fix: login shows raw SyntaxError to user on non-JSON server response
+
+### Summary
+`login.html` was calling `response.json()` bare inside the outer try/catch. When the API returned an HTML error page, the SyntaxError ("Unexpected token 'T', "The page c"... is not valid JSON") propagated to the catch block and was shown verbatim to users. Fixed by wrapping `response.json()` in an inner try/catch (same pattern already used in `register.html` since v1.3.1). Added 8-test regression suite.
+
+### Fixed
+- `login.html` — inner try/catch around `response.json()`; non-JSON responses now show "Server error (N). Please try again shortly."
+
+### Added
+- `tests/unit/login-error-handling.test.js` — 8 tests covering the full login response handling path (non-JSON 404/500, no SyntaxError in message, success, EMAIL_UNVERIFIED, 401 with/without error body)
+- Total unit tests: 67 (was 59)
+
+---
+
 ## [v1.4.3] — 2026-03-24
 
 **Type**: PATCH — Bug fix: lender webhook HMAC used ciphertext instead of plaintext key
