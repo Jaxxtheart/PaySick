@@ -6,6 +6,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.3] — 2026-03-26
+
+**Type**: PATCH — Diagnostic crash wrapper + integration test coverage for forgot/reset-password
+
+### Summary
+Production API returning Vercel HTML 500 (instead of JSON) on all `/api/*` routes. Root cause still under diagnosis. Added crash-safe wrapper to `api/index.js` and `api/[...slug].js` that catches any module-load exception and returns `{"error":"Server failed to start","code":"SERVER_LOAD_ERROR"}` as `application/json` — converting an opaque HTML crash into a parseable JSON error. Also added 14 integration tests for `POST /api/users/forgot-password` and `POST /api/users/reset-password` which had zero prior integration test coverage.
+
+### Added
+- `api/index.js`: try/catch wrapper around `require('../backend/src/server')` — crash → JSON 500
+- `api/[...slug].js`: same crash wrapper for the Vercel file-system catch-all function
+- `tests/integration/users.test.js`: 14 new integration tests for forgot-password and reset-password
+
+### Fixed
+- Module-load crashes in Vercel functions now return `application/json` instead of Vercel HTML 500
+
+---
+
 ## [v1.5.2] — 2026-03-26
 
 **Type**: PATCH — Bug fix: explicit `/api/(.*)` rewrite in vercel.json to guarantee function invocation
