@@ -1,6 +1,12 @@
 # Vercel Ignore File
 # Files and directories that should not be uploaded to Vercel
 
+# Code backups / version archives (large snapshot directories, not needed at runtime)
+code-backups/
+
+# Tests (not needed at runtime)
+tests/
+
 # Documentation (not needed in deployment)
 *.md
 !README.md
