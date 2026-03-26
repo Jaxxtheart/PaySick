@@ -39,6 +39,7 @@ Users who have forgotten their password can now request a reset link via email. 
 - Total unit tests: 67 (was 59)
 
 ---
+
 ## [v1.4.3] — 2026-03-24
 
 **Type**: PATCH — Bug fix: lender webhook HMAC used ciphertext instead of plaintext key

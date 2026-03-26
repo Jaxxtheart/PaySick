@@ -47,13 +47,6 @@ When a feature is removed from the live platform:
 - Every version folder must contain all four files: `RELEASE_NOTES.md`, `REQUIREMENTS.md`, `ARCHITECTURE.md`, and a `snapshot/` directory
 - Always update `CHANGELOG.md` and `code-backups/README.md` as part of the same commit
 
-## Bug Fixing Workflow
-
-When a bug is reported, do not start by trying to fix it. Instead:
-
-1. **Write a failing test first** that reproduces the bug
-2. **Use subagents to attempt the fix** — each subagent should try to resolve the bug independently
-3. **Prove the fix with a passing test** — the fix is only accepted when the previously failing test passes
 ---
 
 ## Bot Crawling Prevention
