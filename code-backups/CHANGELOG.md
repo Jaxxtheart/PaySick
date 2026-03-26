@@ -6,6 +6,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.0] — 2026-03-26
+
+**Type**: MINOR — New feature: forgot password / reset password flow
+
+### Summary
+Users who have forgotten their password can now request a reset link via email. Backend: `POST /forgot-password` (anti-enumeration, SHA-256 token storage, 1-hour expiry) and `POST /reset-password` (transaction: mark token used, rehash password, revoke all sessions). Frontend: `forgot-password.html` and `reset-password.html` with client-side validation and friendly non-JSON error handling. "Forgot password?" link added to `login.html`. 30 new unit tests (total: 97).
+
+### Added
+- `POST /api/users/forgot-password` — anti-enumeration; sends branded reset email with 1-hour token
+- `POST /api/users/reset-password` — validates token, updates password in transaction, revokes all sessions
+- `backend/src/services/email.service.js` — `sendPasswordResetEmail()`
+- `forgot-password.html` — email entry form, generic success message
+- `reset-password.html` — new password form, client-side length/match validation, auto-redirect to login on success
+- `login.html` — "Forgot password?" link
+- `tests/unit/password-reset.test.js` — 30 new tests (token format, expiry, SHA-256 hashing, password requirements, API response handling)
+
+---
+
+## [v1.4.4] — 2026-03-26
+
+**Type**: PATCH — Bug fix: login shows raw SyntaxError to user on non-JSON server response
+
+### Summary
+`login.html` was calling `response.json()` bare inside the outer try/catch. When the API returned an HTML error page, the SyntaxError ("Unexpected token 'T', "The page c"... is not valid JSON") propagated to the catch block and was shown verbatim to users. Fixed by wrapping `response.json()` in an inner try/catch (same pattern already used in `register.html` since v1.3.1). Added 8-test regression suite.
+
+### Fixed
+- `login.html` — inner try/catch around `response.json()`; non-JSON responses now show "Server error (N). Please try again shortly."
+
+### Added
+- `tests/unit/login-error-handling.test.js` — 8 tests covering the full login response handling path (non-JSON 404/500, no SyntaxError in message, success, EMAIL_UNVERIFIED, 401 with/without error body)
+- Total unit tests: 67 (was 59)
+
+---
 ## [v1.4.3] — 2026-03-24
 
 **Type**: PATCH — Bug fix: lender webhook HMAC used ciphertext instead of plaintext key
