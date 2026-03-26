@@ -377,3 +377,194 @@ describe('Authenticated routes without token', () => {
     expect(res.status).toBe(401);
   });
 });
+
+// ─────────────────────────────────────────────
+// POST /api/users/forgot-password
+// ─────────────────────────────────────────────
+describe('POST /api/users/forgot-password', () => {
+  // The single most important invariant: this endpoint MUST always return JSON.
+  // An HTML response (status 404/500 from Vercel) would fail response.json()
+  // on the client and show "Server error (N). Please try again shortly."
+  test('response is always application/json (never HTML)', async () => {
+    const res = await request(app)
+      .post('/api/users/forgot-password')
+      .send({ email: 'any@example.com' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.type).toMatch(/json/);
+    expect(typeof res.body).toBe('object');
+  });
+
+  test('returns 400 when email is missing', async () => {
+    const res = await request(app)
+      .post('/api/users/forgot-password')
+      .send({})
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.type).toMatch(/json/);
+    expect(res.body.error).toBeDefined();
+  });
+
+  test('returns 400 when email field is not a string', async () => {
+    const res = await request(app)
+      .post('/api/users/forgot-password')
+      .send({ email: 12345 })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.type).toMatch(/json/);
+  });
+
+  test('returns 200 with generic message when email is NOT in database (anti-enumeration)', async () => {
+    // mockQuery default: { rows: [], rowCount: 0 } — simulates email not found
+    const res = await request(app)
+      .post('/api/users/forgot-password')
+      .send({ email: 'notregistered@example.com' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(200);
+    expect(res.type).toMatch(/json/);
+    expect(res.body.message).toBeDefined();
+    // Must NOT reveal whether the email exists
+    expect(res.body.message).toMatch(/if an account/i);
+  });
+
+  test('returns 200 with same generic message when email IS in database (anti-enumeration)', async () => {
+    // Simulate: user found → invalidate old tokens → insert new token
+    mockQuery
+      .mockResolvedValueOnce({ // user lookup
+        rows: [{ user_id: 'user-uuid-123', full_name: 'Test User', email: 'exists@example.com' }],
+        rowCount: 1
+      })
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // invalidate old tokens
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // insert new token
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 }); // logSecurityEvent
+
+    const res = await request(app)
+      .post('/api/users/forgot-password')
+      .send({ email: 'exists@example.com' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(200);
+    expect(res.type).toMatch(/json/);
+    expect(res.body.message).toBeDefined();
+    expect(res.body.message).toMatch(/if an account/i);
+  });
+
+  test('returns 200 (not 500) even when database query fails', async () => {
+    mockQuery.mockRejectedValueOnce(new Error('DB connection refused'));
+
+    const res = await request(app)
+      .post('/api/users/forgot-password')
+      .send({ email: 'test@example.com' })
+      .set('Content-Type', 'application/json');
+
+    // Must still return JSON, not HTML
+    expect(res.type).toMatch(/json/);
+    expect(res.status).toBeLessThan(600); // any valid HTTP status
+  });
+});
+
+// ─────────────────────────────────────────────
+// POST /api/users/reset-password
+// ─────────────────────────────────────────────
+describe('POST /api/users/reset-password', () => {
+  const validToken = 'a'.repeat(64); // 64-char hex token
+
+  test('response is always application/json (never HTML)', async () => {
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ token: validToken, new_password: 'NewPass123' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.type).toMatch(/json/);
+    expect(typeof res.body).toBe('object');
+  });
+
+  test('returns 400 when token is missing', async () => {
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ new_password: 'NewPass123' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('INVALID_TOKEN');
+  });
+
+  test('returns 400 when token is not 64 characters', async () => {
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ token: 'short', new_password: 'NewPass123' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('INVALID_TOKEN');
+  });
+
+  test('returns 400 when new_password is missing', async () => {
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ token: validToken })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBeDefined();
+  });
+
+  test('returns 400 when token hash not found in database', async () => {
+    // mockQuery default: empty rows — token not found
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ token: validToken, new_password: 'NewPass123' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('INVALID_TOKEN');
+  });
+
+  test('returns 400 when token is expired', async () => {
+    const expiredDate = new Date(Date.now() - 2 * 60 * 60 * 1000); // 2 hours ago
+    mockQuery.mockResolvedValueOnce({
+      rows: [{
+        token_id: 'tok-1',
+        user_id: 'usr-1',
+        expires_at: expiredDate.toISOString(),
+        email: 'user@example.com',
+        full_name: 'Test User'
+      }],
+      rowCount: 1
+    });
+
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ token: validToken, new_password: 'NewPass123' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('TOKEN_EXPIRED');
+  });
+
+  test('returns 200 on successful password reset', async () => {
+    const futureDate = new Date(Date.now() + 30 * 60 * 1000); // 30 min from now
+    mockQuery.mockResolvedValueOnce({
+      rows: [{
+        token_id: 'tok-1',
+        user_id: 'usr-1',
+        expires_at: futureDate.toISOString(),
+        email: 'user@example.com',
+        full_name: 'Test User'
+      }],
+      rowCount: 1
+    });
+
+    const res = await request(app)
+      .post('/api/users/reset-password')
+      .send({ token: validToken, new_password: 'NewSecurePass1' })
+      .set('Content-Type', 'application/json');
+
+    expect(res.status).toBe(200);
+    expect(res.type).toMatch(/json/);
+    expect(res.body.message).toBeDefined();
+  });
+});
