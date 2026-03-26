@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.2] — 2026-03-26
+
+**Type**: PATCH — Bug fix: explicit `/api/(.*)` rewrite in vercel.json to guarantee function invocation
+
+### Summary
+File-based catch-all `api/[...slug].js` was not reliably routing `/api/*` requests to the Express function in Vercel production. Added explicit rewrite `"/api/(.*)" → "/api/index.js"` in vercel.json. Combined with the v1.5.1 fix (deps in root package.json), this ensures all API routes are correctly handled.
+
+### Fixed
+- `vercel.json`: added `{ "source": "/api/(.*)", "destination": "/api/index.js" }` rewrite
+
+---
+
 ## [v1.5.1] — 2026-03-26
 
 **Type**: PATCH — Bug fix: API routes returning HTML 404 in Vercel production
