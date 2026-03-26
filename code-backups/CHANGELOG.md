@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.4] — 2026-03-26
+
+**Type**: PATCH — Root cause fix for all API 500 errors: missing `requireRole` export
+
+### Summary
+`providers.js` imported `requireRole` from `auth.middleware.js`, but the function was never defined or exported. At module load time, Express route registration hit `requireRole('admin')` as `undefined`, throwing `TypeError: requireRole is not a function`. This crashed `server.js` before `module.exports = app` was reached, causing every API route to return 500. Root cause was identified via the v1.5.3 diagnostic wrapper, which converted the opaque Vercel HTML 500 into a JSON error logged as: `[PaySick] FATAL: server failed to load: requireRole is not a function`.
+
+### Fixed
+- `auth.middleware.js`: added `requireRole(role)` factory function and added it to `module.exports`
+
+---
+
 ## [v1.5.3] — 2026-03-26
 
 **Type**: PATCH — Diagnostic crash wrapper + integration test coverage for forgot/reset-password

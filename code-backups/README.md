@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.5.4](./v1.5.4/) | 2026-03-26 | Fix: root cause of all API 500 errors — `requireRole` was imported by providers.js but never exported from auth.middleware.js, crashing server at load time |
 | [v1.5.3](./v1.5.3/) | 2026-03-26 | Fix: API returning HTML 500 — add crash diagnostic wrapper to api/index.js + api/[...slug].js; add 14 integration tests for forgot/reset-password |
 | [v1.5.2](./v1.5.2/) | 2026-03-26 | Fix: API 404 persists — add explicit `/api/(.*)` rewrite in vercel.json so Vercel always invokes api/index.js for all API paths |
 | [v1.5.1](./v1.5.1/) | 2026-03-26 | Fix: API routes returning HTML 404 in production — moved all backend dependencies to root package.json so Vercel's npm install reliably installs them |
