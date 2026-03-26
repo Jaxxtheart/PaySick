@@ -6,6 +6,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.0] — 2026-03-26
+
+**Type**: MINOR — New feature: forgot password / reset password flow
+
+### Summary
+Users who have forgotten their password can now request a reset link via email. Backend: `POST /forgot-password` (anti-enumeration, SHA-256 token storage, 1-hour expiry) and `POST /reset-password` (transaction: mark token used, rehash password, revoke all sessions). Frontend: `forgot-password.html` and `reset-password.html` with client-side validation and friendly non-JSON error handling. "Forgot password?" link added to `login.html`. 30 new unit tests (total: 97).
+
+### Added
+- `POST /api/users/forgot-password` — anti-enumeration; sends branded reset email with 1-hour token
+- `POST /api/users/reset-password` — validates token, updates password in transaction, revokes all sessions
+- `backend/src/services/email.service.js` — `sendPasswordResetEmail()`
+- `forgot-password.html` — email entry form, generic success message
+- `reset-password.html` — new password form, client-side length/match validation, auto-redirect to login on success
+- `login.html` — "Forgot password?" link
+- `tests/unit/password-reset.test.js` — 30 new tests (token format, expiry, SHA-256 hashing, password requirements, API response handling)
+
+---
+
 ## [v1.4.4] — 2026-03-26
 
 **Type**: PATCH — Bug fix: login shows raw SyntaxError to user on non-JSON server response
