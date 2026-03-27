@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.5] — 2026-03-27
+
+**Type**: PATCH — Regulatory terminology compliance audit & update
+
+### Summary
+Comprehensive audit and update of all customer-facing, provider-facing, investor-facing, and internal documents to ensure consistent positioning of PaySick as a **healthcare payment facilitation platform** — not a credit provider, medical scheme, or insurer.
+
+### Fixed
+- `about.html`: Removed false NCA credit provider claim; replaced with correct CPA/POPIA positioning
+- `terms-of-service.html`: Removed NCA credit agreement conditional; added explicit non-credit/non-NCR disclaimer
+- `privacy-policy.html`: Removed NCA row from legal framework table; fixed "claims history" → "payment history"
+- `index.html`: "credit risk" → "collection burden" in provider section (2 instances)
+- `providers.html`: "Zero Credit Risk" heading and copy → "Zero Collection Burden"
+- `provider-apply.html`: "credit risk" language → payment management language (2 instances)
+- `marketplace-offers.html`: "loan offer/application/processed" → payment arrangement language
+- `investor-deck.html`: All prohibited terms replaced — underwriting/lenders/loans/credit risk/NIM/healthcare financing → approved payment facilitation equivalents (both HTML and PPTX generation code)
+- `marketplace-apply.html`: APR comment → service fee rate; loan UI text → arrangement language
+
+---
+
 ## [v1.5.4] — 2026-03-26
 
 **Type**: PATCH — Root cause fix for all API 500 errors: missing `requireRole` export

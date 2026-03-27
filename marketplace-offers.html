@@ -684,7 +684,7 @@
     <div class="modal-overlay" id="confirmModal">
         <div class="modal">
             <h3>Accept This Offer?</h3>
-            <p>You're about to accept this loan offer. Once accepted, your loan will be processed and funds will be disbursed.</p>
+            <p>You're about to accept this payment arrangement offer. Once accepted, your arrangement will be processed and your healthcare provider will be paid.</p>
 
             <div class="modal-highlight">
                 <div class="label">Monthly Payment</div>
@@ -933,7 +933,7 @@
             try {
                 const result = await PaySickAPI.marketplace.acceptOffer(currentOfferId);
 
-                showToast('Offer accepted! Your loan is being processed.', 'success');
+                showToast('Offer accepted! Your payment arrangement is being processed.', 'success');
 
                 // Redirect to dashboard after short delay
                 setTimeout(() => {
@@ -965,7 +965,7 @@
                         </svg>
                     </div>
                     <h3>No Applications Yet</h3>
-                    <p>You haven't submitted any loan applications. Start by applying for medical financing.</p>
+                    <p>You haven't submitted any payment arrangement applications. Start by applying for a healthcare payment arrangement.</p>
                     <a href="marketplace-apply.html" class="btn btn-primary" style="display: inline-block; text-decoration: none;">Apply Now</a>
                 </div>
             `;

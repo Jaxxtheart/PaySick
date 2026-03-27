@@ -1109,7 +1109,7 @@
         function updateMonthlyEstimate() {
             const principal = applicationData.loanAmount;
             const term = applicationData.requestedTerm;
-            const rate = 0.22; // Estimate 22% APR
+            const rate = 0.22; // Estimate 22% annualised service fee rate
 
             const monthlyRate = rate / 12;
             const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, term)) /
@@ -1251,11 +1251,11 @@
                     <div style="margin-top: 24px; padding: 20px; background: #F0FFF4; border: 2px solid #2ED573; border-radius: 12px;">
                         <div style="font-weight: 700; color: #1A7A3C; margin-bottom: 8px;">Suggested Alternative</div>
                         <p style="font-size: 14px; color: #2A2A2A; margin-bottom: 12px;">
-                            Based on your income, you may qualify for a smaller loan that fits within affordability limits:
+                            Based on your income, you may qualify for a smaller payment arrangement that fits within affordability limits:
                         </p>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
                             <div>
-                                <div style="font-size: 12px; color: #8A8A8A;">Max loan amount</div>
+                                <div style="font-size: 12px; color: #8A8A8A;">Max arrangement amount</div>
                                 <div style="font-weight: 700; font-size: 18px; color: #1A7A3C;">${formatCurrency(alt.max_loan_amount)}</div>
                             </div>
                             <div>
@@ -1267,7 +1267,7 @@
                                 <div style="font-weight: 700; font-size: 18px; color: #1A7A3C;">${(alt.rti * 100).toFixed(1)}%</div>
                             </div>
                         </div>
-                        <button class="btn btn-primary" style="margin-top: 16px; width: 100%;" onclick="applyWithAlternative(${alt.max_loan_amount})">Apply for ${formatCurrency(alt.max_loan_amount)} instead</button>
+                        <button class="btn btn-primary" style="margin-top: 16px; width: 100%;" onclick="applyWithAlternative(${alt.max_loan_amount})">Apply for arrangement of ${formatCurrency(alt.max_loan_amount)} instead</button>
                     </div>`;
             }
 
