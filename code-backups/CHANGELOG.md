@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.5.6] — 2026-03-31
+
+**Type**: PATCH — Bug fix: password reset email delivery
+
+### Summary
+Fixed two bugs causing password reset emails to silently fail in production: reset links pointed to `localhost:3000` (APP_URL missing from vercel.json), and emails were delivered to a fake Ethereal test inbox instead of the user (SMTP_HOST not set in production, Ethereal fallback triggered silently).
+
+### Fixed
+- `vercel.json`: Added `APP_URL=https://paysick.co.za` to env block
+- `backend/src/services/email.service.js`: Added production guard — throws clear error when `NODE_ENV=production` and `SMTP_HOST` is not set, preventing silent Ethereal fallback
+
+### Added
+- `tests/unit/email-service.test.js`: 5 new unit tests covering APP_URL domain correctness and production SMTP configuration guard (total: 102 unit tests)
+
+---
+
 ## [v1.5.5] — 2026-03-27
 
 **Type**: PATCH — Regulatory terminology compliance audit & update
