@@ -47,13 +47,32 @@ When a feature is removed from the live platform:
 - Every version folder must contain all four files: `RELEASE_NOTES.md`, `REQUIREMENTS.md`, `ARCHITECTURE.md`, and a `snapshot/` directory
 - Always update `CHANGELOG.md` and `code-backups/README.md` as part of the same commit
 
-## Bug Fixing Workflow
+## Test-First Development (Mandatory)
+
+**All work — new features, bug fixes, and changes — must follow a test-first workflow. Writing code before a test exists is a violation of this rule.**
+
+### New functionality workflow
+
+When building any new page, feature, API route, or module:
+
+1. **Write a failing test first** that describes the expected behaviour of the new functionality
+2. **Confirm the test fails** before writing any implementation code — a test that passes before the implementation exists is not a valid test
+3. **Implement the functionality** until the test passes
+4. **Do not ship** any feature without a passing test that was written before the implementation
+
+### Bug Fixing Workflow
 
 When a bug is reported, do not start by trying to fix it. Instead:
 
 1. **Write a failing test first** that reproduces the bug
 2. **Use subagents to attempt the fix** — each subagent should try to resolve the bug independently
 3. **Prove the fix with a passing test** — the fix is only accepted when the previously failing test passes
+
+### Rules
+
+- **Never write implementation code before a test.** This applies to all work without exception.
+- If you catch yourself writing implementation before a test, stop immediately, delete the implementation, write the test first, confirm it fails, then re-implement.
+- A passing test written *after* the implementation does not satisfy this requirement — order matters.
 ---
 
 ## Bot Crawling Prevention
