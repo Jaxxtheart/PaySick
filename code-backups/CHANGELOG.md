@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.6.0] — 2026-04-05
+
+**Type**: MINOR — New feature: Customer Messaging Journey
+
+### Summary
+Introduces the complete customer messaging journey — all 43 message types across 10 lifecycle stages, a 13-rung collections escalation ladder (day 1 → day 90), a notification dispatcher service, and a `/api/notifications` inbox API.
+
+### Added
+- `backend/src/services/messaging-journey.service.js` — `MessagingJourneyService`, `MESSAGE_TYPES` (43 types), `CHANNELS`, `JOURNEY_STAGES` (10 stages), `COLLECTIONS_LADDER` (13 rungs), email/SMS/in_app templates for every message type, `getTriggerRules()` canonical event-to-channel map
+- `backend/src/services/collections-messaging.service.js` — `CollectionsMessagingService`, `ESCALATION_STAGES`, `getStrategyForDaysOverdue()`, `getFullSequenceForPayment()`
+- `backend/src/services/notification.service.js` — `NotificationService` with `send()`, `sendAll()`, `schedule()`, `getUserNotifications()`, `getUnreadCount()`, `markRead()`, `markAllRead()`
+- `backend/src/routes/notifications.js` — REST API: `GET /api/notifications`, `GET /api/notifications/unread-count`, `PUT /api/notifications/:id/read`, `PUT /api/notifications/read-all`
+- `tests/unit/messaging-journey.test.js` — 173 unit tests (total: 443 unit tests)
+
+### Modified
+- `backend/src/services/email.service.js` — added `sendJourneyEmail({ to, subject, html })`
+- `backend/src/server.js` — registered `/api/notifications` route
+
+---
+
 ## [v1.5.6] — 2026-03-31
 
 **Type**: PATCH — Bug fix: password reset email delivery
