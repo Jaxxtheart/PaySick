@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - PaySick</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAFAFA; color: #1A1A1A; }
+        .site-header { background: #1A1A1A; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo-text { font-size: 22px; font-weight: 400; color: #fff; letter-spacing: -0.5px; }
+        .logo-text span { font-weight: 300; color: #8A8A8A; }
+        .back-link { color: #FF4757; text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+        .back-link:hover { opacity: .75; }
+        .hero { background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%); padding: 64px 40px 56px; text-align: center; color: #fff; }
+        .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; }
+        .hero p { font-size: 16px; opacity: .88; }
+        .page-layout { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 40px; gap: 48px; }
+        .toc { width: 220px; flex-shrink: 0; padding: 48px 0 80px; }
+        .toc-sticky { position: sticky; top: 72px; }
+        .toc h4 { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #8A8A8A; margin-bottom: 12px; }
+        .toc ol { padding-left: 0; list-style: none; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { font-size: 13px; color: #4A4A4A; text-decoration: none; line-height: 1.4; display: block; transition: color .2s; }
+        .toc a:hover { color: #FF4757; }
+        .content { flex: 1; padding: 48px 0 80px; min-width: 0; }
+        .effective { background: #FFF5F6; border-left: 3px solid #FF4757; padding: 14px 18px; border-radius: 0 6px 6px 0; margin-bottom: 40px; font-size: 14px; color: #4A4A4A; line-height: 1.6; }
+        .effective strong { color: #E01E37; }
+        .standout-box { background: #FFF5F6; border: 1px solid #FFCDD2; border-left: 4px solid #FF4757; border-radius: 0 8px 8px 0; padding: 24px 28px; margin-bottom: 40px; }
+        .standout-box .sb-title { font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #E01E37; margin-bottom: 10px; }
+        .standout-box p { font-size: 14px; line-height: 1.7; color: #2A2A2A; margin-bottom: 0; }
+        .standout-box p + p { margin-top: 8px; }
+        h2 { font-size: 20px; font-weight: 700; color: #1A1A1A; margin: 44px 0 14px; padding-bottom: 10px; border-bottom: 2px solid #F0F0F0; scroll-margin-top: 80px; }
+        h2:first-of-type { margin-top: 0; }
+        h3 { font-size: 16px; font-weight: 600; color: #1A1A1A; margin: 26px 0 10px; }
+        p { font-size: 15px; line-height: 1.8; color: #3A3A3A; margin-bottom: 14px; }
+        ul, ol { padding-left: 22px; margin-bottom: 14px; }
+        li { font-size: 15px; line-height: 1.8; color: #3A3A3A; margin-bottom: 7px; }
+        a { color: #FF4757; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { color: #1A1A1A; }
+        .criteria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 16px 0 28px; }
+        .criteria-card { background: #fff; border: 1px solid #E5E5E5; border-radius: 8px; padding: 16px; border-left: 3px solid #FF4757; }
+        .criteria-card .cc-title { font-size: 13px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
+        .criteria-card .cc-desc { font-size: 13px; color: #6A6A6A; line-height: 1.5; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+        th { background: #F8F9FA; font-weight: 700; text-align: left; padding: 10px 14px; border-bottom: 2px solid #E5E5E5; color: #1A1A1A; }
+        td { padding: 10px 14px; border-bottom: 1px solid #F0F0F0; color: #3A3A3A; vertical-align: top; line-height: 1.5; }
+        tr:last-child td { border-bottom: none; }
+        .contact-box { background: #F8F9FA; border-radius: 10px; padding: 28px; margin-top: 48px; }
+        .contact-box h3 { margin-top: 0; margin-bottom: 16px; }
+        .contact-box p { margin-bottom: 8px; font-size: 14px; }
+        .site-footer { background: #1A1A1A; text-align: center; padding: 28px; color: #8A8A8A; font-size: 13px; }
+        .site-footer a { color: #FF4757; text-decoration: none; }
+        @media (max-width: 860px) { .toc { display: none; } .page-layout { padding: 0 20px; } }
+        @media (max-width: 600px) { .site-header { padding: 14px 20px; } .hero { padding: 48px 20px 40px; } }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a class="logo" href="index.html" aria-label="PaySick home">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><radialGradient id="tosCross" cx="40%" cy="40%"><stop offset="0%" style="stop-color:#FF4757"/><stop offset="100%" style="stop-color:#E01E37"/></radialGradient></defs>
+            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#tosCross)"/>
+            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#tosCross)"/>
+            <circle cx="50" cy="50" r="7" fill="#1A1A1A"/>
+            <circle cx="50" cy="50" r="5" fill="#E01E37"/>
+        </svg>
+        <div class="logo-text">Pay<span>Sick</span></div>
+    </a>
+    <a class="back-link" href="index.html">&#8592; Back to Home</a>
+</header>
+
+<div class="hero">
+    <h1>Terms of Service</h1>
+    <p>The binding agreement between you and PaySick South Africa (Pty) Ltd</p>
+</div>
+
+<div class="page-layout">
+
+    <nav class="toc" aria-label="Page contents">
+        <div class="toc-sticky">
+            <h4>Contents</h4>
+            <ol>
+                <li><a href="#t1">1. About PaySick</a></li>
+                <li><a href="#t2">2. Non-Credit Liability</a></li>
+                <li><a href="#t3">3. Eligibility Criteria</a></li>
+                <li><a href="#t4">4. Application Assessment</a></li>
+                <li><a href="#t5">5. The Service</a></li>
+                <li><a href="#t6">6. Fees &amp; Charges</a></li>
+                <li><a href="#t7">7. Debit Order Authority</a></li>
+                <li><a href="#t8">8. User Obligations</a></li>
+                <li><a href="#t9">9. Intellectual Property</a></li>
+                <li><a href="#t10">10. Acceptable Use</a></li>
+                <li><a href="#t11">11. Payment Conduct Reporting</a></li>
+                <li><a href="#t12">12. Termination &amp; Default</a></li>
+                <li><a href="#t13">13. Limitation of Liability</a></li>
+                <li><a href="#t14">14. Indemnification</a></li>
+                <li><a href="#t15">15. Dispute Resolution</a></li>
+                <li><a href="#t16">16. Governing Law</a></li>
+                <li><a href="#t17">17. Changes</a></li>
+                <li><a href="#t18">18. Contact</a></li>
+            </ol>
+        </div>
+    </nav>
+
+    <main class="content">
+
+        <div class="effective">
+            <strong>Effective Date:</strong> 3 March 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.3<br>
+            By registering for, accessing, or using the PaySick platform you confirm that you have read, understood, and agreed to be bound by these Terms. If you do not agree, you must not use the platform. These Terms constitute a binding legal agreement.
+        </div>
+
+        <div class="standout-box" id="t2">
+            <div class="sb-title">Non-Credit Liability Notice</div>
+            <p><strong>PaySick is a technology-enabled payment facilitation platform, not a bank, not a deposit-taking institution, and not an insurer.</strong> PaySick enables eligible patients to spread approved medical bills over structured payment instalments. These Terms of Service govern your use of the platform and do not, of themselves, create or imply any entitlement to a payment plan, guarantee of approval, or financial obligation on PaySick beyond what is expressly set out in a payment arrangement confirmed to you in writing.</p>
+            <p>PaySick exercises no control over, and accepts no liability in respect of, the quality, safety, accuracy, or outcomes of any medical treatment, diagnostic service, surgical procedure, or professional advice rendered by any healthcare provider whose invoice is facilitated through our platform. PaySick's role is strictly one of payment facilitation. The medical services contract exists solely between you and the healthcare provider.</p>
+            <p>PaySick does not guarantee healthcare outcomes, treatment efficacy, or provider performance. Any dispute relating to the quality of medical services must be directed to the healthcare provider and, where applicable, to the Health Professions Council of South Africa (HPCSA) or the relevant professional body.</p>
+        </div>
+
+        <h2 id="t1">1. About PaySick</h2>
+        <p><strong>PaySick South Africa (Pty) Ltd</strong> ("PaySick", "we", "us", "our") is a private company incorporated under the Companies Act 71 of 2008. PaySick provides a digital healthcare payment facilitation service that enables eligible patients to defer and spread approved medical bills over structured monthly instalments collected by debit order.</p>
+        <p>PaySick operates in compliance with the <strong>Financial Intelligence Centre Act 38 of 2001 (FICA)</strong>, the <strong>Consumer Protection Act 68 of 2008 (CPA)</strong>, and the <strong>Protection of Personal Information Act 4 of 2013 (POPIA)</strong>. <strong>PaySick is a payment facilitation platform, not a credit provider, medical scheme, or insurer.</strong> PaySick is not regulated by the National Credit Regulator (NCR), the Council for Medical Schemes (CMS), or the Financial Sector Conduct Authority (FSCA). PaySick arranges payment timing between patients and healthcare providers; it does not extend credit or assume healthcare risk.</p>
+
+        <h2 id="t3">2. Eligibility Criteria</h2>
+        <p>Access to the PaySick service is restricted. You are only eligible to apply if you meet <strong>all</strong> of the following criteria at the time of each application:</p>
+        <div class="criteria-grid">
+            <div class="criteria-card"><div class="cc-title">Age</div><div class="cc-desc">You must be 18 years of age or older. We do not contract with minors under any circumstances.</div></div>
+            <div class="criteria-card"><div class="cc-title">Residency</div><div class="cc-desc">You must be a South African citizen or permanent resident with a valid 13-digit ID number.</div></div>
+            <div class="criteria-card"><div class="cc-title">Banking</div><div class="cc-desc">You must hold a valid South African bank account that can accept authenticated debit orders (DebiCheck).</div></div>
+            <div class="criteria-card"><div class="cc-title">Contact</div><div class="cc-desc">You must have a valid South African mobile number and email address for service communications.</div></div>
+            <div class="criteria-card"><div class="cc-title">Financial Standing</div><div class="cc-desc">You must not be under debt review, sequestration, or administration, or subject to any order that restricts new financial commitments.</div></div>
+            <div class="criteria-card"><div class="cc-title">Affordability</div><div class="cc-desc">You must pass our affordability and suitability assessment as determined at PaySick's sole discretion for each application.</div></div>
+        </div>
+        <p>Meeting the above criteria does not guarantee approval. <strong>PaySick reserves the right to decline any application without being required to provide reasons.</strong></p>
+
+        <h2 id="t4">3. Application Assessment</h2>
+        <p>PaySick operates a structured assessment process to determine whether a payment plan is suitable for each applicant. This process is designed to ensure payment plans are offered only to applicants who have a genuine ability to meet their repayment obligations.</p>
+        <p>Our assessment takes into account factors including your identity and financial profile, your existing obligations, the nature and amount of the medical invoice, and other information relevant to affordability. The specific criteria, methodology, and weightings applied are proprietary to PaySick and are not disclosed externally.</p>
+        <p><strong>We will not offer a payment plan where our assessment indicates that repayment would create undue financial hardship.</strong> Our assessment decisions are final. PaySick does not approve borderline applications in order to generate volume, and we do not offer payment plans to applicants whose profile indicates a material risk of financial harm.</p>
+        <p>By submitting an application, you authorise PaySick to obtain information from relevant third parties and to assess your suitability for a payment plan based on the information you have provided. You accept that PaySick's assessment decision is conclusive for that application.</p>
+
+        <h2 id="t5">4. The Service</h2>
+
+        <h3>4.1 What PaySick Does</h3>
+        <p>Upon approval of your application, PaySick:</p>
+        <ol>
+            <li>Settles your medical bill directly with the healthcare provider on your behalf</li>
+            <li>Enters into a payment arrangement with you for the same amount, repayable in three equal monthly instalments</li>
+            <li>Collects those instalments via authenticated debit order on your chosen date</li>
+        </ol>
+
+        <h3>4.2 What PaySick Does Not Do</h3>
+        <p>PaySick does not: provide medical advice; recommend or endorse healthcare providers; guarantee treatment outcomes; act as an insurer or medical aid scheme; accept deposits; provide general banking services; or offer revolving credit facilities. PaySick does not act as your financial advisor.</p>
+
+        <h3>4.3 Bill Amount Limits</h3>
+        <p>Applications are accepted for medical bills between <strong>R500 and R500,000</strong>. Approval within this range is subject to your affordability assessment and the limit assigned to your profile. These limits may be revised by PaySick at any time on reasonable notice.</p>
+
+        <h3>4.4 Pre-Agreement Disclosure</h3>
+        <p>Before any payment arrangement is confirmed, PaySick will provide you with a written pre-agreement disclosure setting out the total amount, all fees, the repayment schedule, and your rights. You should read this disclosure carefully before accepting any payment plan. You have a right to a <strong>5-business-day cooling-off period</strong> to reconsider before the arrangement takes effect.</p>
+
+        <h2 id="t6">5. Fees and Charges</h2>
+        <table>
+            <thead><tr><th>Charge</th><th>Description</th><th>Limit</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Initiation fee</strong></td><td>Once-off fee charged on approval to set up your payment plan</td><td>Subject to applicable regulatory caps</td></tr>
+                <tr><td><strong>Monthly service fee</strong></td><td>Fixed monthly administration fee for maintaining your payment plan</td><td>Subject to applicable regulatory caps</td></tr>
+                <tr><td><strong>Interest / cost of credit</strong></td><td>Where applicable, charged at the rate specified in your pre-agreement disclosure</td><td>Subject to applicable regulatory caps</td></tr>
+                <tr><td><strong>Dishonour fee</strong></td><td>Charged if a debit order is returned unpaid by your bank</td><td>Actual bank charge plus a reasonable administration fee</td></tr>
+                <tr><td><strong>Late payment penalty</strong></td><td>Charged from the day after a payment is missed until settlement</td><td>Subject to applicable regulatory caps</td></tr>
+                <tr><td><strong>Early settlement</strong></td><td>No penalty. You may settle your full outstanding balance at any time.</td><td>No charge</td></tr>
+            </tbody>
+        </table>
+        <p>All fees are disclosed in full in your pre-agreement disclosure before you accept any payment arrangement. No fee will be charged that was not disclosed to you in advance.</p>
+
+        <h2 id="t7">6. Debit Order Authority</h2>
+        <p>By completing onboarding and providing your banking details, you grant PaySick a <strong>DebiCheck authenticated debit order mandate</strong> to collect your monthly instalments on your chosen date. This mandate is authenticated directly with your bank as required by the South African Reserve Bank's DebiCheck framework and cannot be collected without your bank's confirmation.</p>
+        <p>You acknowledge that:</p>
+        <ul>
+            <li>It is your responsibility to ensure sufficient funds are available on each collection date</li>
+            <li>Disputing or reversing a valid debit order without settling the underlying amount owing is a breach of your payment arrangement and may constitute fraud</li>
+            <li>You may cancel your debit order mandate only through a formal settlement or account closure process. Cancellation of the debit order alone does not extinguish your repayment obligation.</li>
+        </ul>
+
+        <h2 id="t8">7. Your Obligations and Representations</h2>
+        <p>By using the PaySick platform you represent, warrant, and undertake that:</p>
+        <ul>
+            <li>All information you provide is <strong>truthful, accurate, and complete</strong> at the time of submission and throughout your relationship with PaySick</li>
+            <li>You will <strong>immediately notify PaySick</strong> of any change to your contact details, banking details, employment status, or financial circumstances that may affect your ability to repay</li>
+            <li>You will not use the platform to facilitate any fraudulent, unlawful, or deceptive transaction</li>
+            <li>You have not provided false identification documents or misrepresented your identity</li>
+            <li>You have not deliberately misrepresented your financial position or ability to meet your repayment obligations</li>
+            <li>The medical invoice you submit for facilitation relates to a genuine, lawfully rendered healthcare service</li>
+        </ul>
+        <p><strong>Breach of any warranty in this section constitutes a material breach of contract and may result in immediate termination of your account, cancellation of your payment arrangement, and referral to law enforcement or relevant regulatory authorities.</strong></p>
+
+        <h2 id="t9">8. Intellectual Property</h2>
+        <p>All intellectual property on or in the PaySick platform, including but not limited to the PaySick name, logo, trade dress, website, source code, application software, database architecture, assessment models, algorithms, data structures, user interface designs, written content, and documentation, is the <strong>exclusive property of PaySick South Africa (Pty) Ltd</strong> or its licensors and is protected by South African and international intellectual property law, including the Copyright Act 98 of 1978, the Trade Marks Act 194 of 1993, and applicable common law rights.</p>
+        <p>You are granted a <strong>limited, non-exclusive, non-transferable, revocable licence</strong> to access and use the PaySick platform for your personal, non-commercial use solely for the purpose of applying for and managing healthcare payment plans as contemplated by these Terms.</p>
+        <p><strong>You may not:</strong></p>
+        <ul>
+            <li>Copy, reproduce, adapt, modify, translate, create derivative works of, or reverse-engineer any part of the platform</li>
+            <li>Scrape, data-mine, or systematically extract information from the platform by automated means</li>
+            <li>Use any PaySick intellectual property for commercial purposes without express written permission</li>
+            <li>Frame or embed any PaySick page on another website or application</li>
+            <li>Remove, alter, or obscure any copyright, trademark, or other proprietary notice</li>
+            <li>Attempt to decompile, disassemble, or derive the source code of any PaySick software</li>
+            <li>Use our assessment models, scoring methodology, or pricing logic for competitive intelligence purposes</li>
+        </ul>
+        <p>Any unauthorised use of PaySick's intellectual property will result in immediate termination of your access and may give rise to civil and criminal liability.</p>
+
+        <h2 id="t10">9. Acceptable Use</h2>
+        <p>You must not use the PaySick platform to:</p>
+        <ul>
+            <li>Submit fraudulent, fictitious, or inflated medical invoices</li>
+            <li>Impersonate another person or misrepresent your identity or financial position</li>
+            <li>Circumvent, disable, or interfere with any security feature of the platform</li>
+            <li>Introduce viruses, malware, or any code designed to damage, intercept, or disrupt platform functionality</li>
+            <li>Attempt unauthorised access to any part of the platform, PaySick's systems, or any third-party systems connected thereto</li>
+            <li>Use the platform in a manner that places an unreasonable load on our infrastructure or interferes with other users</li>
+            <li>Collect or harvest personal information of other users</li>
+        </ul>
+        <p>PaySick reserves the right to <strong>immediately suspend or terminate</strong> any account where prohibited use is detected or suspected, with or without prior notice.</p>
+
+        <h2 id="t11">10. Payment Conduct Reporting</h2>
+        <p>Where required by applicable law, PaySick may report the existence of your payment arrangement and your payment conduct (including defaults, late payments, and early settlements) to relevant third parties, including registered credit bureaus. Where such reporting applies, your payment conduct may form part of your financial profile with those parties. Consistent, on-time payment may have a positive effect on your profile; defaults may have an adverse effect.</p>
+
+        <h2 id="t12">11. Termination, Default, and Enforcement</h2>
+        <h3>11.1 Termination by You</h3>
+        <p>You may close your PaySick account at any time, provided that all outstanding payment arrangement obligations have been settled in full. Account closure does not extinguish any existing repayment obligations.</p>
+
+        <h3>11.2 Termination by PaySick</h3>
+        <p>PaySick may suspend or terminate your account immediately, without notice, if you: (a) breach any material term of these Terms; (b) provide false information; (c) engage in fraudulent or unlawful conduct; (d) pose a risk of harm to PaySick, other users, or third parties; or (e) are placed under debt review, sequestration, or administration after account opening.</p>
+
+        <h3>11.3 Default and Recovery</h3>
+        <p>If you fail to make scheduled payments, PaySick will contact you to advise of the default and to give you an opportunity to remedy the situation or propose an alternative arrangement. Where the default remains unresolved, PaySick may refer the outstanding amount to a registered debt collection service and, if necessary, apply to the appropriate court for recovery. You will be liable for reasonable collection costs in the event of default.</p>
+        <p>You have the right to approach a registered Debt Counsellor at any time if you are experiencing financial difficulty. PaySick will consider any reasonable debt restructuring proposal in good faith.</p>
+
+        <h2 id="t13">12. Limitation of PaySick's Liability</h2>
+        <p>To the maximum extent permitted by South African law, PaySick:</p>
+        <ul>
+            <li>Provides the platform on an <strong>"as available"</strong> basis. We do not guarantee uninterrupted or error-free service.</li>
+            <li>Accepts <strong>no liability</strong> for medical treatment outcomes, healthcare provider conduct, or the suitability of any medical service facilitated through our platform.</li>
+            <li>Accepts <strong>no liability</strong> for any loss arising from your failure to provide accurate information during the application process.</li>
+            <li>Accepts <strong>no liability</strong> for indirect, consequential, special, incidental, or punitive damages howsoever arising, including loss of data, loss of profits, or loss of business opportunity.</li>
+            <li>Limits its aggregate liability for any claim arising under these Terms to the <strong>total fees paid by you to PaySick in the 12 months preceding the event giving rise to the claim</strong>.</li>
+        </ul>
+        <p>Nothing in these Terms limits PaySick's liability for: (a) death or personal injury caused by PaySick's gross negligence; (b) fraud or fraudulent misrepresentation; or (c) any liability that cannot lawfully be excluded under the Consumer Protection Act 68 of 2008.</p>
+
+        <h2 id="t14">13. Indemnification</h2>
+        <p>You agree to indemnify, defend, and hold harmless PaySick South Africa (Pty) Ltd, its directors, officers, employees, agents, and licensors from and against any claim, loss, damage, liability, cost, or expense (including reasonable legal fees) arising out of or relating to: (a) your use or misuse of the platform; (b) your breach of these Terms; (c) any misrepresentation you have made to PaySick; (d) your violation of any applicable law; or (e) any claim by a third party arising from your conduct on or through the platform.</p>
+
+        <h2 id="t15">14. Dispute Resolution</h2>
+        <p>If you have a complaint about our service or a payment arrangement, please first contact us at <a href="mailto:legal@paysick.co.za">legal@paysick.co.za</a>. We will acknowledge your complaint within <strong>3 business days</strong> and endeavour to resolve it within <strong>20 business days</strong> as required by the CPA.</p>
+        <p>If we cannot resolve your complaint, you may refer it to:</p>
+        <ul>
+            <li><strong>National Consumer Commission (NCC)</strong> — for Consumer Protection Act matters: <a href="https://www.thencc.gov.za" target="_blank" rel="noopener">www.thencc.gov.za</a> | 0860 266 786</li>
+            <li><strong>Consumer Goods and Services Ombud (CGSO)</strong> — for general consumer disputes: <a href="https://www.cgso.org.za" target="_blank" rel="noopener">www.cgso.org.za</a> | 0860 000 272</li>
+            <li><strong>Information Regulator</strong> — for POPIA-related privacy complaints: <a href="https://www.justice.gov.za/inforeg/" target="_blank" rel="noopener">www.justice.gov.za/inforeg</a></li>
+            <li><strong>Western Cape Division of the High Court</strong> for formal legal proceedings, subject to jurisdiction, and you hereby consent to that jurisdiction</li>
+        </ul>
+
+        <h2 id="t16">15. Governing Law</h2>
+        <p>These Terms of Service are governed exclusively by the laws of the <strong>Republic of South Africa</strong>. Any dispute that cannot be resolved through the mechanisms in Section 14 shall be referred to arbitration in Cape Town under the Arbitration Foundation of Southern Africa (AFSA) rules, or to the competent South African courts. You agree that South African law shall apply without reference to choice-of-law principles that would result in the application of any other jurisdiction's law.</p>
+
+        <h2 id="t17">16. Changes to These Terms</h2>
+        <p>PaySick may update these Terms from time to time. We will:</p>
+        <ul>
+            <li>Post the updated Terms on this page with a revised effective date</li>
+            <li>Notify registered users by email at least <strong>20 business days</strong> before material changes take effect, as required by CPA Section 49</li>
+            <li>Where changes affect existing payment arrangements, give advance written notice</li>
+        </ul>
+        <p>Your continued use of the platform after the effective date of a revised version constitutes acceptance of those terms. If you do not accept revised Terms, you must stop using the platform and contact us to close your account.</p>
+
+        <div class="contact-box" id="t18">
+            <h3>17. Contact and Legal Notices</h3>
+            <p><strong>General enquiries:</strong> <a href="mailto:hello@paysick.co.za">hello@paysick.co.za</a></p>
+            <p><strong>Legal / Terms matters:</strong> <a href="mailto:legal@paysick.co.za">legal@paysick.co.za</a></p>
+            <p><strong>Complaints:</strong> <a href="mailto:complaints@paysick.co.za">complaints@paysick.co.za</a></p>
+            <p><strong>National Consumer Commission:</strong> <a href="https://www.thencc.gov.za" target="_blank" rel="noopener">www.thencc.gov.za</a> | 0860 266 786</p>
+            <p><strong>Consumer Goods and Services Ombud:</strong> <a href="https://www.cgso.org.za" target="_blank" rel="noopener">www.cgso.org.za</a> | 0860 000 272</p>
+        </div>
+
+    </main>
+</div>
+
+<footer class="site-footer">
+    <p>&copy; 2026 PaySick South Africa. All rights reserved. POPIA Compliant &nbsp;|&nbsp;
+        <a href="terms-of-service.html">Terms</a> &nbsp;|&nbsp;
+        <a href="privacy-policy.html">Privacy</a> &nbsp;|&nbsp;
+        <a href="licenses.html">Licenses</a> &nbsp;|&nbsp;
+        <a href="accessibility.html">Accessibility</a>
+    </p>
+</footer>
+
+</body>
+</html>
