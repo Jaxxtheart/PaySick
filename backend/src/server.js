@@ -242,6 +242,7 @@ app.get('/', (req, res) => {
       applications: '/api/applications',
       payments: '/api/payments',
       providers: '/api/providers',
+      providerDashboard: '/api/providers/dashboard',
       marketplace: '/api/marketplace',
       risk: '/api/risk',
       notifications: '/api/notifications',
