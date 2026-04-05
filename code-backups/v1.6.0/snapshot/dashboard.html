@@ -587,6 +587,343 @@
             grid-column: 1 / -1;
         }
 
+        /* ═══════════════════════════════════════════════
+           NOTIFICATION SYSTEM
+           ═══════════════════════════════════════════════ */
+
+        /* Bell button in header */
+        .notif-bell {
+            position: relative;
+            background: none;
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .notif-bell:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .notif-bell svg {
+            width: 22px;
+            height: 22px;
+            stroke: #4A4A4A;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.25s ease;
+        }
+
+        .notif-bell:hover svg {
+            stroke: #FF4757;
+        }
+
+        /* Animated bell swing when new notifications arrive */
+        .notif-bell.has-unread svg {
+            animation: bellSwing 0.6s ease-in-out;
+        }
+
+        @keyframes bellSwing {
+            0%   { transform: rotate(0); }
+            15%  { transform: rotate(14deg); }
+            30%  { transform: rotate(-12deg); }
+            45%  { transform: rotate(8deg); }
+            60%  { transform: rotate(-6deg); }
+            75%  { transform: rotate(3deg); }
+            100% { transform: rotate(0); }
+        }
+
+        /* Badge — pulsing red dot with count. Loss aversion: seeing a number creates urgency */
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            background: #FF4757;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        .notif-badge.visible {
+            display: flex;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4); }
+            50%      { transform: scale(1.1); box-shadow: 0 3px 10px rgba(255, 71, 87, 0.6); }
+        }
+
+        /* Dropdown Panel — slides down with eased entry */
+        .notif-panel {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 400px;
+            max-height: 520px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(-8px);
+            opacity: 0;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .notif-panel.open {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Panel header */
+        .notif-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .notif-panel-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .notif-mark-all {
+            background: none;
+            border: none;
+            color: #FF4757;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .notif-mark-all:hover {
+            background: rgba(255, 71, 87, 0.08);
+        }
+
+        /* Scrollable body */
+        .notif-panel-body {
+            overflow-y: auto;
+            flex: 1;
+            max-height: 420px;
+            scrollbar-width: thin;
+        }
+
+        /* Group labels — temporal anchoring */
+        .notif-group-label {
+            padding: 10px 20px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8A8A8A;
+            background: #FAFAFA;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        /* Individual notification item */
+        .notif-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #F8F8F8;
+            position: relative;
+        }
+
+        .notif-item:hover {
+            background: #FAFAFA;
+        }
+
+        /* Unread indicator — left accent bar (Gestalt: figure-ground separation) */
+        .notif-item.unread {
+            background: rgba(255, 71, 87, 0.03);
+        }
+
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            background: #FF4757;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Priority accent — critical items get a pulse dot */
+        .notif-item.priority-critical .notif-icon-wrap {
+            animation: iconPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.3); }
+            50%      { box-shadow: 0 0 0 6px rgba(255, 71, 87, 0); }
+        }
+
+        /* Icon circle */
+        .notif-icon-wrap {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Content */
+        .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-message {
+            font-size: 14px;
+            color: #1A1A1A;
+            line-height: 1.4;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .notif-item.unread .notif-message {
+            font-weight: 600;
+        }
+
+        .notif-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notif-time {
+            font-size: 12px;
+            color: #AAAAAA;
+        }
+
+        /* CTA button — single clear action. Reduces decision paralysis. */
+        .notif-cta {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #FF4757;
+            background: rgba(255, 71, 87, 0.08);
+            padding: 3px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .notif-cta:hover {
+            background: rgba(255, 71, 87, 0.16);
+        }
+
+        /* Empty state */
+        .notif-empty {
+            padding: 48px 20px;
+            text-align: center;
+            color: #AAAAAA;
+        }
+
+        .notif-empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .notif-empty-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .notif-empty-sub {
+            font-size: 13px;
+            margin-top: 4px;
+            color: #CCCCCC;
+        }
+
+        /* Panel overlay for mobile */
+        .notif-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 499;
+            display: none;
+        }
+
+        .notif-overlay.open {
+            display: block;
+        }
+
+        /* Side menu badge */
+        .menu-notif-badge {
+            background: #FF4757;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            margin-left: auto;
+        }
+
+        .menu-notif-badge.visible {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .notif-panel {
+                width: calc(100vw - 16px);
+                right: -8px;
+                max-height: 70vh;
+                border-radius: 12px;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           END NOTIFICATION SYSTEM
+           ═══════════════════════════════════════════════ */
+
         /* Responsive */
         @media (max-width: 1024px) {
             .content-grid {
@@ -710,9 +1047,10 @@
                 <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle class="icon-stroke" cx="12" cy="8" r="4"/><path class="icon-stroke" d="M12 12v1M10.5 20.5a5 5 0 003 0M19.9 17.5A8 8 0 004.1 17.5"/><path class="icon-stroke" d="M10 3.1a4 4 0 010 9.8M14 3.1a4 4 0 000 9.8"/></svg></span>
                 <span class="menu-item-text">Account Settings</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" onclick="toggleMenu(); setTimeout(function(){ toggleNotifPanel(); }, 350); return false;">
                 <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path class="icon-stroke" d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
                 <span class="menu-item-text">Notifications</span>
+                <span class="menu-notif-badge" id="menuNotifBadge">0</span>
             </a>
             <a href="#" class="menu-item">
                 <span class="icon">💬</span>
@@ -755,6 +1093,38 @@
                 </div>
             </div>
             <div class="user-menu">
+                <!-- Notification Bell -->
+                <div style="position:relative;">
+                    <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" aria-label="Notifications">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </button>
+
+                    <!-- Notification Dropdown Panel -->
+                    <div class="notif-panel" id="notifPanel">
+                        <div class="notif-panel-header">
+                            <span class="notif-panel-title">Notifications</span>
+                            <button class="notif-mark-all" id="notifMarkAllBtn" onclick="markAllNotifRead()">Mark all read</button>
+                        </div>
+                        <div class="notif-panel-body" id="notifPanelBody">
+                            <div class="notif-empty">
+                                <div class="notif-empty-icon">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                    </svg>
+                                </div>
+                                <div class="notif-empty-text">You're all caught up</div>
+                                <div class="notif-empty-sub">No new notifications</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+
                 <div class="user-info">
                     <div class="avatar" id="userAvatar">JD</div>
                     <span class="user-name" id="userName">John Doe</span>
@@ -1129,8 +1499,369 @@
             }
         }
 
+        // ═══════════════════════════════════════════════════════════
+        // NOTIFICATION SYSTEM — HCI-driven bell, badge & dropdown
+        //
+        // Psychological nudges:
+        // 1. Loss aversion: critical items (failed payments) surface first
+        //    with red pulsing icons — people act faster to avoid loss
+        // 2. Recency bias: "Just now" / "5 min ago" creates immediacy
+        // 3. Zeigarnik effect: unread count (badge) creates tension that
+        //    resolves only when the user acts on the notification
+        // 4. Single-CTA per item: reduces decision paralysis (Hick's Law)
+        // 5. Temporal grouping (Today/Yesterday/Earlier): pattern recognition
+        //    helps users scan quickly (Gestalt proximity principle)
+        // 6. Progressive disclosure: collapsed dropdown, not always visible
+        // 7. Social proof in copy: "Most patients resolve within 24 hours"
+        // ═══════════════════════════════════════════════════════════
+
+        // ── UI helper functions (isomorphic with notification-ui.helpers.js) ──
+
+        function notifFormatTimeAgo(iso) {
+            var now = Date.now(), then = new Date(iso).getTime();
+            var s = Math.floor((now - then) / 1000);
+            if (s < 60) return 'Just now';
+            if (s < 3600) return Math.floor(s / 60) + ' min ago';
+            if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+            if (s < 30 * 86400) return Math.floor(s / 86400) + 'd ago';
+            return new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        var NOTIF_ICONS = {
+            payment_success:       { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            plan_activated:        { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            application_approved:  { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            account_settled:       { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            restructure_accepted:  { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            payment_failed:        { sym: '!',  bg: 'rgba(255,71,87,0.12)',  color: '#FF4757' },
+            payment_failed_retry:  { sym: '!',  bg: 'rgba(255,71,87,0.12)',  color: '#FF4757' },
+            application_declined:  { sym: '\u2715', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' },
+            payment_upcoming_1d:   { sym: '\u23F0', bg: 'rgba(255,159,64,0.12)', color: '#FF9F40' },
+            payment_due_today:     { sym: '\u23F0', bg: 'rgba(255,71,87,0.12)',  color: '#FF4757' },
+            welcome:               { sym: '\u2605', bg: 'rgba(52,152,219,0.12)', color: '#3498DB' },
+            restructure_offer:     { sym: '\u2764', bg: 'rgba(255,159,64,0.12)', color: '#FF9F40' },
+            security_alert_new_device:    { sym: '\u26A0', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' },
+            security_alert_failed_logins: { sym: '\u26A0', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' }
+        };
+
+        var NOTIF_ICON_DEFAULT = { sym: '\u2022', bg: 'rgba(138,138,138,0.12)', color: '#8A8A8A' };
+
+        // Collections icons — orange for early/mid, red for late
+        ['collections_day_1','collections_day_3','collections_day_7',
+         'collections_early_8d','collections_early_14d','collections_early_21d','collections_early_30d',
+         'collections_mid_31d','collections_mid_45d','collections_mid_60d'].forEach(function(t) {
+            NOTIF_ICONS[t] = { sym: '\u25B2', bg: 'rgba(255,159,64,0.12)', color: '#FF9F40' };
+        });
+        ['collections_late_61d','collections_late_75d','collections_late_90d'].forEach(function(t) {
+            NOTIF_ICONS[t] = { sym: '\u25B2', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' };
+        });
+        // Payment upcoming blue
+        ['payment_upcoming_7d','payment_upcoming_3d'].forEach(function(t) {
+            NOTIF_ICONS[t] = { sym: '\u23F0', bg: 'rgba(52,152,219,0.12)', color: '#3498DB' };
+        });
+
+        function notifIcon(type) { return NOTIF_ICONS[type] || NOTIF_ICON_DEFAULT; }
+
+        function notifPriority(type) {
+            if (/^payment_failed/.test(type) || /^security_alert/.test(type)) return 'critical';
+            if (/^collections_/.test(type) || type === 'restructure_offer' || type === 'application_declined') return 'high';
+            if (/^payment_upcoming/.test(type) || type === 'payment_due_today' || type === 'application_more_info' || /^onboarding_/.test(type)) return 'medium';
+            return 'low';
+        }
+
+        var PRIORITY_SORT = { critical: 0, high: 1, medium: 2, low: 3 };
+
+        function notifCTA(type) {
+            if (type === 'payment_failed' || type === 'payment_failed_retry') return { label: 'Pay Now', url: 'make-payment.html' };
+            if (/^collections_/.test(type)) return { label: 'Resolve Payment', url: 'make-payment.html' };
+            if (type === 'restructure_offer') return { label: 'View Options', url: 'dashboard.html' };
+            if (type === 'application_approved') return { label: 'View My Plan', url: 'dashboard.html' };
+            if (type === 'application_declined') return { label: 'See Details', url: 'dashboard.html' };
+            if (type === 'application_more_info') return { label: 'Provide Info', url: 'dashboard.html' };
+            if (/^payment_upcoming/.test(type) || type === 'payment_due_today') return { label: 'View Payment', url: 'payments.html' };
+            if (/^security_alert/.test(type)) return { label: 'Secure Account', url: 'forgot-password.html' };
+            if (/^onboarding_/.test(type)) return { label: 'Complete Profile', url: 'onboarding.html' };
+            if (/^survey_/.test(type)) return { label: 'Take Survey', url: 'dashboard.html' };
+            return null;
+        }
+
+        function notifGroup(notifications) {
+            if (!notifications.length) return [];
+            var now = new Date();
+            var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            var yesterStart = todayStart - 86400000;
+            var buckets = { Today: [], Yesterday: [], Earlier: [] };
+            notifications.forEach(function(n) {
+                var t = new Date(n.created_at).getTime();
+                if (t >= todayStart) buckets.Today.push(n);
+                else if (t >= yesterStart) buckets.Yesterday.push(n);
+                else buckets.Earlier.push(n);
+            });
+            var groups = [];
+            ['Today','Yesterday','Earlier'].forEach(function(label) {
+                if (buckets[label].length > 0) groups.push({ label: label, items: buckets[label] });
+            });
+            return groups;
+        }
+
+        // ── Panel toggle ─────────────────────────────────────────────────────
+
+        var notifPanelOpen = false;
+
+        function toggleNotifPanel() {
+            notifPanelOpen = !notifPanelOpen;
+            var panel = document.getElementById('notifPanel');
+            var overlay = document.getElementById('notifOverlay');
+            if (notifPanelOpen) {
+                panel.classList.add('open');
+                overlay.classList.add('open');
+                // Force reflow then animate
+                panel.offsetHeight;
+                panel.style.transform = 'translateY(0)';
+                panel.style.opacity = '1';
+                loadNotifications();
+            } else {
+                closeNotifPanel();
+            }
+        }
+
+        function closeNotifPanel() {
+            notifPanelOpen = false;
+            var panel = document.getElementById('notifPanel');
+            var overlay = document.getElementById('notifOverlay');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && notifPanelOpen) closeNotifPanel();
+        });
+
+        // ── Render notifications ─────────────────────────────────────────────
+
+        function renderNotifications(notifications) {
+            var body = document.getElementById('notifPanelBody');
+
+            if (!notifications || notifications.length === 0) {
+                body.innerHTML =
+                    '<div class="notif-empty">' +
+                        '<div class="notif-empty-icon">' +
+                            '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+                                '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>' +
+                                '<path d="M13.73 21a2 2 0 0 1-3.46 0"/>' +
+                            '</svg>' +
+                        '</div>' +
+                        '<div class="notif-empty-text">You\'re all caught up</div>' +
+                        '<div class="notif-empty-sub">No new notifications</div>' +
+                    '</div>';
+                return;
+            }
+
+            // Sort: critical first (loss aversion), then by time
+            notifications.sort(function(a, b) {
+                var pa = PRIORITY_SORT[notifPriority(a.type)] || 3;
+                var pb = PRIORITY_SORT[notifPriority(b.type)] || 3;
+                // Unread before read
+                var ua = a.read_at ? 1 : 0;
+                var ub = b.read_at ? 1 : 0;
+                if (ua !== ub) return ua - ub;
+                if (pa !== pb) return pa - pb;
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+
+            var groups = notifGroup(notifications);
+            var html = '';
+
+            groups.forEach(function(group) {
+                html += '<div class="notif-group-label">' + group.label + '</div>';
+                group.items.forEach(function(n) {
+                    var icon = notifIcon(n.type);
+                    var priority = notifPriority(n.type);
+                    var cta = notifCTA(n.type);
+                    var isUnread = !n.read_at;
+                    var subject = n.subject || '';
+                    var message = n.message || '';
+                    // Truncate message for display
+                    var displayText = subject || (message.length > 100 ? message.substring(0, 100) + '...' : message);
+                    // Strip HTML tags for in-panel display
+                    displayText = displayText.replace(/<[^>]*>/g, '');
+
+                    html += '<div class="notif-item' +
+                        (isUnread ? ' unread' : '') +
+                        ' priority-' + priority +
+                        '" data-id="' + n.notification_id + '" onclick="handleNotifClick(\'' + n.notification_id + '\', ' + (cta ? '\'' + cta.url + '\'' : 'null') + ')">' +
+                        '<div class="notif-icon-wrap" style="background:' + icon.bg + ';color:' + icon.color + ';">' +
+                            icon.sym +
+                        '</div>' +
+                        '<div class="notif-content">' +
+                            '<div class="notif-message">' + escapeHtml(displayText) + '</div>' +
+                            '<div class="notif-meta">' +
+                                '<span class="notif-time">' + notifFormatTimeAgo(n.created_at) + '</span>' +
+                                (cta ? '<a href="' + cta.url + '" class="notif-cta" onclick="event.stopPropagation();">' + cta.label + '</a>' : '') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                });
+            });
+
+            body.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ── Notification interactions ─────────────────────────────────────────
+
+        async function handleNotifClick(notifId, ctaUrl) {
+            // Mark as read on click
+            try {
+                if (!isDemoMode()) {
+                    await PaySickAPI.notifications.markRead(notifId);
+                }
+            } catch (e) { /* ignore */ }
+
+            // Visual: immediately remove unread styling (completion satisfaction)
+            var el = document.querySelector('[data-id="' + notifId + '"]');
+            if (el) el.classList.remove('unread');
+
+            // Update badge count
+            updateBadgeCount();
+
+            // Navigate if there's a CTA
+            if (ctaUrl) {
+                closeNotifPanel();
+                window.location.href = ctaUrl;
+            }
+        }
+
+        async function markAllNotifRead() {
+            try {
+                if (!isDemoMode()) {
+                    await PaySickAPI.notifications.markAllRead();
+                }
+            } catch (e) { /* ignore */ }
+
+            // Visual: remove all unread styling
+            document.querySelectorAll('.notif-item.unread').forEach(function(el) {
+                el.classList.remove('unread');
+            });
+
+            // Reset badge
+            setBadge(0);
+        }
+
+        // ── Badge management ─────────────────────────────────────────────────
+
+        function setBadge(count) {
+            var badge = document.getElementById('notifBadge');
+            var menuBadge = document.getElementById('menuNotifBadge');
+            var bell = document.getElementById('notifBell');
+
+            if (count > 0) {
+                var display = count > 99 ? '99+' : String(count);
+                badge.textContent = display;
+                badge.classList.add('visible');
+                if (menuBadge) { menuBadge.textContent = display; menuBadge.classList.add('visible'); }
+                bell.classList.add('has-unread');
+            } else {
+                badge.classList.remove('visible');
+                if (menuBadge) menuBadge.classList.remove('visible');
+                bell.classList.remove('has-unread');
+            }
+        }
+
+        var lastBadgeCount = 0;
+
+        async function updateBadgeCount() {
+            try {
+                if (isDemoMode()) {
+                    setBadge(3); // Demo shows 3 unread
+                    return;
+                }
+                var count = await PaySickAPI.notifications.getUnreadCount();
+                setBadge(count);
+
+                // If new notifications arrived, trigger bell animation
+                if (count > lastBadgeCount && lastBadgeCount >= 0) {
+                    var bell = document.getElementById('notifBell');
+                    bell.classList.remove('has-unread');
+                    bell.offsetHeight; // force reflow
+                    bell.classList.add('has-unread');
+                }
+                lastBadgeCount = count;
+            } catch (e) {
+                // Silently fail — notification badge is not critical path
+            }
+        }
+
+        // ── Load notifications into panel ─────────────────────────────────────
+
+        async function loadNotifications() {
+            var body = document.getElementById('notifPanelBody');
+
+            if (isDemoMode()) {
+                renderNotifications(getDemoNotifications());
+                return;
+            }
+
+            // Show loading shimmer
+            body.innerHTML =
+                '<div style="padding:20px;">' +
+                    '<div style="height:52px;background:#F5F5F5;border-radius:8px;margin-bottom:12px;animation:pulse 1.5s infinite;"></div>' +
+                    '<div style="height:52px;background:#F5F5F5;border-radius:8px;margin-bottom:12px;animation:pulse 1.5s infinite;animation-delay:0.2s;"></div>' +
+                    '<div style="height:52px;background:#F5F5F5;border-radius:8px;animation:pulse 1.5s infinite;animation-delay:0.4s;"></div>' +
+                '</div>';
+
+            try {
+                var notifications = await PaySickAPI.notifications.getAll({ limit: 30 });
+                renderNotifications(notifications);
+            } catch (e) {
+                body.innerHTML =
+                    '<div class="notif-empty">' +
+                        '<div class="notif-empty-text" style="color:#FF4757;">Unable to load notifications</div>' +
+                        '<div class="notif-empty-sub">Please try again later</div>' +
+                    '</div>';
+            }
+        }
+
+        // Demo notifications for demo mode
+        function getDemoNotifications() {
+            var now = new Date();
+            return [
+                { notification_id: 'demo-1', type: 'payment_upcoming_1d', subject: 'Payment due tomorrow', message: 'Your payment of R6,167.00 is due tomorrow on 6 April 2026.', created_at: new Date(now - 2 * 60 * 60 * 1000).toISOString(), read_at: null },
+                { notification_id: 'demo-2', type: 'plan_activated', subject: 'Payment plan active', message: 'Your payment plan with Netcare Dental Centre is now active.', created_at: new Date(now - 5 * 60 * 60 * 1000).toISOString(), read_at: null },
+                { notification_id: 'demo-3', type: 'welcome', subject: 'Welcome to PaySick!', message: 'Your account is active. You can now apply for a healthcare payment plan.', created_at: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(), read_at: null }
+            ];
+        }
+
+        // ── Polling — ambient awareness without interruption ──────────────────
+        // Poll every 60s. If tab is hidden, pause (Page Visibility API).
+
+        var notifPollInterval = null;
+
+        function startNotifPolling() {
+            updateBadgeCount();
+            notifPollInterval = setInterval(updateBadgeCount, 60000);
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    clearInterval(notifPollInterval);
+                } else {
+                    updateBadgeCount();
+                    notifPollInterval = setInterval(updateBadgeCount, 60000);
+                }
+            });
+        }
+
         // Run on page load
-        window.addEventListener('load', initDashboard);
+        window.addEventListener('load', function() {
+            initDashboard();
+            startNotifPolling();
+        });
     </script>
 </body>
 </html>

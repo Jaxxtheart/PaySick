@@ -314,6 +314,43 @@ const PaySickAPI = {
     async getLoanRepayments(loanId) {
       return PaySickAPI.request(`/marketplace/loans/${loanId}/repayments`);
     }
+  },
+
+  // ─── Notifications ──────────────────────────────────────────────────────
+  notifications: {
+    /**
+     * Get in-app notifications (most recent first)
+     */
+    async getAll(opts = {}) {
+      const params = new URLSearchParams();
+      if (opts.unread) params.set('unread', 'true');
+      if (opts.limit)  params.set('limit', String(opts.limit));
+      const qs = params.toString();
+      const data = await PaySickAPI.request(`/notifications${qs ? '?' + qs : ''}`);
+      return data.notifications || [];
+    },
+
+    /**
+     * Get unread notification count (for badge)
+     */
+    async getUnreadCount() {
+      const data = await PaySickAPI.request('/notifications/unread-count');
+      return data.count || 0;
+    },
+
+    /**
+     * Mark a single notification as read
+     */
+    async markRead(notificationId) {
+      return PaySickAPI.request(`/notifications/${notificationId}/read`, { method: 'PUT' });
+    },
+
+    /**
+     * Mark all notifications as read
+     */
+    async markAllRead() {
+      return PaySickAPI.request('/notifications/read-all', { method: 'PUT' });
+    }
   }
 };
 
