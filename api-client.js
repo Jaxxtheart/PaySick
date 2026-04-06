@@ -254,6 +254,50 @@ const PaySickAPI = {
      */
     async search(searchTerm) {
       return PaySickAPI.request(`/providers/search/${encodeURIComponent(searchTerm)}`);
+    },
+
+    // ─── Provider Dashboard (authenticated, provider role) ────────────
+
+    /**
+     * Get dashboard overview stats
+     */
+    async getDashboardOverview() {
+      return PaySickAPI.request('/providers/dashboard/overview');
+    },
+
+    /**
+     * Get patient list for this provider
+     */
+    async getDashboardPatients() {
+      return PaySickAPI.request('/providers/dashboard/patients');
+    },
+
+    /**
+     * Get settlements for this provider
+     */
+    async getDashboardSettlements() {
+      return PaySickAPI.request('/providers/dashboard/settlements');
+    },
+
+    /**
+     * Get trust tier and score
+     */
+    async getDashboardTrustTier() {
+      return PaySickAPI.request('/providers/dashboard/trust-tier');
+    },
+
+    /**
+     * Get payment performance metrics
+     */
+    async getDashboardPaymentPerformance() {
+      return PaySickAPI.request('/providers/dashboard/payment-performance');
+    },
+
+    /**
+     * Get monthly revenue breakdown
+     */
+    async getDashboardRevenueMonthly() {
+      return PaySickAPI.request('/providers/dashboard/revenue-monthly');
     }
   },
 
