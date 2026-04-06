@@ -401,6 +401,9 @@ router.post('/forgot-password', async (req, res) => {
       await sendPasswordResetEmail(user.email, user.full_name, rawToken);
     } catch (emailErr) {
       console.error('Password reset email failed:', emailErr.message);
+      await logSecurityEvent('PASSWORD_RESET_EMAIL_FAILED', user.user_id, ipAddress,
+        req.get('User-Agent'), { email: user.email, error: emailErr.message });
+      return res.status(500).json({ error: 'Unable to send reset email. Please try again later.' });
     }
 
     await logSecurityEvent('PASSWORD_RESET_REQUESTED', user.user_id, ipAddress,
@@ -428,6 +431,21 @@ router.post('/reset-password', async (req, res) => {
 
   if (!new_password || typeof new_password !== 'string') {
     return res.status(400).json({ error: 'New password is required.' });
+  }
+
+  // Enforce same password strength rules as registration
+  if (new_password.length < 8) {
+    return res.status(400).json({
+      error: 'Password must be at least 8 characters',
+      code: 'WEAK_PASSWORD'
+    });
+  }
+
+  if (!/[A-Z]/.test(new_password) || !/[a-z]/.test(new_password) || !/[0-9]/.test(new_password)) {
+    return res.status(400).json({
+      error: 'Password must contain uppercase, lowercase, and numeric characters',
+      code: 'WEAK_PASSWORD'
+    });
   }
 
   try {
