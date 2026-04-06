@@ -577,7 +577,76 @@
 
 <script src="api-client.js"></script>
 <script>
-// ─── Auth Guard ──────────────────────────────────────────────────────────────
+// ─── Demo Mode ───────────────────────────────────────────────────────────────
+
+function isDemoMode() {
+    const tok = localStorage.getItem('paysick_auth_token') || '';
+    return tok.startsWith('demo-');
+}
+
+// Realistic demo data for Dr. Sarah Smith at City Medical Centre
+const DEMO_DATA = {
+    overview: {
+        total_patients: 28,
+        total_applications: 34,
+        total_revenue: 285000,
+        active_plans: 12,
+        overdue_count: 2,
+        avg_risk_score: 41,
+        approval_rate: 82.35
+    },
+    trustTier: {
+        current_tier: 'standard',
+        composite_score: 74,
+        holdback_pct: 5,
+        payout_speed_days: 3,
+        per_patient_cap: 25000,
+        next_tier: 'trusted',
+        upgrade_criteria: {
+            min_months: 12,
+            max_default_rate: 0.025,
+            min_completed_loans: 50,
+            min_clean_months: 12,
+            min_satisfaction: 85
+        }
+    },
+    performance: {
+        total_payments: 84,
+        on_time_count: 72,
+        on_time_rate: 0.857,
+        failed_count: 8,
+        failed_rate: 0.095,
+        in_collections_count: 4,
+        collection_rate: 0.048,
+        avg_days_to_pay: 1.2
+    },
+    patients: [
+        { full_name: 'Thabo Nkosi',      treatment_type: 'specialist',    bill_amount: 18500, plan_status: 'active',     risk_score: 38, payments_made: 2, outstanding_balance: 6167,  application_date: '2026-02-12' },
+        { full_name: 'Lerato Dlamini',   treatment_type: 'consultation',  bill_amount:  4200, plan_status: 'active',     risk_score: 29, payments_made: 1, outstanding_balance: 2800,  application_date: '2026-03-03' },
+        { full_name: 'Sipho Mthembu',    treatment_type: 'follow-up',     bill_amount:  2800, plan_status: 'completed',  risk_score: 22, payments_made: 3, outstanding_balance: 0,     application_date: '2025-11-14' },
+        { full_name: 'Nomsa Khumalo',    treatment_type: 'specialist',    bill_amount: 24000, plan_status: 'active',     risk_score: 55, payments_made: 1, outstanding_balance: 16000, application_date: '2026-03-20' },
+        { full_name: 'Kagiso Sithole',   treatment_type: 'consultation',  bill_amount:  3500, plan_status: 'overdue',    risk_score: 67, payments_made: 0, outstanding_balance: 3500,  application_date: '2026-01-18' },
+        { full_name: 'Zanele Mokoena',   treatment_type: 'urgent',        bill_amount: 12000, plan_status: 'active',     risk_score: 44, payments_made: 2, outstanding_balance: 4000,  application_date: '2026-02-28' },
+        { full_name: 'Bongani Ngubane',  treatment_type: 'specialist',    bill_amount:  9500, plan_status: 'active',     risk_score: 35, payments_made: 1, outstanding_balance: 6334,  application_date: '2026-03-15' },
+        { full_name: 'Ayanda Cele',      treatment_type: 'consultation',  bill_amount:  5200, plan_status: 'completed',  risk_score: 18, payments_made: 3, outstanding_balance: 0,     application_date: '2025-12-10' }
+    ],
+    settlements: [
+        { settlement_id: 'demo-s1', period_start: '2026-03-01', period_end: '2026-03-31', gross_amount: 52000, commission_amount: 2600, net_amount: 49400, line_items: 8, status: 'paid' },
+        { settlement_id: 'demo-s2', period_start: '2026-02-01', period_end: '2026-02-28', gross_amount: 38500, commission_amount: 1925, net_amount: 36575, line_items: 6, status: 'paid' },
+        { settlement_id: 'demo-s3', period_start: '2026-01-01', period_end: '2026-01-31', gross_amount: 29000, commission_amount: 1450, net_amount: 27550, line_items: 5, status: 'paid' },
+        { settlement_id: 'demo-s4', period_start: '2026-04-01', period_end: '2026-04-30', gross_amount: 41000, commission_amount: 2050, net_amount: 38950, line_items: 7, status: 'pending' }
+    ],
+    months: [
+        { month: '2026-04', gross: 41000, net: 38950, patient_count: 7 },
+        { month: '2026-03', gross: 52000, net: 49400, patient_count: 8 },
+        { month: '2026-02', gross: 38500, net: 36575, patient_count: 6 },
+        { month: '2026-01', gross: 29000, net: 27550, patient_count: 5 },
+        { month: '2025-12', gross: 34000, net: 32300, patient_count: 6 },
+        { month: '2025-11', gross: 22000, net: 20900, patient_count: 4 }
+    ]
+};
+
+// ─── Auth Guard ───────────────────────────────────────────────────────────────
 
 (function authGuard() {
     const token = localStorage.getItem('paysick_auth_token');
@@ -643,7 +712,7 @@ function showError(msg) {
 
 async function loadOverview() {
     try {
-        const data = await PaySickAPI.providers.getDashboardOverview();
+        const data = isDemoMode() ? DEMO_DATA.overview : await PaySickAPI.providers.getDashboardOverview();
         document.getElementById('statPatients').textContent = parseInt(data.total_patients) || 0;
         document.getElementById('statRevenue').textContent = formatZAR(data.total_revenue);
         document.getElementById('statActivePlans').textContent = parseInt(data.active_plans) || 0;
@@ -656,7 +725,7 @@ async function loadOverview() {
 
 async function loadTrustTier() {
     try {
-        const data = await PaySickAPI.providers.getDashboardTrustTier();
+        const data = isDemoMode() ? DEMO_DATA.trustTier : await PaySickAPI.providers.getDashboardTrustTier();
         const tier = data.current_tier || 'probation';
 
         const badge = document.getElementById('tierBadge');
@@ -688,7 +757,7 @@ async function loadTrustTier() {
 
 async function loadPaymentPerformance() {
     try {
-        const data = await PaySickAPI.providers.getDashboardPaymentPerformance();
+        const data = isDemoMode() ? DEMO_DATA.performance : await PaySickAPI.providers.getDashboardPaymentPerformance();
 
         const onTimeRate = (data.on_time_rate * 100).toFixed(1);
         const failedRate = (data.failed_rate * 100).toFixed(1);
@@ -711,7 +780,7 @@ async function loadPaymentPerformance() {
 
 async function loadPatients() {
     try {
-        const data = await PaySickAPI.providers.getDashboardPatients();
+        const data = isDemoMode() ? { patients: DEMO_DATA.patients } : await PaySickAPI.providers.getDashboardPatients();
         const tbody = document.getElementById('patientsBody');
 
         if (!data.patients || data.patients.length === 0) {
@@ -738,7 +807,7 @@ async function loadPatients() {
 
 async function loadSettlements() {
     try {
-        const data = await PaySickAPI.providers.getDashboardSettlements();
+        const data = isDemoMode() ? { settlements: DEMO_DATA.settlements } : await PaySickAPI.providers.getDashboardSettlements();
         const tbody = document.getElementById('settlementsBody');
 
         if (!data.settlements || data.settlements.length === 0) {
@@ -763,7 +832,7 @@ async function loadSettlements() {
 
 async function loadRevenue() {
     try {
-        const data = await PaySickAPI.providers.getDashboardRevenueMonthly();
+        const data = isDemoMode() ? { months: DEMO_DATA.months } : await PaySickAPI.providers.getDashboardRevenueMonthly();
         const container = document.getElementById('revenueBars');
 
         if (!data.months || data.months.length === 0) {
