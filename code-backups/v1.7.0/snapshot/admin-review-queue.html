@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Manual Review Queue — PaySick Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
+
+    .header {
+      background: #1B2A4A;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo { font-size: 22px; font-weight: 700; color: #EF476F; text-decoration: none; }
+    .page-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.9); }
+    .admin-badge {
+      background: #EF476F;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .logout-btn:hover { border-color: #EF476F; color: #EF476F; }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .filters {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      box-shadow: 0 2px 8px rgba(27,42,74,0.06);
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-group label { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    .filter-group select, .filter-group input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #1B2A4A;
+      min-width: 150px;
+    }
+    .filter-btn {
+      padding: 9px 20px;
+      background: #1B2A4A;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .filter-btn:hover { background: #EF476F; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(27,42,74,0.06);
+    }
+    .stat-card .number { font-size: 28px; font-weight: 700; color: #1B2A4A; }
+    .stat-card .label { font-size: 13px; color: #666; margin-top: 4px; }
+    .stat-card.critical .number { color: #EF476F; }
+    .stat-card.high .number { color: #F59E0B; }
+
+    .table-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(27,42,74,0.06);
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #E5E5E5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-header h2 { font-size: 16px; font-weight: 700; color: #1B2A4A; }
+    .count-badge {
+      background: #F4F6F9;
+      color: #666;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: #F4F6F9;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tbody tr { border-bottom: 1px solid #F0F0F0; transition: background 0.15s; }
+    tbody tr:hover { background: #F9FAFB; }
+    tbody td { padding: 14px 16px; font-size: 14px; }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .priority-CRITICAL { background: #FEE2E2; color: #DC2626; }
+    .priority-HIGH { background: #FEF3C7; color: #D97706; }
+    .priority-STANDARD { background: #E0E7FF; color: #4338CA; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-OPEN { background: #DCFCE7; color: #166534; }
+    .status-IN_PROGRESS { background: #FEF3C7; color: #92400E; }
+    .status-RESOLVED { background: #F3F4F6; color: #6B7280; }
+
+    .sla-countdown { font-size: 13px; font-weight: 600; }
+    .sla-overdue { color: #EF476F; }
+    .sla-urgent { color: #F59E0B; }
+    .sla-ok { color: #10B981; }
+
+    .action-buttons { display: flex; gap: 6px; }
+    .btn-approve {
+      padding: 5px 12px;
+      background: #10B981;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .btn-reject {
+      padding: 5px 12px;
+      background: #EF476F;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .btn-escalate {
+      padding: 5px 12px;
+      background: #F59E0B;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      width: 480px;
+      max-width: 90vw;
+    }
+    .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #1B2A4A; }
+    .modal textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 80px;
+      margin-bottom: 16px;
+    }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .btn-cancel { background: #F4F6F9; color: #1B2A4A; }
+    .btn-confirm { background: #1B2A4A; color: white; }
+
+    .loading { text-align: center; padding: 48px; color: #666; font-size: 16px; }
+    .error-msg { text-align: center; padding: 48px; color: #EF476F; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <a href="/admin-dashboard.html" class="logo">PaySick</a>
+    <span class="page-title">Manual Review Queue</span>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+</header>
+
+<main class="main">
+  <!-- Stats Row -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card critical">
+      <div class="number" id="statCritical">—</div>
+      <div class="label">Critical Priority</div>
+    </div>
+    <div class="stat-card high">
+      <div class="number" id="statHigh">—</div>
+      <div class="label">High Priority</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="statStandard">—</div>
+      <div class="label">Standard</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="statOverdue">—</div>
+      <div class="label">SLA Overdue</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Priority</label>
+      <select id="filterPriority">
+        <option value="">All Priorities</option>
+        <option value="CRITICAL">Critical</option>
+        <option value="HIGH">High</option>
+        <option value="STANDARD">Standard</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Review Type</label>
+      <select id="filterType">
+        <option value="">All Types</option>
+        <option value="DSP_UNKNOWN_STATUS">DSP Unknown</option>
+        <option value="NO_BENCHMARK">No Benchmark</option>
+        <option value="TARIFF_INFLATION_HOLD">Tariff Inflation Hold</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Status</label>
+      <select id="filterStatus">
+        <option value="">Open &amp; In Progress</option>
+        <option value="OPEN">Open</option>
+        <option value="IN_PROGRESS">In Progress</option>
+        <option value="RESOLVED">Resolved</option>
+      </select>
+    </div>
+    <button class="filter-btn" onclick="loadQueue()">Apply Filters</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <div class="table-header">
+      <h2>Review Queue</h2>
+      <span class="count-badge" id="totalCount">Loading...</span>
+    </div>
+    <div id="tableContent">
+      <div class="loading">Loading review queue...</div>
+    </div>
+  </div>
+</main>
+
+<!-- Resolve Modal -->
+<div class="modal-overlay" id="resolveModal">
+  <div class="modal">
+    <h3 id="modalTitle">Resolve Review Item</h3>
+    <input type="hidden" id="modalItemId">
+    <input type="hidden" id="modalDecision">
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:600;color:#666;display:block;margin-bottom:6px">Decision Notes</label>
+      <textarea id="modalNotes" placeholder="Enter resolution notes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmResolve()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="/api-client.js"></script>
+<script>
+  function getToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  async function apiFetch(path, options = {}) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...options.headers };
+    const res = await fetch(path, { ...options, headers });
+    return res;
+  }
+
+  function formatSlaCountdown(deadline) {
+    if (!deadline) return '<span class="sla-ok">—</span>';
+    const diff = new Date(deadline) - new Date();
+    const hours = Math.floor(diff / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    if (diff < 0) return `<span class="sla-countdown sla-overdue">Overdue ${Math.abs(hours)}h ${Math.abs(mins)}m</span>`;
+    if (hours < 2) return `<span class="sla-countdown sla-urgent">${hours}h ${mins}m</span>`;
+    return `<span class="sla-countdown sla-ok">${hours}h ${mins}m</span>`;
+  }
+
+  async function loadQueue() {
+    const priority = document.getElementById('filterPriority').value;
+    const reviewType = document.getElementById('filterType').value;
+    const status = document.getElementById('filterStatus').value;
+
+    let url = '/api/admin/underwriting/review-queue?limit=100';
+    if (priority) url += `&priority=${priority}`;
+    if (reviewType) url += `&review_type=${encodeURIComponent(reviewType)}`;
+    if (status) url += `&status=${status}`;
+
+    document.getElementById('tableContent').innerHTML = '<div class="loading">Loading...</div>';
+
+    try {
+      const res = await apiFetch(url);
+      if (res.status === 401) { window.location.href = '/login.html'; return; }
+      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+
+      document.getElementById('totalCount').textContent = `${data.total || 0} items`;
+
+      // Update stats
+      const items = data.queue || [];
+      const critical = items.filter(i => i.priority === 'CRITICAL').length;
+      const high = items.filter(i => i.priority === 'HIGH').length;
+      const standard = items.filter(i => i.priority === 'STANDARD').length;
+      const overdue = items.filter(i => i.sla_deadline && new Date(i.sla_deadline) < new Date()).length;
+      document.getElementById('statCritical').textContent = critical;
+      document.getElementById('statHigh').textContent = high;
+      document.getElementById('statStandard').textContent = standard;
+      document.getElementById('statOverdue').textContent = overdue;
+
+      if (items.length === 0) {
+        document.getElementById('tableContent').innerHTML = '<div class="loading">No review items found.</div>';
+        return;
+      }
+
+      const rows = items.map(item => `
+        <tr>
+          <td>${item.id}</td>
+          <td><span class="priority-badge priority-${item.priority}">${item.priority}</span></td>
+          <td>${item.review_type.replace(/_/g, ' ')}</td>
+          <td style="font-family:monospace;font-size:12px">${(item.application_id || '').slice(0,8)}...</td>
+          <td><span class="status-badge status-${item.status}">${item.status}</span></td>
+          <td>${formatSlaCountdown(item.sla_deadline)}</td>
+          <td>${new Date(item.opened_at).toLocaleDateString('en-ZA')}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-approve" onclick="openModal(${item.id}, 'APPROVED')">Approve</button>
+              <button class="btn-reject" onclick="openModal(${item.id}, 'REJECTED')">Reject</button>
+              <button class="btn-escalate" onclick="openModal(${item.id}, 'ESCALATED')">Escalate</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('tableContent').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Priority</th><th>Type</th><th>Application</th>
+              <th>Status</th><th>SLA Countdown</th><th>Opened</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    } catch (err) {
+      document.getElementById('tableContent').innerHTML = `<div class="error-msg">Failed to load review queue: ${err.message}</div>`;
+    }
+  }
+
+  function openModal(itemId, decision) {
+    document.getElementById('modalItemId').value = itemId;
+    document.getElementById('modalDecision').value = decision;
+    document.getElementById('modalTitle').textContent = `${decision === 'APPROVED' ? 'Approve' : decision === 'REJECTED' ? 'Reject' : 'Escalate'} Review Item #${itemId}`;
+    document.getElementById('modalNotes').value = '';
+    document.getElementById('resolveModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('resolveModal').classList.remove('active');
+  }
+
+  async function confirmResolve() {
+    const itemId = document.getElementById('modalItemId').value;
+    const decision = document.getElementById('modalDecision').value;
+    const notes = document.getElementById('modalNotes').value;
+
+    try {
+      const res = await apiFetch(`/api/admin/underwriting/review-queue/${itemId}/resolve`, {
+        method: 'POST',
+        body: JSON.stringify({ resolution_decision: decision, resolution_notes: notes })
+      });
+      if (!res.ok) throw new Error('Resolution failed');
+      closeModal();
+      loadQueue();
+    } catch (err) {
+      alert('Failed to resolve item: ' + err.message);
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
+    window.location.href = '/login.html';
+  }
+
+  // Load on page load
+  loadQueue();
+</script>
+</body>
+</html>

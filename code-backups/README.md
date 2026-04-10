@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.7.0](./v1.7.0/) | 2026-04-10 | Shield Framework v5.0: DSP Status Verification, Tariff-Anchored Facilitation Ceiling, Provider Billing Agreement Gate, Tariff Disclosure Screen, EOB/Payout Reconciliation — 18 new API routes, 7 frontend pages, 007 migration (15 tables), 25 integration tests |
 | [v1.6.0](./v1.6.0/) | 2026-04-05 | Customer Messaging Journey: 43 message types, 10 lifecycle stages, 13-rung collections escalation ladder, NotificationService, /api/notifications inbox API, 173 new unit tests (total: 443) |
 | [v1.5.6](./v1.5.6/) | 2026-03-31 | Fix: password reset email delivery — APP_URL missing from vercel.json caused localhost reset links; SMTP_HOST not set caused silent Ethereal fallback in production; add production guard + 5 unit tests (total: 102) |
 | [v1.5.5](./v1.5.5/) | 2026-03-27 | Regulatory terminology compliance audit — remove false NCA credit provider claim; replace all credit/loan/underwriting/lender/insurance terminology with approved payment facilitation language across all customer-facing, provider-facing, and investor-facing documents |

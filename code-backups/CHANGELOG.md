@@ -6,6 +6,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.0] — 2026-04-10
+
+**Type**: MINOR — New feature set: Shield Framework v5.0 Segment 1 Tariff Billing Risk Controls
+
+### Summary
+Implements five Segment 1 tariff billing risk controls: DSP Status Verification, Tariff-Anchored Facilitation Ceiling, Provider Billing Agreement Gate, Tariff Disclosure Screen, and Post-Procedure EOB Reconciliation Gate. Includes database migration (007), underwriting service, 18 new API routes, 7 new frontend pages (admin + patient + provider), and 25 integration tests.
+
+### Added
+- `backend/src/migrations/007_shield_v5_controls.sql` — 15 new tables/column additions for Shield v5.0 data model
+- `backend/src/services/underwriting.service.js` — `dspCheck`, `calculateCeiling`, `checkBillingAgreement`, `createDisclosure`, `acknowledgeDisclosure`, `checkDisclosureGate`, `triggerProvisionalPayout`, `submitEob`, `reconcileEob`, `addToManualReviewQueue`, `logAuditEvent`
+- `backend/src/routes/underwriting.js` — 18 new API endpoints under `/api/v1/underwriting`, `/api/v1/providers`, `/api/v1/payouts`, `/api/admin`
+- `admin-review-queue.html` — Manual review queue with SLA countdowns and Approve/Reject/Escalate actions
+- `admin-billing-agreements.html` — Provider billing agreements management
+- `admin-benchmarks.html` — Procedure benchmark CRUD
+- `admin-eob-reconciliation.html` — EOB submissions and one-click reconciliation
+- `admin-circuit-breaker.html` — Segment 1 tariff inflation monitor and circuit breaker events
+- `provider-billing-agreement.html` — Provider onboarding billing agreement signing
+- `tariff-disclosure.html` — Patient tariff gap disclosure with checkbox acknowledgement
+
+### Modified
+- `backend/src/server.js` — registered `underwritingRoutes` at `/api`; added global `X-Robots-Tag` header to security middleware
+
+### Tests
+- `tests/integration/shield-v5.test.js` — 25 integration tests for all 5 controls (written before implementation)
+
+---
+
 ## [v1.6.0] — 2026-04-05
 
 **Type**: MINOR — New feature: Customer Messaging Journey
