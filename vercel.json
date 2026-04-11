@@ -17,7 +17,6 @@
     "APP_URL": "https://paysick.co.za",
     "ALLOW_DEMO_LOGIN": "true",
     "CORS_ORIGIN": "https://paysick.co.za,https://www.paysick.co.za",
-    "ALLOW_VERCEL_PREVIEWS": "true",
-    "APP_URL": "https://paysick.co.za"
+    "ALLOW_VERCEL_PREVIEWS": "true"
   }
 }
