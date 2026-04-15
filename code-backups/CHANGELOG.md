@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.1] — 2026-04-15
+
+**Type**: PATCH — Copy change: align application page heading with Shield framework approved terminology
+
+### Summary
+Updated `marketplace-apply.html` `<h1>` and `<title>` from "Apply for Medical Finance" to "Apply for a Medical Payment Plan" to comply with Shield framework LANG-01 language requirement mandating the approved term "payment plan" in all user-facing copy.
+
+### Changed
+- `marketplace-apply.html` — `<h1>` and `<title>` updated to "Apply for a Medical Payment Plan"
+
+---
+
 ## [v1.7.0] — 2026-04-10
 
 **Type**: MINOR — New feature set: Shield Framework v5.0 Segment 1 Tariff Billing Risk Controls

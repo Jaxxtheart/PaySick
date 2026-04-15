@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #FF4757;
+            color: #FF4757;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #FF4757;
+            color: white;
+        }
+
+        /* Hamburger Menu */
+        .menu-toggle {
+            display: block !important;
+            background: none;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #1A1A1A;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            color: #FF4757;
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-logo-svg {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .menu-logo-text {
+            font-size: 24px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .menu-logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .menu-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #8A8A8A;
+            padding: 8px;
+        }
+
+        .menu-close:hover {
+            color: #FF4757;
+        }
+
+        .menu-user-info {
+            padding: 24px;
+            border-bottom: 1px solid #E5E5E5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-user-details {
+            flex: 1;
+        }
+
+        .menu-user-name {
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .menu-user-email {
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        .menu-nav {
+            padding: 16px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: #1A1A1A;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #FAFAFA;
+            color: #FF4757;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .menu-item-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #E5E5E5;
+            margin: 8px 0;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-section h1 {
+            font-size: 32px;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            color: #8A8A8A;
+            font-size: 16px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-label {
+            color: #8A8A8A;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-icon.red { background: rgba(255, 71, 87, 0.1); color: #FF4757; }
+        .stat-icon.green { background: rgba(46, 213, 115, 0.1); color: #2ED573; }
+        .stat-icon.blue { background: rgba(52, 152, 219, 0.1); color: #3498DB; }
+        .stat-icon.orange { background: rgba(255, 159, 64, 0.1); color: #FF9F40; }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .stat-description {
+            color: #4A4A4A;
+            font-size: 14px;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #FAFAFA;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .view-all {
+            color: #FF4757;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .view-all:hover {
+            opacity: 0.7;
+        }
+
+        /* Payment Plans */
+        .payment-plan {
+            border: 2px solid #F0F0F0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .payment-plan:hover {
+            border-color: #FF4757;
+        }
+
+        .payment-plan:last-child {
+            margin-bottom: 0;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .plan-provider {
+            font-weight: 600;
+            color: #1A1A1A;
+            font-size: 16px;
+        }
+
+        .plan-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active { background: #E8F8F0; color: #2ED573; }
+        .status-upcoming { background: #FFF4E6; color: #FF9F40; }
+        .status-completed { background: #E8F0F8; color: #3498DB; }
+
+        .plan-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .plan-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-detail-label {
+            color: #8A8A8A;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .plan-detail-value {
+            color: #1A1A1A;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #F0F0F0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            transition: width 0.3s ease;
+        }
+
+        /* Upcoming Payments */
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-radius: 8px;
+            background: #FAFAFA;
+            margin-bottom: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .payment-item:hover {
+            background: #F0F0F0;
+        }
+
+        .payment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-date {
+            color: #8A8A8A;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .payment-provider {
+            color: #1A1A1A;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .payment-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pay-now-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .pay-now-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .action-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: #FF4757;
+        }
+
+        /* Full Width Card */
+        .full-card {
+            grid-column: 1 / -1;
+        }
+
+        /* ═══════════════════════════════════════════════
+           NOTIFICATION SYSTEM
+           ═══════════════════════════════════════════════ */
+
+        /* Bell button in header */
+        .notif-bell {
+            position: relative;
+            background: none;
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .notif-bell:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .notif-bell svg {
+            width: 22px;
+            height: 22px;
+            stroke: #4A4A4A;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.25s ease;
+        }
+
+        .notif-bell:hover svg {
+            stroke: #FF4757;
+        }
+
+        /* Animated bell swing when new notifications arrive */
+        .notif-bell.has-unread svg {
+            animation: bellSwing 0.6s ease-in-out;
+        }
+
+        @keyframes bellSwing {
+            0%   { transform: rotate(0); }
+            15%  { transform: rotate(14deg); }
+            30%  { transform: rotate(-12deg); }
+            45%  { transform: rotate(8deg); }
+            60%  { transform: rotate(-6deg); }
+            75%  { transform: rotate(3deg); }
+            100% { transform: rotate(0); }
+        }
+
+        /* Badge — pulsing red dot with count. Loss aversion: seeing a number creates urgency */
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            background: #FF4757;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        .notif-badge.visible {
+            display: flex;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4); }
+            50%      { transform: scale(1.1); box-shadow: 0 3px 10px rgba(255, 71, 87, 0.6); }
+        }
+
+        /* Dropdown Panel — slides down with eased entry */
+        .notif-panel {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 400px;
+            max-height: 520px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(-8px);
+            opacity: 0;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .notif-panel.open {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Panel header */
+        .notif-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .notif-panel-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .notif-mark-all {
+            background: none;
+            border: none;
+            color: #FF4757;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .notif-mark-all:hover {
+            background: rgba(255, 71, 87, 0.08);
+        }
+
+        /* Scrollable body */
+        .notif-panel-body {
+            overflow-y: auto;
+            flex: 1;
+            max-height: 420px;
+            scrollbar-width: thin;
+        }
+
+        /* Group labels — temporal anchoring */
+        .notif-group-label {
+            padding: 10px 20px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8A8A8A;
+            background: #FAFAFA;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        /* Individual notification item */
+        .notif-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #F8F8F8;
+            position: relative;
+        }
+
+        .notif-item:hover {
+            background: #FAFAFA;
+        }
+
+        /* Unread indicator — left accent bar (Gestalt: figure-ground separation) */
+        .notif-item.unread {
+            background: rgba(255, 71, 87, 0.03);
+        }
+
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            background: #FF4757;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Priority accent — critical items get a pulse dot */
+        .notif-item.priority-critical .notif-icon-wrap {
+            animation: iconPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.3); }
+            50%      { box-shadow: 0 0 0 6px rgba(255, 71, 87, 0); }
+        }
+
+        /* Icon circle */
+        .notif-icon-wrap {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Content */
+        .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-message {
+            font-size: 14px;
+            color: #1A1A1A;
+            line-height: 1.4;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .notif-item.unread .notif-message {
+            font-weight: 600;
+        }
+
+        .notif-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notif-time {
+            font-size: 12px;
+            color: #AAAAAA;
+        }
+
+        /* CTA button — single clear action. Reduces decision paralysis. */
+        .notif-cta {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #FF4757;
+            background: rgba(255, 71, 87, 0.08);
+            padding: 3px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .notif-cta:hover {
+            background: rgba(255, 71, 87, 0.16);
+        }
+
+        /* Empty state */
+        .notif-empty {
+            padding: 48px 20px;
+            text-align: center;
+            color: #AAAAAA;
+        }
+
+        .notif-empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .notif-empty-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .notif-empty-sub {
+            font-size: 13px;
+            margin-top: 4px;
+            color: #CCCCCC;
+        }
+
+        /* Panel overlay for mobile */
+        .notif-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 499;
+            display: none;
+        }
+
+        .notif-overlay.open {
+            display: block;
+        }
+
+        /* Side menu badge */
+        .menu-notif-badge {
+            background: #FF4757;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            margin-left: auto;
+        }
+
+        .menu-notif-badge.visible {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .notif-panel {
+                width: calc(100vw - 16px);
+                right: -8px;
+                max-height: 70vh;
+                border-radius: 12px;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           END NOTIFICATION SYSTEM
+           ═══════════════════════════════════════════════ */
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-card {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .logout-btn {
+                display: none;
+            }
+
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+
+            .plan-details {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <div class="menu-logo">
+                <svg class="menu-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="menuCrossGradient" cx="40%" cy="40%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                        </radialGradient>
+                        <radialGradient id="menuBgCircle" cx="50%" cy="50%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                            <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="url(#menuBgCircle)"/>
+                    <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#menuCrossGradient)"/>
+                    <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#menuCrossGradient)"/>
+                    <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                </svg>
+                <div class="menu-logo-text">Pay<span>Sick</span></div>
+            </div>
+            <button class="menu-close" onclick="toggleMenu()">✕</button>
+        </div>
+
+        <div class="menu-user-info">
+            <div class="avatar" id="menuAvatar">JD</div>
+            <div class="menu-user-details">
+                <div class="menu-user-name" id="menuUserName">John Doe</div>
+                <div class="menu-user-email" id="menuUserEmail">user@paysick.com</div>
+            </div>
+        </div>
+
+        <nav class="menu-nav">
+            <a href="dashboard.html" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M3 12l9-9 9 9"/><path class="icon-stroke" d="M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/></svg></span>
+                <span class="menu-item-text">Dashboard</span>
+            </a>
+            <a href="payments.html" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="2" y="5" width="20" height="14" rx="2"/><path class="icon-stroke" d="M2 10h20"/><path class="icon-stroke" d="M6 15h4"/></svg></span>
+                <span class="menu-item-text">My Payments</span>
+            </a>
+            <a href="payments.html" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="3" y="4" width="18" height="18" rx="2"/><path class="icon-stroke" d="M3 10h18"/><path class="icon-stroke" d="M8 2v4M16 2v4"/></svg></span>
+                <span class="menu-item-text">Upcoming Payments</span>
+            </a>
+            <a href="payments.html?tab=history" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M4 20h16"/><rect class="icon-stroke" x="6" y="10" width="3" height="10"/><rect class="icon-stroke" x="11" y="6" width="3" height="14"/><rect class="icon-stroke" x="16" y="12" width="3" height="8"/></svg></span>
+                <span class="menu-item-text">Payment History</span>
+            </a>
+            <a href="marketplace-apply.html" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path class="icon-stroke" d="M14 2v6h6"/><path class="icon-stroke" d="M8 13h8M8 17h6"/></svg></span>
+                <span class="menu-item-text">Apply for Funding</span>
+            </a>
+            <a href="providers.html" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="3" y="3" width="18" height="18" rx="2"/><path class="icon-stroke" d="M12 7v10M7 12h10"/></svg></span>
+                <span class="menu-item-text">Healthcare Providers</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="index.html" class="menu-item">
+                <span class="icon">🌐</span>
+                <span class="menu-item-text">Main Site</span>
+            </a>
+            <a href="index.html#how-it-works" class="menu-item">
+                <span class="icon">❓</span>
+                <span class="menu-item-text">How It Works</span>
+            </a>
+            <a href="index.html#features" class="menu-item">
+                <span class="icon">✨</span>
+                <span class="menu-item-text">Features</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="onboarding.html" class="menu-item">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle class="icon-stroke" cx="12" cy="8" r="4"/><path class="icon-stroke" d="M12 12v1M10.5 20.5a5 5 0 003 0M19.9 17.5A8 8 0 004.1 17.5"/><path class="icon-stroke" d="M10 3.1a4 4 0 010 9.8M14 3.1a4 4 0 000 9.8"/></svg></span>
+                <span class="menu-item-text">Account Settings</span>
+            </a>
+            <a href="#" class="menu-item" onclick="toggleMenu(); setTimeout(function(){ toggleNotifPanel(); }, 350); return false;">
+                <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path class="icon-stroke" d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
+                <span class="menu-item-text">Notifications</span>
+                <span class="menu-notif-badge" id="menuNotifBadge">0</span>
+            </a>
+            <a href="#" class="menu-item">
+                <span class="icon">💬</span>
+                <span class="menu-item-text">Support</span>
+            </a>
+
+            <div class="menu-divider"></div>
+
+            <a href="#" class="menu-item" onclick="logout(); return false;">
+                <span class="icon">🚪</span>
+                <span class="menu-item-text">Logout</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <div class="logo-container">
+                    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="dashCrossGradient" cx="40%" cy="40%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                            </radialGradient>
+                            <radialGradient id="dashBgCircle" cx="50%" cy="50%">
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="40" fill="url(#dashBgCircle)"/>
+                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#dashCrossGradient)"/>
+                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#dashCrossGradient)"/>
+                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                    </svg>
+                    <div class="logo-text">Pay<span>Sick</span></div>
+                </div>
+            </div>
+            <div class="user-menu">
+                <!-- Notification Bell -->
+                <div style="position:relative;">
+                    <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" aria-label="Notifications">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </button>
+
+                    <!-- Notification Dropdown Panel -->
+                    <div class="notif-panel" id="notifPanel">
+                        <div class="notif-panel-header">
+                            <span class="notif-panel-title">Notifications</span>
+                            <button class="notif-mark-all" id="notifMarkAllBtn" onclick="markAllNotifRead()">Mark all read</button>
+                        </div>
+                        <div class="notif-panel-body" id="notifPanelBody">
+                            <div class="notif-empty">
+                                <div class="notif-empty-icon">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                    </svg>
+                                </div>
+                                <div class="notif-empty-text">You're all caught up</div>
+                                <div class="notif-empty-sub">No new notifications</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">JD</div>
+                    <span class="user-name" id="userName">John Doe</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="welcome-section">
+            <h1>Welcome back, <span id="welcomeName">there</span>!</h1>
+            <p>Here's an overview of your payment plans and upcoming payments</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Total Balance</span>
+                    <div class="stat-icon red">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="bold" fill="currentColor">R</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value" id="statTotalBalance">—</div>
+                <div class="stat-description" id="statBalanceDesc">Loading...</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Next Payment</span>
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="15" r="1.5" fill="currentColor"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value" id="statNextPayment">—</div>
+                <div class="stat-description" id="statNextDesc">Loading...</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Paid This Year</span>
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <polyline points="8 12 11 15 16 9" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value" id="statPaidYear">—</div>
+                <div class="stat-description" id="statPaidDesc">Loading...</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-label">Active Plans</span>
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="12" y1="20" x2="12" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="18" y1="20" x2="18" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="6" y1="20" x2="6" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stat-value" id="statActivePlans">—</div>
+                <div class="stat-description" id="statPlansDesc">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Active Payment Plans -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Active Payment Plans</h2>
+                    <a href="#" class="view-all">View All →</a>
+                </div>
+
+                <div id="activePlansList">
+                    <p style="color:#888;padding:8px 0">Loading your payment plans...</p>
+                </div>
+            </div>
+
+            <!-- Upcoming Payments -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Upcoming Payments</h2>
+                    <a href="payments.html" class="view-all">View All →</a>
+                </div>
+
+                <div id="upcomingPaymentsList">
+                    <p style="color:#888;padding:8px 0">Loading upcoming payments...</p>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card full-card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                <div class="quick-actions">
+                    <a href="payments.html" class="action-btn">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M2 10h20" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div>Make a Payment</div>
+                    </a>
+                    <a href="payments.html" class="action-btn">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="8" y1="17" x2="16" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div>View Statements</div>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M12 1v6m0 6v6M23 12h-6m-6 0H1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M18.36 5.64l-4.24 4.24m0 4.24l4.24 4.24M5.64 5.64l4.24 4.24m0 4.24l-4.24 4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div>Account Settings</div>
+                    </a>
+                    <a href="#" class="action-btn">
+                        <div class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="9" cy="10" r="1" fill="currentColor"/>
+                                <circle cx="12" cy="10" r="1" fill="currentColor"/>
+                                <circle cx="15" cy="10" r="1" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div>Get Support</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="api-client.js"></script>
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('paysick_user') || 'null');
+            const token = localStorage.getItem('paysick_auth_token');
+
+            if (!user || !token || user.role !== 'user') {
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            // Check if onboarding is complete
+            const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+            if (onboardingComplete !== 'true') {
+                window.location.href = 'onboarding.html';
+                return null;
+            }
+
+            return user;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('paysick_user');
+            localStorage.removeItem('paysick_auth_token');
+            localStorage.removeItem('paysick_refresh_token');
+            localStorage.removeItem('paysick_onboarding_complete');
+            localStorage.removeItem('paysick_onboarding_data');
+            window.location.href = 'login.html';
+        }
+
+        // Toggle menu
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function fmt(amount) {
+            return 'R\u202f' + parseFloat(amount || 0).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function isDemoMode() {
+            const tok = localStorage.getItem('paysick_auth_token') || '';
+            return tok.startsWith('demo-');
+        }
+
+        function loadDemoData() {
+            // Stats
+            document.getElementById('statTotalBalance').textContent = fmt(18500);
+            document.getElementById('statBalanceDesc').textContent = 'Across 1 active plan';
+            document.getElementById('statNextPayment').textContent = fmt(6167);
+            document.getElementById('statNextDesc').textContent = 'Due in 14 days';
+            document.getElementById('statPaidYear').textContent = fmt(6167);
+            document.getElementById('statPaidDesc').textContent = '1 payment completed';
+            document.getElementById('statActivePlans').textContent = '1';
+            document.getElementById('statPlansDesc').textContent = 'All in good standing';
+
+            // Active plans
+            document.getElementById('activePlansList').innerHTML =
+                '<div class="payment-plan">' +
+                    '<div class="plan-header">' +
+                        '<span class="plan-provider">Netcare Dental Centre</span>' +
+                        '<span class="plan-status status-active">Active</span>' +
+                    '</div>' +
+                    '<div class="plan-details">' +
+                        '<div class="plan-detail"><span class="plan-detail-label">Total Amount</span><span class="plan-detail-value">' + fmt(18500) + '</span></div>' +
+                        '<div class="plan-detail"><span class="plan-detail-label">Remaining</span><span class="plan-detail-value">' + fmt(12333) + '</span></div>' +
+                        '<div class="plan-detail"><span class="plan-detail-label">Monthly Payment</span><span class="plan-detail-value">' + fmt(6167) + '</span></div>' +
+                        '<div class="plan-detail"><span class="plan-detail-label">Next Due</span><span class="plan-detail-value">15 Apr 2026</span></div>' +
+                    '</div>' +
+                    '<div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>' +
+                '</div>';
+
+            // Upcoming payments
+            document.getElementById('upcomingPaymentsList').innerHTML =
+                '<div class="payment-item">' +
+                    '<div class="payment-info">' +
+                        '<div class="payment-date">15 April 2026</div>' +
+                        '<div class="payment-provider">Netcare Dental Centre</div>' +
+                    '</div>' +
+                    '<div class="payment-actions">' +
+                        '<div class="payment-amount">' + fmt(6167) + '</div>' +
+                        '<span class="pay-now-btn" style="opacity:0.5;cursor:default;">Demo</span>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        // Initialize dashboard — loads all data from live API (or demo mock)
+        async function initDashboard() {
+            const user = checkAuth();
+            if (!user) return;
+
+            // Set user info in header
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('welcomeName').textContent = user.name.split(' ')[0];
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials;
+            document.getElementById('menuAvatar').textContent = initials;
+            document.getElementById('menuUserName').textContent = user.name;
+            document.getElementById('menuUserEmail').textContent = user.email;
+
+            if (isDemoMode()) {
+                loadDemoData();
+                return;
+            }
+
+            // ── Load dashboard stats ──────────────────────────────────────
+            try {
+                const data = await PaySickAPI.users.getDashboard();
+
+                document.getElementById('statTotalBalance').textContent = fmt(data.total_balance);
+                document.getElementById('statBalanceDesc').textContent =
+                    'Across ' + data.active_plans + ' active plan' + (data.active_plans !== 1 ? 's' : '');
+
+                if (data.next_payment) {
+                    document.getElementById('statNextPayment').textContent = fmt(data.next_payment.amount);
+                    const daysUntil = Math.ceil((new Date(data.next_payment.due_date) - new Date()) / 86400000);
+                    document.getElementById('statNextDesc').textContent =
+                        daysUntil > 0 ? 'Due in ' + daysUntil + ' day' + (daysUntil !== 1 ? 's' : '') : 'Due today';
+                } else {
+                    document.getElementById('statNextPayment').textContent = 'None';
+                    document.getElementById('statNextDesc').textContent = 'No payments due';
+                }
+
+                const hist = data.payment_history || {};
+                document.getElementById('statPaidYear').textContent = fmt(hist.total_paid_this_year);
+                document.getElementById('statPaidDesc').textContent =
+                    (hist.completed_payments || 0) + ' payment' + (hist.completed_payments !== 1 ? 's' : '') + ' completed';
+
+                document.getElementById('statActivePlans').textContent = data.active_plans;
+                document.getElementById('statPlansDesc').textContent =
+                    data.active_plans > 0 ? 'All in good standing' : 'No active plans';
+            } catch (err) {
+                console.error('Dashboard stats error:', err);
+                ['statTotalBalance', 'statNextPayment', 'statPaidYear', 'statActivePlans'].forEach(id => {
+                    document.getElementById(id).textContent = '—';
+                });
+                ['statBalanceDesc', 'statNextDesc', 'statPaidDesc', 'statPlansDesc'].forEach(id => {
+                    document.getElementById(id).textContent = 'Unable to load';
+                });
+            }
+
+            // ── Load active payment plans ─────────────────────────────────
+            try {
+                const plans = await PaySickAPI.payments.getPlans();
+                const list = document.getElementById('activePlansList');
+
+                if (!plans || plans.length === 0) {
+                    list.innerHTML = '<p style="color:#888;padding:8px 0">No active payment plans yet. <a href="marketplace-apply.html">Apply now</a>.</p>';
+                } else {
+                    list.innerHTML = plans.slice(0, 3).map(function(plan) {
+                        const progress = plan.number_of_payments > 0
+                            ? Math.round((plan.payments_made / plan.number_of_payments) * 100)
+                            : 0;
+                        const statusLabel = plan.status.charAt(0).toUpperCase() + plan.status.slice(1);
+                        const nextDue = plan.first_payment_date
+                            ? new Date(new Date(plan.first_payment_date).setMonth(
+                                new Date(plan.first_payment_date).getMonth() + plan.payments_made
+                              )).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : '—';
+                        return '<div class="payment-plan">' +
+                            '<div class="plan-header">' +
+                                '<span class="plan-provider">' + (plan.provider_name || 'Healthcare Provider') + '</span>' +
+                                '<span class="plan-status status-' + plan.status + '">' + statusLabel + '</span>' +
+                            '</div>' +
+                            '<div class="plan-details">' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Total Amount</span><span class="plan-detail-value">' + fmt(plan.total_amount) + '</span></div>' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Remaining</span><span class="plan-detail-value">' + fmt(plan.outstanding_balance) + '</span></div>' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Monthly Payment</span><span class="plan-detail-value">' + fmt(plan.monthly_amount) + '</span></div>' +
+                                '<div class="plan-detail"><span class="plan-detail-label">Next Due</span><span class="plan-detail-value">' + nextDue + '</span></div>' +
+                            '</div>' +
+                            '<div class="progress-bar"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+                        '</div>';
+                    }).join('');
+                }
+            } catch (err) {
+                console.error('Plans load error:', err);
+                document.getElementById('activePlansList').innerHTML =
+                    '<p style="color:#888;padding:8px 0">Unable to load payment plans. Please try again later.</p>';
+            }
+
+            // ── Load upcoming payments ────────────────────────────────────
+            try {
+                const upcoming = await PaySickAPI.payments.getUpcoming();
+                const list = document.getElementById('upcomingPaymentsList');
+
+                if (!upcoming || upcoming.length === 0) {
+                    list.innerHTML = '<p style="color:#888;padding:8px 0">No upcoming payments due.</p>';
+                } else {
+                    list.innerHTML = upcoming.slice(0, 4).map(function(payment) {
+                        const dateStr = new Date(payment.due_date).toLocaleDateString('en-ZA', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        });
+                        return '<div class="payment-item">' +
+                            '<div class="payment-info">' +
+                                '<div class="payment-date">' + dateStr + '</div>' +
+                                '<div class="payment-provider">' + (payment.provider_name || 'Healthcare Provider') + '</div>' +
+                            '</div>' +
+                            '<div class="payment-actions">' +
+                                '<div class="payment-amount">' + fmt(payment.amount) + '</div>' +
+                                '<a href="make-payment.html?id=' + payment.payment_id + '" class="pay-now-btn">Pay Now</a>' +
+                            '</div>' +
+                        '</div>';
+                    }).join('');
+                }
+            } catch (err) {
+                console.error('Upcoming payments error:', err);
+                document.getElementById('upcomingPaymentsList').innerHTML =
+                    '<p style="color:#888;padding:8px 0">Unable to load upcoming payments. Please try again later.</p>';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // NOTIFICATION SYSTEM — HCI-driven bell, badge & dropdown
+        //
+        // Psychological nudges:
+        // 1. Loss aversion: critical items (failed payments) surface first
+        //    with red pulsing icons — people act faster to avoid loss
+        // 2. Recency bias: "Just now" / "5 min ago" creates immediacy
+        // 3. Zeigarnik effect: unread count (badge) creates tension that
+        //    resolves only when the user acts on the notification
+        // 4. Single-CTA per item: reduces decision paralysis (Hick's Law)
+        // 5. Temporal grouping (Today/Yesterday/Earlier): pattern recognition
+        //    helps users scan quickly (Gestalt proximity principle)
+        // 6. Progressive disclosure: collapsed dropdown, not always visible
+        // 7. Social proof in copy: "Most patients resolve within 24 hours"
+        // ═══════════════════════════════════════════════════════════
+
+        // ── UI helper functions (isomorphic with notification-ui.helpers.js) ──
+
+        function notifFormatTimeAgo(iso) {
+            var now = Date.now(), then = new Date(iso).getTime();
+            var s = Math.floor((now - then) / 1000);
+            if (s < 60) return 'Just now';
+            if (s < 3600) return Math.floor(s / 60) + ' min ago';
+            if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+            if (s < 30 * 86400) return Math.floor(s / 86400) + 'd ago';
+            return new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        var NOTIF_ICONS = {
+            payment_success:       { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            plan_activated:        { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            application_approved:  { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            account_settled:       { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            restructure_accepted:  { sym: '\u2713', bg: 'rgba(46,213,115,0.12)', color: '#2ED573' },
+            payment_failed:        { sym: '!',  bg: 'rgba(255,71,87,0.12)',  color: '#FF4757' },
+            payment_failed_retry:  { sym: '!',  bg: 'rgba(255,71,87,0.12)',  color: '#FF4757' },
+            application_declined:  { sym: '\u2715', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' },
+            payment_upcoming_1d:   { sym: '\u23F0', bg: 'rgba(255,159,64,0.12)', color: '#FF9F40' },
+            payment_due_today:     { sym: '\u23F0', bg: 'rgba(255,71,87,0.12)',  color: '#FF4757' },
+            welcome:               { sym: '\u2605', bg: 'rgba(52,152,219,0.12)', color: '#3498DB' },
+            restructure_offer:     { sym: '\u2764', bg: 'rgba(255,159,64,0.12)', color: '#FF9F40' },
+            security_alert_new_device:    { sym: '\u26A0', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' },
+            security_alert_failed_logins: { sym: '\u26A0', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' }
+        };
+
+        var NOTIF_ICON_DEFAULT = { sym: '\u2022', bg: 'rgba(138,138,138,0.12)', color: '#8A8A8A' };
+
+        // Collections icons — orange for early/mid, red for late
+        ['collections_day_1','collections_day_3','collections_day_7',
+         'collections_early_8d','collections_early_14d','collections_early_21d','collections_early_30d',
+         'collections_mid_31d','collections_mid_45d','collections_mid_60d'].forEach(function(t) {
+            NOTIF_ICONS[t] = { sym: '\u25B2', bg: 'rgba(255,159,64,0.12)', color: '#FF9F40' };
+        });
+        ['collections_late_61d','collections_late_75d','collections_late_90d'].forEach(function(t) {
+            NOTIF_ICONS[t] = { sym: '\u25B2', bg: 'rgba(255,71,87,0.12)', color: '#FF4757' };
+        });
+        // Payment upcoming blue
+        ['payment_upcoming_7d','payment_upcoming_3d'].forEach(function(t) {
+            NOTIF_ICONS[t] = { sym: '\u23F0', bg: 'rgba(52,152,219,0.12)', color: '#3498DB' };
+        });
+
+        function notifIcon(type) { return NOTIF_ICONS[type] || NOTIF_ICON_DEFAULT; }
+
+        function notifPriority(type) {
+            if (/^payment_failed/.test(type) || /^security_alert/.test(type)) return 'critical';
+            if (/^collections_/.test(type) || type === 'restructure_offer' || type === 'application_declined') return 'high';
+            if (/^payment_upcoming/.test(type) || type === 'payment_due_today' || type === 'application_more_info' || /^onboarding_/.test(type)) return 'medium';
+            return 'low';
+        }
+
+        var PRIORITY_SORT = { critical: 0, high: 1, medium: 2, low: 3 };
+
+        function notifCTA(type) {
+            if (type === 'payment_failed' || type === 'payment_failed_retry') return { label: 'Pay Now', url: 'make-payment.html' };
+            if (/^collections_/.test(type)) return { label: 'Resolve Payment', url: 'make-payment.html' };
+            if (type === 'restructure_offer') return { label: 'View Options', url: 'dashboard.html' };
+            if (type === 'application_approved') return { label: 'View My Plan', url: 'dashboard.html' };
+            if (type === 'application_declined') return { label: 'See Details', url: 'dashboard.html' };
+            if (type === 'application_more_info') return { label: 'Provide Info', url: 'dashboard.html' };
+            if (/^payment_upcoming/.test(type) || type === 'payment_due_today') return { label: 'View Payment', url: 'payments.html' };
+            if (/^security_alert/.test(type)) return { label: 'Secure Account', url: 'forgot-password.html' };
+            if (/^onboarding_/.test(type)) return { label: 'Complete Profile', url: 'onboarding.html' };
+            if (/^survey_/.test(type)) return { label: 'Take Survey', url: 'dashboard.html' };
+            return null;
+        }
+
+        function notifGroup(notifications) {
+            if (!notifications.length) return [];
+            var now = new Date();
+            var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            var yesterStart = todayStart - 86400000;
+            var buckets = { Today: [], Yesterday: [], Earlier: [] };
+            notifications.forEach(function(n) {
+                var t = new Date(n.created_at).getTime();
+                if (t >= todayStart) buckets.Today.push(n);
+                else if (t >= yesterStart) buckets.Yesterday.push(n);
+                else buckets.Earlier.push(n);
+            });
+            var groups = [];
+            ['Today','Yesterday','Earlier'].forEach(function(label) {
+                if (buckets[label].length > 0) groups.push({ label: label, items: buckets[label] });
+            });
+            return groups;
+        }
+
+        // ── Panel toggle ─────────────────────────────────────────────────────
+
+        var notifPanelOpen = false;
+
+        function toggleNotifPanel() {
+            notifPanelOpen = !notifPanelOpen;
+            var panel = document.getElementById('notifPanel');
+            var overlay = document.getElementById('notifOverlay');
+            if (notifPanelOpen) {
+                panel.classList.add('open');
+                overlay.classList.add('open');
+                // Force reflow then animate
+                panel.offsetHeight;
+                panel.style.transform = 'translateY(0)';
+                panel.style.opacity = '1';
+                loadNotifications();
+            } else {
+                closeNotifPanel();
+            }
+        }
+
+        function closeNotifPanel() {
+            notifPanelOpen = false;
+            var panel = document.getElementById('notifPanel');
+            var overlay = document.getElementById('notifOverlay');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && notifPanelOpen) closeNotifPanel();
+        });
+
+        // ── Render notifications ─────────────────────────────────────────────
+
+        function renderNotifications(notifications) {
+            var body = document.getElementById('notifPanelBody');
+
+            if (!notifications || notifications.length === 0) {
+                body.innerHTML =
+                    '<div class="notif-empty">' +
+                        '<div class="notif-empty-icon">' +
+                            '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+                                '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>' +
+                                '<path d="M13.73 21a2 2 0 0 1-3.46 0"/>' +
+                            '</svg>' +
+                        '</div>' +
+                        '<div class="notif-empty-text">You\'re all caught up</div>' +
+                        '<div class="notif-empty-sub">No new notifications</div>' +
+                    '</div>';
+                return;
+            }
+
+            // Sort: critical first (loss aversion), then by time
+            notifications.sort(function(a, b) {
+                var pa = PRIORITY_SORT[notifPriority(a.type)] || 3;
+                var pb = PRIORITY_SORT[notifPriority(b.type)] || 3;
+                // Unread before read
+                var ua = a.read_at ? 1 : 0;
+                var ub = b.read_at ? 1 : 0;
+                if (ua !== ub) return ua - ub;
+                if (pa !== pb) return pa - pb;
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+
+            var groups = notifGroup(notifications);
+            var html = '';
+
+            groups.forEach(function(group) {
+                html += '<div class="notif-group-label">' + group.label + '</div>';
+                group.items.forEach(function(n) {
+                    var icon = notifIcon(n.type);
+                    var priority = notifPriority(n.type);
+                    var cta = notifCTA(n.type);
+                    var isUnread = !n.read_at;
+                    var subject = n.subject || '';
+                    var message = n.message || '';
+                    // Truncate message for display
+                    var displayText = subject || (message.length > 100 ? message.substring(0, 100) + '...' : message);
+                    // Strip HTML tags for in-panel display
+                    displayText = displayText.replace(/<[^>]*>/g, '');
+
+                    html += '<div class="notif-item' +
+                        (isUnread ? ' unread' : '') +
+                        ' priority-' + priority +
+                        '" data-id="' + n.notification_id + '" onclick="handleNotifClick(\'' + n.notification_id + '\', ' + (cta ? '\'' + cta.url + '\'' : 'null') + ')">' +
+                        '<div class="notif-icon-wrap" style="background:' + icon.bg + ';color:' + icon.color + ';">' +
+                            icon.sym +
+                        '</div>' +
+                        '<div class="notif-content">' +
+                            '<div class="notif-message">' + escapeHtml(displayText) + '</div>' +
+                            '<div class="notif-meta">' +
+                                '<span class="notif-time">' + notifFormatTimeAgo(n.created_at) + '</span>' +
+                                (cta ? '<a href="' + cta.url + '" class="notif-cta" onclick="event.stopPropagation();">' + cta.label + '</a>' : '') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                });
+            });
+
+            body.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ── Notification interactions ─────────────────────────────────────────
+
+        async function handleNotifClick(notifId, ctaUrl) {
+            // Mark as read on click
+            try {
+                if (!isDemoMode()) {
+                    await PaySickAPI.notifications.markRead(notifId);
+                }
+            } catch (e) { /* ignore */ }
+
+            // Visual: immediately remove unread styling (completion satisfaction)
+            var el = document.querySelector('[data-id="' + notifId + '"]');
+            if (el) el.classList.remove('unread');
+
+            // Update badge count
+            updateBadgeCount();
+
+            // Navigate if there's a CTA
+            if (ctaUrl) {
+                closeNotifPanel();
+                window.location.href = ctaUrl;
+            }
+        }
+
+        async function markAllNotifRead() {
+            try {
+                if (!isDemoMode()) {
+                    await PaySickAPI.notifications.markAllRead();
+                }
+            } catch (e) { /* ignore */ }
+
+            // Visual: remove all unread styling
+            document.querySelectorAll('.notif-item.unread').forEach(function(el) {
+                el.classList.remove('unread');
+            });
+
+            // Reset badge
+            setBadge(0);
+        }
+
+        // ── Badge management ─────────────────────────────────────────────────
+
+        function setBadge(count) {
+            var badge = document.getElementById('notifBadge');
+            var menuBadge = document.getElementById('menuNotifBadge');
+            var bell = document.getElementById('notifBell');
+
+            if (count > 0) {
+                var display = count > 99 ? '99+' : String(count);
+                badge.textContent = display;
+                badge.classList.add('visible');
+                if (menuBadge) { menuBadge.textContent = display; menuBadge.classList.add('visible'); }
+                bell.classList.add('has-unread');
+            } else {
+                badge.classList.remove('visible');
+                if (menuBadge) menuBadge.classList.remove('visible');
+                bell.classList.remove('has-unread');
+            }
+        }
+
+        var lastBadgeCount = 0;
+
+        async function updateBadgeCount() {
+            try {
+                if (isDemoMode()) {
+                    setBadge(3); // Demo shows 3 unread
+                    return;
+                }
+                var count = await PaySickAPI.notifications.getUnreadCount();
+                setBadge(count);
+
+                // If new notifications arrived, trigger bell animation
+                if (count > lastBadgeCount && lastBadgeCount >= 0) {
+                    var bell = document.getElementById('notifBell');
+                    bell.classList.remove('has-unread');
+                    bell.offsetHeight; // force reflow
+                    bell.classList.add('has-unread');
+                }
+                lastBadgeCount = count;
+            } catch (e) {
+                // Silently fail — notification badge is not critical path
+            }
+        }
+
+        // ── Load notifications into panel ─────────────────────────────────────
+
+        async function loadNotifications() {
+            var body = document.getElementById('notifPanelBody');
+
+            if (isDemoMode()) {
+                renderNotifications(getDemoNotifications());
+                return;
+            }
+
+            // Show loading shimmer
+            body.innerHTML =
+                '<div style="padding:20px;">' +
+                    '<div style="height:52px;background:#F5F5F5;border-radius:8px;margin-bottom:12px;animation:pulse 1.5s infinite;"></div>' +
+                    '<div style="height:52px;background:#F5F5F5;border-radius:8px;margin-bottom:12px;animation:pulse 1.5s infinite;animation-delay:0.2s;"></div>' +
+                    '<div style="height:52px;background:#F5F5F5;border-radius:8px;animation:pulse 1.5s infinite;animation-delay:0.4s;"></div>' +
+                '</div>';
+
+            try {
+                var notifications = await PaySickAPI.notifications.getAll({ limit: 30 });
+                renderNotifications(notifications);
+            } catch (e) {
+                body.innerHTML =
+                    '<div class="notif-empty">' +
+                        '<div class="notif-empty-text" style="color:#FF4757;">Unable to load notifications</div>' +
+                        '<div class="notif-empty-sub">Please try again later</div>' +
+                    '</div>';
+            }
+        }
+
+        // Demo notifications for demo mode
+        function getDemoNotifications() {
+            var now = new Date();
+            return [
+                { notification_id: 'demo-1', type: 'payment_upcoming_1d', subject: 'Payment due tomorrow', message: 'Your payment of R6,167.00 is due tomorrow on 6 April 2026.', created_at: new Date(now - 2 * 60 * 60 * 1000).toISOString(), read_at: null },
+                { notification_id: 'demo-2', type: 'plan_activated', subject: 'Payment plan active', message: 'Your payment plan with Netcare Dental Centre is now active.', created_at: new Date(now - 5 * 60 * 60 * 1000).toISOString(), read_at: null },
+                { notification_id: 'demo-3', type: 'welcome', subject: 'Welcome to PaySick!', message: 'Your account is active. You can now apply for a healthcare payment plan.', created_at: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(), read_at: null }
+            ];
+        }
+
+        // ── Polling — ambient awareness without interruption ──────────────────
+        // Poll every 60s. If tab is hidden, pause (Page Visibility API).
+
+        var notifPollInterval = null;
+
+        function startNotifPolling() {
+            updateBadgeCount();
+            notifPollInterval = setInterval(updateBadgeCount, 60000);
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    clearInterval(notifPollInterval);
+                } else {
+                    updateBadgeCount();
+                    notifPollInterval = setInterval(updateBadgeCount, 60000);
+                }
+            });
+        }
+
+        // Run on page load
+        window.addEventListener('load', function() {
+            initDashboard();
+            startNotifPolling();
+        });
+    </script>
+</body>
+</html>
