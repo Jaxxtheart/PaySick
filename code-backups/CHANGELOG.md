@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.2] — 2026-04-15
+
+**Type**: PATCH — UI and terms update: cap payment plan slider at R10,000
+
+### Summary
+Reduced the maximum selectable amount on the marketplace-apply amount slider from R500,000 to R10,000. Updated Terms of Service section 4.3 to state R10,000 per-payment-plan maximum. Default slider value adjusted to R7,500; step reduced to R500.
+
+### Changed
+- `marketplace-apply.html` — slider max R500,000 → R10,000; step 1000 → 500; default value R50,000 → R7,500; range label updated; `applyWithAlternative` cap updated
+- `terms-of-service.html` — section 4.3 Bill Amount Limits: R500,000 → R10,000 per payment plan
+
+---
+
 ## [v1.7.1] — 2026-04-15
 
 **Type**: PATCH — Copy change: align application page heading with Shield framework approved terminology
