@@ -58,6 +58,11 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.7.5](./v1.7.5/) | 2026-04-15 | UI patch: replace multi-lender preview cards with single PaySick arrangement card; add admin review queue and provider dashboard links on post-submission screen |
+| [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |
+| [v1.7.3](./v1.7.3/) | 2026-04-15 | Copy patch: replace "Loan Amount" with "Payment Arrangement" on application review screen (LANG-02 compliance) |
+| [v1.7.2](./v1.7.2/) | 2026-04-15 | UI/terms patch: cap payment plan slider max at R10,000 in marketplace-apply.html; update Terms of Service section 4.3 to reflect R10,000 per-payment-plan limit |
+| [v1.7.1](./v1.7.1/) | 2026-04-15 | Copy patch: "Apply for Medical Finance" → "Apply for a Medical Payment Plan" in marketplace-apply.html to comply with Shield framework LANG-01 approved terminology |
 | [v1.7.0](./v1.7.0/) | 2026-04-10 | Shield Framework v5.0: DSP Status Verification, Tariff-Anchored Facilitation Ceiling, Provider Billing Agreement Gate, Tariff Disclosure Screen, EOB/Payout Reconciliation — 18 new API routes, 7 frontend pages, 007 migration (15 tables), 25 integration tests |
 | [v1.6.0](./v1.6.0/) | 2026-04-05 | Customer Messaging Journey: 43 message types, 10 lifecycle stages, 13-rung collections escalation ladder, NotificationService, /api/notifications inbox API, 173 new unit tests (total: 443) |
 | [v1.5.6](./v1.5.6/) | 2026-03-31 | Fix: password reset email delivery — APP_URL missing from vercel.json caused localhost reset links; SMTP_HOST not set caused silent Ethereal fallback in production; add production guard + 5 unit tests (total: 102) |

@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for a Medical Payment Plan - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E5E5E5;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .logo-svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            color: #4A4A4A;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            color: #4A4A4A;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            color: #8A8A8A;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E5E5E5;
+            color: #8A8A8A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #2ED573;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 14px;
+            color: #8A8A8A;
+            display: none;
+        }
+
+        .step.active .step-label {
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background: #E5E5E5;
+        }
+
+        .step.completed + .step-connector {
+            background: #2ED573;
+        }
+
+        @media (min-width: 768px) {
+            .step-label {
+                display: block;
+            }
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .section-description {
+            font-size: 16px;
+            color: #8A8A8A;
+            margin-bottom: 32px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4A4A4A;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FF4757;
+            box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-prefix {
+            position: relative;
+        }
+
+        .input-prefix span {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8A8A8A;
+            font-weight: 600;
+        }
+
+        .input-prefix input {
+            padding-left: 40px;
+        }
+
+        /* Procedure Cards */
+        .procedure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .procedure-card {
+            border: 2px solid #E5E5E5;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .procedure-card:hover {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.02);
+        }
+
+        .procedure-card.selected {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .procedure-card .icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .procedure-card .icon svg {
+            width: 40px;
+            height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .procedure-card:hover .icon svg,
+        .procedure-card.selected .icon svg {
+            transform: scale(1.1);
+        }
+
+        .procedure-card .icon svg .icon-stroke {
+            stroke: #8A8A8A;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .procedure-card .icon svg .icon-fill {
+            fill: #8A8A8A;
+            transition: fill 0.3s ease;
+        }
+
+        .procedure-card:hover .icon svg .icon-stroke,
+        .procedure-card.selected .icon svg .icon-stroke {
+            stroke: #FF4757;
+        }
+
+        .procedure-card:hover .icon svg .icon-fill,
+        .procedure-card.selected .icon svg .icon-fill {
+            fill: #FF4757;
+        }
+
+        .procedure-card .name {
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .procedure-card .description {
+            font-size: 13px;
+            color: #8A8A8A;
+        }
+
+        /* Amount Slider */
+        .amount-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .amount-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FF4757;
+        }
+
+        .amount-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #E5E5E5;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .amount-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+        }
+
+        .amount-range {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        /* Term Selection */
+        .term-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .term-option {
+            border: 2px solid #E5E5E5;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .term-option:hover {
+            border-color: #FF4757;
+        }
+
+        .term-option.selected {
+            border-color: #FF4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .term-option .months {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .term-option .label {
+            font-size: 12px;
+            color: #8A8A8A;
+        }
+
+        /* Estimate Box */
+        .estimate-box {
+            background: linear-gradient(135deg, #FAFAFA 0%, #F0F0F0 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .estimate-title {
+            font-size: 14px;
+            color: #8A8A8A;
+            margin-bottom: 8px;
+        }
+
+        .estimate-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .estimate-note {
+            font-size: 13px;
+            color: #8A8A8A;
+            margin-top: 8px;
+        }
+
+        /* Navigation Buttons */
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #E5E5E5;
+            color: #4A4A4A;
+        }
+
+        .btn-secondary:hover {
+            border-color: #FF4757;
+            color: #FF4757;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #E5E5E5;
+            color: #8A8A8A;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Summary Section */
+        .summary-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: #FAFAFA;
+            border-radius: 10px;
+        }
+
+        .summary-item .label {
+            color: #8A8A8A;
+        }
+
+        .summary-item .value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .summary-highlight {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(224, 30, 55, 0.1) 100%);
+            border: 2px solid #FF4757;
+        }
+
+        .summary-highlight .value {
+            color: #FF4757;
+            font-size: 20px;
+        }
+
+        /* Success State */
+        .success-state {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2ED573 0%, #1ABC9C 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .success-icon svg .icon-stroke {
+            stroke: white;
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #8A8A8A;
+            margin-bottom: 32px;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #E5E5E5;
+            border-top-color: #FF4757;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 16px;
+            color: #4A4A4A;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #2ED573 0%, #1ABC9C 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo-container">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="crossGradient" cx="40%" cy="40%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                        </radialGradient>
+                        <radialGradient id="bgCircle" cx="50%" cy="50%">
+                            <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                            <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="40" fill="url(#bgCircle)"/>
+                    <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#crossGradient)"/>
+                    <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#crossGradient)"/>
+                    <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+                </svg>
+                <div class="logo-text">Pay<span>Sick</span></div>
+            </a>
+            <a href="dashboard.html" class="back-btn">
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Finding you the best rates...</div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="page-header">
+            <h1>Apply for a Medical Payment Plan</h1>
+            <p>Get competitive rates from multiple lenders</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Procedure</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Amount</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Details</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Review</div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <!-- Step 1: Procedure Type -->
+            <div class="form-section active" id="step1">
+                <h2 class="section-title">What procedure do you need?</h2>
+                <p class="section-description">Select the type of medical procedure you're financing</p>
+
+                <div class="procedure-grid">
+                    <div class="procedure-card" data-procedure="Dental" data-code="DENT">
+                        <div class="icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M20 4c-4 0-7 2-8 5-1 3-0.5 6 0 9 0.5 3 1 6 0.5 9-0.3 2 0.5 4 2 5s3.5 0.5 4.5-1c0.8-1.2 1-3 1-5 0-2 0.2-4 1-5 0.8 1 1 3 1 5 0 2 0.2 3.8 1 5 1 1.5 3 2 4.5 1s2.3-3 2-5c-0.5-3 0-6 0.5-9 0.5-3 1-6 0-9-1-3-4-5-8-5z"/>
+                                <path class="icon-stroke" d="M15 12c0.5 2 1.5 3 3 3.5M25 12c-0.5 2-1.5 3-3 3.5"/>
+                            </svg>
+                        </div>
+                        <div class="name">Dental</div>
+                        <div class="description">Implants, crowns, braces</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Eye Care" data-code="EYES">
+                        <div class="icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M4 20c0 0 6-10 16-10s16 10 16 10-6 10-16 10S4 20 4 20z"/>
+                                <circle class="icon-stroke" cx="20" cy="20" r="6"/>
+                                <circle class="icon-fill" cx="20" cy="20" r="2.5"/>
+                            </svg>
+                        </div>
+                        <div class="name">Eye Care</div>
+                        <div class="description">LASIK, cataract surgery</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Cosmetic" data-code="COSM">
+                        <div class="icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M20 4L6 14l4 22h20l4-22L20 4z"/>
+                                <path class="icon-stroke" d="M6 14h28"/>
+                                <path class="icon-stroke" d="M10 36l6-22"/>
+                                <path class="icon-stroke" d="M30 36l-6-22"/>
+                                <path class="icon-stroke" d="M16 14l4-10 4 10"/>
+                            </svg>
+                        </div>
+                        <div class="name">Cosmetic</div>
+                        <div class="description">Plastic surgery, skin</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Orthopedic" data-code="ORTH">
+                        <div class="icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M12 4c-3 0-5 2-5 4.5S10 13 10 13v14s-3 2.5-3 4.5 2 4.5 5 4.5 5-2 5-4.5-3-4.5-3-4.5V13s3-2.5 3-4.5S15 4 12 4z"/>
+                                <path class="icon-stroke" d="M28 4c-3 0-5 2-5 4.5s3 4.5 3 4.5v14s-3 2.5-3 4.5 2 4.5 5 4.5 5-2 5-4.5-3-4.5-3-4.5V13s3-2.5 3-4.5S31 4 28 4z"/>
+                                <path class="icon-stroke" d="M14 20h12"/>
+                            </svg>
+                        </div>
+                        <div class="name">Orthopedic</div>
+                        <div class="description">Joint, spine surgery</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="Fertility" data-code="FERT">
+                        <div class="icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path class="icon-stroke" d="M20 36V22"/>
+                                <path class="icon-stroke" d="M20 22c0-6 4-10 4-14 0-2.5-2-4-4-4s-4 1.5-4 4c0 4 4 8 4 14z"/>
+                                <path class="icon-stroke" d="M14 28c-4-2-6-5-6-8 0-4 3-6 6-6"/>
+                                <path class="icon-stroke" d="M26 28c4-2 6-5 6-8 0-4-3-6-6-6"/>
+                                <ellipse class="icon-stroke" cx="20" cy="20" rx="3" ry="4"/>
+                            </svg>
+                        </div>
+                        <div class="name">Fertility</div>
+                        <div class="description">IVF, fertility treatments</div>
+                    </div>
+                    <div class="procedure-card" data-procedure="General Surgery" data-code="SURG">
+                        <div class="icon">
+                            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <rect class="icon-stroke" x="16" y="4" width="8" height="32" rx="2"/>
+                                <rect class="icon-stroke" x="4" y="16" width="32" height="8" rx="2"/>
+                                <circle class="icon-fill" cx="20" cy="20" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="name">General Surgery</div>
+                        <div class="description">Other medical procedures</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="procedureDescription">Describe your procedure (optional)</label>
+                    <textarea id="procedureDescription" rows="3" placeholder="E.g., Dental implants for 2 teeth, wisdom tooth extraction..."></textarea>
+                </div>
+
+                <div class="form-navigation">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="nextStep()" id="step1Next" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Payment Arrangement -->
+            <div class="form-section" id="step2">
+                <h2 class="section-title">How much do you need?</h2>
+                <p class="section-description">Select the amount you'd like to finance</p>
+
+                <div class="amount-display">
+                    <div class="amount-value" id="amountDisplay">R7,500</div>
+                </div>
+
+                <input type="range" class="amount-slider" id="amountSlider" min="5000" max="10000" step="500" value="7500">
+                <div class="amount-range">
+                    <span>R5,000</span>
+                    <span>R10,000</span>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <h3 style="font-size: 18px; margin-bottom: 16px;">Select repayment term</h3>
+                    <div class="term-grid">
+                        <div class="term-option" data-term="6">
+                            <div class="months">6</div>
+                            <div class="label">months</div>
+                        </div>
+                        <div class="term-option selected" data-term="12">
+                            <div class="months">12</div>
+                            <div class="label">months</div>
+                        </div>
+                        <div class="term-option" data-term="18">
+                            <div class="months">18</div>
+                            <div class="label">months</div>
+                        </div>
+                        <div class="term-option" data-term="24">
+                            <div class="months">24</div>
+                            <div class="label">months</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="estimate-box">
+                    <div class="estimate-title">Estimated monthly payment</div>
+                    <div class="estimate-value" id="monthlyEstimate">R4,583</div>
+                    <div class="estimate-note">* Final payment depends on the rate you're offered</div>
+                </div>
+
+                <div class="form-navigation">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Employment Details -->
+            <div class="form-section" id="step3">
+                <h2 class="section-title">Tell us about your income</h2>
+                <p class="section-description">This helps lenders offer you better rates</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employmentStatus">Employment Status</label>
+                        <select id="employmentStatus">
+                            <option value="">Select status</option>
+                            <option value="EMPLOYED">Employed Full-time</option>
+                            <option value="PART_TIME">Employed Part-time</option>
+                            <option value="SELF_EMPLOYED">Self-employed</option>
+                            <option value="CONTRACTOR">Contractor</option>
+                            <option value="RETIRED">Retired</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="employmentDuration">How long at current employer?</label>
+                        <select id="employmentDuration">
+                            <option value="">Select duration</option>
+                            <option value="6">Less than 6 months</option>
+                            <option value="12">6-12 months</option>
+                            <option value="24">1-2 years</option>
+                            <option value="60">2-5 years</option>
+                            <option value="120">5+ years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyIncome">Monthly Income (before tax)</label>
+                    <div class="input-prefix">
+                        <span>R</span>
+                        <input type="number" id="monthlyIncome" placeholder="25000" min="1000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyObligations">Existing monthly debt repayments</label>
+                    <div class="input-prefix">
+                        <span>R</span>
+                        <input type="number" id="monthlyObligations" placeholder="0" min="0">
+                    </div>
+                    <div style="font-size: 13px; color: #8A8A8A; margin-top: 6px;">Total amount you currently pay per month on any loans, credit cards, or store accounts. Enter 0 if none.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="medicalAidCovered">How much does your medical aid cover? <span style="font-weight: 400; color: #8A8A8A;">(optional)</span></label>
+                    <div class="input-prefix">
+                        <span>R</span>
+                        <input type="number" id="medicalAidCovered" placeholder="0" min="0">
+                    </div>
+                    <div style="font-size: 13px; color: #8A8A8A; margin-top: 6px;">If your medical aid pays part of the cost, enter that amount here. Enter 0 if you have no medical aid or it covers nothing.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="urgencyClassification">How urgent is this procedure?</label>
+                    <select id="urgencyClassification">
+                        <option value="">Select urgency</option>
+                        <option value="elective">Elective — convenience, no medical urgency (e.g. cosmetic, veneers)</option>
+                        <option value="planned">Planned — scheduled within the next 2–3 months</option>
+                        <option value="semi_urgent">Semi-urgent — needed within the next few weeks</option>
+                        <option value="urgent">Urgent — needed immediately or within days</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider">Healthcare Provider (optional)</label>
+                    <input type="text" id="provider" placeholder="E.g., Life Hospital, Netcare Dental...">
+                </div>
+
+                <div class="form-navigation">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="step3Next" disabled>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Review & Submit -->
+            <div class="form-section" id="step4">
+                <h2 class="section-title">Review your application</h2>
+                <p class="section-description">Make sure everything looks correct</p>
+
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="label">Procedure Type</span>
+                        <span class="value" id="summaryProcedure">-</span>
+                    </div>
+                    <div class="summary-item summary-highlight">
+                        <span class="label">Payment Arrangement</span>
+                        <span class="value" id="summaryAmount">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Repayment Term</span>
+                        <span class="value" id="summaryTerm">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Employment</span>
+                        <span class="value" id="summaryEmployment">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Monthly Income</span>
+                        <span class="value" id="summaryIncome">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Existing Monthly Repayments</span>
+                        <span class="value" id="summaryObligations">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Procedure Urgency</span>
+                        <span class="value" id="summaryUrgency">-</span>
+                    </div>
+                </div>
+
+                <div class="estimate-box" style="margin-top: 24px;">
+                    <div class="estimate-title">What happens next?</div>
+                    <p style="color: #4A4A4A; line-height: 1.6;">
+                        Your application will be sent to our network of lenders who will compete to offer you the best rate.
+                        You'll receive multiple offers within minutes and can choose the one that works best for you.
+                    </p>
+                </div>
+
+                <div class="form-navigation">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitApplication()">Submit Application</button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="form-section" id="successState">
+                <div class="success-state">
+                    <div class="success-icon" id="successIcon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <path class="icon-stroke" d="M22 4L10 22h8l-2 14L30 18h-8l2-14z"/>
+                        </svg>
+                    </div>
+                    <h2 class="success-title" id="successTitle">Application Submitted!</h2>
+                    <p class="success-message" id="successMessage">
+                        We're finding you the best rates from our lending partners.<br>
+                        You'll receive offers shortly.
+                    </p>
+
+                    <!-- Preview Offers Container (shown in demo mode) -->
+                    <div id="previewOffersContainer" style="display: none; margin-top: 32px; text-align: left; max-width: 600px;">
+                        <div style="background: linear-gradient(135deg, #FFF5E6 0%, #FFE0B3 100%); border-radius: 12px; padding: 16px; margin-bottom: 24px; border: 1px solid #FFB347;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" fill="none" stroke="#FF9F40" stroke-width="2"/>
+                                    <path d="M12 8v4M12 16h.01" stroke="#FF9F40" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span style="font-weight: 600; color: #CC6600;">Marketplace Preview Mode</span>
+                            </div>
+                            <p style="font-size: 14px; color: #8B4513; margin: 0;" id="previewMessage">
+                                Our lending partners are being onboarded. Below is a preview of what offers would look like.
+                            </p>
+                        </div>
+
+                        <h3 style="font-size: 18px; margin-bottom: 16px; color: #1A1A1A;">Preview Offers</h3>
+                        <div id="previewOffersList"></div>
+
+                        <div style="margin-top: 24px; padding: 20px; background: #F8F9FA; border-radius: 12px;">
+                            <h4 style="font-size: 16px; margin-bottom: 12px; color: #1A1A1A;">What happens next?</h4>
+                            <ul id="nextStepsList" style="list-style: none; padding: 0; margin: 0;">
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="viewOffers()" id="viewOffersBtn" style="margin-top: 24px;">View My Offers</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'" style="margin-top: 12px;">Back to Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="api-client.js"></script>
+    <script>
+        // Application state
+        let currentStep = 1;
+        let applicationData = {
+            procedureType: '',
+            procedureCode: '',
+            procedureDescription: '',
+            loanAmount: 7500,
+            requestedTerm: 12,
+            employmentStatus: '',
+            employmentDurationMonths: 0,
+            monthlyIncome: 0,
+            monthlyObligations: 0,
+            medicalAidCovered: 0,
+            urgencyClassification: '',
+            provider: ''
+        };
+        let applicationId = null;
+
+        // Check authentication
+        function checkAuth() {
+            if (!PaySickAPI.users.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize
+        function init() {
+            if (!checkAuth()) return;
+
+            // Set up procedure card selection
+            document.querySelectorAll('.procedure-card').forEach(card => {
+                card.addEventListener('click', () => selectProcedure(card));
+            });
+
+            // Set up amount slider
+            const slider = document.getElementById('amountSlider');
+            slider.addEventListener('input', updateAmount);
+
+            // Set up term selection
+            document.querySelectorAll('.term-option').forEach(option => {
+                option.addEventListener('click', () => selectTerm(option));
+            });
+
+            // Set up form validation
+            document.getElementById('employmentStatus').addEventListener('change', validateStep3);
+            document.getElementById('employmentDuration').addEventListener('change', validateStep3);
+            document.getElementById('monthlyIncome').addEventListener('input', validateStep3);
+            document.getElementById('monthlyObligations').addEventListener('input', validateStep3);
+            document.getElementById('medicalAidCovered').addEventListener('input', validateStep3);
+            document.getElementById('urgencyClassification').addEventListener('change', validateStep3);
+
+            updateAmount();
+        }
+
+        // Select procedure
+        function selectProcedure(card) {
+            document.querySelectorAll('.procedure-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+
+            applicationData.procedureType = card.dataset.procedure;
+            applicationData.procedureCode = card.dataset.code;
+            document.getElementById('step1Next').disabled = false;
+        }
+
+        // Update amount display
+        function updateAmount() {
+            const slider = document.getElementById('amountSlider');
+            const amount = parseInt(slider.value);
+            applicationData.loanAmount = amount;
+
+            document.getElementById('amountDisplay').textContent = formatCurrency(amount);
+            updateMonthlyEstimate();
+        }
+
+        // Select term
+        function selectTerm(option) {
+            document.querySelectorAll('.term-option').forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+
+            applicationData.requestedTerm = parseInt(option.dataset.term);
+            updateMonthlyEstimate();
+        }
+
+        // Update monthly estimate
+        function updateMonthlyEstimate() {
+            const principal = applicationData.loanAmount;
+            const term = applicationData.requestedTerm;
+            const rate = 0.22; // Estimate 22% annualised service fee rate
+
+            const monthlyRate = rate / 12;
+            const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, term)) /
+                           (Math.pow(1 + monthlyRate, term) - 1);
+
+            document.getElementById('monthlyEstimate').textContent = formatCurrency(payment);
+        }
+
+        // Validate step 3
+        function validateStep3() {
+            const status = document.getElementById('employmentStatus').value;
+            const duration = document.getElementById('employmentDuration').value;
+            const income = document.getElementById('monthlyIncome').value;
+            const urgency = document.getElementById('urgencyClassification').value;
+
+            applicationData.employmentStatus = status;
+            applicationData.employmentDurationMonths = parseInt(duration) || 0;
+            applicationData.monthlyIncome = parseInt(income) || 0;
+            applicationData.monthlyObligations = parseInt(document.getElementById('monthlyObligations').value) || 0;
+            applicationData.medicalAidCovered = parseInt(document.getElementById('medicalAidCovered').value) || 0;
+            applicationData.urgencyClassification = urgency;
+
+            const isValid = status && duration && income && parseInt(income) >= 1000 && urgency;
+            document.getElementById('step3Next').disabled = !isValid;
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep === 3) {
+                applicationData.procedureDescription = document.getElementById('procedureDescription').value;
+                applicationData.provider = document.getElementById('provider').value;
+                updateSummary();
+            }
+
+            if (currentStep < 4) {
+                document.querySelector(`#step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+
+                currentStep++;
+
+                document.querySelector(`#step${currentStep}`).classList.add('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.querySelector(`#step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+
+                currentStep--;
+
+                document.querySelector(`#step${currentStep}`).classList.add('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('completed');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            }
+        }
+
+        const URGENCY_LABELS = {
+            elective: 'Elective',
+            planned: 'Planned',
+            semi_urgent: 'Semi-urgent',
+            urgent: 'Urgent'
+        };
+
+        // Update summary
+        function updateSummary() {
+            document.getElementById('summaryProcedure').textContent = applicationData.procedureType;
+            document.getElementById('summaryAmount').textContent = formatCurrency(applicationData.loanAmount);
+            document.getElementById('summaryTerm').textContent = applicationData.requestedTerm + ' months';
+            document.getElementById('summaryEmployment').textContent = formatEmployment(applicationData.employmentStatus);
+            document.getElementById('summaryIncome').textContent = formatCurrency(applicationData.monthlyIncome);
+            document.getElementById('summaryObligations').textContent = formatCurrency(applicationData.monthlyObligations);
+            document.getElementById('summaryUrgency').textContent = URGENCY_LABELS[applicationData.urgencyClassification] || applicationData.urgencyClassification;
+        }
+
+        function isDemoMode() {
+            const tok = localStorage.getItem('paysick_auth_token') || '';
+            return tok.startsWith('demo-');
+        }
+
+        function buildDemoResponse() {
+            const principal = applicationData.loanAmount;
+            const term      = applicationData.requestedTerm;
+            const income    = applicationData.monthlyIncome;
+            function mp(rate) { const r = rate/12; return Math.round(principal*(r*Math.pow(1+r,term))/(Math.pow(1+r,term)-1)); }
+            const proposedRepayment = mp(0.1125);
+            const rti = income > 0 ? (proposedRepayment / income) : 0;
+            const dtiPost = income > 0 ? ((applicationData.monthlyObligations + proposedRepayment) / income) : 0;
+            return {
+                success: true, demo: true, status: 'PREVIEW',
+                applicationId: 'DEMO-' + Date.now(),
+                shield_assessment: {
+                    gate: 'PATIENT_GATE',
+                    decision: 'APPROVE',
+                    traffic_light: 'green',
+                    ai_recommendation: 'approve',
+                    ai_confidence: 0.91,
+                    borrower_profile: applicationData.medicalAidCovered > 0 ? 'convenience' : (applicationData.urgencyClassification === 'urgent' ? 'urgent_necessity' : 'planned_necessity'),
+                    risk_tier: rti < 0.12 ? 'prime' : 'standard',
+                    affordability: {
+                        rti: rti,
+                        dti_post: dtiPost,
+                        proposed_monthly_repayment: proposedRepayment,
+                        disposable_income: income - applicationData.monthlyObligations - proposedRepayment
+                    },
+                    flags: [],
+                    rationale: ['Demo assessment — application passes all affordability checks.']
+                },
+                marketplaceStatus: { message: 'Our lending partners are currently being onboarded. Your application has been saved and you will be notified when lenders are available to make offers.' },
+                previewOffers: [
+                    { lenderName: 'MediFinance SA',   interestRateDisplay: '16.5%', monthlyPayment: mp(0.165), totalRepayment: mp(0.165)*term, term, features: ['No early settlement fees','Flexible payment dates','Healthcare specialist'] },
+                    { lenderName: 'HealthCredit Plus', interestRateDisplay: '18.5%', monthlyPayment: mp(0.185), totalRepayment: mp(0.185)*term, term, features: ['Same-day approval','Direct provider payment','Rewards program'] },
+                    { lenderName: 'CareCapital',       interestRateDisplay: '19.5%', monthlyPayment: mp(0.195), totalRepayment: mp(0.195)*term, term, features: ['Payment holiday option','24/7 support','Family plans available'] }
+                ],
+                nextSteps: [
+                    'We are currently onboarding lending partners to our marketplace',
+                    'Your application details have been saved',
+                    'You will receive an email notification when lenders are ready to make offers',
+                    'Expected launch: Q2 2026'
+                ]
+            };
+        }
+
+        function showShieldDecline(shield) {
+            showLoading(false);
+
+            // Build rationale bullets
+            const rationaleHTML = (shield.rationale || []).map(r =>
+                `<li style="margin-bottom: 8px; color: #4A4A4A;">${r}</li>`
+            ).join('');
+
+            // Build alternative offer if provided
+            let alternativeHTML = '';
+            if (shield.alternative) {
+                const alt = shield.alternative;
+                alternativeHTML = `
+                    <div style="margin-top: 24px; padding: 20px; background: #F0FFF4; border: 2px solid #2ED573; border-radius: 12px;">
+                        <div style="font-weight: 700; color: #1A7A3C; margin-bottom: 8px;">Suggested Alternative</div>
+                        <p style="font-size: 14px; color: #2A2A2A; margin-bottom: 12px;">
+                            Based on your income, you may qualify for a smaller payment arrangement that fits within affordability limits:
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                            <div>
+                                <div style="font-size: 12px; color: #8A8A8A;">Max arrangement amount</div>
+                                <div style="font-weight: 700; font-size: 18px; color: #1A7A3C;">${formatCurrency(alt.max_loan_amount)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #8A8A8A;">Monthly repayment</div>
+                                <div style="font-weight: 700; font-size: 18px; color: #1A7A3C;">${formatCurrency(alt.max_monthly_repayment)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #8A8A8A;">RTI</div>
+                                <div style="font-weight: 700; font-size: 18px; color: #1A7A3C;">${(alt.rti * 100).toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 16px; width: 100%;" onclick="applyWithAlternative(${alt.max_loan_amount})">Apply for arrangement of ${formatCurrency(alt.max_loan_amount)} instead</button>
+                    </div>`;
+            }
+
+            // Hide current step, show decline card in place
+            document.querySelector(`#step${currentStep}`).classList.remove('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+
+            // Build and inject a decline card into the success state section
+            document.getElementById('successState').innerHTML = `
+                <div style="padding: 24px 0;">
+                    <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                            <path d="M10 10L30 30M30 10L10 30" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h2 style="font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 8px;">Application Not Approved</h2>
+                    <p style="color: #8A8A8A; margin-bottom: 24px;">Our affordability assessment could not approve this application at this time.</p>
+
+                    <div style="background: #FFF5F6; border: 1px solid #FFCDD2; border-left: 4px solid #FF4757; border-radius: 0 8px 8px 0; padding: 20px; text-align: left; margin-bottom: 16px;">
+                        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #E01E37; margin-bottom: 12px;">Reason</div>
+                        <ul style="list-style: none; padding: 0; margin: 0;">${rationaleHTML}</ul>
+                    </div>
+
+                    ${alternativeHTML}
+
+                    <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="currentStep = 2; document.getElementById('step2').classList.add('active'); document.getElementById('successState').innerHTML = ''; document.querySelector('.step[data-step=\\'2\\']').classList.add('active');">Adjust Amount or Term</button>
+                        <button class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+                    </div>
+                </div>`;
+            document.getElementById('successState').classList.add('active');
+        }
+
+        function applyWithAlternative(maxAmount) {
+            // Jump back to step 2 with the alternative amount pre-set
+            document.getElementById('successState').classList.remove('active');
+            applicationData.loanAmount = maxAmount;
+            document.getElementById('amountSlider').value = Math.min(maxAmount, 10000);
+            updateAmount();
+            // Go to step 2
+            currentStep = 1;
+            nextStep();
+        }
+
+        // Submit application
+        async function submitApplication() {
+            showLoading(true);
+
+            try {
+                const response = isDemoMode()
+                    ? buildDemoResponse()
+                    : await PaySickAPI.marketplace.submitApplication({
+                        procedureType: applicationData.procedureType,
+                        procedureCode: applicationData.procedureCode,
+                        procedureDescription: applicationData.procedureDescription,
+                        loanAmount: applicationData.loanAmount,
+                        requestedTerm: applicationData.requestedTerm,
+                        monthlyIncome: applicationData.monthlyIncome,
+                        monthlyObligations: applicationData.monthlyObligations,
+                        medicalAidCovered: applicationData.medicalAidCovered,
+                        urgencyClassification: applicationData.urgencyClassification,
+                        employmentStatus: applicationData.employmentStatus,
+                        employmentDurationMonths: applicationData.employmentDurationMonths
+                    });
+
+                // Shield declined — show decline card instead of success
+                if (response.shield_declined) {
+                    showShieldDecline(response.shield);
+                    return;
+                }
+
+                applicationId = response.applicationId;
+
+                // Check if this is a preview/demo response
+                if (response.demo || response.status === 'PREVIEW') {
+                    // Update UI for preview mode
+                    document.getElementById('successTitle').textContent = 'Application Received!';
+                    document.getElementById('successMessage').innerHTML =
+                        response.marketplaceStatus?.message ||
+                        'Our lending marketplace is currently being set up. Below is a preview of what your offers would look like.';
+
+                    // Show preview offers container
+                    const previewContainer = document.getElementById('previewOffersContainer');
+                    previewContainer.style.display = 'block';
+
+                    // Render preview offers
+                    if (response.previewOffers && response.previewOffers.length > 0) {
+                        const offersHTML = response.previewOffers.map((offer, idx) => `
+                            <div style="background: white; border: 2px solid ${idx === 0 ? '#2ED573' : '#E5E5E5'}; border-radius: 12px; padding: 20px; margin-bottom: 16px; ${idx === 0 ? 'box-shadow: 0 4px 12px rgba(46, 213, 115, 0.15);' : ''}">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 16px; color: #1A1A1A;">${offer.lenderName}</div>
+                                        ${idx === 0 ? '<span style="background: #2ED573; color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 4px; display: inline-block;">Best Rate</span>' : ''}
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 24px; font-weight: 700; color: #FF4757;">${offer.interestRateDisplay || (offer.interestRate * 100).toFixed(1) + '%'}</div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Interest Rate</div>
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 12px; border-top: 1px solid #E5E5E5;">
+                                    <div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Monthly</div>
+                                        <div style="font-weight: 600;">R${offer.monthlyPayment.toLocaleString()}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Term</div>
+                                        <div style="font-weight: 600;">${offer.term} months</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: #8A8A8A;">Total</div>
+                                        <div style="font-weight: 600;">R${offer.totalRepayment.toLocaleString()}</div>
+                                    </div>
+                                </div>
+                                ${offer.features ? `
+                                    <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;">
+                                        ${offer.features.map(f => `<span style="background: #F0F0F0; color: #4A4A4A; font-size: 11px; padding: 4px 8px; border-radius: 4px;">${f}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                                <div style="margin-top: 12px; text-align: center;">
+                                    <span style="background: #FFF3CD; color: #856404; font-size: 12px; padding: 4px 12px; border-radius: 4px;">Preview Only - Not a Real Offer</span>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('previewOffersList').innerHTML = offersHTML;
+                    }
+
+                    // Render next steps
+                    if (response.nextSteps && response.nextSteps.length > 0) {
+                        const stepsHTML = response.nextSteps.map(step => `
+                            <li style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                                <svg style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" fill="#2ED573"/>
+                                    <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none"/>
+                                </svg>
+                                <span style="font-size: 14px; color: #4A4A4A;">${step}</span>
+                            </li>
+                        `).join('');
+                        document.getElementById('nextStepsList').innerHTML = stepsHTML;
+                    }
+
+                    // Update button
+                    document.getElementById('viewOffersBtn').textContent = 'Notify Me When Lenders Are Available';
+                    document.getElementById('viewOffersBtn').onclick = function() {
+                        showToast('You will be notified when lenders are available!', 'success');
+                    };
+
+                    showToast('Application saved! You\'ll be notified when lenders are available.', 'success');
+                } else {
+                    // Normal success - marketplace is live
+                    showToast('Application submitted successfully!', 'success');
+                }
+
+                // Show success state
+                document.querySelector(`#step${currentStep}`).classList.remove('active');
+                document.getElementById('successState').classList.add('active');
+
+            } catch (error) {
+                console.error('Submit error:', error);
+                showToast(error.message || 'Failed to submit application', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // View offers
+        function viewOffers() {
+            if (applicationId) {
+                window.location.href = `marketplace-offers.html?id=${applicationId}`;
+            } else {
+                window.location.href = 'marketplace-offers.html';
+            }
+        }
+
+        // Helper functions
+        function formatCurrency(amount) {
+            return 'R' + Math.round(amount).toLocaleString('en-ZA');
+        }
+
+        function formatEmployment(status) {
+            const labels = {
+                'EMPLOYED': 'Employed Full-time',
+                'PART_TIME': 'Part-time',
+                'SELF_EMPLOYED': 'Self-employed',
+                'CONTRACTOR': 'Contractor',
+                'RETIRED': 'Retired',
+                'OTHER': 'Other'
+            };
+            return labels[status] || status;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

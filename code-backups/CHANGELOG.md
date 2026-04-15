@@ -6,6 +6,70 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.5] — 2026-04-15
+
+**Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links
+
+### Summary
+Post-submission screen now shows one PaySick payment arrangement card (amount, instalment, term, ref, pending status) plus direct links to the Admin Review Queue and Provider Dashboard. Removed all fake lender offer cards (MediFinance SA, HealthCredit Plus, CareCapital).
+
+### Changed
+- `marketplace-apply.html` — replaced 3-card lender preview with single arrangement card; added admin and provider dashboard deep links; updated mock response, toast, and success message copy
+
+### Deprecated
+- Multi-lender preview offer cards (last in v1.7.4)
+
+---
+
+## [v1.7.4] — 2026-04-15
+
+**Type**: PATCH — Copy change: replace lender marketplace messaging with PaySick direct disbursement messaging
+
+### Summary
+Until external lenders are onboarded, PaySick handles all fund disbursements directly. Replaced all lender marketplace copy ("network of lenders", "best rate", "multiple offers") on the application flow with accurate PaySick direct disbursement copy.
+
+### Changed
+- `marketplace-apply.html` — "What happens next?" blurb, loading overlay, success message, post-submit banner, section heading, and primary button updated to reflect PaySick direct disbursement
+
+---
+
+## [v1.7.3] — 2026-04-15
+
+**Type**: PATCH — Copy change: replace "Loan Amount" with "Payment Arrangement" on application review screen
+
+### Summary
+The review step of the application form displayed the prohibited label "Loan Amount". Replaced with "Payment Arrangement" per Shield framework LANG-02.
+
+### Changed
+- `marketplace-apply.html` — review summary label `Loan Amount` → `Payment Arrangement`
+
+---
+
+## [v1.7.2] — 2026-04-15
+
+**Type**: PATCH — UI and terms update: cap payment plan slider at R10,000
+
+### Summary
+Reduced the maximum selectable amount on the marketplace-apply amount slider from R500,000 to R10,000. Updated Terms of Service section 4.3 to state R10,000 per-payment-plan maximum. Default slider value adjusted to R7,500; step reduced to R500.
+
+### Changed
+- `marketplace-apply.html` — slider max R500,000 → R10,000; step 1000 → 500; default value R50,000 → R7,500; range label updated; `applyWithAlternative` cap updated
+- `terms-of-service.html` — section 4.3 Bill Amount Limits: R500,000 → R10,000 per payment plan
+
+---
+
+## [v1.7.1] — 2026-04-15
+
+**Type**: PATCH — Copy change: align application page heading with Shield framework approved terminology
+
+### Summary
+Updated `marketplace-apply.html` `<h1>` and `<title>` from "Apply for Medical Finance" to "Apply for a Medical Payment Plan" to comply with Shield framework LANG-01 language requirement mandating the approved term "payment plan" in all user-facing copy.
+
+### Changed
+- `marketplace-apply.html` — `<h1>` and `<title>` updated to "Apply for a Medical Payment Plan"
+
+---
+
 ## [v1.7.0] — 2026-04-10
 
 **Type**: MINOR — New feature set: Shield Framework v5.0 Segment 1 Tariff Billing Risk Controls
