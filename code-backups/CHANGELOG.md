@@ -6,6 +6,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.5] — 2026-04-15
+
+**Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links
+
+### Summary
+Post-submission screen now shows one PaySick payment arrangement card (amount, instalment, term, ref, pending status) plus direct links to the Admin Review Queue and Provider Dashboard. Removed all fake lender offer cards (MediFinance SA, HealthCredit Plus, CareCapital).
+
+### Changed
+- `marketplace-apply.html` — replaced 3-card lender preview with single arrangement card; added admin and provider dashboard deep links; updated mock response, toast, and success message copy
+
+### Deprecated
+- Multi-lender preview offer cards (last in v1.7.4)
+
+---
+
 ## [v1.7.4] — 2026-04-15
 
 **Type**: PATCH — Copy change: replace lender marketplace messaging with PaySick direct disbursement messaging
