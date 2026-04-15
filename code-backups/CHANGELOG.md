@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.4] — 2026-04-15
+
+**Type**: PATCH — Copy change: replace lender marketplace messaging with PaySick direct disbursement messaging
+
+### Summary
+Until external lenders are onboarded, PaySick handles all fund disbursements directly. Replaced all lender marketplace copy ("network of lenders", "best rate", "multiple offers") on the application flow with accurate PaySick direct disbursement copy.
+
+### Changed
+- `marketplace-apply.html` — "What happens next?" blurb, loading overlay, success message, post-submit banner, section heading, and primary button updated to reflect PaySick direct disbursement
+
+---
+
 ## [v1.7.3] — 2026-04-15
 
 **Type**: PATCH — Copy change: replace "Loan Amount" with "Payment Arrangement" on application review screen

@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |
 | [v1.7.3](./v1.7.3/) | 2026-04-15 | Copy patch: replace "Loan Amount" with "Payment Arrangement" on application review screen (LANG-02 compliance) |
 | [v1.7.2](./v1.7.2/) | 2026-04-15 | UI/terms patch: cap payment plan slider max at R10,000 in marketplace-apply.html; update Terms of Service section 4.3 to reflect R10,000 per-payment-plan limit |
 | [v1.7.1](./v1.7.1/) | 2026-04-15 | Copy patch: "Apply for Medical Finance" → "Apply for a Medical Payment Plan" in marketplace-apply.html to comply with Shield framework LANG-01 approved terminology |
