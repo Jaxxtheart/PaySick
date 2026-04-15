@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.3] — 2026-04-15
+
+**Type**: PATCH — Copy change: replace "Loan Amount" with "Payment Arrangement" on application review screen
+
+### Summary
+The review step of the application form displayed the prohibited label "Loan Amount". Replaced with "Payment Arrangement" per Shield framework LANG-02.
+
+### Changed
+- `marketplace-apply.html` — review summary label `Loan Amount` → `Payment Arrangement`
+
+---
+
 ## [v1.7.2] — 2026-04-15
 
 **Type**: PATCH — UI and terms update: cap payment plan slider at R10,000
