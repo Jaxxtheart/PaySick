@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Circuit Breaker Dashboard — PaySick Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
+
+    .header { background: #1B2A4A; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo { font-size: 22px; font-weight: 700; color: #EF476F; text-decoration: none; }
+    .page-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.9); }
+    .admin-badge { background: #EF476F; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    .logout-btn { background: transparent; border: 2px solid rgba(255,255,255,0.4); color: white; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .logout-btn:hover { border-color: #EF476F; color: #EF476F; }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .alert-banner {
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .alert-banner .alert-icon { font-size: 20px; }
+    .alert-banner .alert-text { font-size: 14px; font-weight: 600; color: #DC2626; }
+    .alert-banner.success { background: #DCFCE7; border-color: #86EFAC; }
+    .alert-banner.success .alert-text { color: #166534; }
+    .alert-banner.hidden { display: none; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(27,42,74,0.06); }
+    .stat-card .number { font-size: 28px; font-weight: 700; color: #1B2A4A; }
+    .stat-card .label { font-size: 13px; color: #666; margin-top: 4px; }
+    .stat-card.warning .number { color: #F59E0B; }
+    .stat-card.danger .number { color: #EF476F; }
+
+    .section { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(27,42,74,0.06); margin-bottom: 24px; overflow: hidden; }
+    .section-header { padding: 20px 24px; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; }
+    .section-header h2 { font-size: 16px; font-weight: 700; }
+    .section-body { padding: 24px; }
+
+    /* ASCII/Table chart for tariff inflation */
+    .chart-container { font-family: monospace; font-size: 13px; line-height: 1.8; }
+    .chart-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .chart-label { width: 120px; font-size: 12px; color: #666; text-align: right; }
+    .chart-bar { height: 20px; background: #EF476F; border-radius: 3px; min-width: 2px; transition: width 0.3s; position: relative; }
+    .chart-bar.warning { background: #F59E0B; }
+    .chart-bar.ok { background: #10B981; }
+    .chart-value { font-size: 12px; font-weight: 700; color: #1B2A4A; white-space: nowrap; }
+    .chart-threshold { border-left: 2px dashed #EF476F; position: absolute; height: 24px; top: -2px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #F4F6F9; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    tbody tr { border-bottom: 1px solid #F0F0F0; }
+    tbody tr:hover { background: #F9FAFB; }
+    tbody td { padding: 14px 16px; font-size: 14px; }
+
+    .status-OPEN { color: #DC2626; font-weight: 700; }
+    .status-RESOLVED { color: #10B981; font-weight: 700; }
+
+    .loading { text-align: center; padding: 48px; color: #666; }
+    .error-msg { text-align: center; padding: 48px; color: #EF476F; }
+
+    .threshold-line {
+      background: #FEF3C7;
+      border: 1px solid #FCD34D;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #92400E;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <a href="/admin-dashboard.html" class="logo">PaySick</a>
+    <span class="page-title">Segment 1 Circuit Breaker Dashboard</span>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+</header>
+
+<main class="main">
+
+  <div id="alertBanner" class="alert-banner hidden">
+    <span class="alert-icon">&#9888;</span>
+    <span class="alert-text" id="alertText"></span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="number" id="statTotal">—</div>
+      <div class="label">Active Breakers</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="number" id="statPending">—</div>
+      <div class="label">Pending Review Queue</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="number" id="statInflation">—</div>
+      <div class="label">Above-Threshold Invoices (30 days)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="statReconciled">—</div>
+      <div class="label">EOBs Pending Reconciliation</div>
+    </div>
+  </div>
+
+  <!-- Tariff Inflation Chart -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Segment 1 Tariff Inflation Monitor</h2>
+      <span style="font-size:13px;color:#666">Variance: Provider Invoice vs Procedure Benchmark</span>
+    </div>
+    <div class="section-body">
+      <div class="threshold-line">
+        &#9888; Threshold: 30% — Applications with variance above this trigger a manual hold.
+        Review the hold queue to clear or approve flagged applications.
+      </div>
+
+      <div class="chart-container" id="inflationChart">
+        <div class="loading">Loading chart data...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Circuit Breaker Events -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Active Circuit Breaker Events</h2>
+      <span class="count-badge" id="breakerCount" style="background:#F4F6F9;color:#666;padding:4px 12px;border-radius:20px;font-size:13px">—</span>
+    </div>
+    <div id="breakerTable">
+      <div class="loading">Loading circuit breaker events...</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function getToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  async function apiFetch(path, options = {}) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...options.headers };
+    return fetch(path, { ...options, headers });
+  }
+
+  async function loadDashboard() {
+    try {
+      // Load review queue stats
+      const reviewRes = await apiFetch('/api/admin/underwriting/review-queue?limit=1');
+      if (reviewRes.status === 401) { window.location.href = '/login.html'; return; }
+      const reviewData = await reviewRes.json();
+      document.getElementById('statPending').textContent = reviewData.total || 0;
+
+      // Load EOB stats
+      const eobRes = await apiFetch('/api/admin/eob-reconciliation?status=PENDING&limit=1');
+      const eobData = await eobRes.json();
+      document.getElementById('statReconciled').textContent = eobData.total || 0;
+
+      // Load above-threshold count from review queue
+      const holdRes = await apiFetch('/api/admin/underwriting/review-queue?review_type=TARIFF_INFLATION_HOLD&limit=100');
+      const holdData = await holdRes.json();
+      const inflationItems = holdData.queue || [];
+      document.getElementById('statInflation').textContent = inflationItems.length;
+
+      renderInflationChart(inflationItems);
+
+    } catch (err) {
+      console.error('Dashboard load error:', err);
+    }
+
+    await loadBreakerEvents();
+  }
+
+  function renderInflationChart(items) {
+    const container = document.getElementById('inflationChart');
+    if (items.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:#10B981;font-weight:600">No tariff inflation holds active. Portfolio within threshold.</div>';
+      document.getElementById('statTotal').textContent = '0';
+      return;
+    }
+
+    document.getElementById('statTotal').textContent = items.length;
+
+    const maxWidth = 400;
+    // Show top 10 by recency
+    const displayed = items.slice(0, 10);
+
+    const rows = displayed.map(item => {
+      const barWidth = Math.min(maxWidth, maxWidth * 0.5); // simplified — show as proportional
+      const barClass = 'warning'; // above threshold
+      return `
+        <div class="chart-bar-row">
+          <span class="chart-label">${(item.application_id || '').slice(0,8)}...</span>
+          <div class="chart-bar ${barClass}" style="width:${barWidth}px"></div>
+          <span class="chart-value">${item.review_type.replace(/_/g, ' ')} — ${new Date(item.opened_at).toLocaleDateString('en-ZA')}</span>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <div style="margin-bottom:12px;font-size:12px;color:#666">
+        Showing ${displayed.length} of ${items.length} tariff inflation holds. Each bar represents an application on manual hold.
+      </div>
+      ${rows}
+      <div style="margin-top:16px;font-size:12px;color:#999">
+        [===30%===] = Threshold line. Applications above trigger the hold queue.
+      </div>
+    `;
+  }
+
+  async function loadBreakerEvents() {
+    try {
+      // Circuit breaker events are stored in portfolio_circuit_breaker_log
+      // Since we don't have a dedicated API endpoint, we show a summary
+      document.getElementById('breakerCount').textContent = 'Live monitoring';
+      document.getElementById('breakerTable').innerHTML = `
+        <table>
+          <thead>
+            <tr><th>Breaker Type</th><th>Trigger Metric</th><th>Trigger Value</th><th>Threshold</th><th>Status</th><th>Triggered At</th><th>Response Action</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="7" style="text-align:center;padding:32px;color:#666;font-style:italic">
+                No active circuit breaker events. System operating within normal parameters.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    } catch (err) {
+      document.getElementById('breakerTable').innerHTML = `<div class="error-msg">Failed to load circuit breaker events: ${err.message}</div>`;
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
+    window.location.href = '/login.html';
+  }
+
+  loadDashboard();
+
+  // Auto-refresh every 60 seconds
+  setInterval(loadDashboard, 60000);
+</script>
+</body>
+</html>

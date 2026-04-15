@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Procedure Benchmarks — PaySick Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
+
+    .header { background: #1B2A4A; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo { font-size: 22px; font-weight: 700; color: #EF476F; text-decoration: none; }
+    .page-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.9); }
+    .admin-badge { background: #EF476F; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    .logout-btn { background: transparent; border: 2px solid rgba(255,255,255,0.4); color: white; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .logout-btn:hover { border-color: #EF476F; color: #EF476F; }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .top-actions { display: flex; justify-content: flex-end; margin-bottom: 20px; gap: 12px; }
+    .btn-primary { padding: 10px 20px; background: #EF476F; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .btn-primary:hover { background: #D63E5F; }
+
+    .filters { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; box-shadow: 0 2px 8px rgba(27,42,74,0.06); }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-group label { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; }
+    .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 160px; }
+    .filter-btn { padding: 9px 20px; background: #1B2A4A; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .filter-btn:hover { background: #EF476F; }
+
+    .table-container { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(27,42,74,0.06); overflow: hidden; }
+    .table-header { padding: 20px 24px; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; }
+    .table-header h2 { font-size: 16px; font-weight: 700; }
+    .count-badge { background: #F4F6F9; color: #666; padding: 4px 12px; border-radius: 20px; font-size: 13px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #F4F6F9; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    tbody tr { border-bottom: 1px solid #F0F0F0; transition: background 0.15s; }
+    tbody tr:hover { background: #F9FAFB; }
+    tbody td { padding: 14px 16px; font-size: 14px; }
+
+    .amount { font-weight: 600; color: #1B2A4A; }
+    .code-chip { background: #E0E7FF; color: #4338CA; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; font-weight: 600; }
+    .region-chip { background: #DCFCE7; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+
+    .btn-edit { padding: 5px 12px; background: #1B2A4A; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: 12px; padding: 32px; width: 520px; max-width: 90vw; }
+    .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1B2A4A; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .modal-actions button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .btn-cancel { background: #F4F6F9; color: #1B2A4A; }
+    .btn-confirm { background: #EF476F; color: white; }
+
+    .loading { text-align: center; padding: 48px; color: #666; }
+    .error-msg { text-align: center; padding: 48px; color: #EF476F; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <a href="/admin-dashboard.html" class="logo">PaySick</a>
+    <span class="page-title">Procedure Benchmarks</span>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+</header>
+
+<main class="main">
+  <div class="top-actions">
+    <button class="btn-primary" onclick="openCreateModal()">+ Add Benchmark</button>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Procedure Code</label>
+      <input type="text" id="filterCode" placeholder="e.g. APP001">
+    </div>
+    <div class="filter-group">
+      <label>Metro Region</label>
+      <select id="filterRegion">
+        <option value="">All Regions</option>
+        <option value="GAUTENG">Gauteng</option>
+        <option value="WESTERN_CAPE">Western Cape</option>
+        <option value="KWAZULU_NATAL">KwaZulu-Natal</option>
+        <option value="EASTERN_CAPE">Eastern Cape</option>
+        <option value="NATIONAL">National</option>
+      </select>
+    </div>
+    <button class="filter-btn" onclick="loadBenchmarks()">Search</button>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <h2>Procedure Cost Benchmarks</h2>
+      <span class="count-badge" id="totalCount">Loading...</span>
+    </div>
+    <div id="tableContent">
+      <div class="loading">Loading benchmarks...</div>
+    </div>
+  </div>
+</main>
+
+<!-- Create/Edit Modal -->
+<div class="modal-overlay" id="benchmarkModal">
+  <div class="modal">
+    <h3 id="modalTitle">Add Procedure Benchmark</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Procedure Code *</label>
+        <input type="text" id="bCode" placeholder="e.g. APP001">
+      </div>
+      <div class="form-group">
+        <label>Procedure Name *</label>
+        <input type="text" id="bName" placeholder="e.g. Appendectomy">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Specialty</label>
+        <input type="text" id="bSpecialty" placeholder="e.g. General Surgery">
+      </div>
+      <div class="form-group">
+        <label>Metro Region</label>
+        <select id="bRegion">
+          <option value="">National (no region)</option>
+          <option value="GAUTENG">Gauteng</option>
+          <option value="WESTERN_CAPE">Western Cape</option>
+          <option value="KWAZULU_NATAL">KwaZulu-Natal</option>
+          <option value="EASTERN_CAPE">Eastern Cape</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Benchmark Cost (100%) (ZAR) *</label>
+        <input type="number" id="bCost" placeholder="e.g. 25000" step="0.01" min="0">
+      </div>
+      <div class="form-group">
+        <label>Benchmark Source</label>
+        <input type="text" id="bSource" placeholder="e.g. NHRPL 2024">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Effective From *</label>
+      <input type="date" id="bEffectiveFrom">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="saveBenchmark()">Save Benchmark</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  async function apiFetch(path, options = {}) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...options.headers };
+    return fetch(path, { ...options, headers });
+  }
+
+  function formatZAR(val) {
+    return val ? `R ${parseFloat(val).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}` : '—';
+  }
+
+  async function loadBenchmarks() {
+    document.getElementById('tableContent').innerHTML = '<div class="loading">Loading...</div>';
+    const code = document.getElementById('filterCode').value.trim();
+    const region = document.getElementById('filterRegion').value;
+
+    let url = '/api/admin/benchmarks?limit=100';
+    if (code) url += `&procedure_code=${encodeURIComponent(code)}`;
+    if (region) url += `&metro_region=${encodeURIComponent(region)}`;
+
+    try {
+      const res = await apiFetch(url);
+      if (res.status === 401) { window.location.href = '/login.html'; return; }
+      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+
+      document.getElementById('totalCount').textContent = `${data.total || 0} benchmarks`;
+
+      const items = data.benchmarks || [];
+      if (items.length === 0) {
+        document.getElementById('tableContent').innerHTML = '<div class="loading">No benchmarks found. Use the filter above or add a new benchmark.</div>';
+        return;
+      }
+
+      const rows = items.map(b => `
+        <tr>
+          <td><span class="code-chip">${b.procedure_code}</span></td>
+          <td>${b.procedure_name}</td>
+          <td>${b.specialty || '—'}</td>
+          <td>${b.metro_region ? `<span class="region-chip">${b.metro_region}</span>` : '<span style="color:#999">National</span>'}</td>
+          <td class="amount">${formatZAR(b.benchmark_cost_100pct)}</td>
+          <td>${b.benchmark_source || '—'}</td>
+          <td>${new Date(b.effective_from).toLocaleDateString('en-ZA')}</td>
+          <td>${b.updated_by || '—'}</td>
+          <td><button class="btn-edit" onclick="openEditModal(${JSON.stringify(b).replace(/"/g, '&quot;')})">Edit</button></td>
+        </tr>
+      `).join('');
+
+      document.getElementById('tableContent').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th><th>Procedure Name</th><th>Specialty</th><th>Region</th>
+              <th>100% Benchmark</th><th>Source</th><th>Effective From</th><th>Updated By</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    } catch (err) {
+      document.getElementById('tableContent').innerHTML = `<div class="error-msg">Failed to load: ${err.message}</div>`;
+    }
+  }
+
+  function openCreateModal() {
+    document.getElementById('modalTitle').textContent = 'Add Procedure Benchmark';
+    ['bCode','bName','bSpecialty','bCost','bSource'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('bRegion').value = '';
+    document.getElementById('bEffectiveFrom').value = new Date().toISOString().split('T')[0];
+    document.getElementById('benchmarkModal').classList.add('active');
+  }
+
+  function openEditModal(b) {
+    document.getElementById('modalTitle').textContent = `Edit Benchmark: ${b.procedure_code}`;
+    document.getElementById('bCode').value = b.procedure_code;
+    document.getElementById('bName').value = b.procedure_name;
+    document.getElementById('bSpecialty').value = b.specialty || '';
+    document.getElementById('bRegion').value = b.metro_region || '';
+    document.getElementById('bCost').value = b.benchmark_cost_100pct;
+    document.getElementById('bSource').value = b.benchmark_source || '';
+    document.getElementById('bEffectiveFrom').value = b.effective_from ? b.effective_from.split('T')[0] : '';
+    document.getElementById('benchmarkModal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('benchmarkModal').classList.remove('active');
+  }
+
+  async function saveBenchmark() {
+    const payload = {
+      procedure_code: document.getElementById('bCode').value.trim(),
+      procedure_name: document.getElementById('bName').value.trim(),
+      specialty: document.getElementById('bSpecialty').value.trim() || undefined,
+      metro_region: document.getElementById('bRegion').value || undefined,
+      benchmark_cost_100pct: parseFloat(document.getElementById('bCost').value),
+      benchmark_source: document.getElementById('bSource').value.trim() || undefined,
+      effective_from: document.getElementById('bEffectiveFrom').value
+    };
+
+    if (!payload.procedure_code || !payload.procedure_name || !payload.benchmark_cost_100pct || !payload.effective_from) {
+      alert('Procedure code, name, benchmark cost, and effective date are required.');
+      return;
+    }
+
+    try {
+      const res = await apiFetch('/api/admin/procedure-benchmarks', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Save failed'); }
+      closeModal();
+      loadBenchmarks();
+      alert('Benchmark saved successfully.');
+    } catch (err) { alert('Failed to save benchmark: ' + err.message); }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
+    window.location.href = '/login.html';
+  }
+
+  // Set today as default effective from
+  document.getElementById('bEffectiveFrom').value = new Date().toISOString().split('T')[0];
+  loadBenchmarks();
+</script>
+</body>
+</html>

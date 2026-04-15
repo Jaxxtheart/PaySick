@@ -173,7 +173,6 @@ app.use('/api/', globalLimiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);
 app.use('/api/users/demo-login', authLimiter);
-app.use('/api/users/forgot-password', authLimiter);
 
 // ============================================
 // SECURITY HEADERS
