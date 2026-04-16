@@ -451,7 +451,7 @@
                     window.location.href = 'admin-dashboard.html';
                     break;
                 case 'provider':
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'provider-dashboard.html';
                     break;
                 case 'lender':
                     window.location.href = 'lender-dashboard.html';
@@ -461,6 +461,10 @@
                     window.location.href = onboardingComplete === 'true' ? 'dashboard.html' : 'onboarding.html';
             }
         }
+
+        // Guard: set to true when manual login succeeds so auto-login
+        // doesn't overwrite localStorage with stale/incomplete data.
+        let manualLoginCompleted = false;
 
         // Attempt auto-login via stored refresh token (Remember Me)
         (async function attemptAutoLogin() {
@@ -493,6 +497,10 @@
                     return;
                 }
 
+                // If manual login already completed while we were waiting,
+                // don't overwrite its data — just bail out.
+                if (manualLoginCompleted) return;
+
                 const tokens = await response.json();
                 localStorage.setItem('paysick_auth_token', tokens.accessToken);
 
@@ -501,11 +509,15 @@
                     headers: { 'Authorization': 'Bearer ' + tokens.accessToken }
                 });
 
+                // Check again after the second await
+                if (manualLoginCompleted) return;
+
                 if (profileRes.ok) {
                     const profileData = await profileRes.json();
                     const user = profileData.user || profileData;
                     localStorage.setItem('paysick_user', JSON.stringify({
                         ...user,
+                        role: user.role || role,
                         name: user.full_name
                     }));
                     redirectByRole(user.role || role);
@@ -559,6 +571,9 @@
                 }
 
                 if (response.ok && data.accessToken) {
+                    // Prevent in-flight auto-login from overwriting our data
+                    manualLoginCompleted = true;
+
                     // Handle Remember Me — store refresh token, never the password
                     if (rememberMe && data.refreshToken) {
                         localStorage.setItem('paysick_remember', JSON.stringify({
