@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.6] — 2026-04-20
+
+**Type**: PATCH — investor deck copy update: Shield™ as AI-based proprietary risk IP, universal customer problem framing, two-part funding ask
+
+### Summary
+Updated `investor-deck.html` across four slides: (1) Problem slide reframed as a universal customer problem before narrowing to SA statistics; (2) Risk Management slide replaced with Shield™ AI Framework slide, surfacing the five Tariff Billing Controls and Four-Gate Assessment as primary AI IP; (3) Medical Risk Score slide renamed to Shield™ Intelligence Engine with updated subtitle and card header; (4) Funding ask restructured into two distinct tranches — R15M institutional disbursement facility (senior debt, non-dilutive) and R10M equity seed round (operational run rate). PPTX generation code updated to match all four slides.
+
+### Changed
+- `investor-deck.html` — Slides 2, 8, 11, 14 (HTML + PPTX generation code)
+
+---
+
 ## [v1.7.5] — 2026-04-15
 
 **Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links

@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.7.6](./v1.7.6/) | 2026-04-20 | Investor deck: Shield™ as AI-based proprietary risk IP, universal customer problem framing, two-part funding ask (R15M institutional disbursement facility + R10M operational equity) |
 | [v1.7.5](./v1.7.5/) | 2026-04-15 | UI patch: replace multi-lender preview cards with single PaySick arrangement card; add admin review queue and provider dashboard links on post-submission screen |
 | [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |
 | [v1.7.3](./v1.7.3/) | 2026-04-15 | Copy patch: replace "Loan Amount" with "Payment Arrangement" on application review screen (LANG-02 compliance) |
