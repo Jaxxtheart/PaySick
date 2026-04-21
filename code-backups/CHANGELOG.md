@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.7.7] — 2026-04-21
+
+**Type**: PATCH — investor deck: remove marketplace model, adopt direct balance sheet funding, update capital ask to R30M, remove all em dashes
+
+### Summary
+Removed the marketplace model from `investor-deck.html` entirely. PaySick now funds every patient arrangement directly from its own balance sheet with no third-party lenders. Updated eight slides (5, 6, 7, 8, 9, 10, 12, 13) and the PPTX generation code to reflect direct funding, a revised three-stream revenue model (Patient Service Fee 60%, Provider Service Fee 25%, Late Payment Income 15%), and updated unit economics (R8K avg arrangement, R800 revenue per arrangement). Capital ask updated to R30M: Part 1 R20M Balance Sheet Arrangement Capital (4× turns/year, non-dilutive), Part 2 R10M Equity Seed Round unchanged. "Lender Gate" renamed to "Capital Gate" throughout. All em dashes removed from the deck.
+
+### Changed
+- `investor-deck.html` — Slides 5, 6, 7, 8, 9, 10, 12, 13, 14 (HTML + PPTX generation code); em dash removal across all slides
+
+---
+
 ## [v1.7.6] — 2026-04-20
 
 **Type**: PATCH — investor deck copy update: Shield™ as AI-based proprietary risk IP, universal customer problem framing, two-part funding ask
