@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.0] — 2026-05-18
+
+**Type**: MINOR — New `/api/v1` facilitation API surface (applications, decisions, payouts, schedules) with full Shield 5-gate underwriting engine, two-stage disbursement, instalment schedule generation, webhook dispatcher, provider scoring service, and Stitch/DSP/DebiCheck adapter mocks.
+
+### Summary
+Adds the patient-facing payment facilitation API on top of the existing scaffolding. The Shield Framework's 5 gates (provider, affordability, cooling-off, tariff, circuit breakers) run as a pure function and are fully unit-tested. All money is integer-cent. All responses are scanned for prohibited terminology.
+
+### Added
+- `POST /api/v1/applications` — submit a new payment facilitation request
+- `POST /api/v1/decisions/:applicationId` — run the 5 Shield gates
+- `POST /api/v1/payouts/:applicationId` — provisional / final disbursement
+- `GET  /api/v1/schedules/:applicationId` — patient instalment schedule
+- `backend/src/services/shield-gates.service.js` — pure 5-gate engine
+- `backend/src/services/schedule.service.js` — pure schedule generator
+- `backend/src/services/provider-scoring.service.js` — tier + status + nightly job
+- `backend/src/services/webhook-dispatcher.service.js` — queue-backed event fan-out
+- `backend/src/adapters/{income-verification,dsp-check,debicheck}.adapter.js` — mocks with the production interfaces
+- `backend/src/utils/money.js` — cents-only integer arithmetic
+- `backend/src/migrations/008_v1_api_surface.sql` — 7 new tables + provider scoring columns
+- `tests/unit/v1-*.test.js` — 54 unit tests, all green (node:test runner)
+
+### Changed
+- `backend/src/server.js` — mounts the v1 router and lists it in the manifest
+
+---
+
 ## [v1.7.5] — 2026-04-15
 
 **Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links

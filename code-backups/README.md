@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.8.0](./v1.8.0/) | 2026-05-18 | MINOR: new `/api/v1` facilitation API — applications, decisions (Shield 5-gate engine), payouts (provisional + final), schedules; webhook dispatcher; provider scoring service; Stitch/DSP/DebiCheck adapter mocks; 008 migration (7 tables); 54 new unit tests |
 | [v1.7.5](./v1.7.5/) | 2026-04-15 | UI patch: replace multi-lender preview cards with single PaySick arrangement card; add admin review queue and provider dashboard links on post-submission screen |
 | [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |
 | [v1.7.3](./v1.7.3/) | 2026-04-15 | Copy patch: replace "Loan Amount" with "Payment Arrangement" on application review screen (LANG-02 compliance) |

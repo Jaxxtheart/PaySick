@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licenses &amp; IP Notice - PaySick</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAFAFA; color: #1A1A1A; }
+        .site-header { background: #1A1A1A; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo-text { font-size: 22px; font-weight: 400; color: #fff; letter-spacing: -0.5px; }
+        .logo-text span { font-weight: 300; color: #8A8A8A; }
+        .back-link { color: #FF4757; text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+        .back-link:hover { opacity: .75; }
+        .hero { background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%); padding: 64px 40px 56px; text-align: center; color: #fff; }
+        .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; }
+        .hero p { font-size: 16px; opacity: .88; }
+        .content { max-width: 900px; margin: 0 auto; padding: 64px 40px 80px; }
+
+        /* IP Notice box */
+        .ip-box { background: #1A1A1A; color: #F5F5F5; border-radius: 10px; padding: 28px; margin-bottom: 48px; }
+        .ip-box .ip-title { font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #FF4757; margin-bottom: 12px; }
+        .ip-box p { font-size: 14px; line-height: 1.75; color: #CECECE; margin-bottom: 8px; }
+        .ip-box p:last-child { margin-bottom: 0; }
+
+        h2 { font-size: 20px; font-weight: 700; color: #1A1A1A; margin: 44px 0 16px; padding-bottom: 10px; border-bottom: 2px solid #F0F0F0; }
+        h2:first-of-type { margin-top: 0; }
+        h3 { font-size: 16px; font-weight: 600; color: #1A1A1A; margin: 24px 0 10px; }
+        p { font-size: 15px; line-height: 1.8; color: #3A3A3A; margin-bottom: 14px; }
+        ul { padding-left: 22px; margin-bottom: 14px; }
+        li { font-size: 15px; line-height: 1.8; color: #3A3A3A; margin-bottom: 7px; }
+        a { color: #FF4757; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { color: #1A1A1A; }
+
+        /* IP ownership sections */
+        .ip-category { background: #fff; border: 1px solid #E5E5E5; border-radius: 10px; padding: 24px; margin-bottom: 16px; border-left: 4px solid #FF4757; }
+        .ip-category h3 { margin-top: 0; color: #1A1A1A; font-size: 15px; }
+        .ip-category p { font-size: 14px; margin-bottom: 0; }
+
+        /* Package cards */
+        .package-grid { display: grid; gap: 12px; }
+        .package { background: #fff; border: 1px solid #E5E5E5; border-radius: 10px; padding: 18px 22px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; transition: border-color .2s; }
+        .package:hover { border-color: #FF4757; }
+        .pkg-info { flex: 1; }
+        .pkg-name { font-size: 15px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px; }
+        .pkg-desc { font-size: 13px; color: #6A6A6A; line-height: 1.5; margin-bottom: 8px; }
+        .pkg-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+        .badge { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+        .badge-mit { background: #E8F8F0; color: #1B7A3E; }
+        .badge-bsd { background: #FFF3E8; color: #9A3412; }
+        .badge-saas { background: #F0F0FF; color: #4B5563; }
+        .pkg-ver { font-size: 12px; color: #8A8A8A; align-self: center; white-space: nowrap; }
+
+        .license-text { background: #F8F9FA; border-radius: 10px; padding: 28px; margin-top: 48px; }
+        .license-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1A1A1A; }
+        .license-text pre { font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.7; color: #3A3A3A; white-space: pre-wrap; word-break: break-word; }
+
+        .site-footer { background: #1A1A1A; text-align: center; padding: 28px; color: #8A8A8A; font-size: 13px; }
+        .site-footer a { color: #FF4757; text-decoration: none; }
+
+        @media (max-width: 600px) {
+            .site-header { padding: 14px 20px; }
+            .hero { padding: 48px 20px 40px; }
+            .content { padding: 40px 20px 60px; }
+            .package { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a class="logo" href="index.html" aria-label="PaySick home">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><radialGradient id="licCross" cx="40%" cy="40%"><stop offset="0%" style="stop-color:#FF4757"/><stop offset="100%" style="stop-color:#E01E37"/></radialGradient></defs>
+            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#licCross)"/>
+            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#licCross)"/>
+            <circle cx="50" cy="50" r="7" fill="#1A1A1A"/>
+            <circle cx="50" cy="50" r="5" fill="#E01E37"/>
+        </svg>
+        <div class="logo-text">Pay<span>Sick</span></div>
+    </a>
+    <a class="back-link" href="index.html">&#8592; Back to Home</a>
+</header>
+
+<div class="hero">
+    <h1>Licenses &amp; Intellectual Property</h1>
+    <p>PaySick's proprietary IP protections and third-party open source attributions</p>
+</div>
+
+<main class="content">
+
+    <div class="ip-box">
+        <div class="ip-title">Proprietary Software Notice</div>
+        <p>The PaySick platform, including its source code, database architecture, application assessment technology, user interface, brand identity, and all related documentation, is <strong>proprietary and confidential to PaySick South Africa (Pty) Ltd</strong>. All rights are reserved.</p>
+        <p>Your use of the PaySick service is governed by the <a href="terms-of-service.html" style="color:#FF4757;">Terms of Service</a>, which grants you a limited, non-exclusive, non-transferable licence to access the platform for personal use only. No other licence is granted. Copying, reverse-engineering, or distributing any part of this platform without express written permission is strictly prohibited and constitutes an infringement of PaySick's intellectual property rights.</p>
+        <p>PaySick actively monitors for and pursues legal action against unauthorised use, reproduction, or misappropriation of its technology, algorithms, and brand.</p>
+    </div>
+
+    <h2>PaySick Proprietary Intellectual Property</h2>
+    <p>The following categories of intellectual property are owned exclusively by PaySick South Africa (Pty) Ltd and protected under the <strong>Copyright Act 98 of 1978</strong>, the <strong>Trade Marks Act 194 of 1993</strong>, and applicable common law:</p>
+
+    <div class="ip-category">
+        <h3>Platform Software &amp; Source Code</h3>
+        <p>All server-side application code, frontend code, database schemas, migration scripts, and deployment configurations constituting the PaySick platform are original literary works protected by the Copyright Act. Unauthorised copying, modification, or distribution is prohibited.</p>
+    </div>
+
+    <div class="ip-category">
+        <h3>Healthcare Risk Scoring Models &amp; Algorithms</h3>
+        <p>PaySick's proprietary application assessment models, scoring methodology, and decision logic are confidential trade secrets and protected intellectual property. These systems may not be reverse-engineered, disclosed, or used for competitive intelligence purposes.</p>
+    </div>
+
+    <div class="ip-category">
+        <h3>Brand Identity &amp; Trade Marks</h3>
+        <p>The name "PaySick", the PaySick logo (red medical cross design), the tagline "HEAL NOW, PAY LATER", and all associated brand assets are trade marks of PaySick South Africa (Pty) Ltd. These marks may not be used without express written consent, including in domain names, app names, social media handles, or advertising material.</p>
+    </div>
+
+    <div class="ip-category">
+        <h3>Database Contents &amp; Compiled Data</h3>
+        <p>The PaySick provider directory, risk model training outputs, and platform analytics constitute a proprietary database protected under South African copyright law. Systematic extraction of this data by any means (automated or manual) is prohibited.</p>
+    </div>
+
+    <div class="ip-category">
+        <h3>User Interface Design &amp; Visual Assets</h3>
+        <p>All original user interface layouts, iconography, colour systems, typography choices, and visual design elements of the PaySick platform are original artistic works protected by copyright. The PaySick Design System is proprietary and not available for reuse.</p>
+    </div>
+
+    <div class="ip-category">
+        <h3>Documentation &amp; Written Content</h3>
+        <p>All user-facing text, help content, legal documents, marketing copy, and technical documentation on the PaySick platform is original literary work protected by copyright. Reproduction without permission is prohibited.</p>
+    </div>
+
+    <h2>SaaS Usage: What You Are Permitted To Do</h2>
+    <p>Your access to the PaySick platform is provided as a <strong>Software-as-a-Service (SaaS)</strong>. You access the functionality of the software over the internet; no software is licensed to you for installation or local execution. Your permitted use is strictly limited to:</p>
+    <ul>
+        <li>Registering an account and managing your personal profile</li>
+        <li>Submitting applications for healthcare payment facilitation</li>
+        <li>Viewing the status of your applications and payment plans</li>
+        <li>Managing your debit order and banking details</li>
+        <li>Accessing your statements and transaction history</li>
+    </ul>
+    <p>Any use beyond this scope, including but not limited to commercial use, reselling access, building competing products, or using our data or algorithms for any purpose, is strictly outside the scope of the licence granted and is prohibited.</p>
+
+    <h2>Data Privacy in the Context of SaaS Delivery</h2>
+    <p>As a SaaS platform operating in South Africa, PaySick processes your personal information as a <strong>Responsible Party</strong> under POPIA. Our sub-processors (Vercel, Neon) are engaged as <strong>operators</strong> in terms of POPIA Section 20 under binding data processing agreements. The personal information you provide is used exclusively to deliver the service described in our <a href="terms-of-service.html">Terms of Service</a>. It is not shared with, sold to, or used by any third party for advertising, profiling, or commercial purposes unrelated to your PaySick service.</p>
+    <p>Full details of our data processing practices are set out in our <a href="privacy-policy.html">Privacy Policy</a>.</p>
+
+    <h2>Third-Party Open Source Components</h2>
+    <p>PaySick's backend is built using the following open source libraries. Their licenses are reproduced below as required.</p>
+
+    <div class="package-grid">
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://expressjs.com" target="_blank" rel="noopener">Express.js</a></div>
+                <div class="pkg-desc">Web application framework for Node.js. Powers PaySick's REST API.</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">^4.18.2</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://github.com/brianc/node-postgres" target="_blank" rel="noopener">pg (node-postgres)</a></div>
+                <div class="pkg-desc">Non-blocking PostgreSQL client. Manages all database operations.</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">^8.11.0</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://helmetjs.github.io" target="_blank" rel="noopener">Helmet</a></div>
+                <div class="pkg-desc">Sets security-related HTTP response headers (CSP, HSTS, X-Frame-Options, etc.).</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">^7.0.0</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://github.com/expressjs/cors" target="_blank" rel="noopener">cors</a></div>
+                <div class="pkg-desc">Cross-Origin Resource Sharing middleware for Express.</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">^2.8.5</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://github.com/nfriedly/express-rate-limit" target="_blank" rel="noopener">express-rate-limit</a></div>
+                <div class="pkg-desc">Rate limiting middleware. Prevents brute-force and denial-of-service attacks.</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">^7.1.0</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://github.com/expressjs/morgan" target="_blank" rel="noopener">morgan</a></div>
+                <div class="pkg-desc">HTTP request logger. Used in sanitised form in production to avoid logging sensitive data.</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">^1.10.0</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://github.com/motdotla/dotenv" target="_blank" rel="noopener">dotenv</a></div>
+                <div class="pkg-desc">Environment variable management. Used only in development; production uses platform env vars.</div>
+                <div class="pkg-meta"><span class="badge badge-bsd">BSD-2-Clause</span></div>
+            </div>
+            <div class="pkg-ver">^16.3.1</div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://nodejs.org" target="_blank" rel="noopener">Node.js</a> (runtime)</div>
+                <div class="pkg-desc">JavaScript runtime. Built-in <code>crypto</code> module used for secure password hashing, AES-256-GCM encryption, and secure random token generation; no external cryptography libraries.</div>
+                <div class="pkg-meta"><span class="badge badge-mit">MIT</span></div>
+            </div>
+            <div class="pkg-ver">>=18.0.0</div>
+        </div>
+
+    </div>
+
+    <h2>Infrastructure Providers</h2>
+
+    <div class="package-grid">
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://vercel.com" target="_blank" rel="noopener">Vercel</a></div>
+                <div class="pkg-desc">Serverless deployment and CDN platform. Subject to <a href="https://vercel.com/legal/terms" target="_blank" rel="noopener">Vercel's Terms of Service</a> and <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>. Engaged as a POPIA operator under a data processing agreement.</div>
+                <div class="pkg-meta"><span class="badge badge-saas">Commercial SaaS</span></div>
+            </div>
+        </div>
+
+        <div class="package">
+            <div class="pkg-info">
+                <div class="pkg-name"><a href="https://neon.tech" target="_blank" rel="noopener">Neon (PostgreSQL)</a></div>
+                <div class="pkg-desc">Serverless PostgreSQL database hosting. Subject to <a href="https://neon.tech/terms-of-service" target="_blank" rel="noopener">Neon's Terms of Service</a>. Engaged as a POPIA operator under a data processing agreement.</div>
+                <div class="pkg-meta"><span class="badge badge-saas">Commercial SaaS</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="license-text">
+        <h3>MIT License</h3>
+        <pre>Copyright (c) respective package authors and contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+    </div>
+
+    <div class="license-text" style="margin-top: 16px;">
+        <h3>BSD 2-Clause License (dotenv)</h3>
+        <pre>Copyright (c) dotenv contributors.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre>
+    </div>
+
+</main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 PaySick South Africa (Pty) Ltd. All rights reserved. All intellectual property belongs to PaySick unless otherwise stated. &nbsp;|&nbsp;
+        <a href="terms-of-service.html">Terms</a> &nbsp;|&nbsp;
+        <a href="privacy-policy.html">Privacy</a> &nbsp;|&nbsp;
+        <a href="licenses.html">Licenses</a> &nbsp;|&nbsp;
+        <a href="accessibility.html">Accessibility</a>
+    </p>
+</footer>
+
+</body>
+</html>

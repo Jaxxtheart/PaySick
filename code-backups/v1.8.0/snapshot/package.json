@@ -1,0 +1,26 @@
+{
+  "name": "paysick",
+  "version": "1.0.0",
+  "description": "PaySick - Healthcare Payment Platform",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.9",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.1"
+  }
+}
