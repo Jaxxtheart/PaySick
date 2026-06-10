@@ -38,6 +38,7 @@ Full codebase audit. Closed four open security gaps identified in CLAUDE.md requ
 - On failed refresh: clears all session data and throws a user-friendly error
 - Does not attempt refresh for non-`TOKEN_EXPIRED` 401s or when no refresh token exists
 - Internal `_refreshAccessToken()` helper added
+- Public `users.refreshToken()` method exposed for manual token refresh from application code; updates localStorage with new tokens on success
 
 ### Server-Side Session Revocation on Logout (`api-client.js`)
 - `users.logout()` now calls `POST /api/users/logout` to revoke the token server-side before clearing localStorage
@@ -58,9 +59,9 @@ Full codebase audit. Closed four open security gaps identified in CLAUDE.md requ
 
 | Suite | Before | After |
 |-------|--------|-------|
-| Unit tests | 352 pass, 1 fail | 378 pass, 0 fail |
+| Unit tests | 352 pass, 1 fail | 381 pass, 0 fail |
 | New test files | — | `tests/unit/bot-protection.test.js`, `tests/unit/api-client.test.js` |
-| New test cases | — | +26 tests |
+| New test cases | — | +29 tests |
 
 ---
 
@@ -72,10 +73,10 @@ Full codebase audit. Closed four open security gaps identified in CLAUDE.md requ
 | `backend/src/middleware/bot-blocker.js` | **New** — bot UA fingerprinting middleware |
 | `backend/src/middleware/honeypot.js` | **New** — honeypot trap middleware |
 | `public/robots.txt` | **New** — disallow all crawlers |
-| `api-client.js` | Token auto-refresh, server-side logout |
+| `api-client.js` | Token auto-refresh, `users.refreshToken()` public method, server-side logout |
 | `node_modules/nodemailer/index.js` | **New** — minimal stub for test environment |
-| `tests/unit/bot-protection.test.js` | **New** — 18 tests for bot blocking |
-| `tests/unit/api-client.test.js` | **New** — 7 tests for token refresh and logout |
+| `tests/unit/bot-protection.test.js` | **New** — 14 tests for bot blocking and honeypot |
+| `tests/unit/api-client.test.js` | **New** — 10 tests for token refresh, `users.refreshToken()`, and logout |
 
 ---
 

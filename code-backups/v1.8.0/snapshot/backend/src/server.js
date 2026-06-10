@@ -201,6 +201,16 @@ app.use((req, res, next) => {
 });
 
 // ============================================
+// BOT PROTECTION
+// ============================================
+
+// Block known bot/scraper User-Agents (CLAUDE.md: bot fingerprinting requirement)
+app.use(botBlocker);
+
+// Block IPs that have previously triggered the honeypot trap
+app.use(honeypotBlockMiddleware);
+
+// ============================================
 // HEALTH CHECK
 // ============================================
 
@@ -240,6 +250,9 @@ app.use('/v2/shield', shieldRoutes);
 
 // Shield Framework v5.0 — Segment 1 Underwriting Controls
 app.use('/api', underwritingRoutes);
+
+// Honeypot trap endpoint — hidden from real users, lures bots (CLAUDE.md requirement)
+app.get('/api/hp-check', honeypotTrapHandler);
 
 // Root endpoint
 app.get('/', (req, res) => {

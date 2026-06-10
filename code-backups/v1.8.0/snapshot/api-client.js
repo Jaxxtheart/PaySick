@@ -192,6 +192,23 @@ const PaySickAPI = {
      */
     async getDashboard() {
       return PaySickAPI.request('/users/dashboard');
+    },
+
+    /**
+     * Manually exchange the stored refresh token for a new access token.
+     * Updates localStorage with the new tokens on success.
+     * Throws if the refresh request fails.
+     */
+    async refreshToken() {
+      const storedRefreshToken = localStorage.getItem('paysick_refresh_token');
+      const data = await PaySickAPI._refreshAccessToken(storedRefreshToken);
+      if (data.accessToken) {
+        localStorage.setItem('paysick_auth_token', data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('paysick_refresh_token', data.refreshToken);
+      }
+      return data;
     }
   },
 

@@ -182,6 +182,84 @@ describe('Token auto-refresh on 401 TOKEN_EXPIRED', () => {
 
 });
 
+// ─── Fix 5b: users.refreshToken() public method ──────────────────────────────
+
+describe('users.refreshToken() public method', () => {
+
+  let originalFetch;
+  beforeEach(() => { originalFetch = global.fetch; });
+  afterEach(() => { global.fetch = originalFetch; });
+
+  test('users.refreshToken() calls POST /users/refresh-token with the stored refresh token', async () => {
+    const { client, ls } = loadClient();
+
+    ls.setItem('paysick_refresh_token', 'my-stored-refresh-token');
+
+    let capturedUrl  = null;
+    let capturedBody = null;
+
+    global.fetch = async (url, opts) => {
+      capturedUrl  = url;
+      capturedBody = JSON.parse(opts.body || '{}');
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ accessToken: 'fresh-access', refreshToken: 'fresh-refresh' }),
+      };
+    };
+
+    const result = await client.users.refreshToken();
+
+    assert.ok(capturedUrl && capturedUrl.includes('/users/refresh-token'),
+      'must POST to /users/refresh-token');
+    assert.equal(capturedBody.refreshToken, 'my-stored-refresh-token',
+      'must send the stored refresh token in the request body');
+    assert.equal(result.accessToken, 'fresh-access', 'should return the new access token');
+    assert.equal(result.refreshToken, 'fresh-refresh', 'should return the new refresh token');
+  });
+
+  test('users.refreshToken() updates localStorage with the new tokens', async () => {
+    const { client, ls } = loadClient();
+
+    ls.setItem('paysick_refresh_token', 'old-refresh');
+
+    global.fetch = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ accessToken: 'updated-access', refreshToken: 'updated-refresh' }),
+    });
+
+    await client.users.refreshToken();
+
+    assert.equal(ls.getItem('paysick_auth_token'), 'updated-access',
+      'access token should be updated in localStorage');
+    assert.equal(ls.getItem('paysick_refresh_token'), 'updated-refresh',
+      'refresh token should be updated in localStorage');
+  });
+
+  test('users.refreshToken() throws when the server returns an error', async () => {
+    const { client, ls } = loadClient();
+
+    ls.setItem('paysick_refresh_token', 'bad-refresh');
+
+    global.fetch = async () => ({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: 'Refresh token invalid', code: 'INVALID_REFRESH_TOKEN' }),
+    });
+
+    await assert.rejects(
+      () => client.users.refreshToken(),
+      (err) => {
+        assert.ok(err instanceof Error, 'should throw an Error');
+        return true;
+      },
+      'should throw when the refresh request fails'
+    );
+  });
+
+});
+
 // ─── Fix 6: Server-side token revocation on logout ───────────────────────────
 
 describe('Server-side token revocation on logout', () => {
