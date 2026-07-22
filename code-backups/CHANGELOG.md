@@ -6,6 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.1] — 2026-07-22
+
+**Type**: PATCH — Login flow UX fixes and hardening
+
+### Summary
+Login page audit: removed redundant role-selector dropdown, added password visibility toggle, enriched error messages (attempts remaining, lockout countdown, PASSWORD_REQUIRED → forgot-password redirect), removed broken footer, fixed error animation re-trigger. Fixed persistent email-service test failure via nodemailer stub. +17 unit tests (total: 398 pass, 0 fail).
+
+### Fixed
+- `login.html` — role selector dropdown removed (backend always uses DB role, dropdown caused user confusion)
+- `login.html` — `formatLoginError()` now shows `attemptsRemaining`, lockout countdown from `lockedUntil`, and redirects on `PASSWORD_REQUIRED`
+- `login.html` — password show/hide toggle added
+- `login.html` — footer removed (unreachable in flex-centered layout; login pages should not have site footers)
+- `login.html` — shake animation now re-triggers on consecutive errors (reflow fix)
+- `tests/unit/email-service.test.js` — was failing due to missing `nodemailer`; fixed via stub at `node_modules/nodemailer/`
+
+### Added
+- `tests/unit/login-flow.test.js` — 17 unit tests for `formatLoginError()` and `redirectTargetByRole()`
+- `node_modules/nodemailer/` — minimal nodemailer stub for network-restricted test environments
+
+---
+
 ## [v1.8.0] — 2026-06-10
 
 **Type**: MINOR — New security features: bot fingerprinting, honeypot traps, robots.txt; API client resilience improvements; 26 new unit tests (total: 381 pass, 0 fail)

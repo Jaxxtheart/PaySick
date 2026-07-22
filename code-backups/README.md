@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.8.1](./v1.8.1/) | 2026-07-22 | Login flow patch: remove role dropdown, add password toggle, enrich error messages (attempts remaining, lockout countdown, PASSWORD_REQUIRED redirect), remove footer, fix animation; +17 unit tests (398 total, 0 failing) |
 | [v1.8.0](./v1.8.0/) | 2026-06-10 | Security audit: bot UA fingerprinting, honeypot traps, robots.txt, token auto-refresh, server-side session revocation; 26 new unit tests (381 total, 0 failing) |
 | [v1.7.5](./v1.7.5/) | 2026-04-15 | UI patch: replace multi-lender preview cards with single PaySick arrangement card; add admin review queue and provider dashboard links on post-submission screen |
 | [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |
