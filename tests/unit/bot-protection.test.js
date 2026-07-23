@@ -19,9 +19,9 @@ const path = require('node:path');
 describe('robots.txt', () => {
 
   const REPO_ROOT = path.resolve(__dirname, '../../');
-  const ROBOTS_PATH = path.join(REPO_ROOT, 'public', 'robots.txt');
+  const ROBOTS_PATH = path.join(REPO_ROOT, 'robots.txt');
 
-  test('robots.txt file exists at public/robots.txt', () => {
+  test('robots.txt file exists at repo root (not public/ — this is a plain HTML project, not Next.js)', () => {
     assert.ok(
       fs.existsSync(ROBOTS_PATH),
       `robots.txt must exist at ${ROBOTS_PATH}`
