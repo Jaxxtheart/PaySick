@@ -6,6 +6,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.0] — 2026-07-25
+
+**Type**: MINOR — New investor-deck slide + corrected market sizing / Phase 1 entry across the deck and its downloadable PPTX
+
+### Summary
+Aligned the `/investor-deck` presentation with PaySick White Paper V6.0 (July 2026). Replaced the superseded R240B TAM ladder with the credit-addressable ladder (R25–50B / R4.8–9B / R150–400M), corrected the "zero dominant players" claim, updated Phase 1 risk figures (PD 3.2% → 1.4%, net loss 1.4% → 0.63%), reframed the leadership slide as the target operating model, and corrected the exit range (R2.2B–R3.5B → R300M–R2.5B). Added a new Phase 1 / Phase 2 sequencing slide. Deck grows 15 → 16 slides; page and client-generated PPTX both updated in lock-step.
+
+### Added
+- `investor-deck.html` — new slide 04 "Phase 1 / Phase 2 Sequencing" (page + PPTX)
+
+### Changed
+- `investor-deck.html` — slide 03 market ladder + heading + supporting copy/footnote; slide 05 competitive set + differentiation line; slide 09 Phase 1 risk figures; slide 13 Operating Model reframe; slide 14 exit range; all slide counters, nav dots, and PPTX slides updated to 16
+- `tests/unit/investor-deck.test.js` — new content-integrity test (added test-first)
+
+### Deprecated
+- Legacy R240B TAM ladder (last in v1.7.5)
+- Legacy leadership "filled bench" slide with named prior employers (last in v1.7.5)
+
+### Review Items (not changed)
+- Slide 15 "10% Operations" vs funding three senior hires — flagged
+- Slide 14 roadmap volume targets vs R150–400M Phase 1 obtainable — flagged
+
+---
+
 ## [v1.7.5] — 2026-04-15
 
 **Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links
