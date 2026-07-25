@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.3] — 2026-07-25
+
+**Type**: PATCH — Race condition fix: reset token atomicity
+
+### Summary
+The UPDATE (invalidate old token) + INSERT (new token) in forgot-password were two separate non-atomic queries. Concurrent or sequential double-requests could invalidate a token the user hadn't used yet, causing "Reset link is invalid." Fixed by wrapping both in a transaction() and adding a partial unique index `(user_id) WHERE used = false` at the DB level. +6 unit tests. 63/63 passing.
+
+### Fixed
+- `backend/src/routes/users.js` — forgot-password UPDATE + INSERT now wrapped in a single `transaction()` call
+- `backend/src/migrations/008_reset_token_unique.sql` (new) — partial unique index enforcing at most one active token per user
+
+### Added
+- `tests/unit/reset-token-race.test.js` — 6 new tests (test-first workflow)
+
+---
+
 ## [v1.8.2] — 2026-07-25
 
 **Type**: PATCH — Security fixes: reset-flow and email-scanner hardening

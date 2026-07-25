@@ -1,0 +1,56 @@
+{
+  "name": "paysick-backend",
+  "version": "1.0.0",
+  "description": "PaySick Healthcare Payment Platform - Backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:setup": "node src/utils/setupDatabase.js",
+    "db:migrate": "psql -U $DB_USER -d $DB_NAME -f database/schema.sql",
+    "vercel-build": "echo 'Build completed'",
+    "test": "node --test ../tests/unit/*.test.js",
+    "test:unit": "node --test ../tests/unit/*.test.js",
+    "test:integration": "jest --testPathPattern='tests/integration/' --forceExit --detectOpenHandles",
+    "test:coverage": "jest --testPathPattern='tests/' --coverage --forceExit --detectOpenHandles"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "setupFiles": [
+      "../tests/setup.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/utils/setupDatabase.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov"]
+  },
+  "keywords": [
+    "healthcare",
+    "payments",
+    "postgresql"
+  ],
+  "author": "PaySick",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.9",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "nodemon": "^3.0.2"
+  }
+}

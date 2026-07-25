@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Tariff Gap Disclosure — PaySick</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #F4F6F9;
+      color: #1B2A4A;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #1B2A4A;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 22px; font-weight: 700; color: #EF476F; text-decoration: none; }
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+    .secure-badge span { font-size: 16px; }
+
+    .progress-strip {
+      background: white;
+      border-bottom: 1px solid #E5E5E5;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .prog-step { color: #999; display: flex; align-items: center; gap: 6px; }
+    .prog-step.active { color: #EF476F; font-weight: 700; }
+    .prog-step.done { color: #10B981; }
+    .prog-dot { width: 8px; height: 8px; border-radius: 50%; background: #ddd; }
+    .prog-dot.active { background: #EF476F; }
+    .prog-dot.done { background: #10B981; }
+    .prog-sep { color: #ccc; }
+
+    .main { flex: 1; max-width: 760px; margin: 0 auto; padding: 32px 24px; width: 100%; }
+
+    .disclosure-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(27,42,74,0.08);
+      overflow: hidden;
+    }
+
+    .disclosure-card-header {
+      background: linear-gradient(135deg, #1B2A4A 0%, #2A3F6F 100%);
+      color: white;
+      padding: 28px 32px;
+    }
+    .disclosure-card-header .step-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #EF476F;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .disclosure-card-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .disclosure-card-header p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+
+    /* Summary boxes */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #E5E5E5;
+      border-top: 1px solid #E5E5E5;
+    }
+    .summary-box {
+      background: #F9FAFB;
+      padding: 20px;
+      text-align: center;
+    }
+    .summary-box .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600; }
+    .summary-box .value { font-size: 22px; font-weight: 700; color: #1B2A4A; }
+    .summary-box.highlight { background: #FFF1F3; }
+    .summary-box.highlight .value { color: #EF476F; }
+
+    .disclosure-body { padding: 32px; }
+
+    .important-banner {
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: flex-start;
+    }
+    .important-banner .icon { font-size: 20px; flex-shrink: 0; }
+    .important-banner .text { font-size: 13px; color: #92400E; line-height: 1.6; }
+    .important-banner .text strong { color: #78350F; }
+
+    .disclosure-text-container {
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 24px;
+      background: #F9FAFB;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    .disclosure-text-container h4 { font-size: 13px; font-weight: 700; color: #1B2A4A; margin: 16px 0 8px; }
+    .disclosure-text-container h4:first-child { margin-top: 0; }
+    .disclosure-text-container ul { padding-left: 20px; margin: 8px 0; }
+    .disclosure-text-container li { margin-bottom: 4px; }
+    .scroll-hint { font-size: 11px; color: #999; text-align: center; margin-bottom: 24px; }
+
+    .dsp-notice {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    .dsp-notice.dsp { background: #DCFCE7; border: 1px solid #86EFAC; color: #166534; }
+    .dsp-notice.non-dsp { background: #FEE2E2; border: 1px solid #FCA5A5; color: #DC2626; }
+    .dsp-notice.unknown { background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E; }
+    .dsp-notice .dsp-title { font-weight: 700; margin-bottom: 4px; }
+
+    .payment-breakdown {
+      background: #F4F6F9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .payment-breakdown h3 { font-size: 14px; font-weight: 700; color: #1B2A4A; margin-bottom: 12px; }
+    .breakdown-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #E5E5E5; font-size: 13px; }
+    .breakdown-row:last-child { border-bottom: none; font-weight: 700; font-size: 14px; }
+    .breakdown-row .amount { font-weight: 600; }
+    .breakdown-row.gap .amount { color: #EF476F; font-weight: 700; }
+
+    .confirm-section { margin-bottom: 24px; }
+    .confirm-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      background: #F9FAFB;
+      border: 1.5px solid #E5E5E5;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+    .confirm-check:hover { border-color: #EF476F; background: #FFF1F3; }
+    .confirm-check.checked { border-color: #10B981; background: #DCFCE7; }
+    .confirm-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: #EF476F; flex-shrink: 0; margin-top: 2px; }
+    .confirm-check label { font-size: 13px; color: #374151; cursor: pointer; line-height: 1.5; }
+
+    .confirm-btn {
+      width: 100%;
+      padding: 18px;
+      background: #EF476F;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-bottom: 12px;
+    }
+    .confirm-btn:hover:not(:disabled) { background: #D63E5F; transform: translateY(-1px); }
+    .confirm-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+    .decline-link {
+      display: block;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .decline-link:hover { color: #EF476F; }
+
+    .legal-note { font-size: 11px; color: #999; text-align: center; margin-top: 16px; line-height: 1.5; }
+
+    /* Success Screen */
+    .success-screen {
+      display: none;
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .check-circle {
+      width: 80px; height: 80px; border-radius: 50%; background: #DCFCE7;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 36px; color: #10B981;
+    }
+    .success-screen h2 { font-size: 22px; font-weight: 700; color: #1B2A4A; margin-bottom: 12px; }
+    .success-screen p { font-size: 15px; color: #666; max-width: 400px; margin: 0 auto 24px; line-height: 1.6; }
+    .next-btn { display: inline-block; padding: 14px 32px; background: #1B2A4A; color: white; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="logo">PaySick</a>
+  <div class="secure-badge">
+    <span>&#128274;</span>
+    Secure — Your data is encrypted
+  </div>
+</header>
+
+<div class="progress-strip">
+  <div class="prog-step done"><div class="prog-dot done"></div>Application</div>
+  <span class="prog-sep">›</span>
+  <div class="prog-step done"><div class="prog-dot done"></div>Scheme Verification</div>
+  <span class="prog-sep">›</span>
+  <div class="prog-step active"><div class="prog-dot active"></div>Gap Disclosure</div>
+  <span class="prog-sep">›</span>
+  <div class="prog-step"><div class="prog-dot"></div>Confirmation</div>
+</div>
+
+<main class="main">
+  <div class="disclosure-card">
+    <div class="disclosure-card-header">
+      <div class="step-label">Step 3 of 4 — Required Reading</div>
+      <h1>Tariff Gap Disclosure</h1>
+      <p>Before we can process your payment plan, you must read and acknowledge the following important information about the tariff gap between your medical scheme's payment and your provider's charge.</p>
+    </div>
+
+    <!-- Summary figures - populated by JS -->
+    <div class="summary-grid" id="summaryGrid" style="display:none">
+      <div class="summary-box">
+        <div class="label">Provider Charge</div>
+        <div class="value" id="sumProviderAmount">—</div>
+      </div>
+      <div class="summary-box">
+        <div class="label">Scheme Tariff</div>
+        <div class="value" id="sumBenchmark">—</div>
+      </div>
+      <div class="summary-box highlight">
+        <div class="label">Estimated Gap</div>
+        <div class="value" id="sumGap">—</div>
+      </div>
+    </div>
+
+    <div class="disclosure-body">
+
+      <!-- DSP Status Notice -->
+      <div class="dsp-notice" id="dspNotice" style="display:none"></div>
+
+      <!-- Important Banner -->
+      <div class="important-banner">
+        <div class="icon">&#9432;</div>
+        <div class="text">
+          <strong>You are not obligated to proceed.</strong>
+          You may decline this payment plan at any time before confirming. If you decline, you will need to arrange payment of the tariff gap directly with your healthcare provider.
+        </div>
+      </div>
+
+      <!-- Disclosure Text -->
+      <div class="disclosure-text-container" id="disclosureText">
+        <div style="text-align:center;padding:24px;color:#666">Loading disclosure text...</div>
+      </div>
+      <div class="scroll-hint">&#8593; Scroll to read the full disclosure</div>
+
+      <!-- Payment Breakdown -->
+      <div class="payment-breakdown" id="paymentBreakdown" style="display:none">
+        <h3>Your Estimated Gap Breakdown</h3>
+        <div class="breakdown-row">
+          <span>Provider charge</span>
+          <span class="amount" id="brkProvider">—</span>
+        </div>
+        <div class="breakdown-row">
+          <span>Medical scheme payment (estimated)</span>
+          <span class="amount" id="brkScheme">—</span>
+        </div>
+        <div class="breakdown-row gap">
+          <span>Gap amount (your portion)</span>
+          <span class="amount" id="brkGap">—</span>
+        </div>
+      </div>
+
+      <!-- Confirmation Checkboxes -->
+      <div class="confirm-section">
+        <div class="confirm-check" id="checkWrap1" onclick="toggleCheck(1)">
+          <input type="checkbox" id="chk1">
+          <label for="chk1">I have read and understood the tariff gap disclosure above, including my rights and options.</label>
+        </div>
+        <div class="confirm-check" id="checkWrap2" onclick="toggleCheck(2)">
+          <input type="checkbox" id="chk2">
+          <label for="chk2">I understand that the gap amount shown is an estimate and the final amount may differ based on my scheme's actual payment.</label>
+        </div>
+        <div class="confirm-check" id="checkWrap3" onclick="toggleCheck(3)">
+          <input type="checkbox" id="chk3">
+          <label for="chk3">I consent to PaySick facilitating the payment of my tariff gap and I accept the monthly instalment schedule that will be presented in the next step.</label>
+        </div>
+      </div>
+
+      <button class="confirm-btn" id="confirmBtn" disabled onclick="acknowledgeDisclosure()">
+        I Acknowledge — Proceed to Payment Plan
+      </button>
+      <a class="decline-link" onclick="declineDisclosure()">I do not wish to proceed — decline and return to previous step</a>
+      <p class="legal-note">
+        By confirming, you are providing your electronic consent as per the Electronic Communications and Transactions Act (ECT Act), No. 25 of 2002.
+        Your IP address and session ID will be recorded for audit purposes.
+      </p>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+      <div class="check-circle">&#10003;</div>
+      <h2>Disclosure Acknowledged</h2>
+      <p>You have confirmed your understanding of the tariff gap. We are now preparing your payment plan details.</p>
+      <a href="#" class="next-btn" id="nextBtn">Continue to Payment Plan ›</a>
+    </div>
+  </div>
+</main>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const disclosureId = params.get('disclosure_id');
+  const applicationId = params.get('application_id');
+  const returnUrl = params.get('return') || '/onboarding.html';
+
+  function getToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+  function getUserId() {
+    try { return JSON.parse(localStorage.getItem('user') || '{}').user_id || ''; } catch { return ''; }
+  }
+
+  function formatZAR(val) {
+    if (!val && val !== 0) return '—';
+    return `R ${parseFloat(val).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
+  }
+
+  function toggleCheck(n) {
+    const chk = document.getElementById(`chk${n}`);
+    chk.checked = !chk.checked;
+    const wrap = document.getElementById(`checkWrap${n}`);
+    wrap.classList.toggle('checked', chk.checked);
+    updateBtn();
+  }
+
+  function updateBtn() {
+    const all = [1,2,3].every(n => document.getElementById(`chk${n}`).checked);
+    document.getElementById('confirmBtn').disabled = !all;
+  }
+
+  function populateDisclosure(data) {
+    // DSP notice
+    const dspStatus = data.dsp_status || 'UNKNOWN';
+    const dspEl = document.getElementById('dspNotice');
+    if (dspStatus === 'DSP') {
+      dspEl.className = 'dsp-notice dsp';
+      dspEl.innerHTML = '<div class="dsp-title">&#10003; Your provider is a Designated Service Provider (DSP)</div>Your medical scheme recognises this provider as a DSP. This means reduced co-payments may apply.';
+    } else if (dspStatus === 'NON_DSP') {
+      dspEl.className = 'dsp-notice non-dsp';
+      dspEl.innerHTML = '<div class="dsp-title">&#9888; Your provider is NOT a Designated Service Provider (NON-DSP)</div>Your medical scheme does not recognise this provider as a DSP. You may face higher co-payments or gaps. A conservative gap estimate and 10% additional upfront deposit apply.';
+    } else {
+      dspEl.className = 'dsp-notice unknown';
+      dspEl.innerHTML = '<div class="dsp-title">&#63; DSP status is unconfirmed</div>We could not verify your provider\'s DSP status with your medical scheme. Your application has been flagged for manual review. A 5% additional deposit may apply.';
+    }
+    dspEl.style.display = 'block';
+
+    // Summary figures
+    if (data.estimated_gap || data.provider_amount || data.benchmark) {
+      document.getElementById('sumProviderAmount').textContent = formatZAR(data.provider_amount);
+      document.getElementById('sumBenchmark').textContent = formatZAR(data.benchmark);
+      document.getElementById('sumGap').textContent = formatZAR(data.estimated_gap);
+      document.getElementById('summaryGrid').style.display = 'grid';
+
+      document.getElementById('brkProvider').textContent = formatZAR(data.provider_amount);
+      document.getElementById('brkScheme').textContent = formatZAR(data.benchmark);
+      document.getElementById('brkGap').textContent = formatZAR(data.estimated_gap);
+      document.getElementById('paymentBreakdown').style.display = 'block';
+    }
+  }
+
+  const DISCLOSURE_TEXT_HTML = `
+    <h4>TARIFF GAP FACILITATION DISCLOSURE — PaySick (Pty) Ltd</h4>
+    <p>This disclosure explains the gap between your medical scheme's tariff (what your scheme pays) and the healthcare provider's actual charge (what the provider bills).</p>
+    <h4>WHAT IS A GAP?</h4>
+    <p>Your medical scheme pays claims based on a tariff rate — typically the National Health Reference Price List (NHRPL) or a multiple thereof. Many healthcare providers charge above this tariff, resulting in a "tariff gap" — the difference between what your scheme pays and what the provider charges.</p>
+    <h4>HOW PAYSICK HELPS</h4>
+    <p>PaySick facilitates the payment of your tariff gap through a structured payment plan. You agree to pay a facilitation fee in exchange for PaySick settling your gap amount directly with the provider.</p>
+    <h4>YOUR RIGHTS</h4>
+    <ul>
+      <li>You have the right to request an itemised account from the provider.</li>
+      <li>You have the right to verify the provider's charges against the applicable tariff schedule.</li>
+      <li>You are not obligated to accept gap payment facilitation — you may negotiate directly with the provider or pay the gap yourself.</li>
+      <li>The facilitation fee is fixed and disclosed upfront. No hidden charges apply.</li>
+    </ul>
+    <h4>PROVIDER DSP STATUS</h4>
+    <p>If your provider is a Designated Service Provider (DSP) for your medical scheme, your out-of-pocket exposure may be reduced. If your provider is NOT a DSP, a conservative gap estimate and an additional upfront deposit may apply.</p>
+    <h4>FACILITATION CEILING</h4>
+    <p>The maximum gap amount PaySick will facilitate is capped based on your medical scheme's benefit coverage for this procedure. This ceiling protects you from facilitation of excessive provider charges.</p>
+    <h4>BY ACKNOWLEDGING THIS DISCLOSURE, YOU CONFIRM THAT:</h4>
+    <ul>
+      <li>You have read and understood the above information.</li>
+      <li>You have had the opportunity to ask questions.</li>
+      <li>You consent to PaySick facilitating the gap payment on your behalf.</li>
+      <li>You understand the total facilitation amount and monthly instalment schedule.</li>
+    </ul>
+    <p style="margin-top:16px;font-size:11px;color:#999">PaySick (Pty) Ltd | NCR Registration: [Pending] | FSCA Registration: [Pending]<br>This is a facilitation service, not financial advice.</p>
+  `;
+
+  async function loadDisclosure() {
+    document.getElementById('disclosureText').innerHTML = DISCLOSURE_TEXT_HTML;
+
+    // Try to load disclosure details if ID provided
+    if (disclosureId) {
+      // Populate from URL params as fallback
+      const data = {
+        dsp_status: params.get('dsp_status') || 'UNKNOWN',
+        estimated_gap: parseFloat(params.get('estimated_gap') || '0') || null,
+        provider_amount: parseFloat(params.get('provider_amount') || '0') || null,
+        benchmark: parseFloat(params.get('benchmark') || '0') || null
+      };
+      populateDisclosure(data);
+    }
+  }
+
+  async function acknowledgeDisclosure() {
+    const btn = document.getElementById('confirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    try {
+      const token = getToken();
+      const userId = getUserId() || params.get('patient_id');
+
+      if (!disclosureId || !applicationId || !userId) {
+        // Demo mode — show success
+        showSuccess();
+        return;
+      }
+
+      const res = await fetch(`/api/v1/underwriting/disclosure/${disclosureId}/acknowledge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          application_id: applicationId,
+          patient_id: userId,
+          method: 'CHECKBOX',
+          ip_address: null,
+          user_agent: navigator.userAgent,
+          session_id: sessionStorage.getItem('session_id') || null
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Acknowledgement failed');
+      showSuccess();
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'I Acknowledge — Proceed to Payment Plan';
+      updateBtn();
+      alert('Could not record your acknowledgement: ' + err.message);
+    }
+  }
+
+  function showSuccess() {
+    document.querySelector('.disclosure-body').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+    document.getElementById('nextBtn').href = returnUrl;
+  }
+
+  function declineDisclosure() {
+    if (confirm('Are you sure you want to decline? You will need to arrange payment of the tariff gap directly with your healthcare provider.')) {
+      window.history.back();
+    }
+  }
+
+  loadDisclosure();
+</script>
+</body>
+</html>
