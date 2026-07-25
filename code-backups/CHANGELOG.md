@@ -6,6 +6,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.2] — 2026-07-25
+
+**Type**: PATCH — Security fixes: reset-flow and email-scanner hardening
+
+### Summary
+Four security bugs patched: (1) verify-email.html auto-consumed one-time token on page load (email scanner vulnerability) — fixed with explicit confirm button; (2) /forgot-password and /resend-verification had no rate limiters; (3) forgot-password returned 500 on SMTP failure for registered addresses (user enumeration); (4) email URLs contained .html extension causing unnecessary Vercel 308 redirect. +8 unit tests. 57/57 passing.
+
+### Fixed
+- `verify-email.html` — added `stateConfirm` state with confirmation button; removed IIFE auto-submit that allowed email scanners to consume one-time token
+- `backend/src/routes/users.js` — added `forgotPasswordRateLimit` (5/hr) and `resendVerificationRateLimit` (5/hr); applied to respective routes
+- `backend/src/routes/users.js` — `catch(emailErr)` in forgot-password now logs and continues (no longer returns 500 that leaks user existence)
+- `backend/src/services/email.service.js` — reset and verify email URLs changed to clean paths (no .html extension)
+- `tests/unit/email-service.test.js` — updated URL assertion to match new clean URL format
+
+### Added
+- `tests/unit/reset-flow-security.test.js` — 8 new security tests (test-first workflow)
+
+---
+
 ## [v1.8.1] — 2026-07-22
 
 **Type**: PATCH — Login flow UX fixes and hardening
