@@ -440,7 +440,7 @@
   }
   // Populate user info in menu from localStorage
   (function() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem('paysick_user') || localStorage.getItem('user') || '{}');
     if (user.full_name) {
       const el = document.getElementById('menuUserName');
       if (el) el.textContent = user.full_name;
@@ -454,7 +454,7 @@
   })();
 
   function getToken() {
-    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    return localStorage.getItem('paysick_auth_token') || localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
   }
 
   async function apiFetch(path, options = {}) {
@@ -576,6 +576,8 @@
   }
 
   function handleLogout() {
+    localStorage.removeItem('paysick_auth_token');
+    localStorage.removeItem('paysick_user');
     localStorage.removeItem('auth_token');
     sessionStorage.removeItem('auth_token');
     window.location.href = '/login.html';

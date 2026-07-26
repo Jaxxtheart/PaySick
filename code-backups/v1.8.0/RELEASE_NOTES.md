@@ -45,6 +45,19 @@ references the existing `providers` entity.
 - `backend/.env.example` — documents `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`,
   `ANTHROPIC_MODEL`, optional `ANTHROPIC_TEMPERATURE`, and `CRON_SECRET`.
 
+## Fixed (auth-token key consistency)
+- Corrected a pre-existing `localStorage` key mismatch: login stores the token
+  under `paysick_auth_token`, but eight pages read `auth_token` and so sent no
+  `Authorization` header — the API replied 401 and the page redirected to
+  `/login.html` (appearing to "log the user out" on open). Their logout handlers
+  also cleared only `auth_token`, leaving the real session behind. Fixed on
+  `admin-approve-queue`, `admin-benchmarks`, `admin-billing-agreements`,
+  `admin-circuit-breaker`, `admin-eob-reconciliation`, `admin-review-queue`,
+  `provider-billing-agreement`, and `tariff-disclosure`: they now read
+  `paysick_auth_token` (with `auth_token`/session fallbacks) and clear both keys
+  plus `paysick_user` on logout. Two pages that read the user object from `user`
+  now read `paysick_user` first.
+
 ## Removed
 - Nothing. Fully additive.
 

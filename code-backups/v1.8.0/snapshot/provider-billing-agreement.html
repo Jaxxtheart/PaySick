@@ -350,7 +350,7 @@
   document.getElementById('submitBtn').disabled = true;
 
   function getToken() {
-    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    return localStorage.getItem('paysick_auth_token') || localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
   }
 
   async function submitAgreement() {

@@ -338,10 +338,10 @@
   const returnUrl = params.get('return') || '/onboarding.html';
 
   function getToken() {
-    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    return localStorage.getItem('paysick_auth_token') || localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
   }
   function getUserId() {
-    try { return JSON.parse(localStorage.getItem('user') || '{}').user_id || ''; } catch { return ''; }
+    try { return JSON.parse(localStorage.getItem('paysick_user') || localStorage.getItem('user') || '{}').user_id || ''; } catch { return ''; }
   }
 
   function formatZAR(val) {

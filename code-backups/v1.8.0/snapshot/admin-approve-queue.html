@@ -128,6 +128,7 @@
       return res;
     }
     function handleLogout() {
+      localStorage.removeItem('paysick_auth_token'); localStorage.removeItem('paysick_user');
       localStorage.removeItem('auth_token'); sessionStorage.removeItem('auth_token');
       window.location.href = '/login.html';
     }
