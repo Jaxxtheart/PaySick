@@ -58,6 +58,17 @@ references the existing `providers` entity.
   plus `paysick_user` on logout. Two pages that read the user object from `user`
   now read `paysick_user` first.
 
+## Fixed (password reset "invalid or already used")
+- `forgot-password` force-invalidated every previously-issued unused token on
+  each request. Requesting a link twice — or an accidental double-fire of the
+  request — killed the first email's link, so clicking it returned "Reset link is
+  invalid or has already been used" on the first legitimate attempt. Tokens are
+  already single-use and expire in 1 hour, so the blanket pre-invalidation was
+  unnecessary. Extracted issuance into `backend/src/services/password-reset.service.js`
+  (`issueResetToken`) which inserts a single-use token and no longer invalidates
+  prior ones; unexpired links now coexist. Covered by
+  `tests/unit/password-reset-issue.test.js` (test-first).
+
 ## Removed
 - Nothing. Fully additive.
 

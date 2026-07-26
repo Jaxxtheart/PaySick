@@ -23,6 +23,7 @@ const {
   recordFailedLogin
 } = require('../services/security.service');
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../services/email.service');
+const { issueResetToken } = require('../services/password-reset.service');
 const {
   authenticateToken,
   requireAdmin,
@@ -379,28 +380,14 @@ router.post('/forgot-password', async (req, res) => {
 
     const user = result.rows[0];
 
-    // Invalidate any existing unused tokens for this user before issuing a new one
-    await query(
-      `UPDATE password_reset_tokens
-       SET used = true, used_at = NOW()
-       WHERE user_id = $1 AND used = false`,
-      [user.user_id]
-    );
-
-    const rawToken  = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await query(
-      `INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
-       VALUES ($1, $2, $3)`,
-      [user.user_id, tokenHash, expiresAt]
-    );
-
+    // Issue a single-use, 1-hour token. We deliberately do NOT invalidate
+    // previously-issued unused tokens: each token is already single-use and
+    // expiring, and force-invalidating earlier ones broke the "requested twice"
+    // / double-fire case — the first email's link would read as already used.
     try {
-      await sendPasswordResetEmail(user.email, user.full_name, rawToken);
+      await issueResetToken({ query, sendPasswordResetEmail }, user);
     } catch (emailErr) {
-      console.error('Password reset email failed:', emailErr.message);
+      console.error('Password reset issuance failed:', emailErr.message);
       await logSecurityEvent('PASSWORD_RESET_EMAIL_FAILED', user.user_id, ipAddress,
         req.get('User-Agent'), { email: user.email, error: emailErr.message });
       return res.status(500).json({ error: 'Unable to send reset email. Please try again later.' });
