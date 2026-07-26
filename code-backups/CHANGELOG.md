@@ -6,6 +6,51 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.1] — 2026-07-26
+
+**Type**: PATCH — investor-deck market-sizing correction and copy/figure edits
+
+### Summary
+Aligns the `/investor-deck` presentation (page + client-side `downloadPPTX()`
+generator) with PaySick White Paper V6.0 (July 2026). Content-only edits to an
+existing page; no backend, API, or platform change. The Daily Provider Outreach
+Agent shipped in v1.8.0 is carried through unchanged.
+
+> Consolidation note: this work was drafted on the pre-outreach base as
+> v1.8.0 + v1.8.1. Because `v1.8.0` was released to `main` for the (unrelated)
+> Outreach Agent in the interim, the investor-deck work is merged here as a
+> single v1.8.1 whose snapshot reflects the true merged tree (Outreach Agent +
+> these deck edits).
+
+### Changed (`investor-deck.html`)
+- **Slide 03 (Market):** R240B/R85B/R12B TAM ladder → credit-addressable
+  R25–50B / R4.8–9B / R150–400M with modelled-estimates footnote.
+- **Slide 04 (Sequencing):** new slide — Phase 1 / Phase 2 (Elective Four wedge);
+  framing "Phase 1 is our Trojan Horse".
+- **Slide 05 (Why Now):** fragmented-not-empty framing; "0 Dominant Players" card
+  re-described; niche competitors flagged sub-scale.
+- **Slide 09 (Risk):** Phase-1 figures — PD 3.2% → 1.4%, net loss 1.4% → 0.63%
+  (LGD 45% unchanged).
+- **Slide 13 (Operating Model):** Leadership reframed to a target operating model;
+  founder-led, no named individuals.
+- **Slide 14 (Roadmap & Exit):** exit R2.2B–R3.5B → R300M–R2.5B (SA-only); final
+  milestone Africa Expansion → UK Expansion; 2028 → 2027.
+- **Slide 15 (The Ask):** R25M → $8M; pre-money R50M → $24M, equity 33% → 25%,
+  runway 18 → 24 months (post-money $32M, USD).
+- **Diction:** all 23 em dashes removed (en-dash numeric ranges retained).
+- **Structure:** deck grows 15 → 16 slides; counters, nav dots and PPTX updated to 16.
+
+### Tests
+- `tests/unit/investor-deck.test.js` (test-first, 11 assertions) — locks the
+  corrected figures, absence of superseded figures on page + PPTX, Trojan Horse
+  framing, $8M ask, UK/2027 roadmap, no-em-dash rule, and counter consistency (16).
+
+### Versioning
+- Archived v1.8.1 snapshot with RELEASE_NOTES / REQUIREMENTS / ARCHITECTURE;
+  updated CHANGELOG and code-backups README.
+
+---
+
 ## [v1.8.0] — 2026-07-26
 
 **Type**: MINOR — new feature/module: Daily Provider Outreach Agent
