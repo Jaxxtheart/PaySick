@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - PaySick</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 520px;
+            padding: 48px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-svg { width: 56px; height: 56px; }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span { font-weight: 300; color: #4A4A4A; }
+
+        .logo p {
+            color: #8A8A8A;
+            font-size: 14px;
+            margin-top: -4px;
+        }
+
+        /* Section headings */
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #FF4757;
+            margin: 28px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .section-label:first-of-type { margin-top: 0; }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            color: #1A1A1A;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        label .required {
+            color: #FF4757;
+            margin-left: 2px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 13px 15px;
+            border: 2px solid #E5E5E5;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            font-family: inherit;
+            background: #fff;
+            color: #1A1A1A;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #FF4757;
+            box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.12);
+        }
+
+        input.valid   { border-color: #2ED573; }
+        input.invalid { border-color: #E01E37; }
+
+        .field-hint {
+            font-size: 12px;
+            color: #8A8A8A;
+            margin-top: 5px;
+        }
+
+        .field-error {
+            font-size: 12px;
+            color: #E01E37;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Password strength meter */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #E5E5E5;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease, background 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: #8A8A8A;
+        }
+
+        /* Checkboxes */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            margin-top: 2px;
+            accent-color: #FF4757;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-size: 13px;
+            font-weight: 400;
+            color: #4A4A4A;
+            cursor: pointer;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        .checkbox-group label a {
+            color: #FF4757;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .checkbox-group label a:hover { text-decoration: underline; }
+
+        /* Submit button */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn:active:not(:disabled) { transform: translateY(0); }
+
+        .btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* Alert banners */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show { display: block; }
+
+        .alert-error {
+            background: #FFE5E8;
+            color: #C0002A;
+            border-left: 3px solid #E01E37;
+            animation: shake 0.4s ease;
+        }
+
+        .alert-success {
+            background: #E8FFF0;
+            color: #1B7A3E;
+            border-left: 3px solid #2ED573;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25%       { transform: translateX(-8px); }
+            75%       { transform: translateX(8px); }
+        }
+
+        /* Bottom link */
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #8A8A8A;
+        }
+
+        .login-link a {
+            color: #FF4757;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .login-link a:hover { opacity: 0.75; }
+
+        /* ID format helper */
+        .id-helper {
+            background: #F8F9FA;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #4A4A4A;
+        }
+
+        .id-helper span { color: #FF4757; font-weight: 600; }
+
+        @media (max-width: 560px) {
+            .register-container { padding: 32px 20px; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+
+        <!-- Logo -->
+        <div class="logo">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="regCrossGrad" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="regBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#regBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#regCrossGrad)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#regCrossGrad)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div class="logo-text">Pay<span>Sick</span></div>
+            <p>Create your account — it only takes a minute</p>
+        </div>
+
+        <!-- Alert banners -->
+        <div class="alert alert-error" id="alertError"></div>
+        <div class="alert alert-success" id="alertSuccess"></div>
+
+        <form id="registerForm" novalidate>
+
+            <!-- ── PERSONAL DETAILS ── -->
+            <div class="section-label">Personal Details</div>
+
+            <div class="form-group">
+                <label for="full_name">Full Name <span class="required">*</span></label>
+                <input type="text" id="full_name" name="full_name"
+                    placeholder="As it appears on your ID document"
+                    autocomplete="name" maxlength="255" required>
+                <div class="field-error" id="err_full_name">Please enter your full name.</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email" maxlength="255" required>
+                    <div class="field-error" id="err_email">Please enter a valid email address.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cell_number">Cell Number <span class="required">*</span></label>
+                    <input type="tel" id="cell_number" name="cell_number"
+                        placeholder="0821234567"
+                        autocomplete="tel" maxlength="15" required>
+                    <div class="field-hint">South African mobile number</div>
+                    <div class="field-error" id="err_cell">Enter a valid SA number (e.g. 0821234567).</div>
+                </div>
+            </div>
+
+            <!-- ── IDENTITY VERIFICATION ── -->
+            <div class="section-label">Identity Verification (FICA)</div>
+
+            <div class="form-group">
+                <label for="sa_id_number">SA ID Number <span class="required">*</span></label>
+                <input type="text" id="sa_id_number" name="sa_id_number"
+                    placeholder="13-digit South African ID number"
+                    inputmode="numeric" maxlength="13" required>
+                <div class="id-helper" id="idHelper">
+                    Format: <span id="idDobHint">YYMMDD</span> + 4-digit sequence + citizenship + checksum
+                </div>
+                <div class="field-error" id="err_id">Enter your 13-digit SA ID number.</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date_of_birth">Date of Birth <span class="required">*</span></label>
+                    <input type="date" id="date_of_birth" name="date_of_birth"
+                        autocomplete="bday" required>
+                    <div class="field-error" id="err_dob">Please select your date of birth.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="postal_code">Postal Code <span class="required">*</span></label>
+                    <input type="text" id="postal_code" name="postal_code"
+                        placeholder="4-digit code"
+                        inputmode="numeric" maxlength="4" required>
+                    <div class="field-error" id="err_postal">Enter your 4-digit postal code.</div>
+                </div>
+            </div>
+
+            <!-- ── SECURITY ── -->
+            <div class="section-label">Password</div>
+
+            <div class="form-group">
+                <label for="password">Password <span class="required">*</span></label>
+                <input type="password" id="password" name="password"
+                    placeholder="Create a strong password"
+                    autocomplete="new-password" required>
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText">
+                        Min. 8 characters with uppercase, lowercase &amp; number
+                    </div>
+                </div>
+                <div class="field-error" id="err_password"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password <span class="required">*</span></label>
+                <input type="password" id="confirm_password" name="confirm_password"
+                    placeholder="Re-enter your password"
+                    autocomplete="new-password" required>
+                <div class="field-error" id="err_confirm">Passwords do not match.</div>
+            </div>
+
+            <!-- ── CONSENT ── -->
+            <div class="section-label">Legal Consent</div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms_accepted" name="terms_accepted" required>
+                <label for="terms_accepted">
+                    I have read and agree to the
+                    <a href="terms-of-service.html" target="_blank">Terms &amp; Conditions</a>
+                    and <a href="privacy-policy.html" target="_blank">Privacy Policy</a>.
+                    <span class="required">*</span>
+                </label>
+            </div>
+
+            <div class="checkbox-group" style="margin-bottom:24px;">
+                <input type="checkbox" id="popia_consent" name="popia_consent" required>
+                <label for="popia_consent">
+                    I consent to PaySick collecting and processing my personal information
+                    as required under the
+                    <a href="https://www.justice.gov.za/inforeg/" target="_blank" rel="noopener">
+                        Protection of Personal Information Act (POPIA)</a>.
+                    <span class="required">*</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">Create Account</button>
+
+        </form>
+
+        <div class="login-link">
+            Already have an account?
+            <a href="login.html">Sign in</a>
+        </div>
+
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // ─── helpers ──────────────────────────────────────────────
+
+        function $(id) { return document.getElementById(id); }
+
+        function showError(fieldErrorId, message) {
+            const el = $(fieldErrorId);
+            if (!el) return;
+            el.textContent = message || el.textContent;
+            el.style.display = 'block';
+        }
+
+        function hideError(fieldErrorId) {
+            const el = $(fieldErrorId);
+            if (el) el.style.display = 'none';
+        }
+
+        function markField(inputEl, valid) {
+            inputEl.classList.toggle('valid',   valid);
+            inputEl.classList.toggle('invalid', !valid);
+        }
+
+        function showAlert(type, message) {
+            const err = $('alertError');
+            const ok  = $('alertSuccess');
+            err.classList.remove('show');
+            ok.classList.remove('show');
+            if (type === 'error') {
+                err.textContent = message;
+                err.classList.add('show');
+                err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                ok.textContent = message;
+                ok.classList.add('show');
+            }
+        }
+
+        // ─── validation helpers ───────────────────────────────────
+
+        function validateEmail(v) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+        }
+
+        function validateCell(v) {
+            // SA mobile: starts with 0, followed by 9-14 more digits
+            return /^0[0-9]{9,14}$/.test(v.replace(/\s/g, ''));
+        }
+
+        function validateSAID(v) {
+            if (!/^\d{13}$/.test(v)) return false;
+
+            // Luhn check for SA IDs
+            const digits = v.split('').map(Number);
+            let sum = 0;
+            for (let i = 0; i < 12; i++) {
+                if (i % 2 === 0) {
+                    sum += digits[i];
+                } else {
+                    let d = digits[i] * 2;
+                    if (d > 9) d -= 9;
+                    sum += d;
+                }
+            }
+            const checkDigit = (10 - (sum % 10)) % 10;
+            return checkDigit === digits[12];
+        }
+
+        function extractDOBFromID(idNumber) {
+            if (idNumber.length < 6) return null;
+            const yy = parseInt(idNumber.substring(0, 2), 10);
+            const mm = parseInt(idNumber.substring(2, 4), 10);
+            const dd = parseInt(idNumber.substring(4, 6), 10);
+            if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return null;
+            // Assume 1900s if yy >= current 2-digit year, otherwise 2000s
+            const currentYY = new Date().getFullYear() % 100;
+            const year = yy > currentYY ? 1900 + yy : 2000 + yy;
+            return `${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+        }
+
+        function getPasswordStrength(pw) {
+            let score = 0;
+            if (pw.length >= 8)  score++;
+            if (pw.length >= 12) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[a-z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            return score; // 0 – 6
+        }
+
+        // ─── live SA ID parsing ───────────────────────────────────
+
+        $('sa_id_number').addEventListener('input', function () {
+            const v = this.value.replace(/\D/g, '').substring(0, 13);
+            this.value = v;
+
+            if (v.length === 13) {
+                const valid = validateSAID(v);
+                markField(this, valid);
+                if (valid) {
+                    hideError('err_id');
+                    // Auto-fill DOB from ID
+                    const dob = extractDOBFromID(v);
+                    if (dob && !$('date_of_birth').value) {
+                        $('date_of_birth').value = dob;
+                        markField($('date_of_birth'), true);
+                    }
+                } else {
+                    showError('err_id', 'ID number checksum failed. Please check your ID number.');
+                }
+            } else {
+                this.classList.remove('valid', 'invalid');
+            }
+        });
+
+        // ─── live password strength ───────────────────────────────
+
+        $('password').addEventListener('input', function () {
+            const pw = this.value;
+            const score = getPasswordStrength(pw);
+            const fill = $('strengthFill');
+            const text = $('strengthText');
+            const pct  = Math.round((score / 6) * 100);
+
+            fill.style.width = pct + '%';
+
+            const levels = [
+                { max: 1, color: '#E01E37', label: 'Very weak' },
+                { max: 2, color: '#FF6B35', label: 'Weak' },
+                { max: 3, color: '#FFA502', label: 'Fair' },
+                { max: 4, color: '#7BED9F', label: 'Good' },
+                { max: 5, color: '#2ED573', label: 'Strong' },
+                { max: 6, color: '#1E9E5E', label: 'Very strong' },
+            ];
+
+            const level = levels.find(l => score <= l.max) || levels[levels.length - 1];
+            fill.style.background = level.color;
+
+            if (pw.length === 0) {
+                text.textContent = 'Min. 8 characters with uppercase, lowercase & number';
+                text.style.color = '#8A8A8A';
+                fill.style.width = '0%';
+            } else {
+                text.textContent = level.label;
+                text.style.color = level.color;
+            }
+
+            // Clear error once password looks ok
+            if (score >= 4) hideError('err_password');
+        });
+
+        // ─── live confirm-password match ──────────────────────────
+
+        $('confirm_password').addEventListener('input', function () {
+            if ($('password').value && this.value) {
+                const match = this.value === $('password').value;
+                markField(this, match);
+                if (match) hideError('err_confirm');
+            }
+        });
+
+        // ─── form submission ──────────────────────────────────────
+
+        $('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const btn = $('submitBtn');
+            let hasErrors = false;
+
+            // Read values
+            const full_name      = $('full_name').value.trim();
+            const email          = $('email').value.trim();
+            const cell_number    = $('cell_number').value.replace(/\s/g, '');
+            const sa_id_number   = $('sa_id_number').value.trim();
+            const date_of_birth  = $('date_of_birth').value;
+            const postal_code    = $('postal_code').value.trim();
+            const password       = $('password').value;
+            const confirmPw      = $('confirm_password').value;
+            const terms_accepted = $('terms_accepted').checked;
+            const popia_consent  = $('popia_consent').checked;
+
+            // ── validate each field ──
+
+            if (!full_name) {
+                showError('err_full_name', 'Please enter your full name.');
+                markField($('full_name'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_full_name');
+                markField($('full_name'), true);
+            }
+
+            if (!validateEmail(email)) {
+                showError('err_email', 'Please enter a valid email address.');
+                markField($('email'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_email');
+                markField($('email'), true);
+            }
+
+            if (!validateCell(cell_number)) {
+                showError('err_cell', 'Enter a valid SA cell number (e.g. 0821234567).');
+                markField($('cell_number'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_cell');
+                markField($('cell_number'), true);
+            }
+
+            if (!validateSAID(sa_id_number)) {
+                showError('err_id', 'Enter a valid 13-digit SA ID number.');
+                markField($('sa_id_number'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_id');
+                markField($('sa_id_number'), true);
+            }
+
+            if (!date_of_birth) {
+                showError('err_dob', 'Please select your date of birth.');
+                markField($('date_of_birth'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_dob');
+                markField($('date_of_birth'), true);
+            }
+
+            if (!/^[0-9]{4}$/.test(postal_code)) {
+                showError('err_postal', 'Enter your 4-digit postal code.');
+                markField($('postal_code'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_postal');
+                markField($('postal_code'), true);
+            }
+
+            const pwScore = getPasswordStrength(password);
+            if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+                showError('err_password', 'Password must be at least 8 characters with uppercase, lowercase and a number.');
+                markField($('password'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_password');
+                markField($('password'), true);
+            }
+
+            if (confirmPw !== password) {
+                showError('err_confirm', 'Passwords do not match.');
+                markField($('confirm_password'), false);
+                hasErrors = true;
+            } else {
+                hideError('err_confirm');
+                markField($('confirm_password'), true);
+            }
+
+            if (!terms_accepted) {
+                showAlert('error', 'You must accept the Terms & Conditions to continue.');
+                hasErrors = true;
+            }
+
+            if (!popia_consent) {
+                showAlert('error', 'POPIA consent is required to use PaySick.');
+                hasErrors = true;
+            }
+
+            if (hasErrors) {
+                // Scroll to first invalid field
+                const firstInvalid = document.querySelector('input.invalid, input:invalid');
+                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // ── submit to API ──
+
+            btn.disabled = true;
+            btn.textContent = 'Creating account…';
+
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        full_name,
+                        email,
+                        password,
+                        cell_number,
+                        sa_id_number,
+                        postal_code,
+                        date_of_birth,
+                        terms_accepted,
+                        popia_consent
+                    })
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch {
+                    // Server returned a non-JSON body (e.g. an HTML error page from the
+                    // hosting layer when the API process failed to start).
+                    showAlert('error', `Server error (${response.status}). Please try again shortly.`);
+                    return;
+                }
+
+                if (response.ok && data.requiresEmailVerification) {
+                    // Save registration data so onboarding can pre-populate fields
+                    localStorage.setItem('paysick_pending_email', data.email);
+                    localStorage.setItem('paysick_registration_data', JSON.stringify({
+                        full_name, email, cell_number, sa_id_number, postal_code, date_of_birth
+                    }));
+
+                    showAlert('success', 'Account created! Please check your email for a verification link.');
+
+                    setTimeout(() => {
+                        window.location.href = `verify-email.html?email=${encodeURIComponent(data.email)}`;
+                    }, 1500);
+
+                } else if (response.ok) {
+                    // Fallback: if server already verified (shouldn't happen, but handle gracefully)
+                    if (data.accessToken) {
+                        localStorage.setItem('paysick_auth_token', data.accessToken);
+                        localStorage.setItem('paysick_user', JSON.stringify({
+                            ...data.user, name: data.user.full_name
+                        }));
+                    }
+                    showAlert('success', 'Account created! Redirecting…');
+                    setTimeout(() => { window.location.href = 'onboarding.html?from=register'; }, 1200);
+
+                } else {
+                    // Surface API validation errors clearly
+                    const message = data.error || 'Registration failed. Please try again.';
+
+                    if (response.status === 409) {
+                        showAlert('error', 'An account with this email or ID number already exists. Try signing in instead.');
+                    } else if (data.code === 'WEAK_PASSWORD') {
+                        showAlert('error', message);
+                        markField($('password'), false);
+                        showError('err_password', message);
+                    } else {
+                        showAlert('error', message);
+                    }
+                }
+            } catch (err) {
+                console.error('Registration error:', err);
+                showAlert('error', 'Unable to connect to the server. Please check your connection and try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        });
+
+        // ─── set sensible date-of-birth max ──────────────────────
+        (function setDobMax() {
+            const today = new Date();
+            today.setFullYear(today.getFullYear() - 18); // must be 18+
+            $('date_of_birth').max = today.toISOString().split('T')[0];
+            $('date_of_birth').min = '1920-01-01';
+        })();
+
+        // ─── postal code – digits only ────────────────────────────
+        $('postal_code').addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').substring(0, 4);
+        });
+
+    })();
+    </script>
+</body>
+</html>
