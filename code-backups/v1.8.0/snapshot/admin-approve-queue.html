@@ -152,14 +152,20 @@
       } catch (_) {}
     }
 
+    // Loaded touches, kept so action handlers can look a draft up by id rather
+    // than embedding its subject/body (which contain apostrophes/newlines) in
+    // inline onclick attributes.
+    let currentTouches = [];
+
     async function loadQueue() {
       const el = document.getElementById('queue');
       el.innerHTML = '<div class="loading">Loading queue…</div>';
       try {
         const res = await apiFetch('/api/outreach/queue');
         const { touches } = await res.json();
-        if (!touches || touches.length === 0) { el.innerHTML = '<div class="empty">Nothing awaiting approval. 🎉</div>'; return; }
-        el.innerHTML = touches.map(renderCard).join('');
+        currentTouches = touches || [];
+        if (currentTouches.length === 0) { el.innerHTML = '<div class="empty">Nothing awaiting approval. 🎉</div>'; return; }
+        el.innerHTML = currentTouches.map(renderCard).join('');
       } catch (err) {
         el.innerHTML = `<div class="empty">Failed to load queue: ${esc(err.message)}</div>`;
       }
@@ -185,7 +191,7 @@
           ${hold ? `<div class="flags">Prohibited terms — <b>${flags}</b>. Edit to clear before approving.</div>` : ''}
           <div class="actions">
             <button class="btn btn-approve" onclick="approve('${t.id}')" ${hold ? 'disabled title="Edit to clear compliance hold first"' : ''}>Approve &amp; send</button>
-            <button class="btn btn-edit" onclick='openEdit(${JSON.stringify({ id: t.id, subject: t.subject || '', body: t.body || '' })})'>Edit</button>
+            <button class="btn btn-edit" onclick="openEdit('${t.id}')">Edit</button>
             <button class="btn btn-reject" onclick="reject('${t.id}')">Reject</button>
             <button class="btn btn-secondary" onclick="markReplied('${t.provider_id}')">Mark replied</button>
           </div>
@@ -217,10 +223,12 @@
       } catch (err) { toast(err.message); }
     }
 
-    function openEdit(t) {
+    function openEdit(id) {
+      const t = currentTouches.find(x => x.id === id);
+      if (!t) return toast('Draft not found — refreshing');
       document.getElementById('editTouchId').value = t.id;
-      document.getElementById('editSubject').value = t.subject;
-      document.getElementById('editBody').value = t.body;
+      document.getElementById('editSubject').value = t.subject || '';
+      document.getElementById('editBody').value = t.body || '';
       document.getElementById('editModal').classList.add('active');
     }
     function closeEdit() { document.getElementById('editModal').classList.remove('active'); }
