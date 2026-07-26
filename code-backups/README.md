@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.8.1](./v1.8.1/) | 2026-07-26 | PATCH: Investor-deck market-sizing correction + copy/figure edits — credit-addressable TAM ladder (R25–50B/R4.8–9B/R150–400M), new Phase 1/2 sequencing slide, Phase-1 risk figures, operating-model reframe, exit range R300M–R2.5B, $8M ask; deck 15→16 slides; page + PPTX in lock-step; 11 test-first assertions |
 | [v1.8.0](./v1.8.0/) | 2026-07-26 | MINOR: Daily Provider Outreach Agent — sources/enriches/scores/drafts target practices, human-gated Approve Queue, compliance terminology linter, secured daily cron, additive outreach tables |
 | [v1.7.5](./v1.7.5/) | 2026-04-15 | UI patch: replace multi-lender preview cards with single PaySick arrangement card; add admin review queue and provider dashboard links on post-submission screen |
 | [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |
