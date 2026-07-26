@@ -6,6 +6,45 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.0] — 2026-07-26
+
+**Type**: MINOR — new feature/module: Daily Provider Outreach Agent
+
+### Summary
+Adds a daily, human-gated provider-acquisition agent. Each run it sources target
+practices (Google Places), enriches and scores them for fit, drafts compliant
+personalised outreach via Claude, schedules follow-ups, and compiles a founder
+brief. The agent never sends autonomously — approving a draft in the new admin
+Approve Queue is the only path that sends it. Fully additive; references the
+existing `providers` entity.
+
+### Added
+- Migration `008_outreach_agent.sql` — `outreach_providers`, `outreach_touches`,
+  `outreach_runs` (+ indexes), referencing `providers(provider_id)`.
+- `backend/src/config/outreach.config.js` — targeting/pacing config, fit weights,
+  Places search terms.
+- `backend/src/services/outreach/` — pipeline orchestrator + composable stage
+  services (places, scoring, compliance linter, Claude drafting, sequencing,
+  brief, repo).
+- `backend/src/routes/outreach.js` — `CRON_SECRET`-guarded daily route + admin
+  Approve-Queue API.
+- `admin-approve-queue.html` — the human gate (Approve / Edit / Reject /
+  Mark-replied + funnel snapshot).
+- `tests/unit/outreach-compliance.test.js`, `outreach-scoring.test.js`,
+  `outreach-pipeline.test.js` — test-first coverage (17 assertions).
+
+### Changed
+- `backend/src/server.js` mounts `/api/outreach`.
+- `vercel.json` adds the daily `crons` entry (`0 5 * * *`).
+- `api-client.js` adds `PaySickAPI.outreach.*`.
+- `admin-dashboard.html` adds an "Outreach Approve Queue" nav link.
+- `backend/.env.example` documents the new env vars.
+
+### Deprecated
+- None.
+
+---
+
 ## [v1.7.5] — 2026-04-15
 
 **Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links
