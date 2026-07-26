@@ -58,6 +58,7 @@ See [VERSIONING_GUIDE.md](./VERSIONING_GUIDE.md) for the full step-by-step proce
 
 | Version | Date | Summary |
 |---------|------|---------|
+| [v1.8.1](./v1.8.1/) | 2026-07-26 | PATCH: investor-deck copy/figure edits — removed em dashes, "Trojan Horse" framing, corrected "0 dominant players" card, UK-expansion roadmap shifted to 2027, funding ask updated to $8M with recalculated valuation (page + PPTX) |
 | [v1.8.0](./v1.8.0/) | 2026-07-25 | MINOR: investor-deck aligned to White Paper V6.0 — credit-addressable market ladder, corrected competitive/risk/exit figures, Operating Model reframe, new Phase 1/Phase 2 sequencing slide (15 → 16 slides, page + PPTX) |
 | [v1.7.5](./v1.7.5/) | 2026-04-15 | UI patch: replace multi-lender preview cards with single PaySick arrangement card; add admin review queue and provider dashboard links on post-submission screen |
 | [v1.7.4](./v1.7.4/) | 2026-04-15 | Copy patch: replace lender marketplace messaging with PaySick direct disbursement copy across application flow |

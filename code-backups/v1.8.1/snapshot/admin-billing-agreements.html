@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Provider Billing Agreements — PaySick Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
+
+    /* ── Side Menu ── */
+    .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; display: none; }
+    .menu-overlay.active { display: block; }
+    .side-menu { position: fixed; top: 0; left: -300px; width: 300px; height: 100vh; background: white; box-shadow: 2px 0 12px rgba(0,0,0,0.1); z-index: 1000; transition: left 0.3s ease; overflow-y: auto; }
+    .side-menu.active { left: 0; }
+    .menu-header { padding: 20px 24px; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; }
+    .menu-logo { display: flex; align-items: center; gap: 10px; }
+    .menu-logo-svg { width: 28px; height: 28px; flex-shrink: 0; }
+    .menu-logo-text { font-size: 20px; font-weight: 400; color: #1A1A1A; letter-spacing: -0.5px; }
+    .menu-logo-text span { font-weight: 300; color: #4A4A4A; }
+    .admin-badge-menu { font-size: 11px; color: #8A8A8A; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .menu-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #8A8A8A; padding: 4px; line-height: 1; }
+    .menu-close:hover { color: #EF476F; }
+    .close-icon .icon-stroke { stroke: currentColor; stroke-width: 2; stroke-linecap: round; fill: none; }
+    .menu-user-info { padding: 16px 24px; border-bottom: 1px solid #E5E5E5; display: flex; align-items: center; gap: 12px; }
+    .menu-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #EF476F, #c73659); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+    .menu-user-details { flex: 1; min-width: 0; }
+    .menu-user-name { font-weight: 600; font-size: 14px; color: #1A1A1A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .menu-user-email { font-size: 12px; color: #8A8A8A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .menu-nav { padding: 8px 0; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #1A1A1A; text-decoration: none; transition: background 0.2s, color 0.2s; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .menu-item:hover, .menu-item.active { background: #FFF0F3; color: #EF476F; }
+    .menu-item .icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .menu-item .icon svg { width: 18px; height: 18px; }
+    .menu-item .icon .icon-stroke { stroke: #4A4A4A; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+    .menu-item:hover .icon .icon-stroke, .menu-item.active .icon .icon-stroke { stroke: #EF476F; }
+    .menu-divider { height: 1px; background: #E5E5E5; margin: 6px 0; }
+    .menu-section-label { padding: 8px 24px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #8A8A8A; }
+    /* ── Page Header ── */
+    .page-header { background: white; border-bottom: 1px solid #E5E5E5; padding: 0 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .page-header .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .header-logo { font-size: 20px; font-weight: 700; color: #EF476F; text-decoration: none; letter-spacing: -0.3px; }
+    .header-logo span { font-weight: 300; color: #1B2A4A; }
+    .header-page-title { font-size: 15px; font-weight: 600; color: #1B2A4A; }
+    .menu-toggle { background: none; border: 1px solid #E5E5E5; border-radius: 6px; padding: 7px 10px; cursor: pointer; color: #1B2A4A; display: flex; align-items: center; transition: border-color 0.2s, color 0.2s; }
+    .menu-toggle:hover { border-color: #EF476F; color: #EF476F; }
+    .admin-badge { background: #EF476F; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .logout-btn { background: transparent; border: 2px solid #1B2A4A; color: #1B2A4A; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .logout-btn:hover { background: #1B2A4A; color: white; }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      padding: 10px 20px;
+      background: #EF476F;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: #D63E5F; }
+
+    .filters {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      box-shadow: 0 2px 8px rgba(27,42,74,0.06);
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-group label { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; }
+    .filter-group select, .filter-group input {
+      padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 160px;
+    }
+    .filter-btn { padding: 9px 20px; background: #1B2A4A; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .filter-btn:hover { background: #EF476F; }
+
+    .table-container { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(27,42,74,0.06); overflow: hidden; }
+    .table-header { padding: 20px 24px; border-bottom: 1px solid #E5E5E5; display: flex; justify-content: space-between; align-items: center; }
+    .table-header h2 { font-size: 16px; font-weight: 700; }
+    .count-badge { background: #F4F6F9; color: #666; padding: 4px 12px; border-radius: 20px; font-size: 13px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #F4F6F9; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    tbody tr { border-bottom: 1px solid #F0F0F0; transition: background 0.15s; }
+    tbody tr:hover { background: #F9FAFB; }
+    tbody td { padding: 14px 16px; font-size: 14px; }
+
+    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    .status-ACTIVE { background: #DCFCE7; color: #166534; }
+    .status-SUSPENDED { background: #FEE2E2; color: #DC2626; }
+    .status-PENDING_SIGNATURE { background: #FEF3C7; color: #92400E; }
+
+    .action-buttons { display: flex; gap: 6px; }
+    .btn-suspend { padding: 5px 12px; background: #EF476F; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-reinstate { padding: 5px 12px; background: #10B981; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-view { padding: 5px 12px; background: #1B2A4A; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: 12px; padding: 32px; width: 500px; max-width: 90vw; }
+    .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #1B2A4A; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .modal-actions button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .btn-cancel { background: #F4F6F9; color: #1B2A4A; }
+    .btn-confirm { background: #1B2A4A; color: white; }
+    .btn-confirm.danger { background: #EF476F; }
+
+    .loading { text-align: center; padding: 48px; color: #666; }
+    .error-msg { text-align: center; padding: 48px; color: #EF476F; }
+  </style>
+</head>
+<body>
+
+<!-- Side Menu Overlay -->
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+<!-- Side Menu -->
+<div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <div class="menu-logo">
+            <svg class="menu-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="BillingAgreementsMenuCrossGradient" cx="40%" cy="40%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
+                    </radialGradient>
+                    <radialGradient id="BillingAgreementsMenuBgCircle" cx="50%" cy="50%">
+                        <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
+                        <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#BillingAgreementsMenuBgCircle)"/>
+                <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#BillingAgreementsMenuCrossGradient)"/>
+                <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#BillingAgreementsMenuCrossGradient)"/>
+                <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <div class="menu-logo-text">Pay<span>Sick</span></div>
+                <div class="admin-badge-menu">Admin</div>
+            </div>
+        </div>
+        <button class="menu-close" onclick="toggleMenu()"><svg class="close-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M6 6l12 12M6 18L18 6"/></svg></button>
+    </div>
+    <div class="menu-user-info">
+        <div class="menu-avatar" id="menuAvatar">AU</div>
+        <div class="menu-user-details">
+            <div class="menu-user-name" id="menuUserName">Admin User</div>
+            <div class="menu-user-email" id="menuUserEmail">admin@paysick.com</div>
+        </div>
+    </div>
+    <nav class="menu-nav">
+        <a href="admin-dashboard.html" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M3 12l9-9 9 9"/><path class="icon-stroke" d="M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/></svg></span>
+            <span class="menu-item-text">Dashboard</span>
+        </a>
+        <a href="#" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle class="icon-stroke" cx="9" cy="7" r="4"/><path class="icon-stroke" d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg></span>
+            <span class="menu-item-text">User Management</span>
+        </a>
+        <a href="admin-providers.html" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="3" y="3" width="18" height="18" rx="2"/><path class="icon-stroke" d="M12 7v10M7 12h10"/></svg></span>
+            <span class="menu-item-text">Provider Network</span>
+        </a>
+        <a href="#" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path class="icon-stroke" d="M9 12l2 2 4-4"/></svg></span>
+            <span class="menu-item-text">Risk Management</span>
+        </a>
+        <div class="menu-divider"></div>
+        <div class="menu-section-label">Shield v5.0</div>
+        <a href="admin-review-queue.html" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M9 11l3 3L22 4"/><path class="icon-stroke" d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
+            <span class="menu-item-text">Review Queue</span>
+        </a>
+        <a href="admin-billing-agreements.html" class="menu-item active">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline class="icon-stroke" points="14 2 14 8 20 8"/><line class="icon-stroke" x1="16" y1="13" x2="8" y2="13"/><line class="icon-stroke" x1="16" y1="17" x2="8" y2="17"/></svg></span>
+            <span class="menu-item-text">Billing Agreements</span>
+        </a>
+        <a href="admin-benchmarks.html" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><line class="icon-stroke" x1="12" y1="1" x2="12" y2="23"/><path class="icon-stroke" d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span>
+            <span class="menu-item-text">Tariff Benchmarks</span>
+        </a>
+        <a href="admin-eob-reconciliation.html" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect class="icon-stroke" x="2" y="5" width="20" height="14" rx="2"/><path class="icon-stroke" d="M2 10h20"/></svg></span>
+            <span class="menu-item-text">EOB Reconciliation</span>
+        </a>
+        <a href="admin-circuit-breaker.html" class="menu-item">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+            <span class="menu-item-text">Circuit Breaker</span>
+        </a>
+        <div class="menu-divider"></div>
+        <a href="#" class="menu-item" onclick="handleLogout(); return false;">
+            <span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="icon-stroke" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline class="icon-stroke" points="16 17 21 12 16 7"/><line class="icon-stroke" x1="21" y1="12" x2="9" y2="12"/></svg></span>
+            <span class="menu-item-text">Logout</span>
+        </a>
+    </nav>
+</div>
+
+<!-- Header -->
+<header class="page-header">
+    <div class="header-content">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <a href="admin-dashboard.html" class="header-logo">Pay<span>Sick</span></a>
+            <span class="header-page-title">Provider Billing Agreements</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <span class="admin-badge">Admin</span>
+            <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+        </div>
+    </div>
+</header>
+
+<main class="main">
+  <div class="top-actions">
+    <button class="btn-primary" onclick="openCreateModal()">+ Add Agreement</button>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Status</label>
+      <select id="filterStatus">
+        <option value="">All Statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="SUSPENDED">Suspended</option>
+        <option value="PENDING_SIGNATURE">Pending Signature</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Search Provider ID</label>
+      <input type="text" id="filterProvider" placeholder="Provider UUID...">
+    </div>
+    <button class="filter-btn" onclick="loadAgreements()">Apply Filters</button>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <h2>Billing Agreements</h2>
+      <span class="count-badge" id="totalCount">Loading...</span>
+    </div>
+    <div id="tableContent">
+      <div class="loading">Loading billing agreements...</div>
+    </div>
+  </div>
+</main>
+
+<!-- Suspend Modal -->
+<div class="modal-overlay" id="suspendModal">
+  <div class="modal">
+    <h3>Suspend Billing Agreement</h3>
+    <input type="hidden" id="suspendProviderId">
+    <div class="form-group">
+      <label>Reason for Suspension *</label>
+      <textarea id="suspendReason" placeholder="Describe the reason for suspension..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('suspendModal')">Cancel</button>
+      <button class="btn-confirm danger" onclick="confirmSuspend()">Suspend Agreement</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Agreement Modal -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <h3>Create Billing Agreement</h3>
+    <div class="form-group">
+      <label>Provider ID *</label>
+      <input type="text" id="newProviderId" placeholder="Provider UUID">
+    </div>
+    <div class="form-group">
+      <label>Agreement Version *</label>
+      <input type="text" id="newVersion" placeholder="e.g. v2.1" value="v2.0">
+    </div>
+    <div class="form-group">
+      <label>Signed By (Name)</label>
+      <input type="text" id="newSignedBy" placeholder="Practice manager name">
+    </div>
+    <div class="form-group">
+      <label>Signed By (Role)</label>
+      <input type="text" id="newSignedByRole" placeholder="Practice Manager">
+    </div>
+    <div class="form-group">
+      <label>Effective From *</label>
+      <input type="date" id="newEffectiveFrom">
+    </div>
+    <div class="form-group">
+      <label>Billing Cap Multiplier</label>
+      <input type="number" id="newCapMultiplier" value="3.00" step="0.25" min="1" max="10">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('createModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmCreate()">Create Agreement</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  async function apiFetch(path, options = {}) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...options.headers };
+    const res = await fetch(path, { ...options, headers });
+    return res;
+  }
+
+  async function loadAgreements() {
+    document.getElementById('tableContent').innerHTML = '<div class="loading">Loading...</div>';
+    const status = document.getElementById('filterStatus').value;
+    const providerId = document.getElementById('filterProvider').value.trim();
+
+    // Since we don't have a direct list endpoint, we'll construct a mock view
+    // In production, this would call /api/admin/providers/billing-agreements
+    // For demonstration, show instructions to search by provider
+    if (providerId) {
+      try {
+        const res = await apiFetch(`/api/v1/providers/${providerId}/billing-agreement-status?segment=SEGMENT_1`);
+        if (res.status === 401) { window.location.href = '/login.html'; return; }
+        const data = await res.json();
+
+        document.getElementById('totalCount').textContent = '1 provider checked';
+
+        const statusClass = data.agreement_status || 'NONE';
+        document.getElementById('tableContent').innerHTML = `
+          <table>
+            <thead>
+              <tr><th>Provider ID</th><th>Agreement Status</th><th>Gap Financing</th><th>Suspension Reason</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:monospace;font-size:12px">${providerId}</td>
+                <td><span class="status-badge status-${statusClass}">${statusClass}</span></td>
+                <td>${data.gap_financing_eligible ? 'Eligible' : 'Blocked'}</td>
+                <td>${data.suspension_reason || '—'}</td>
+                <td>
+                  <div class="action-buttons">
+                    ${statusClass === 'ACTIVE' ? `<button class="btn-suspend" onclick="openSuspendModal('${providerId}')">Suspend</button>` : ''}
+                    ${statusClass === 'SUSPENDED' ? `<button class="btn-reinstate" onclick="reinstateAgreement('${providerId}')">Reinstate</button>` : ''}
+                    ${statusClass === 'NONE' ? `<button class="btn-view" onclick="document.getElementById('newProviderId').value='${providerId}';openCreateModal()">Add Agreement</button>` : ''}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        document.getElementById('tableContent').innerHTML = `<div class="error-msg">Failed to load: ${err.message}</div>`;
+      }
+    } else {
+      document.getElementById('totalCount').textContent = 'Enter Provider ID to search';
+      document.getElementById('tableContent').innerHTML = '<div class="loading">Enter a Provider ID above to check their billing agreement status.</div>';
+    }
+  }
+
+  function openSuspendModal(providerId) {
+    document.getElementById('suspendProviderId').value = providerId;
+    document.getElementById('suspendReason').value = '';
+    document.getElementById('suspendModal').classList.add('active');
+  }
+
+  function openCreateModal() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('newEffectiveFrom').value = today;
+    document.getElementById('createModal').classList.add('active');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+  }
+
+  async function confirmSuspend() {
+    const providerId = document.getElementById('suspendProviderId').value;
+    const reason = document.getElementById('suspendReason').value.trim();
+    if (!reason) { alert('Please enter a suspension reason.'); return; }
+    try {
+      const res = await apiFetch(`/api/admin/providers/${providerId}/billing-agreement/suspend`, {
+        method: 'POST',
+        body: JSON.stringify({ suspension_reason: reason })
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Suspend failed'); }
+      closeModal('suspendModal');
+      loadAgreements();
+    } catch (err) { alert('Failed to suspend: ' + err.message); }
+  }
+
+  async function reinstateAgreement(providerId) {
+    if (!confirm('Reinstate this provider\'s billing agreement?')) return;
+    try {
+      const res = await apiFetch(`/api/admin/providers/${providerId}/billing-agreement/reinstate`, { method: 'POST' });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Reinstate failed'); }
+      loadAgreements();
+    } catch (err) { alert('Failed to reinstate: ' + err.message); }
+  }
+
+  async function confirmCreate() {
+    const providerId = document.getElementById('newProviderId').value.trim();
+    const version = document.getElementById('newVersion').value.trim();
+    const signedBy = document.getElementById('newSignedBy').value.trim();
+    const signedByRole = document.getElementById('newSignedByRole').value.trim();
+    const effectiveFrom = document.getElementById('newEffectiveFrom').value;
+    const capMultiplier = parseFloat(document.getElementById('newCapMultiplier').value);
+
+    if (!providerId || !version || !effectiveFrom) { alert('Provider ID, Version, and Effective From are required.'); return; }
+
+    try {
+      const res = await apiFetch(`/api/admin/providers/${providerId}/billing-agreement`, {
+        method: 'POST',
+        body: JSON.stringify({ agreement_version: version, signed_by_name: signedBy, signed_by_role: signedByRole, effective_from: effectiveFrom, billing_cap_multiplier: capMultiplier })
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Create failed'); }
+      closeModal('createModal');
+      alert('Billing agreement created successfully.');
+    } catch (err) { alert('Failed to create: ' + err.message); }
+  }
+
+  function toggleMenu() {
+    document.getElementById('sideMenu').classList.toggle('active');
+    document.getElementById('menuOverlay').classList.toggle('active');
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
+    window.location.href = '/login.html';
+  }
+
+  loadAgreements();
+</script>
+</body>
+</html>

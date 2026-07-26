@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Billing Agreement — PaySick Provider Onboarding</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; min-height: 100vh; }
+
+    .header {
+      background: #1B2A4A;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 22px; font-weight: 700; color: #EF476F; text-decoration: none; }
+    .header-right { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 32px 24px; }
+
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #999;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #999;
+    }
+    .progress-step.active .step-num { background: #EF476F; color: white; }
+    .progress-step.active { color: #1B2A4A; font-weight: 600; }
+    .progress-step.done .step-num { background: #10B981; color: white; }
+    .progress-divider { flex: 1; height: 2px; background: #ddd; }
+    .progress-divider.done { background: #10B981; }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(27,42,74,0.08);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .card-header {
+      background: #1B2A4A;
+      color: white;
+      padding: 20px 24px;
+    }
+    .card-header h1 { font-size: 18px; font-weight: 700; }
+    .card-header p { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+    .card-body { padding: 32px; }
+
+    .agreement-text {
+      background: #F4F6F9;
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      padding: 24px;
+      font-size: 13px;
+      line-height: 1.8;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 24px;
+      color: #374151;
+    }
+    .agreement-text h3 { font-size: 14px; font-weight: 700; color: #1B2A4A; margin: 16px 0 8px; }
+    .agreement-text h3:first-child { margin-top: 0; }
+    .agreement-text ul { padding-left: 20px; margin: 8px 0; }
+    .agreement-text li { margin-bottom: 4px; }
+
+    .form-section { margin-bottom: 24px; }
+    .form-section h3 { font-size: 15px; font-weight: 700; color: #1B2A4A; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #EF476F; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: #555; }
+    .form-group input, .form-group select {
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #1B2A4A;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #EF476F; }
+    .form-group .hint { font-size: 11px; color: #999; }
+
+    .signature-section {
+      background: #FFF7F8;
+      border: 1.5px solid #EF476F;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .signature-section h3 { font-size: 15px; font-weight: 700; color: #EF476F; margin-bottom: 16px; }
+
+    .confirm-checks { margin-bottom: 24px; }
+    .check-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; cursor: pointer; }
+    .check-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #EF476F; flex-shrink: 0; margin-top: 2px; }
+    .check-item label { font-size: 13px; color: #374151; cursor: pointer; line-height: 1.5; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: #EF476F;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover { background: #D63E5F; }
+    .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 48px 32px;
+    }
+    .success-screen .check-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #DCFCE7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 36px;
+    }
+    .success-screen h2 { font-size: 22px; font-weight: 700; color: #1B2A4A; margin-bottom: 12px; }
+    .success-screen p { font-size: 15px; color: #666; max-width: 400px; margin: 0 auto 24px; line-height: 1.6; }
+    .success-screen .ref { font-family: monospace; background: #F4F6F9; padding: 8px 16px; border-radius: 6px; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="logo">PaySick</a>
+  <div class="header-right">Provider Onboarding — Billing Agreement</div>
+</header>
+
+<div class="container">
+  <!-- Progress Bar -->
+  <div class="progress-bar">
+    <div class="progress-step done">
+      <div class="step-num">&#10003;</div>
+      <span>Practice Registration</span>
+    </div>
+    <div class="progress-divider done"></div>
+    <div class="progress-step done">
+      <div class="step-num">&#10003;</div>
+      <span>HPCSA Verification</span>
+    </div>
+    <div class="progress-divider done"></div>
+    <div class="progress-step active">
+      <div class="step-num">3</div>
+      <span>Billing Agreement</span>
+    </div>
+    <div class="progress-divider"></div>
+    <div class="progress-step">
+      <div class="step-num">4</div>
+      <span>Bank Details</span>
+    </div>
+  </div>
+
+  <div class="card" id="agreementForm">
+    <div class="card-header">
+      <h1>PaySick Provider Billing Agreement</h1>
+      <p>Version 2.0 — Please read carefully and complete the signature section below.</p>
+    </div>
+    <div class="card-body">
+
+      <!-- Agreement Text -->
+      <div class="agreement-text">
+        <h3>1. PARTIES</h3>
+        <p>This Billing Agreement ("Agreement") is entered into between PaySick (Pty) Ltd ("PaySick") and the healthcare provider identified in the signature block below ("Provider").</p>
+
+        <h3>2. PURPOSE</h3>
+        <p>PaySick facilitates the payment of tariff gaps between what a patient's medical scheme pays and what the Provider charges. This Agreement governs the terms under which PaySick will settle gap amounts on behalf of patients ("Patients") treated by the Provider.</p>
+
+        <h3>3. PROVIDER OBLIGATIONS</h3>
+        <ul>
+          <li>Provider must submit accurate invoices within 30 days of the procedure date.</li>
+          <li>Provider must submit the Explanation of Benefits (EOB) from the relevant medical scheme within 30 days of scheme payment.</li>
+          <li>Provider agrees not to charge Patients for amounts exceeding the Provider's standard tariff, as disclosed at time of treatment.</li>
+          <li>Provider's invoiced amount must not exceed 300% of the applicable NHRPL rate without prior written agreement from PaySick.</li>
+          <li>Provider must maintain HPCSA registration and immediately notify PaySick of any lapse, suspension, or disciplinary proceedings.</li>
+        </ul>
+
+        <h3>4. PAYOUT STRUCTURE</h3>
+        <ul>
+          <li><strong>Provisional Payout:</strong> 80% of the approved facilitation ceiling will be paid within 2 business days of the procedure date.</li>
+          <li><strong>Final Payout:</strong> The balance (up to 20% of the approved ceiling) will be settled within 5 business days of EOB receipt and reconciliation.</li>
+          <li>If the Provider's invoice exceeds the approved facilitation ceiling, the excess amount will be withheld and the Provider must pursue the balance directly with the Patient.</li>
+        </ul>
+
+        <h3>5. BILLING CAP</h3>
+        <p>Provider agrees that for all PaySick-facilitated procedures, the maximum billable amount will not exceed 3 times the applicable NHRPL rate, unless a higher cap has been agreed in writing.</p>
+
+        <h3>6. SUSPENSION</h3>
+        <p>PaySick reserves the right to suspend this Agreement and withhold payouts if the Provider is found to be submitting fraudulent, inflated, or duplicate invoices, or if the Provider's HPCSA registration lapses.</p>
+
+        <h3>7. GOVERNING LAW</h3>
+        <p>This Agreement is governed by the laws of the Republic of South Africa. Any disputes shall be resolved through mediation before proceeding to litigation.</p>
+      </div>
+
+      <!-- Provider Details -->
+      <div class="form-section">
+        <h3>Provider Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>HPCSA Registration Number *</label>
+            <input type="text" id="hpcsaNumber" placeholder="e.g. MP1234567">
+            <span class="hint">As registered with the HPCSA</span>
+          </div>
+          <div class="form-group">
+            <label>Practice Name *</label>
+            <input type="text" id="practiceName" placeholder="Full practice name">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Practice Number *</label>
+            <input type="text" id="practiceNumber" placeholder="BHF Practice Number">
+          </div>
+          <div class="form-group">
+            <label>Specialty</label>
+            <select id="specialty">
+              <option value="">Select specialty...</option>
+              <option>General Surgery</option>
+              <option>Orthopaedics</option>
+              <option>Cardiology</option>
+              <option>Gynaecology</option>
+              <option>Anaesthesiology</option>
+              <option>Internal Medicine</option>
+              <option>Neurosurgery</option>
+              <option>Urology</option>
+              <option>ENT</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Digital Signature -->
+      <div class="signature-section">
+        <h3>Digital Signature</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name (Signatory) *</label>
+            <input type="text" id="signatoryName" placeholder="Full name as per ID">
+          </div>
+          <div class="form-group">
+            <label>Role / Title *</label>
+            <input type="text" id="signatoryRole" placeholder="e.g. Practice Manager">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Capacity to Sign *</label>
+            <select id="signatoryCapacity">
+              <option value="">Select capacity...</option>
+              <option value="OWNER">Practice Owner</option>
+              <option value="MANAGER">Practice Manager (authorised)</option>
+              <option value="DIRECTOR">Director / Partner</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date of Signature</label>
+            <input type="date" id="sigDate" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmations -->
+      <div class="confirm-checks">
+        <div class="check-item">
+          <input type="checkbox" id="check1">
+          <label for="check1">I have read and understood the full PaySick Provider Billing Agreement above.</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="check2">
+          <label for="check2">I confirm I have authority to sign this Agreement on behalf of the practice.</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="check3">
+          <label for="check3">I agree to the payout structure, billing cap, and EOB submission requirements.</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="check4">
+          <label for="check4">I understand that submission of false or inflated invoices may result in immediate suspension and legal action.</label>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitAgreement()">
+        Sign Billing Agreement
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Screen -->
+  <div class="card" id="successScreen" style="display:none">
+    <div class="success-screen" style="display:block">
+      <div class="check-circle">&#10003;</div>
+      <h2>Agreement Signed Successfully</h2>
+      <p>Your billing agreement has been recorded. PaySick gap payment facilitation is now enabled for your practice. You will receive a confirmation email shortly.</p>
+      <p class="ref" id="refNumber">Reference: Pending...</p>
+      <br>
+      <a href="/provider-dashboard.html" style="display:inline-block;padding:12px 28px;background:#1B2A4A;color:white;border-radius:8px;font-weight:700;text-decoration:none;font-size:14px">Go to Provider Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set today's date
+  document.getElementById('sigDate').value = new Date().toISOString().split('T')[0];
+
+  // Get provider ID from URL params
+  const params = new URLSearchParams(window.location.search);
+  const providerId = params.get('provider_id');
+
+  function checkAllboxes() {
+    const all = ['check1','check2','check3','check4'].every(id => document.getElementById(id).checked);
+    document.getElementById('submitBtn').disabled = !all;
+  }
+
+  ['check1','check2','check3','check4'].forEach(id => {
+    document.getElementById(id).addEventListener('change', checkAllboxes);
+  });
+  document.getElementById('submitBtn').disabled = true;
+
+  function getToken() {
+    return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  async function submitAgreement() {
+    const hpcsaNumber = document.getElementById('hpcsaNumber').value.trim();
+    const practiceName = document.getElementById('practiceName').value.trim();
+    const practiceNumber = document.getElementById('practiceNumber').value.trim();
+    const signatoryName = document.getElementById('signatoryName').value.trim();
+    const signatoryRole = document.getElementById('signatoryRole').value.trim();
+    const signatoryCapacity = document.getElementById('signatoryCapacity').value;
+
+    if (!hpcsaNumber || !practiceName || !practiceNumber || !signatoryName || !signatoryRole || !signatoryCapacity) {
+      alert('Please complete all required fields before signing.');
+      return;
+    }
+
+    if (!providerId) {
+      alert('No provider ID found. Please return to provider onboarding.');
+      return;
+    }
+
+    const token = getToken();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`/api/admin/providers/${providerId}/billing-agreement`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          agreement_version: 'v2.0',
+          signed_by_name: signatoryName,
+          signed_by_role: `${signatoryRole} (${signatoryCapacity})`,
+          effective_from: new Date().toISOString().split('T')[0],
+          billing_cap_multiplier: 3.00
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+      document.getElementById('agreementForm').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('refNumber').textContent = `Reference: ${data.agreement?.id ? `BA-${data.agreement.id}` : 'BA-' + Date.now()}`;
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Sign Billing Agreement';
+      checkAllboxes();
+      alert('Failed to submit agreement: ' + err.message);
+    }
+  }
+</script>
+</body>
+</html>

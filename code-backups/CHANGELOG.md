@@ -6,6 +6,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.8.1] — 2026-07-26
+
+**Type**: PATCH — Investor-deck copy/figure edits: diction, framing, competitive positioning, roadmap, and funding ask
+
+### Summary
+Follow-up corrections to the `/investor-deck` presentation (page + client-generated PPTX) after v1.8.0. Removed all em dashes from deck copy (punctuation-only, no rewording); retained en-dash numeric ranges. Reframed the Phase 1 sequencing line, corrected the "0 dominant players" card, repositioned the roadmap's final milestone, and updated the funding ask.
+
+### Changed
+- `investor-deck.html` — diction: all 23 em dashes replaced with comma/colon/semicolon (page + PPTX)
+- `investor-deck.html` — slide 04 framing "Phase 1 is a wedge, not a ceiling" → "Phase 1 is our Trojan Horse"
+- `investor-deck.html` — slide 05 "0 Dominant Players" card corrected (niche specialists, low market share, early maturity); niche competitor card highlighted as sub-scale
+- `investor-deck.html` — slide 14 roadmap "Africa Expansion (Kenya, Nigeria)" → "UK Expansion (United Kingdom)"; 2028 → 2027; Exit Potential (2028+) → (2027+)
+- `investor-deck.html` — slide 15 ask R25M → $8M; pre-money R50M → $24M; equity 33% → 25%; runway 18 → 24 months (USD)
+- `tests/unit/investor-deck.test.js` — added assertions for Trojan Horse framing, no em dashes, $8M ask, and UK/2027 roadmap
+
+### Deprecated
+- Legacy funding ask (R25M / R50M pre / 33% / 18 months) — last in v1.8.0
+- Legacy roadmap "Africa Expansion" milestone (Kenya, Nigeria, 2028) — last in v1.8.0
+
+### Assumptions / Review Items
+- Slide 15 valuation anchored at $24M pre / 25% / 24 months (default choice; founder to confirm)
+- Ask now in USD by design; rest of deck stays in Rand
+
+---
+
 ## [v1.8.0] — 2026-07-25
 
 **Type**: MINOR — New investor-deck slide + corrected market sizing / Phase 1 entry across the deck and its downloadable PPTX
