@@ -113,7 +113,13 @@
 
   <script src="/api-client.js"></script>
   <script>
-    function getToken() { return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token'); }
+    // Login stores the token under `paysick_auth_token` (see login.html / admin-dashboard.html).
+    // Fall back to the older `auth_token` key some pages use, and to sessionStorage.
+    function getToken() {
+      return localStorage.getItem('paysick_auth_token')
+          || localStorage.getItem('auth_token')
+          || sessionStorage.getItem('auth_token');
+    }
     async function apiFetch(path, options = {}) {
       const token = getToken();
       const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...options.headers };
