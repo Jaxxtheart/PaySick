@@ -19,6 +19,8 @@
  *                          when ANTHROPIC_MODEL points at a model that accepts it.)
  */
 
+const { normalizeSignoff } = require('./signoff');
+
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 // Verified against https://docs.claude.com/en/docs/about-claude/models — the
@@ -31,8 +33,13 @@ paid IN FULL, UPFRONT (within 24 hours). Patients pay in affordable monthly
 instalments. PaySick carries the entire patient payment relationship.
 
 HARD RULES — never violate:
-- Never use: credit, loan, lend, borrow, borrower, interest, APR, debt, default,
-  repayment, financing (as a verb applied to the patient).
+- ZERO credit/lending language. Never use, in any form: credit, loan, lend,
+  borrow, borrower, interest, APR, debt, default, repayment, financing. Do not
+  describe PaySick as offering finance, a line of credit, or a loan. PaySick is a
+  payment facilitator: patients pay in affordable monthly instalments; the
+  provider is paid in full, upfront.
+- Sign off EVERY message exactly as "Best, The PaySick Team". Never sign with a
+  personal name. Do not use any other closing.
 - Frame value to the PROVIDER, in this priority order:
   1. You are paid in full within 24 hours — no waiting, no chasing, no bad debt.
   2. More patients say yes — patients who'd walk out over a lump-sum price proceed.
@@ -71,8 +78,9 @@ function parseDraftJson(raw) {
   const parsed = JSON.parse(text);
   return {
     subject: String(parsed.subject || '').trim(),
-    email_body: String(parsed.email_body || '').trim(),
-    linkedin_dm: String(parsed.linkedin_dm || '').trim(),
+    // Enforce the canonical sign-off in code — never rely on the model for it.
+    email_body: normalizeSignoff(String(parsed.email_body || '').trim()),
+    linkedin_dm: normalizeSignoff(String(parsed.linkedin_dm || '').trim()),
   };
 }
 
