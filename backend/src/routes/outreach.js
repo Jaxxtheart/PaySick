@@ -21,6 +21,9 @@ const { collectBriefData, briefHtml, deliverDailyBrief } = require('../services/
 const { complianceScan } = require('../services/outreach/compliance.service');
 const { nextStep, stepDueInDays, scheduleFromNow } = require('../services/outreach/sequence.service');
 const { sendJourneyEmail } = require('../services/email.service');
+const { verifyResendSignature, parseInboundEmail } = require('../services/outreach/inbound.service');
+const { generateOnboardingReply } = require('../services/outreach/claude.service');
+const { OUTREACH_CONFIG } = require('../config/outreach.config');
 
 // ─── Cron auth ───────────────────────────────────────────────────────────────
 // Vercel Cron invokes GET with `Authorization: Bearer $CRON_SECRET`. We also
@@ -60,6 +63,93 @@ async function runDaily(req, res) {
 // without blocking the unauthenticated cron caller (which uses CRON_SECRET).
 router.get('/daily', optionalAuth, runDaily);
 router.post('/daily', optionalAuth, runDaily);
+
+// ─── Inbound email replies (Resend webhook) ─────────────────────────────────
+// Public endpoint, authenticated by the Resend/Svix signature (NOT admin auth).
+// On a matched reply it flips the lead to `replied`, halts the sequence, records
+// the inbound touch, and generates a HUMAN-GATED onboarding-prompting draft into
+// the Approve Queue. Nothing is auto-sent (§4 human gate, §5 reply handling).
+function checkInboundSignature(req) {
+  const secret = process.env.RESEND_WEBHOOK_SECRET;
+  const raw = req.rawBody != null ? req.rawBody.toString('utf8') : JSON.stringify(req.body || {});
+  if (!secret) {
+    // Dev convenience only; in production a secret is mandatory.
+    return process.env.NODE_ENV !== 'production';
+  }
+  // Primary: Svix signature (Resend's scheme). Fallback: a shared-secret header.
+  if (verifyResendSignature(raw, req.headers, secret)) return true;
+  return req.headers['x-webhook-secret'] === secret;
+}
+
+router.post('/inbound', async (req, res) => {
+  if (!checkInboundSignature(req)) {
+    return res.status(401).json({ error: 'Invalid webhook signature', code: 'BAD_SIGNATURE' });
+  }
+
+  try {
+    const { fromEmail, subject, text } = parseInboundEmail(req.body);
+    if (!fromEmail) {
+      return res.json({ ok: true, matched: false, reason: 'no sender address' });
+    }
+
+    // Match to an outreach lead by public email (case-insensitive). Prefer a
+    // lead that is still in an outbound stage (not already replied/disqualified).
+    const leadRes = await query(
+      `SELECT * FROM outreach_providers
+        WHERE lower(email) = lower($1)
+        ORDER BY (stage = 'replied') ASC, updated_at DESC
+        LIMIT 1`,
+      [fromEmail]
+    );
+    const lead = leadRes.rows[0];
+    if (!lead) {
+      return res.json({ ok: true, matched: false, reason: 'no lead for sender' });
+    }
+
+    // Record the inbound touch (audit trail) and halt the sequence.
+    await query(
+      `INSERT INTO outreach_touches (provider_id, channel, direction, subject, body, status)
+       VALUES ($1, 'email', 'inbound', $2, $3, 'replied')`,
+      [lead.id, subject || null, text || null]
+    );
+    await query(
+      `UPDATE outreach_providers SET stage = 'replied', next_action_at = NULL, updated_at = now()
+        WHERE id = $1`,
+      [lead.id]
+    );
+
+    // Generate a human-gated onboarding-prompting draft (never auto-sent).
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    const onboardingUrl = `${appUrl}${OUTREACH_CONFIG.onboardingLink}`;
+    let drafted = false;
+    try {
+      const draft = await generateOnboardingReply(lead, text, { onboardingUrl });
+      const flags = complianceScan([draft.subject, draft.email_body].filter(Boolean).join('\n'));
+      await query(
+        `INSERT INTO outreach_touches
+           (provider_id, channel, direction, sequence_step, subject, body, status, compliance_flags)
+         VALUES ($1, 'email', 'outbound', NULL, $2, $3, $4, $5)`,
+        [
+          lead.id,
+          draft.subject,
+          draft.email_body,
+          flags.length ? 'compliance_hold' : 'draft',
+          flags.length ? flags : null,
+        ]
+      );
+      drafted = true;
+    } catch (genErr) {
+      // Reply is still recorded and the lead flipped; the founder can respond
+      // manually from the queue even if drafting failed.
+      console.error('Onboarding draft generation failed:', genErr.message);
+    }
+
+    return res.json({ ok: true, matched: true, lead_id: lead.id, onboarding_draft: drafted });
+  } catch (err) {
+    console.error('Inbound handling error:', err.message);
+    return res.status(500).json({ error: 'Failed to handle inbound reply' });
+  }
+});
 
 // ─── Admin Approve Queue API (auth required) ────────────────────────────────
 router.use(authenticateToken, requireAdmin);
@@ -205,18 +295,23 @@ router.post('/touches/:id/approve', async (req, res) => {
       );
     }
 
-    // Flip the lead to contacted and schedule the next sequence step.
-    const step = nextStep(touch.sequence_step ?? 0);
+    // Sequence touches (step 0–3) advance the lead to `contacted` and schedule
+    // the next step. Onboarding replies (sequence_step NULL) are a response to an
+    // inbound reply — send them but DO NOT reset the lead's stage or re-arm the
+    // sequence; the lead stays `replied` for the founder to carry on personally.
     let nextActionAt = null;
-    if (step !== null) {
-      const days = stepDueInDays(step) - (stepDueInDays(touch.sequence_step ?? 0) || 0);
-      nextActionAt = scheduleFromNow(days > 0 ? days : 0);
+    if (touch.sequence_step !== null && touch.sequence_step !== undefined) {
+      const step = nextStep(touch.sequence_step);
+      if (step !== null) {
+        const days = stepDueInDays(step) - (stepDueInDays(touch.sequence_step) || 0);
+        nextActionAt = scheduleFromNow(days > 0 ? days : 0);
+      }
+      await query(
+        `UPDATE outreach_providers SET stage = 'contacted', next_action_at = $2, updated_at = now()
+          WHERE id = $1`,
+        [touch.provider_id, nextActionAt]
+      );
     }
-    await query(
-      `UPDATE outreach_providers SET stage = 'contacted', next_action_at = $2, updated_at = now()
-        WHERE id = $1`,
-      [touch.provider_id, nextActionAt]
-    );
 
     res.json({ ok: true, touch_id: touch.id, next_action_at: nextActionAt });
   } catch (err) {

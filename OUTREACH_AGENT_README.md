@@ -73,6 +73,35 @@ writes one `outreach_runs` row:
    inbound reply whose `next_action_at` is due. A `replied` lead never advances.
 5. **Brief** — compile + deliver the founder's morning brief.
 
+## Inbound replies → agentic onboarding (Resend)
+
+When a provider replies to an outreach email, Resend delivers it to a webhook
+that turns the reply into a human-gated onboarding draft.
+
+**Set up the "link" in Resend:**
+1. In Resend, add a webhook (or inbound route) pointing at
+   **`POST https://<your-domain>/api/outreach/inbound`**.
+2. Copy the signing secret Resend shows (`whsec_…`) into the
+   **`RESEND_WEBHOOK_SECRET`** env var in Vercel. Every inbound call is verified
+   against its Svix signature; unsigned calls are rejected in production.
+
+**What happens on a reply:**
+1. The signature is verified, and the sender is matched to an outreach lead by
+   public email.
+2. The lead flips to **`replied`** and its follow-up sequence halts (it never
+   advances a replied lead).
+3. The reply is recorded as an inbound `outreach_touches` row (audit trail).
+4. The agent drafts an **onboarding-prompting reply** — compliant (linter-checked),
+   signed "Best, The PaySick Team", and containing the onboarding link
+   (`OUTREACH_CONFIG.onboardingLink`, default `/provider-apply.html`).
+5. That draft lands in the **Approve Queue** — it is **human-gated**, never
+   auto-sent. Approving it there is the only way it emails the provider, and
+   approving an onboarding reply does **not** reset the lead back into the
+   sequence.
+
+To change where the onboarding prompt points, edit `onboardingLink` in
+`backend/src/config/outreach.config.js`.
+
 ## The human gate (admin)
 
 `admin-approve-queue.html` (linked from the admin dashboard) lists every

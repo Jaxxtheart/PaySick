@@ -133,7 +133,12 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Body parsing middleware with size limits
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({
+  limit: '1mb',
+  // Capture the raw body so webhook signatures (e.g. Resend/Svix on the outreach
+  // inbound route) can be verified against the exact received bytes.
+  verify: (req, res, buf) => { req.rawBody = buf; }
+}));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // ============================================
