@@ -73,6 +73,67 @@ writes one `outreach_runs` row:
    inbound reply whose `next_action_at` is due. A `replied` lead never advances.
 5. **Brief** — compile + deliver the founder's morning brief.
 
+## Email deliverability (DNS — do this before sending at volume)
+
+Google, Yahoo, and Microsoft now require a valid **DMARC** record (plus aligned
+**SPF** and **DKIM**) for bulk senders. These are DNS records added at wherever
+`paysick.co.za` DNS is hosted (your registrar / DNS provider) — not in this repo.
+
+**1. DMARC** — add a TXT record:
+
+| Field | Value |
+|-------|-------|
+| Type  | `TXT` |
+| Name / Host | `_dmarc` (i.e. `_dmarc.paysick.co.za`) |
+| Value | `v=DMARC1; p=none; rua=mailto:dmarc@paysick.co.za; fo=1` |
+
+`p=none` is a **valid DMARC record** and satisfies the requirement while you
+monitor. Once the aggregate reports (`rua`) look clean, tighten to
+`p=quarantine`, then `p=reject`. (Create/monitor the `dmarc@paysick.co.za` inbox.)
+
+**2. SPF + DKIM** — these must exist and *align* with the From domain, or DMARC
+fails. Resend generates them when you **verify your sending domain** in its
+dashboard: it gives you a DKIM `CNAME`/`TXT` set and an SPF entry (an `include:`
+for Resend on your domain's `TXT` SPF record, e.g.
+`v=spf1 include:_spf.resend.com ~all`). Add exactly what Resend shows for
+`paysick.co.za`.
+
+**3. From address** — send from a monitored address on the verified domain (this
+repo now defaults to `hello@paysick.co.za`, set via `SMTP_FROM`). Do **not** use
+`no-reply@` — it lowers inbox trust and reply/feedback signal.
+
+Verify with any DMARC/SPF/DKIM checker (e.g. dig `_dmarc.paysick.co.za TXT`)
+after the records propagate.
+
+## Inbound replies → agentic onboarding (Resend)
+
+When a provider replies to an outreach email, Resend delivers it to a webhook
+that turns the reply into a human-gated onboarding draft.
+
+**Set up the "link" in Resend:**
+1. In Resend, add a webhook (or inbound route) pointing at
+   **`POST https://<your-domain>/api/outreach/inbound`**.
+2. Copy the signing secret Resend shows (`whsec_…`) into the
+   **`RESEND_WEBHOOK_SECRET`** env var in Vercel. Every inbound call is verified
+   against its Svix signature; unsigned calls are rejected in production.
+
+**What happens on a reply:**
+1. The signature is verified, and the sender is matched to an outreach lead by
+   public email.
+2. The lead flips to **`replied`** and its follow-up sequence halts (it never
+   advances a replied lead).
+3. The reply is recorded as an inbound `outreach_touches` row (audit trail).
+4. The agent drafts an **onboarding-prompting reply** — compliant (linter-checked),
+   signed "Best, The PaySick Team", and containing the onboarding link
+   (`OUTREACH_CONFIG.onboardingLink`, default `/provider-apply.html`).
+5. That draft lands in the **Approve Queue** — it is **human-gated**, never
+   auto-sent. Approving it there is the only way it emails the provider, and
+   approving an onboarding reply does **not** reset the lead back into the
+   sequence.
+
+To change where the onboarding prompt points, edit `onboardingLink` in
+`backend/src/config/outreach.config.js`.
+
 ## The human gate (admin)
 
 `admin-approve-queue.html` (linked from the admin dashboard) lists every

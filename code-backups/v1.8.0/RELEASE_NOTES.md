@@ -45,6 +45,24 @@ references the existing `providers` entity.
 - `backend/.env.example` — documents `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`,
   `ANTHROPIC_MODEL`, optional `ANTHROPIC_TEMPERATURE`, and `CRON_SECRET`.
 
+## Inbound replies + agentic onboarding (§5)
+- Added `POST /api/outreach/inbound` — a Resend inbound-reply webhook verified by
+  its Svix signature (`RESEND_WEBHOOK_SECRET`). On a matched reply it flips the
+  lead to `replied`, halts the sequence, records the inbound touch, and generates
+  a human-gated onboarding-prompting draft (compliant + signed "Best, The PaySick
+  Team", with the onboarding link) into the Approve Queue. Nothing is auto-sent;
+  approving an onboarding reply does not reset the lead into the sequence.
+- New `inbound.service.js` (`verifyResendSignature`, `parseInboundEmail`) and
+  `claude.service.generateOnboardingReply`; config `onboardingLink`
+  (default `/provider-apply.html`); `server.js` captures the raw body for
+  signature verification. Test-first: `tests/unit/outreach-inbound.test.js`.
+
+## Enforced sign-off + hardened no-credit language
+- All generated and templated outreach messages are signed exactly
+  "Best, The PaySick Team" (enforced in code via `signoff.js`), and the drafting
+  prompts carry an explicit zero-credit-language rule. See
+  `tests/unit/outreach-signoff.test.js`.
+
 ## Fixed (auth-token key consistency)
 - Corrected a pre-existing `localStorage` key mismatch: login stores the token
   under `paysick_auth_token`, but eight pages read `auth_token` and so sent no

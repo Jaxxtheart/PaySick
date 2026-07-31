@@ -32,6 +32,10 @@ const OUTREACH_CONFIG = {
   senderName: 'Mosiuwa Tshabalala',
   senderEmail: 'founder@paysick.co.za',
   briefRecipients: ['founder@paysick.co.za'],
+
+  // Where the agentic onboarding reply points a provider who replies (§5).
+  // Combined with APP_URL to form the full link.
+  onboardingLink: '/provider-apply.html',
 };
 
 // Transparent per-vertical fit weights (§6.2). Tuned later against real conversion.
