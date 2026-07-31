@@ -18,7 +18,10 @@ try {
 
 const APP_URL    = process.env.APP_URL   || 'http://localhost:3000';
 const FROM_NAME  = process.env.SMTP_FROM_NAME || 'PaySick';
-const FROM_ADDR  = process.env.SMTP_FROM      || 'noreply@paysick.co.za';
+// Use a monitored, repliable address — never "no-reply". A one-way sender lowers
+// inbox trust and hurts deliverability. Set SMTP_FROM to whatever inbox you
+// monitor (and that Resend receives inbound replies on).
+const FROM_ADDR  = process.env.SMTP_FROM      || 'hello@paysick.co.za';
 const FROM       = `"${FROM_NAME}" <${FROM_ADDR}>`;
 
 // ─────────────────────────────────────────────
@@ -69,7 +72,7 @@ function emailWrapper(bodyHtml) {
           <hr style="border:none;border-top:1px solid #F0F0F0;margin:28px 0 20px;">
           <p style="margin:0;color:#AAAAAA;font-size:12px;line-height:1.6;text-align:center;">
             PaySick (Pty) Ltd &mdash; hello@paysick.co.za<br>
-            This is an automated message. Please do not reply.
+            Questions? Just reply to this email — a real person reads it.
           </p>
         </td></tr>
       </table>

@@ -73,6 +73,38 @@ writes one `outreach_runs` row:
    inbound reply whose `next_action_at` is due. A `replied` lead never advances.
 5. **Brief** — compile + deliver the founder's morning brief.
 
+## Email deliverability (DNS — do this before sending at volume)
+
+Google, Yahoo, and Microsoft now require a valid **DMARC** record (plus aligned
+**SPF** and **DKIM**) for bulk senders. These are DNS records added at wherever
+`paysick.co.za` DNS is hosted (your registrar / DNS provider) — not in this repo.
+
+**1. DMARC** — add a TXT record:
+
+| Field | Value |
+|-------|-------|
+| Type  | `TXT` |
+| Name / Host | `_dmarc` (i.e. `_dmarc.paysick.co.za`) |
+| Value | `v=DMARC1; p=none; rua=mailto:dmarc@paysick.co.za; fo=1` |
+
+`p=none` is a **valid DMARC record** and satisfies the requirement while you
+monitor. Once the aggregate reports (`rua`) look clean, tighten to
+`p=quarantine`, then `p=reject`. (Create/monitor the `dmarc@paysick.co.za` inbox.)
+
+**2. SPF + DKIM** — these must exist and *align* with the From domain, or DMARC
+fails. Resend generates them when you **verify your sending domain** in its
+dashboard: it gives you a DKIM `CNAME`/`TXT` set and an SPF entry (an `include:`
+for Resend on your domain's `TXT` SPF record, e.g.
+`v=spf1 include:_spf.resend.com ~all`). Add exactly what Resend shows for
+`paysick.co.za`.
+
+**3. From address** — send from a monitored address on the verified domain (this
+repo now defaults to `hello@paysick.co.za`, set via `SMTP_FROM`). Do **not** use
+`no-reply@` — it lowers inbox trust and reply/feedback signal.
+
+Verify with any DMARC/SPF/DKIM checker (e.g. dig `_dmarc.paysick.co.za TXT`)
+after the records propagate.
+
 ## Inbound replies → agentic onboarding (Resend)
 
 When a provider replies to an outreach email, Resend delivers it to a webhook
