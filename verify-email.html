@@ -173,6 +173,9 @@
 
         /* Verifying spinner state */
         #stateVerifying .spinner { margin-bottom: 24px; }
+
+        /* Confirm state button spacing */
+        #stateConfirm .btn { margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -233,6 +236,26 @@
 
         <hr class="divider">
         <a href="register.html" class="back-link">&#8592; Wrong email? Go back</a>
+    </div>
+
+    <!-- ── STATE: Confirm ───────────────────────────────────────
+         Shown when a token is in the URL.
+         Requires an explicit click so that email security scanners
+         that pre-fetch links cannot consume the one-time token.
+    -->
+    <div class="state" id="stateConfirm">
+        <div class="icon-wrap">
+            <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="10" width="36" height="26" rx="3" stroke="#FF4757" stroke-width="2.2" fill="none"/>
+                <path d="M4 14l18 12L40 14" stroke="#FF4757" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            </svg>
+        </div>
+        <h1>Confirm your email</h1>
+        <p class="subtitle">Click the button below to verify your PaySick account and activate access.</p>
+        <button class="btn btn-primary" id="confirmBtn" onclick="confirmVerification()" type="button">
+            Confirm Email Address
+        </button>
+        <a href="login.html" class="back-link">&#8592; Back to Login</a>
     </div>
 
     <!-- ── STATE: Verifying ───────────────────────────────────── -->
@@ -361,7 +384,7 @@
                 body: JSON.stringify({ email })
             });
         } catch (_) {}
-        window.location.href = `verify-email.html?email=${encodeURIComponent(email)}`;
+        window.location.href = `verify-email?email=${encodeURIComponent(email)}`;
     }
 
     window.resendFromError = resendFromError;
@@ -390,67 +413,73 @@
 
     window.openEmailClient = openEmailClient;
 
-    // ── If token is in URL → verify immediately ──────────────────
-    if (urlToken) {
+    // ── verifyToken: called only on explicit user click ──────────
+    // NOT called on page load — prevents email security scanners
+    // that pre-fetch links from consuming the one-time token.
+    async function verifyToken() {
         showState('stateVerifying');
+        try {
+            const resp = await fetch('/api/users/verify-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: urlToken })
+            });
+            const data = await resp.json();
 
-        (async function verifyToken() {
-            try {
-                const resp = await fetch('/api/users/verify-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: urlToken })
-                });
-                const data = await resp.json();
+            if (resp.ok && data.accessToken) {
+                localStorage.setItem('paysick_auth_token', data.accessToken);
+                localStorage.setItem('paysick_user', JSON.stringify({
+                    ...data.user,
+                    name: data.user.full_name
+                }));
+                localStorage.removeItem('paysick_pending_email');
 
-                if (resp.ok && data.accessToken) {
-                    // Store session & user
-                    localStorage.setItem('paysick_auth_token', data.accessToken);
-                    localStorage.setItem('paysick_user', JSON.stringify({
-                        ...data.user,
-                        name: data.user.full_name
-                    }));
-                    localStorage.removeItem('paysick_pending_email');
+                showState('stateSuccess');
 
-                    showState('stateSuccess');
-
-                    // Countdown then redirect to onboarding
-                    let secs = 3;
-                    const countEl = document.querySelector('#redirectCountdown strong');
-                    const interval = setInterval(function () {
-                        secs--;
-                        if (countEl) countEl.textContent = secs;
-                        if (secs <= 0) {
-                            clearInterval(interval);
-                            // Carry registration data to onboarding for pre-fill
-                            window.location.href = 'onboarding.html?from=register';
-                        }
-                    }, 1000);
-
-                } else {
-                    // Token invalid or expired
-                    showState('stateError');
-                    if (data.code === 'TOKEN_EXPIRED') {
-                        document.getElementById('errorTitle').textContent = 'Link expired';
-                        document.getElementById('errorMsg').textContent =
-                            'This verification link has expired. Request a new one below.';
-                    } else {
-                        document.getElementById('errorTitle').textContent = 'Invalid link';
-                        document.getElementById('errorMsg').textContent =
-                            data.error || 'This link is invalid or has already been used.';
+                let secs = 3;
+                const countEl = document.querySelector('#redirectCountdown strong');
+                const interval = setInterval(function () {
+                    secs--;
+                    if (countEl) countEl.textContent = secs;
+                    if (secs <= 0) {
+                        clearInterval(interval);
+                        window.location.href = 'onboarding.html?from=register';
                     }
-                    // Pre-fill email for resend button
-                    if (data.email) {
-                        window._verifyEmail = data.email;
-                    }
-                }
-            } catch (_) {
+                }, 1000);
+
+            } else {
                 showState('stateError');
-                document.getElementById('errorTitle').textContent = 'Connection error';
-                document.getElementById('errorMsg').textContent =
-                    'Unable to verify your email. Please check your connection and try again.';
+                if (data.code === 'TOKEN_EXPIRED') {
+                    document.getElementById('errorTitle').textContent = 'Link expired';
+                    document.getElementById('errorMsg').textContent =
+                        'This verification link has expired. Request a new one below.';
+                } else {
+                    document.getElementById('errorTitle').textContent = 'Invalid link';
+                    document.getElementById('errorMsg').textContent =
+                        data.error || 'This link is invalid or has already been used.';
+                }
+                if (data.email) {
+                    window._verifyEmail = data.email;
+                }
             }
-        })();
+        } catch (_) {
+            showState('stateError');
+            document.getElementById('errorTitle').textContent = 'Connection error';
+            document.getElementById('errorMsg').textContent =
+                'Unable to verify your email. Please check your connection and try again.';
+        }
+    }
+
+    // ── Confirm button handler ────────────────────────────────────
+    window.confirmVerification = function () {
+        const btn = document.getElementById('confirmBtn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Confirming…'; }
+        verifyToken();
+    };
+
+    // ── If token is in URL → show confirm state ───────────────────
+    if (urlToken) {
+        showState('stateConfirm');
     }
     // Otherwise: show "check inbox" state (already default)
 

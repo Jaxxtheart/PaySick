@@ -124,7 +124,7 @@ async function sendMail({ to, subject, html }) {
  * Send email verification link to a newly registered user.
  */
 async function sendVerificationEmail(to, fullName, rawToken) {
-  const verifyUrl = `${APP_URL}/verify-email.html?token=${rawToken}`;
+  const verifyUrl = `${APP_URL}/verify-email?token=${rawToken}`;
   const firstName = fullName.split(' ')[0];
 
   const body = `
@@ -163,7 +163,7 @@ async function sendVerificationEmail(to, fullName, rawToken) {
  * Send password reset link to a user who requested it.
  */
 async function sendPasswordResetEmail(to, fullName, rawToken) {
-  const resetUrl = `${APP_URL}/reset-password.html?token=${rawToken}`;
+  const resetUrl = `${APP_URL}/reset-password?token=${rawToken}`;
   const firstName = fullName.split(' ')[0];
 
   const body = `

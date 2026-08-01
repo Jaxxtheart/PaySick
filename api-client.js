@@ -10,9 +10,10 @@ const PaySickAPI = {
     : '/api',
 
   /**
-   * Helper function to make API requests
+   * Helper function to make API requests.
+   * Automatically attempts a token refresh on TOKEN_EXPIRED 401s.
    */
-  async request(endpoint, options = {}) {
+  async request(endpoint, options = {}, _isRetry = false) {
     const url = `${this.baseURL}${endpoint}`;
     const token = localStorage.getItem('paysick_auth_token');
 
@@ -37,6 +38,28 @@ const PaySickAPI = {
       }
 
       if (!response.ok) {
+        // Auto-refresh: attempt once when the access token has expired
+        if (
+          response.status === 401 &&
+          data.code === 'TOKEN_EXPIRED' &&
+          !_isRetry
+        ) {
+          const refreshToken = localStorage.getItem('paysick_refresh_token');
+          if (refreshToken) {
+            try {
+              const refreshData = await this._refreshAccessToken(refreshToken);
+              localStorage.setItem('paysick_auth_token', refreshData.accessToken);
+              if (refreshData.refreshToken) {
+                localStorage.setItem('paysick_refresh_token', refreshData.refreshToken);
+              }
+              return this.request(endpoint, options, true);
+            } catch (_refreshError) {
+              // Refresh failed — clear session and surface the error
+              this.users.logout();
+              throw new Error('Session expired. Please log in again.');
+            }
+          }
+        }
         throw new Error(data.error || 'Request failed');
       }
 
@@ -45,6 +68,23 @@ const PaySickAPI = {
       console.error('API Error:', error);
       throw error;
     }
+  },
+
+  /**
+   * Exchange a refresh token for a new access token.
+   * Internal — callers should use request() which handles this automatically.
+   */
+  async _refreshAccessToken(refreshToken) {
+    const url = `${this.baseURL}/users/refresh-token`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    let data;
+    try { data = await response.json(); } catch { throw new Error('Refresh failed'); }
+    if (!response.ok) throw new Error(data.error || 'Refresh failed');
+    return data;
   },
 
   /**
@@ -81,14 +121,21 @@ const PaySickAPI = {
     },
 
     /**
-     * Logout user
+     * Logout user — revokes the session server-side then clears local storage.
+     * Always clears storage even if the network call fails.
      */
-    logout() {
-      localStorage.removeItem('paysick_auth_token');
-      localStorage.removeItem('paysick_refresh_token');
-      localStorage.removeItem('paysick_user');
-      localStorage.removeItem('paysick_onboarding_complete');
-      localStorage.removeItem('paysick_onboarding_data');
+    async logout() {
+      try {
+        await PaySickAPI.request('/users/logout', { method: 'POST' });
+      } catch (_) {
+        // Ignore server-side errors — local cleanup always runs
+      } finally {
+        localStorage.removeItem('paysick_auth_token');
+        localStorage.removeItem('paysick_refresh_token');
+        localStorage.removeItem('paysick_user');
+        localStorage.removeItem('paysick_onboarding_complete');
+        localStorage.removeItem('paysick_onboarding_data');
+      }
     },
 
     /**
@@ -145,6 +192,23 @@ const PaySickAPI = {
      */
     async getDashboard() {
       return PaySickAPI.request('/users/dashboard');
+    },
+
+    /**
+     * Manually exchange the stored refresh token for a new access token.
+     * Updates localStorage with the new tokens on success.
+     * Throws if the refresh request fails.
+     */
+    async refreshToken() {
+      const storedRefreshToken = localStorage.getItem('paysick_refresh_token');
+      const data = await PaySickAPI._refreshAccessToken(storedRefreshToken);
+      if (data.accessToken) {
+        localStorage.setItem('paysick_auth_token', data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('paysick_refresh_token', data.refreshToken);
+      }
+      return data;
     }
   },
 

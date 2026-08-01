@@ -47,6 +47,18 @@ const registrationRateLimit = createUserRateLimit({
   message: 'Too many registration attempts. Please wait 1 hour.'
 });
 
+const forgotPasswordRateLimit = createUserRateLimit({
+  windowMs: 3600000, // 1 hour
+  maxRequests: 5,
+  message: 'Too many password reset requests. Please wait 1 hour.'
+});
+
+const resendVerificationRateLimit = createUserRateLimit({
+  windowMs: 3600000, // 1 hour
+  maxRequests: 5,
+  message: 'Too many verification email requests. Please wait 1 hour.'
+});
+
 // ============================================
 // REGISTRATION
 // ============================================
@@ -295,7 +307,7 @@ router.post('/verify-email', async (req, res) => {
  * Resend the verification email for an unverified account.
  * Always returns a generic message to avoid user enumeration.
  */
-router.post('/resend-verification', async (req, res) => {
+router.post('/resend-verification', resendVerificationRateLimit, async (req, res) => {
   const ipAddress = getClientIP(req);
   const { email } = req.body;
 
@@ -357,7 +369,7 @@ router.post('/resend-verification', async (req, res) => {
  * Request a password reset link.
  * Always returns 200 — never reveals whether the email is registered.
  */
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotPasswordRateLimit, async (req, res) => {
   const ipAddress = getClientIP(req);
   const { email } = req.body;
 
@@ -387,10 +399,11 @@ router.post('/forgot-password', async (req, res) => {
     try {
       await issueResetToken({ query, sendPasswordResetEmail }, user);
     } catch (emailErr) {
+      // Log the failure for ops alerting but do NOT return 500 — a distinct error
+      // response for registered addresses vs. unknown ones would leak user existence.
       console.error('Password reset issuance failed:', emailErr.message);
       await logSecurityEvent('PASSWORD_RESET_EMAIL_FAILED', user.user_id, ipAddress,
         req.get('User-Agent'), { email: user.email, error: emailErr.message });
-      return res.status(500).json({ error: 'Unable to send reset email. Please try again later.' });
     }
 
     await logSecurityEvent('PASSWORD_RESET_REQUESTED', user.user_id, ipAddress,

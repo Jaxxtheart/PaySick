@@ -191,17 +191,55 @@
             font-size: 14px;
             margin-bottom: 16px;
             display: none;
+            animation: none;
         }
 
         .error-message.show {
             display: block;
-            animation: shake 0.5s ease;
+        }
+
+        .error-message.shake {
+            animation: shake 0.45s ease;
         }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            20%       { transform: translateX(-8px); }
+            40%       { transform: translateX(8px); }
+            60%       { transform: translateX(-5px); }
+            80%       { transform: translateX(5px); }
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 44px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #8A8A8A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+            width: auto;
+            margin-top: 0;
+        }
+
+        .toggle-password:hover {
+            color: #FF4757;
+            transform: translateY(-50%);
+            box-shadow: none;
         }
 
         @media (max-width: 768px) {
@@ -216,10 +254,6 @@
                 border-radius: 12px;
             }
 
-            .logo h1 {
-                font-size: 28px;
-            }
-
             .logo-svg {
                 width: 52px;
                 height: 52px;
@@ -229,7 +263,7 @@
                 font-size: 26px;
             }
 
-            input, select {
+            input {
                 padding: 13px 14px;
                 font-size: 16px; /* prevent iOS zoom on focus */
             }
@@ -268,108 +302,6 @@
                 font-size: 24px;
             }
         }
-
-        /* Footer */
-        footer {
-            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
-            color: white;
-            padding: 60px 60px 30px;
-            margin-top: 80px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 40px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .footer-brand {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .footer-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .footer-logo-svg {
-            width: 45px;
-            height: 45px;
-        }
-
-        .footer-logo-text {
-            font-size: 28px;
-            font-weight: 400;
-            color: white;
-            letter-spacing: -1px;
-        }
-
-        .footer-logo-text span {
-            font-weight: 300;
-            opacity: 0.8;
-        }
-
-        .footer-tagline {
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-
-        .footer-links h4 {
-            color: white;
-            margin-bottom: 20px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .footer-links ul {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: #FF4757;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        @media (max-width: 768px) {
-            footer .footer-content {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            footer {
-                padding: 40px 30px 20px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -400,23 +332,21 @@
 
         <form id="loginForm">
             <div class="form-group">
-                <label for="role">Login As</label>
-                <select id="role" required>
-                    <option value="user">Patient / User</option>
-                    <option value="provider">Healthcare Provider</option>
-                    <option value="lender">Lender</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-
-            <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required>
+                <input type="email" id="email" placeholder="you@example.com" autocomplete="username" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" autocomplete="current-password" placeholder="Enter your password" required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" autocomplete="current-password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password">
+                        <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="remember-me">
@@ -445,28 +375,92 @@
     </div>
 
     <script>
-        function redirectByRole(role) {
-            switch (role) {
-                case 'admin':
-                    window.location.href = 'admin-dashboard.html';
-                    break;
-                case 'provider':
-                    window.location.href = 'provider-dashboard.html';
-                    break;
-                case 'lender':
-                    window.location.href = 'lender-dashboard.html';
-                    break;
-                default:
-                    const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                    window.location.href = onboardingComplete === 'true' ? 'dashboard.html' : 'onboarding.html';
+        // ── Password visibility toggle ──────────────────────────────────────
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eyeIcon');
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            icon.innerHTML = isHidden
+                ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>' +
+                  '<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>' +
+                  '<line x1="1" y1="1" x2="23" y2="23"/>'
+                : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        });
+
+        // ── Error display ───────────────────────────────────────────────────
+        const errorEl = document.getElementById('errorMessage');
+        let errorTimer;
+
+        function showError(msg, durationMs) {
+            clearTimeout(errorTimer);
+            errorEl.textContent = msg;
+            // Reset animation so shake fires every call
+            errorEl.classList.remove('show', 'shake');
+            void errorEl.offsetWidth; // force reflow
+            errorEl.classList.add('show', 'shake');
+            if (durationMs) {
+                errorTimer = setTimeout(() => {
+                    errorEl.classList.remove('show', 'shake');
+                }, durationMs);
             }
         }
 
-        // Guard: set to true when manual login succeeds so auto-login
-        // doesn't overwrite localStorage with stale/incomplete data.
+        // ── Error message formatter (matches tests/unit/login-flow.test.js) ─
+        function formatLoginError(data, status) {
+            if (!data) return 'Login failed. Please try again.';
+
+            if (status === 403) {
+                switch (data.code) {
+                    case 'EMAIL_UNVERIFIED':  return null; // caller redirects
+                    case 'PASSWORD_REQUIRED': return null; // caller redirects
+                    case 'ACCOUNT_LOCKED': {
+                        if (data.lockedUntil) {
+                            const minsLeft = Math.ceil((new Date(data.lockedUntil) - Date.now()) / 60000);
+                            return minsLeft > 0
+                                ? `Account locked. Try again in ${minsLeft} minute${minsLeft !== 1 ? 's' : ''}.`
+                                : 'Account locked. Please try again shortly.';
+                        }
+                        return 'Account temporarily locked. Please try again later.';
+                    }
+                    case 'ACCOUNT_SUSPENDED': return 'Account suspended. Please contact support.';
+                    case 'ACCOUNT_CLOSED':    return 'Account closed. Please contact support.';
+                }
+            }
+
+            if (status === 401) {
+                const base = data.error || 'Invalid email or password.';
+                if (typeof data.attemptsRemaining === 'number' && data.attemptsRemaining > 0) {
+                    return `${base} ${data.attemptsRemaining} attempt${data.attemptsRemaining !== 1 ? 's' : ''} remaining before lockout.`;
+                }
+                if (typeof data.attemptsRemaining === 'number' && data.attemptsRemaining === 0) {
+                    return `${base} Your account has been locked.`;
+                }
+                return base;
+            }
+
+            if (status === 429) return data.error || 'Too many attempts. Please wait before trying again.';
+            return data.error || data.message || 'Login failed. Please try again.';
+        }
+
+        // ── Role → redirect URL ─────────────────────────────────────────────
+        function redirectByRole(role) {
+            switch (role) {
+                case 'admin':    window.location.href = 'admin-dashboard.html'; break;
+                case 'provider': window.location.href = 'provider-dashboard.html'; break;
+                case 'lender':   window.location.href = 'lender-dashboard.html'; break;
+                default: {
+                    const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
+                    window.location.href = onboardingComplete === 'true' ? 'dashboard.html' : 'onboarding.html';
+                }
+            }
+        }
+
+        // ── Guard: manual login wins over in-flight auto-login ─────────────
         let manualLoginCompleted = false;
 
-        // Attempt auto-login via stored refresh token (Remember Me)
+        // ── Auto-login via stored refresh token (Remember Me) ───────────────
         (async function attemptAutoLogin() {
             try {
                 const saved = localStorage.getItem('paysick_remember');
@@ -474,17 +468,14 @@
 
                 const { refreshToken, email, role } = JSON.parse(saved);
                 if (!refreshToken) {
-                    // Clear legacy data (old format stored passwords)
                     localStorage.removeItem('paysick_remember');
                     return;
                 }
 
-                // Prepopulate email and role while we attempt auto-login
+                // Prepopulate email while we try auto-login
                 if (email) document.getElementById('email').value = email;
-                if (role) document.getElementById('role').value = role;
                 document.getElementById('rememberMe').checked = true;
 
-                // Try to get a new access token using the refresh token
                 const response = await fetch('/api/users/refresh-token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -492,24 +483,19 @@
                 });
 
                 if (!response.ok) {
-                    // Refresh token expired or revoked — clear and show login form
                     localStorage.removeItem('paysick_remember');
                     return;
                 }
 
-                // If manual login already completed while we were waiting,
-                // don't overwrite its data — just bail out.
                 if (manualLoginCompleted) return;
 
                 const tokens = await response.json();
                 localStorage.setItem('paysick_auth_token', tokens.accessToken);
 
-                // Fetch user profile with the new access token
                 const profileRes = await fetch('/api/users/profile', {
                     headers: { 'Authorization': 'Bearer ' + tokens.accessToken }
                 });
 
-                // Check again after the second await
                 if (manualLoginCompleted) return;
 
                 if (profileRes.ok) {
@@ -522,29 +508,24 @@
                     }));
                     redirectByRole(user.role || role);
                 } else {
-                    // Profile fetch failed — let user log in manually
                     localStorage.removeItem('paysick_remember');
                 }
-            } catch (e) {
-                // Network error or parse error — clear stale data
+            } catch {
                 localStorage.removeItem('paysick_remember');
             }
         })();
 
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        // ── Manual login form ───────────────────────────────────────────────
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
             const rememberMe = document.getElementById('rememberMe').checked;
-            const errorMessage = document.getElementById('errorMessage');
             const submitBtn = this.querySelector('button[type="submit"]');
 
             if (!email || !password) {
-                errorMessage.textContent = 'Please enter your email and password.';
-                errorMessage.classList.add('show');
-                setTimeout(() => errorMessage.classList.remove('show'), 3000);
+                showError('Please enter your email and password.', 3500);
                 return;
             }
 
@@ -562,24 +543,18 @@
                 try {
                     data = await response.json();
                 } catch {
-                    // Server returned a non-JSON body (e.g. Vercel HTML error page).
-                    // Show a friendly message rather than the raw SyntaxError.
-                    errorMessage.textContent = `Server error (${response.status}). Please try again shortly.`;
-                    errorMessage.classList.add('show');
-                    setTimeout(() => errorMessage.classList.remove('show'), 4000);
+                    showError(`Server error (${response.status}). Please try again shortly.`, 5000);
                     return;
                 }
 
                 if (response.ok && data.accessToken) {
-                    // Prevent in-flight auto-login from overwriting our data
                     manualLoginCompleted = true;
 
-                    // Handle Remember Me — store refresh token, never the password
                     if (rememberMe && data.refreshToken) {
                         localStorage.setItem('paysick_remember', JSON.stringify({
                             refreshToken: data.refreshToken,
                             email: email,
-                            role: data.user.role || role
+                            role: data.user.role
                         }));
                     } else {
                         localStorage.removeItem('paysick_remember');
@@ -588,26 +563,35 @@
                     localStorage.setItem('paysick_auth_token', data.accessToken);
                     localStorage.setItem('paysick_user', JSON.stringify({
                         ...data.user,
-                        role: data.user.role || role,
                         name: data.user.full_name
                     }));
 
-                    redirectByRole(data.user.role || role);
-                } else if (response.status === 403 && data.code === 'EMAIL_UNVERIFIED') {
-                    // Unverified account — redirect to verification page
-                    errorMessage.textContent = 'Please verify your email address first.';
-                    errorMessage.classList.add('show');
+                    redirectByRole(data.user.role);
+                    return;
+                }
+
+                // Handle special redirect cases before showing generic error
+                if (response.status === 403 && data.code === 'EMAIL_UNVERIFIED') {
+                    showError('Please verify your email address first. Redirecting…');
                     setTimeout(() => {
                         window.location.href = `verify-email.html?email=${encodeURIComponent(data.email || email)}`;
                     }, 1800);
                     return;
-                } else {
-                    throw new Error(data.error || data.message || 'Invalid email or password.');
                 }
+
+                if (response.status === 403 && data.code === 'PASSWORD_REQUIRED') {
+                    showError('Please set a password for your account. Redirecting to reset page…');
+                    setTimeout(() => {
+                        window.location.href = `forgot-password.html?email=${encodeURIComponent(email)}`;
+                    }, 1800);
+                    return;
+                }
+
+                const msg = formatLoginError(data, response.status);
+                showError(msg || data.error || 'Login failed. Please try again.', 5000);
+
             } catch (error) {
-                errorMessage.textContent = error.message || 'Login failed. Please try again.';
-                errorMessage.classList.add('show');
-                setTimeout(() => errorMessage.classList.remove('show'), 4000);
+                showError(error.message || 'Login failed. Please try again.', 4000);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';
@@ -615,54 +599,5 @@
         });
     </script>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="footer-logo">
-                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="footerCrossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
-                            </linearGradient>
-                            <radialGradient id="footerBgCircle" cx="50%" cy="50%">
-                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
-                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
-                            </radialGradient>
-                        </defs>
-                        <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
-                        <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#footerCrossGradient)"/>
-                        <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#footerCrossGradient)"/>
-                        <circle cx="50" cy="50" r="8" fill="#ffffff"/>
-                        <circle cx="50" cy="50" r="6" fill="#E01E37"/>
-                    </svg>
-                    <div class="footer-logo-text">Pay<span>Sick</span></div>
-                </div>
-                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
-            </div>
-            <div class="footer-links">
-                <h4>Product</h4>
-                <ul>
-                    <li><a href="index.html#how-it-works">How It Works</a></li>
-                    <li><a href="index.html#features">Payment Terms</a></li>
-                    <li><a href="providers.html">Find Providers</a></li>
-                    <li><a href="index.html#about">Mobile App</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-of-service.html">Terms of Service</a></li>
-                    <li><a href="licenses.html">Licenses</a></li>
-                    <li><a href="accessibility.html">Accessibility</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
-        </div>
-    </footer>
 </body>
 </html>

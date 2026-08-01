@@ -91,8 +91,8 @@ describe('BUG 1 — reset link URL uses correct production domain', () => {
 
             assert.ok(capturedHtml, 'email body should have been captured');
             assert.ok(
-                capturedHtml.includes('https://paysick.co.za/reset-password.html?token=' + rawToken),
-                'reset link should use the configured APP_URL domain'
+                capturedHtml.includes('https://paysick.co.za/reset-password?token=' + rawToken),
+                'reset link should use the configured APP_URL domain (clean URL, no .html extension)'
             );
             assert.ok(
                 !capturedHtml.includes('localhost'),
