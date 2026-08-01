@@ -81,16 +81,18 @@ test('slide 14 roadmap reflects UK expansion and 2027 shift', () => {
   assert.ok(deck.includes('Exit Potential (2027+)'), 'exit potential not shifted to 2027+');
 });
 
-test('slide counter, nav dots and PPTX slide count are all 16', () => {
-  const counters = deck.match(/\d\d \/ 16/g) || [];
-  assert.strictEqual(counters.length, 16, `expected 16 "NN / 16" counters, found ${counters.length}`);
-  assert.ok(deck.includes('16 / 16'), 'final counter 16 / 16 missing');
+// Count raised from 16 to 17 when the Shield™ risk-engine slide was added.
+// See tests/unit/investor-deck-shield.test.js for that slide's own coverage.
+test('slide counter, nav dots and PPTX slide count are all 17', () => {
+  const counters = deck.match(/\d\d \/ 17/g) || [];
+  assert.strictEqual(counters.length, 17, `expected 17 "NN / 17" counters, found ${counters.length}`);
+  assert.ok(deck.includes('17 / 17'), 'final counter 17 / 17 missing');
 
   const navDots = deck.match(/class="nav-dot(?: active)?" data-slide=/g) || [];
-  assert.strictEqual(navDots.length, 16, `expected 16 nav dots, found ${navDots.length}`);
+  assert.strictEqual(navDots.length, 17, `expected 17 nav dots, found ${navDots.length}`);
 
   const addSlide = deck.match(/pptx\.addSlide\(\)/g) || [];
-  assert.strictEqual(addSlide.length, 16, `expected 16 PPTX slides, found ${addSlide.length}`);
+  assert.strictEqual(addSlide.length, 17, `expected 17 PPTX slides, found ${addSlide.length}`);
 });
 
 test('no prohibited customer-facing lending vocabulary introduced', () => {
