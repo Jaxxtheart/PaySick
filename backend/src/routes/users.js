@@ -24,6 +24,7 @@ const {
 } = require('../services/security.service');
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../services/email.service');
 const { issueResetToken } = require('../services/password-reset.service');
+const { validateSAID } = require('../utils/sa-id');
 const {
   authenticateToken,
   requireAdmin,
@@ -128,10 +129,15 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Validate SA ID number (basic check)
-    if (!/^\d{13}$/.test(sa_id_number)) {
+    // Validate SA ID number: shape, embedded date of birth, citizenship digit and
+    // Luhn checksum, cross-checked against the declared date_of_birth. register.html
+    // runs the same checks, but browser-side validation is advisory — this is the
+    // enforcement point for anything posting straight at the API.
+    const idCheck = validateSAID(sa_id_number, { dateOfBirth: date_of_birth });
+    if (!idCheck.valid) {
       return res.status(400).json({
-        error: 'Invalid SA ID number format'
+        error: idCheck.error,
+        code: 'INVALID_SA_ID'
       });
     }
 
