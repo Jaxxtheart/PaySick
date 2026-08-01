@@ -6,6 +6,76 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.9.0] — 2026-08-01
+
+**Type**: MINOR — new API surface, new page, new security modules
+
+### Summary
+Branch reconciliation. The repository held 31 remote branches, 7 with commits
+that had never reached `main`. This release lands what was genuinely missing,
+deliberately drops what `main` had since superseded, and records the reasoning
+so the same branches are not re-litigated.
+
+### Added
+- **`/api/v1` facilitation surface** (from `claude/setup-paysick-api-ZhJ7v`,
+  unmerged since May). `main` carried this work's v1.8.0 snapshot but never the
+  source. Applications, decisions, payouts and schedules; the Shield five-gate
+  engine; schedule, provider-scoring and webhook-dispatcher services; DebiCheck,
+  DSP-check and income-verification adapters; `money.js`; migration
+  `009_v1_api_surface.sql` (renumbered from a colliding `008`).
+- **Bot-crawling protections.** `robots.txt` at the repository root (`main` had
+  none, a standing CLAUDE.md violation); `bot-blocker` and `honeypot` middleware;
+  a catch-all `X-Robots-Tag` header in `vercel.json`, because statically served
+  HTML never passes through Express; hidden honeypot anchors on six entry-point
+  pages — the trap handler existed but nothing linked to it.
+- **Server-side SA ID validation** (`backend/src/utils/sa-id.js`). Registration
+  previously asserted only `/^\d{13}$/` server-side.
+- **Shield™ risk-engine slide** in the investor deck (slide 12 of 17).
+- **`/research` page**, without the stale White Paper V4 payload.
+
+### Changed
+- Rate limits: 5/hour on `forgot-password` and `resend-verification`; a dedicated
+  30-per-15-minutes bucket on `/api/v1`, which previously inherited only the
+  general read-endpoint allowance despite triggering payouts.
+- Bot blocklist review (required at every MINOR bump): 20 AI training and
+  retrieval crawlers named explicitly. `anthropic-ai`, `Google-Extended`,
+  `Meta-ExternalAgent`, `cohere-ai` and `omgili` carry no "bot" token and had
+  been passing straight through.
+- `POST /forgot-password` no longer returns 500 on email-send failure; the
+  distinct response leaked which addresses are registered.
+- Email links use clean URLs, matching `cleanUrls: true`.
+- `api-client.js` gained `users.refreshToken()`.
+- Index footer regained a Company group (Research, Contact). This section was
+  removed site-wide in v1.4.1 "pending content"; that content now exists.
+
+### Rejected (not merged, with reasons)
+- **v1.8.3 atomic reset-token index** — `main` commit `5a800fc`, one day newer,
+  deliberately stopped invalidating prior unused tokens so a re-requested link
+  does not kill the first email. The proposed
+  `UNIQUE (user_id) WHERE used = false` index would have reintroduced that bug.
+- **Investor-deck balance-sheet pivot** (R30M ask, marketplace removed) —
+  contradicts the July v1.8.1 deck. Only the Shield IP slide was taken.
+- **January legal-page rewrite** — `main`'s pages passed through the v1.5.5
+  regulatory terminology audit; re-introducing the older copy would undo it.
+- **Mock-data provider dashboard** — `main`'s is backend-wired.
+
+### Testing
+Test-first throughout. Five new suites, each confirmed red first:
+`static-bot-protection` (13), `sa-id-validation` (27),
+`investor-deck-shield` (23), `research-page` (14), `bot-blocklist-review` (29).
+
+Full suite: **609 pass, 1 fail**. The failure is `email-service.test.js`, which
+cannot resolve `nodemailer` where `registry.npmjs.org` is unreachable. It is
+pre-existing and environmental, and fails identically on `main`.
+
+Two bugs were caught by tests rather than review: the ported SA ID validator's
+century pivot was hardcoded at `22` and had already rotted (a 2024-born applicant
+decoded as 1924); and the first bot-blocklist test fixture embedded a
+`+https://example.com/bot` URL that by itself tripped `/bot\b/`, making 24 of 29
+cases pass vacuously and hiding all five real gaps.
+
+---
+
 ## [v1.8.1] — 2026-07-26
 
 **Type**: PATCH — investor-deck market-sizing correction and copy/figure edits
