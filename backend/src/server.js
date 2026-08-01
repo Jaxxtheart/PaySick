@@ -61,6 +61,7 @@ const shieldRoutes = require('./routes/shield');
 const notificationRoutes = require('./routes/notifications');
 const underwritingRoutes = require('./routes/underwriting');
 const outreachRoutes = require('./routes/outreach');
+const v1Routes = require('./routes/v1');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -261,6 +262,9 @@ app.use('/api', underwritingRoutes);
 // Honeypot trap endpoint — hidden from real users, lures bots (CLAUDE.md requirement)
 app.get('/api/hp-check', honeypotTrapHandler);
 
+// PaySick facilitation API surface (v1) — applications, decisions, payouts, schedules
+app.use('/api/v1', v1Routes);
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -279,7 +283,8 @@ app.get('/', (req, res) => {
       risk: '/api/risk',
       notifications: '/api/notifications',
       outreach: '/api/outreach',
-      shield: '/v2/shield'
+      shield: '/v2/shield',
+      v1: '/api/v1'
     }
   });
 });
