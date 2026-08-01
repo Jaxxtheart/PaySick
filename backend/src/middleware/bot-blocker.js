@@ -56,6 +56,32 @@ const BOT_USER_AGENT_PATTERNS = [
   /Puppeteer/i,
   /Playwright/i,
 
+  // AI training and retrieval crawlers (reviewed at v1.9.0).
+  // Several of these also match /bot\b/ below, but they are named explicitly so
+  // the list stays auditable rather than depending on that accident. The ones
+  // with no "bot" token — anthropic-ai, Google-Extended, Meta-ExternalAgent,
+  // cohere-ai, omgili — are only caught here.
+  /GPTBot/i,
+  /ChatGPT-User/i,
+  /OAI-SearchBot/i,
+  /ClaudeBot/i,
+  /Claude-Web/i,
+  /anthropic-ai/i,
+  /CCBot/i,
+  /PerplexityBot/i,
+  /Google-Extended/i,
+  /Applebot-Extended/i,
+  /Bytespider/i,
+  /Amazonbot/i,
+  /Meta-ExternalAgent/i,
+  /FacebookBot/i,
+  /cohere-ai/i,
+  /Diffbot/i,
+  /ImagesiftBot/i,
+  /omgili/i,
+  /YouBot/i,
+  /TimpiBot/i,
+
   // Generic bot / spider / crawler patterns
   /bot\b/i,
   /crawler/i,

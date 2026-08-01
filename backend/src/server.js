@@ -180,7 +180,23 @@ const authLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// Tighter bucket for the v1 facilitation surface. These endpoints create
+// applications, record decisions and trigger payouts, so they should not get the
+// same allowance as a read endpoint.
+const v1Limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30,
+  message: {
+    error: 'Too many facilitation API requests. Please try again later.',
+    code: 'V1_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use('/api/', globalLimiter);
+app.use('/api/v1', v1Limiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);
 app.use('/api/users/demo-login', authLimiter);
