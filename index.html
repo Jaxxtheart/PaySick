@@ -902,5 +902,10 @@
             });
         });
     </script>
+
+<!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
+     Invisible to real users, screen readers and keyboard nav. Any client that
+     follows it hits GET /api/hp-check and is blocked for the session. -->
+<a href="/api/hp-check" style="display:none" aria-hidden="true" tabindex="-1" rel="nofollow">Directory</a>
 </body>
 </html>
