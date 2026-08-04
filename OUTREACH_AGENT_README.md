@@ -102,6 +102,14 @@ for Resend on your domain's `TXT` SPF record, e.g.
 repo now defaults to `hello@paysick.co.za`, set via `SMTP_FROM`). Do **not** use
 `no-reply@` — it lowers inbox trust and reply/feedback signal.
 
+**4. Brief recipient must be a REAL mailbox.** Resend (like any sender) delivers
+mail but does **not** host inboxes. A made-up address such as
+`founder@paysick.co.za` with no mailbox behind it **hard-bounces**. Set
+`BRIEF_RECIPIENTS` (comma-separated) to an inbox you actually own — a Google
+Workspace / mail-host address on `paysick.co.za`, or a personal email. The daily
+brief also renders in the admin dashboard, so a bounced email never loses the
+information.
+
 Verify with any DMARC/SPF/DKIM checker (e.g. dig `_dmarc.paysick.co.za TXT`)
 after the records propagate.
 
