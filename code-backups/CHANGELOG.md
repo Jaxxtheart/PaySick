@@ -6,6 +6,86 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.0] — 2026-08-04
+
+**Type**: MINOR — new investor-deck slides, pricing correction, blocklist review
+
+### Summary
+The investor deck published a business model the platform contradicted. It
+claimed a "2-4% arrangement fee" and a 10% blended take (R1,850 per arrangement)
+while `backend/src/services/fee.service.js` charges providers a flat 5% at
+settlement and charges patients nothing. No slide said what a single provider had
+to do to become profitable, and nothing tied the outreach agent shipped in v1.9.0
+to a rate of provider acquisition.
+
+This release rebuilds the commercial half of the deck against the code, and makes
+the dependency enforceable: the deck tests now read `fee.service.js` and
+`outreach.config.js` alongside the deck and fail if they disagree. The deck goes
+from 17 slides to 21.
+
+### Added
+- **Slide 08, Pricing** (`#slide-pricing`). Provider service fee 5% netted at
+  settlement, funding-partner placement fee 2%, patient R0, late fee 5% per month
+  compounding. States the deliberate absence of any subscription, setup fee or
+  monthly minimum, and discloses the blended take as 6.2%.
+- **Slide 09, Unit Economics** (`#slide-unit-economics`). Per-arrangement P&L on
+  the R18,500 Phase 1 average bill: R1,147 gross, less R66 verification stack,
+  R25 collection rails and R47 expected credit loss, leaving R1,009 of
+  contribution at an 88% margin.
+- **Slide 10, Customer Profitability** (`#slide-provider-economics`). The usage
+  required to make each provider profitable, at four practice profiles including
+  one that does not clear year one. Year-one breakeven 13 arrangements, steady
+  state 6, payback 1.9 months, LTV:CAC 15.2x.
+- **Slide 11, Capabilities** (`#slide-capability-case`). Seven shipped modules
+  with an annual value each at the outreach exit run-rate, including Shield
+  (R1.96M of loss avoided), the marketplace auction (R145M off balance sheet plus
+  R2.9M placement revenue) and the provider dashboard (R2.13M servicing removed).
+- **Slide 12, Outreach at Scale** (`#slide-outreach-scale`). The published
+  funnel (one activated provider per 158 leads sourced) and three costed
+  scenarios: blocked today, unblocked at the configured caps (46 providers a
+  year), and unblocked with caps lifted (273 a year, R242.4M facilitated).
+- `.ledger` theme-aware figure tables, scrolling inside their own containers.
+- `tests/unit/investor-deck-business-case.test.js` (36 assertions) and
+  `tests/unit/bot-blocklist-review-v1_10_0.test.js` (23 assertions), both written
+  and confirmed failing before implementation.
+
+### Changed
+- **Bot blocklist review** (required at every MINOR bump). Eight second-wave
+  agents added that no existing pattern caught: `Meta-ExternalFetcher`,
+  `MistralAI-User`, `Perplexity-User`, `Firecrawl`, `crawl4ai`,
+  `Webzio-Extended`, `SerpApi`, `Cotoyogi`. The first three carry no "bot" token
+  so `/bot\b/` never fired; `/crawler/` does not match a bare "crawl" stem.
+  `Perplexity-User` is the user-directed sibling of the already-blocked
+  `PerplexityBot`. `Devin`, `NovaAct` and `Operator` were considered and
+  rejected as too generic to match on safely; that reasoning is recorded in the
+  test so the next review does not re-open it.
+- Deck counters, nav dots and PPTX slides raised 17 → 21. The pre-existing
+  counter defect is fixed in passing: the deck skipped `12 / 17` and printed
+  `13 / 17` twice. A test now asserts the sequence is complete.
+- `investor-deck.test.js` and `investor-deck-shield.test.js` structural counts
+  moved 17 → 21; `01 / 17` added to the superseded-content ban list.
+
+### Removed
+- The **Business Model** slide (`#slide-6`). Its 40/35/25 revenue split had no
+  basis in code, its "2-4% arrangement fee" contradicted `fee.service.js`, and it
+  described a provider subscription the platform does not charge. Its unit
+  economics block quoted a 10% blended take and a R320 CAC that was a patient
+  figure presented as a provider one. Code preserved in
+  `code-backups/v1.9.0/snapshot/investor-deck.html`.
+- Superseded claims now banned deck-wide by test: `R1,850 (10%)`,
+  `2-4% arrangement fee`, `Target CAC: R320`, and the `N% of Revenue` splits.
+
+### Not changed
+No route, schema, migration, service or fee constant was touched. The pricing on
+the deck was moved to match the code, not the reverse.
+
+### Tests
+669 total, 668 pass. The single failure, `tests/unit/email-service.test.js`,
+cannot resolve `nodemailer` from the repository root because it is a `backend/`
+dependency; it fails identically on a clean checkout and predates this release.
+
+---
+
 ## [v1.9.0] — 2026-08-01
 
 **Type**: MINOR — new API surface, new page, new security modules
