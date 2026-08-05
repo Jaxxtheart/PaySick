@@ -6,6 +6,77 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.11.0] — 2026-08-04
+
+**Type**: MINOR — deck slide removed, inbound reply webhook hardened
+
+### Summary
+Both changes stem from one discovery: the outreach agent has been sending real
+email, and the deck said it had not.
+
+### Removed
+- **Investor deck slide 12, "Outreach at Scale"** (added in v1.10.0). It stated
+  "It has never sent a message, because sending is blocked on DNS and a set of
+  API keys", and carried a "Blocked today / 0 sent" row. Over 40 outreach emails
+  had been sent, and nothing in the code gates a send: the approve route calls
+  the email service directly, with no DNS or domain-verification check anywhere
+  in the path. The error was inference from the deliverability section of
+  `OUTREACH_AGENT_README.md`, which names DNS records as prerequisites for
+  sending *at volume*, not as a precondition of sending at all. DMARC/SPF/DKIM
+  affect inbox placement; the bulk-sender enforcement thresholds sit around
+  5,000 messages a day.
+
+  Deleted rather than rewritten, at the founder's direction. Deck returns to 20
+  slides, counters renumbered 01 through 20. Requirements OUT-01 through OUT-06
+  are withdrawn with it. Code preserved in
+  `code-backups/v1.10.1/snapshot/investor-deck.html`.
+
+- The capability slide previously valued each module "at the exit run-rate of
+  the outreach plan", which pointed at the deleted slide. It now names its own
+  reference scale: 273 active providers, 13,104 arrangements a year, R242M
+  facilitated. Figures unchanged.
+
+### Fixed
+- **Inbound webhook verified against a re-serialised body.**
+  `checkInboundSignature` fell back to `JSON.stringify(req.body)` when the raw
+  body was unavailable. A Svix signature covers the exact bytes Resend sent, so
+  a re-serialised body is a different byte string in all but the luckiest case
+  (key order, unicode escaping, whitespace). The mismatch presents identically
+  to a wrong secret, which sends the operator chasing the wrong thing.
+  Serverless runtimes that pre-parse the request body are exactly where this
+  bites.
+
+  Replaced with `inboundAuthResult()` in the service layer, which never
+  re-serialises and returns a distinct code per failure: `NO_WEBHOOK_SECRET`,
+  `MISSING_SIGNATURE_HEADERS`, `RAW_BODY_UNAVAILABLE`, `SIGNATURE_MISMATCH`.
+  Each is returned on the 401 and logged. The `x-webhook-secret` fallback is
+  retained and now checked first, since it is the only path not dependent on
+  raw-body capture.
+
+### Added
+- `tests/unit/outreach-inbound-wiring.test.js` (17 assertions) and
+  `tests/unit/investor-deck-outreach-slide-removed.test.js` (9 assertions), both
+  written and confirmed failing before implementation.
+- `OUTREACH_AGENT_README.md`: ordered setup steps for the inbound webhook, a
+  diagnosis table keyed by response code, and a warning that an unwired webhook
+  causes follow-ups to chase providers who already replied.
+
+### Note
+The inbound webhook is a **correctness dependency of the follow-up sequence**,
+not an enhancement. `getContactedDueForFollowup` skips a lead only when an
+inbound touch row exists, and the webhook is the sole writer of those rows. While
+it is unwired, a provider who replies still receives the day 3, day 7 and day 14
+follow-ups. Connecting it remains an operator task: add the endpoint in Resend
+(inbound also needs an MX record; a verified *sending* domain does not grant
+inbound), set `RESEND_WEBHOOK_SECRET` in Vercel, redeploy, and confirm
+`SMTP_FROM` is the mailbox Resend receives for.
+
+### Tests
+695 total, 694 pass. The `email-service.test.js` failure is pre-existing and
+unrelated (`nodemailer` is not resolvable from the repository root).
+
+---
+
 ## [v1.10.1] — 2026-08-04
 
 **Type**: PATCH — routing fix
