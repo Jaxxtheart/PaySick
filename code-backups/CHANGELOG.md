@@ -6,6 +6,70 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.0] — 2026-08-04
+
+**Type**: MINOR — deck slides removed
+
+### Summary
+The four remaining business-case slides added in v1.10.0 are deleted at the
+founder's direction. With the outreach slide already removed in v1.11.0, the
+whole v1.10.0 addition is reverted and the deck is back to 16 slides, its
+pre-v1.10.0 length.
+
+### Removed
+- **Investor deck slides 08 to 11**: Pricing (`slide-pricing`), Unit Economics
+  (`slide-unit-economics`), Customer Profitability
+  (`slide-provider-economics`), Capability Value (`slide-capability-case`).
+  All four HTML sections and all four `downloadPPTX()` builders. Counters
+  renumbered 01 through 16; nav dots reduced to 16. No defect was found in their
+  figures. Code preserved in `code-backups/v1.11.0/snapshot/investor-deck.html`.
+- **Dead CSS**: `.ledger`, `.ledger-wrap`, `.assumption`, `.flag-good`,
+  `.flag-bad`, `.pill` and their theme variants. None had another consumer;
+  `.pill` had already been dead since v1.11.0.
+- **`tests/unit/investor-deck-business-case.test.js`**: every assertion in it
+  described one of the removed slides.
+
+### Changed
+- The superseded-pricing bans from the deleted test file are **migrated** into
+  the `banned` list in `tests/unit/investor-deck.test.js`, so `R1,850 (10%)`,
+  `2-4% arrangement fee`, the `N% of Revenue` splits and `Target CAC: R320`
+  still cannot reappear. That guard matters independently of the slides that
+  carried it.
+- `investor-deck.test.js` and `investor-deck-shield.test.js`: structural counts
+  20 → 16; the stale-counter guard no longer bans "/ 16", which is the live
+  denominator again.
+- `investor-deck-outreach-slide-removed.test.js`: assertions covering the four
+  surviving business-case slides removed as moot; its false-claim bans retained.
+
+### Consequence, stated plainly
+**The deck now carries no pricing or business-model slide at all.** v1.10.0
+removed the original Business Model slide for contradicting `fee.service.js`
+(a "2-4% arrangement fee" against the flat 5% actually charged, a 40/35/25
+revenue split with no basis in code, a provider subscription that does not
+exist), and its four replacements are now gone too.
+
+The old slide is **deliberately not restored**: doing so would reintroduce a
+known-false pricing claim into a live investor document. It remains available in
+`code-backups/v1.9.0/snapshot/investor-deck.html` (`id="slide-6"`), and the
+migrated bans will fail the suite if its figures are pasted back uncorrected.
+This is a deliberate state, recorded so the next person to open the deck knows
+the gap is intentional and why the obvious fix is the wrong one.
+
+### Added
+- `tests/unit/investor-deck-business-slides-removed.test.js` (19 assertions,
+  written and confirmed failing first). Pins each removal, the dead-CSS cleanup,
+  deck structure at 16, and — new standing guard — that all 16 surviving slides
+  are present **by id**, since a count alone cannot distinguish an intended
+  removal from a collateral one of the same size. That is the check that would
+  have caught the v1.11.0 near-miss immediately.
+
+### Tests
+684 total, 683 pass. The `email-service.test.js` failure is pre-existing and
+unrelated (`nodemailer` is not resolvable from the repository root). Deck
+renders at 16 sections, 16 nav dots, no console errors, no horizontal overflow.
+
+---
+
 ## [v1.11.0] — 2026-08-04
 
 **Type**: MINOR — deck slide removed, inbound reply webhook hardened
