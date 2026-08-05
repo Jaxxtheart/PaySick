@@ -6,6 +6,52 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.1] — 2026-08-04
+
+**Type**: PATCH — routing fix
+
+### Summary
+`https://paysick.co.za/investors` returned a Vercel `404 NOT_FOUND`. The deck was
+live the whole time, just not at the path people type.
+
+The deck lives in `investor-deck.html`, so `cleanUrls: true` serves it at
+`/investor-deck`, and `vercel.json` rewrote only `/health` and `/api/(.*)`.
+`/investors` resolved to nothing.
+
+### Fixed
+- **`vercel.json`**: rewrite `/investors` to `/investor-deck.html`, declared
+  above `/health` and `/api/(.*)` so it cannot shadow them.
+
+  A rewrite rather than a redirect, so a link already shared keeps `/investors`
+  in the address bar. The destination names the `.html` file explicitly:
+  `cleanUrls` resolves extensions for incoming request paths, not for rewrite
+  destinations, so `/investor-deck` as a destination would not have resolved.
+
+### Added
+- `tests/unit/investors-route.test.js` (8 assertions, written and confirmed
+  failing before the fix). Pins the rewrite's existence and destination, that it
+  is a rewrite and not a redirect, that it does not shadow the API rules, that
+  the target file exists, and that the alias is covered by the bot protections.
+
+### Notes
+- Not a build or deployment failure. A missing deployment returns
+  `DEPLOYMENT_NOT_FOUND`; this was a path-not-found, so the deployment had
+  resolved and only the path was wrong.
+- Never caught earlier because the only in-repo link to the deck
+  (`research.html`) correctly points at `investor-deck.html`. Every internal link
+  worked; `/investors` was only ever reached by typing it.
+- Bot protection review for the new path is in
+  `code-backups/v1.10.1/RELEASE_NOTES.md`. `robots.txt` and the `vercel.json`
+  `X-Robots-Tag` block are both path-agnostic, so the alias inherits both; the
+  Express-layer controls do not apply for the same reason they do not apply to
+  `/investor-deck`, since static requests terminate at the edge.
+
+### Tests
+677 total, 676 pass. The `email-service.test.js` failure is pre-existing and
+unrelated (`nodemailer` is not resolvable from the repository root).
+
+---
+
 ## [v1.10.0] — 2026-08-04
 
 **Type**: MINOR — new investor-deck slides, pricing correction, blocklist review
