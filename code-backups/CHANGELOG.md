@@ -6,6 +6,95 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.0] — 2026-08-08
+
+**Type**: MINOR — new page, new API module, new services, new schema
+
+### Summary
+SANParks Media Licensing: a second product line selling subscription access to
+imagery and footage captured on SANParks property, in which the transfer of image
+rights settles in the same database transaction as the sale. Access runs on a
+renewable 12- or 24-month term; licences are bought against that subscription and
+priced from the asset's rarity, its live demand, and the rights actually acquired.
+
+The module is prefixed `sanparks_` throughout — separate schema, separate route,
+separate services. Nothing belonging to the healthcare facilitation product was
+modified.
+
+### Added
+- **Subscription engine** (`sanparks-subscription.service.js`). Four tiers;
+  12- and 24-month terms only, the two-year term discounted 12.5%. Renewing before
+  expiry or inside the 30-day grace window backdates the new term to the old
+  expiry, so no uncovered gap can sit behind a licence already granted; renewing
+  after grace starts fresh. Renewing before expiry locks the price for one further
+  term of the same length. Unused credits carry forward on a continuous renewal.
+  Grace permits renewal but not new licensing.
+- **Pricing engine** (`sanparks-pricing.service.js`). Base rate × rarity × demand
+  surge × scope × territory × licence duration, in integer basis points, then the
+  plan discount, then VAT. The surge is capped at 2.5× so a viral asset stays
+  quotable rather than turning the catalogue into an auction. Net splits at the
+  point of sale into a conservation levy, a contributor royalty and the platform
+  fee; the levy takes the residual, so the three parts reconcile to the net
+  exactly for every input including 1 cent. SANParks-captured media pays no
+  third-party royalty — that share goes to conservation.
+- **Rights engine** (`sanparks-rights.service.js`). Three instruments — licence,
+  exclusive licence, and assignment (a buyout that moves the copyright and removes
+  the asset from the catalogue permanently). Conflict detection over live grants:
+  an exclusive grant blocks overlapping grants, exclusivity cannot be sold over
+  grants already live, and a buyout cannot be sold while anything is live.
+  Hash-linked chain of title with tamper, removal and re-ordering detection, plus
+  a rights certificate carrying the verification hash.
+- **Conservation gates**, enforced as rights blockers rather than warnings:
+  commercial use of imagery captured on SANParks land requires a property release;
+  identifiable people require a model release; and no asset featuring a species at
+  poaching risk is released with location metadata intact, at any scope, to
+  anyone. The last is enforced twice — in the rights engine and by a database
+  CHECK constraint.
+- **Licensing transaction** (`sanparks-licensing.service.js`). One
+  `db.transaction()`: idempotency check → asset locked `FOR UPDATE` →
+  subscription gated → live grants read and conflicts evaluated → priced →
+  licence, payment, chain entry, asset rights mutation, revenue splits and credit
+  debit written together. A rights conflict aborts before any write is issued; a
+  failure at any write rolls the whole thing back. The lock is what stops two
+  broadcasters both being told they hold exclusivity over the same clip.
+- **`/api/sanparks`** — plans, subscriptions, renewal, cancellation, catalogue,
+  asset detail, chain of title, quotes, licences. Every endpoint requires
+  authentication, including the plan list, because a media catalogue is the most
+  scrape-attractive surface on the platform.
+- **`sanparks.html`** — plans with a 1-year/2-year toggle, catalogue with filters,
+  licence configurator, a quote showing every multiplier and the conservation
+  split, and the rights certificate with its chain hash. Linked from the index
+  footer. Plans and catalogue are fetched after boot; no price and no asset exists
+  in the served HTML.
+- Migration `010_sanparks_media.sql` — seven tables plus a seed catalogue of eight
+  assets. `idempotency_key` is UNIQUE at the database level, so a replayed sale
+  cannot write a second licence even if application code fails.
+- `api-client.js` gained a `sanparks` module.
+
+### Changed
+- Bot blocklist review (required at every MINOR bump): 16 bulk media downloaders
+  and image harvesters added — `gallery-dl`, `yt-dlp`, `youtube-dl`, `HTTrack`,
+  `Offline Explorer`, `Teleport Pro`, `WebCopier`, `WebZIP`, `SiteSucker`,
+  `aria2`, `img2dataset`, `TinEye`, `PetalBot`, `Screaming Frog`, `WebReaper`,
+  `Xenu Link Sleuth`. None carries a "bot" token, so none was caught by the
+  generic pattern. This is the class of tool that matters most to a licensing
+  catalogue — these exist specifically to walk a gallery and pull every original
+  behind it.
+- Rate limits: a dedicated 40-per-15-minutes bucket on `/api/sanparks`, which
+  otherwise inherited the general read allowance despite executing irreversible
+  rights transfers.
+
+### Tests
+236 new assertions, every one written before its implementation and confirmed
+failing first: subscription (41), pricing (37), rights (56), licensing
+transaction (31), API surface (22), page (18), blocklist review (31). Suite total
+845 passing.
+
+### Removed
+Nothing. The release is additive — no existing feature was changed or removed.
+
+---
+
 ## [v1.9.0] — 2026-08-01
 
 **Type**: MINOR — new API surface, new page, new security modules

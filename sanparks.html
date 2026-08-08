@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <title>SANParks Media Licensing - PaySick</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --ink: #1A1A1A;
+            --body: #3A3A3A;
+            --muted: #7A7A7A;
+            --line: #E5E5E5;
+            --paper: #FAFAFA;
+            --green: #2D6A4F;
+            --green-light: #40916C;
+            --green-pale: #EAF3EE;
+            --red: #FF4757;
+            --amber: #B77800;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--paper); color: var(--ink); }
+
+        /* Header / footer share the platform chrome */
+        .site-header { background: var(--ink); padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo-text { font-size: 22px; font-weight: 400; color: #fff; letter-spacing: -0.5px; }
+        .logo-text span { font-weight: 300; color: #8A8A8A; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .back-link { color: var(--red); text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+        .back-link:hover { opacity: .75; }
+        .session-chip { font-size: 12px; color: #8A8A8A; }
+
+        .hero { background: linear-gradient(135deg, #2D6A4F 0%, #1B4332 100%); padding: 64px 40px 56px; text-align: center; color: #fff; }
+        .hero .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; opacity: .8; margin-bottom: 12px; }
+        .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 14px; }
+        .hero p { font-size: 16px; opacity: .9; max-width: 680px; margin: 0 auto; line-height: 1.6; }
+
+        .wrap { max-width: 1120px; margin: 0 auto; padding: 56px 40px 24px; }
+        .wrap.tight { max-width: 880px; }
+        section h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        section .lede { font-size: 15px; color: var(--body); line-height: 1.7; margin-bottom: 28px; max-width: 720px; }
+
+        /* Term toggle */
+        .term-toggle { display: inline-flex; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin-bottom: 28px; }
+        .term-toggle button { border: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); padding: 9px 20px; border-radius: 999px; cursor: pointer; transition: all .18s; }
+        .term-toggle button[aria-pressed="true"] { background: var(--green); color: #fff; }
+        .term-note { font-size: 13px; color: var(--muted); margin-left: 12px; }
+
+        /* Plans */
+        .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+        .plan-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 24px; border-top: 3px solid var(--green-light); display: flex; flex-direction: column; }
+        .plan-card.is-top { border-top-color: var(--ink); }
+        .plan-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .plan-card .audience { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; min-height: 40px; }
+        .plan-card .price { font-size: 27px; font-weight: 700; letter-spacing: -0.5px; }
+        .plan-card .price-sub { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+        .plan-card .saving { font-size: 12px; font-weight: 600; color: var(--green); min-height: 18px; margin-bottom: 16px; }
+        .plan-card ul { list-style: none; margin-bottom: 20px; }
+        .plan-card li { font-size: 13px; color: var(--body); line-height: 1.5; padding-left: 18px; position: relative; margin-bottom: 7px; }
+        .plan-card li::before { content: ''; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--green-light); }
+        .btn { border: 0; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 600; padding: 11px 18px; cursor: pointer; transition: opacity .18s; }
+        .btn:hover:not(:disabled) { opacity: .85; }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .btn-primary { background: var(--green); color: #fff; width: 100%; margin-top: auto; }
+        .btn-dark { background: var(--ink); color: #fff; }
+        .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+
+        /* Catalogue */
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+        .filters select, .filters input { font: inherit; font-size: 14px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+        .asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+        .asset-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+        .asset-thumb { aspect-ratio: 3 / 2; background: linear-gradient(135deg, #B7C9BC, #6E8E7A); position: relative; display: flex; align-items: flex-end; padding: 10px; }
+        .asset-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+        .badge { position: relative; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 4px 8px; border-radius: 5px; background: rgba(0,0,0,.62); color: #fff; }
+        .badge.hot { background: var(--red); }
+        .asset-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+        .asset-body h3 { font-size: 15px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; }
+        .asset-meta { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+        .asset-flags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .flag { font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 4px; background: var(--green-pale); color: var(--green); }
+        .flag.warn { background: #FFF6E5; color: var(--amber); }
+        .flag.stop { background: #FFF0F1; color: #C81E2C; }
+
+        /* Configurator */
+        .drawer-backdrop { position: fixed; inset: 0; background: rgba(20,20,20,.55); display: none; z-index: 200; }
+        .drawer-backdrop.open { display: block; }
+        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100%); background: #fff; z-index: 201; overflow-y: auto; transform: translateX(100%); transition: transform .22s ease; }
+        .drawer.open { transform: translateX(0); }
+        .drawer-head { padding: 22px 26px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+        .drawer-head h3 { font-size: 17px; font-weight: 700; line-height: 1.4; }
+        .drawer-head .close { border: 0; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; color: var(--muted); }
+        .drawer-body { padding: 26px; }
+        .field { margin-bottom: 18px; }
+        .field label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 7px; }
+        .field select, .field input { width: 100%; font: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+        .field .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+        .quote-panel { background: var(--green-pale); border-radius: 10px; padding: 18px; margin: 22px 0; }
+        .quote-line { display: flex; justify-content: space-between; font-size: 13px; color: var(--body); padding: 5px 0; }
+        .quote-line.total { border-top: 1px solid rgba(45,106,79,.25); margin-top: 8px; padding-top: 11px; font-size: 16px; font-weight: 700; color: var(--ink); }
+        .quote-line .mult { color: var(--muted); font-size: 12px; }
+
+        .blockers { background: #FFF0F1; border-left: 3px solid #C81E2C; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 18px 0; }
+        .blockers h4 { font-size: 13px; font-weight: 700; color: #C81E2C; margin-bottom: 8px; }
+        .blockers li { font-size: 13px; color: var(--body); line-height: 1.55; margin-left: 16px; margin-bottom: 5px; }
+
+        .certificate { border: 1px solid var(--green-light); border-radius: 10px; padding: 20px; margin-top: 20px; background: #fff; }
+        .certificate h4 { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 12px; }
+        .cert-row { display: flex; justify-content: space-between; gap: 14px; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+        .cert-row span:first-child { color: var(--muted); }
+        .cert-hash { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; word-break: break-all; color: var(--body); background: var(--paper); padding: 8px; border-radius: 6px; margin-top: 12px; }
+        .cert-restrictions { margin-top: 14px; }
+        .cert-restrictions li { font-size: 12px; color: var(--body); line-height: 1.6; margin-left: 16px; margin-bottom: 5px; }
+
+        /* Explainer */
+        .how { background: #fff; border-top: 1px solid var(--line); margin-top: 48px; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 22px; margin-top: 8px; }
+        .step { border-left: 2px solid var(--green-light); padding-left: 16px; }
+        .step .num { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 1px; margin-bottom: 6px; }
+        .step h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .step p { font-size: 13px; color: var(--body); line-height: 1.65; }
+
+        .status { font-size: 14px; color: var(--muted); padding: 28px 0; }
+        .status.error { color: #C81E2C; }
+        .signin-note { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 22px; font-size: 14px; color: var(--body); line-height: 1.65; }
+        .signin-note a { color: var(--green); font-weight: 600; }
+
+        .site-footer { background: var(--ink); text-align: center; padding: 28px; color: #8A8A8A; font-size: 13px; margin-top: 56px; }
+        .site-footer a { color: #8A8A8A; text-decoration: none; }
+        .site-footer a:hover { color: var(--red); }
+
+        noscript .status { color: var(--ink); }
+
+        @media (max-width: 640px) {
+            .site-header { padding: 14px 20px; }
+            .hero { padding: 48px 20px 40px; }
+            .wrap { padding: 40px 20px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a class="logo" href="index.html" aria-label="PaySick home">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><radialGradient id="spCross" cx="40%" cy="40%"><stop offset="0%" style="stop-color:#FF4757"/><stop offset="100%" style="stop-color:#E01E37"/></radialGradient></defs>
+            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#spCross)"/>
+            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#spCross)"/>
+            <circle cx="50" cy="50" r="7" fill="#1A1A1A"/>
+            <circle cx="50" cy="50" r="5" fill="#E01E37"/>
+        </svg>
+        <div class="logo-text">Pay<span>Sick</span></div>
+    </a>
+    <div class="header-right">
+        <span class="session-chip" id="sessionChip"></span>
+        <a class="back-link" href="index.html">&larr; Back to Home</a>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="eyebrow">SANParks Media Licensing</div>
+    <h1>Licence the wild, fund the wild</h1>
+    <p>Every image and every second of footage captured across South African National Parks,
+       licensed under a renewable subscription. Rights are transferred and recorded in the same
+       transaction as the sale &mdash; and the largest share of every licence goes back to conservation.</p>
+</section>
+
+<!-- Plans -->
+<section class="wrap" id="plans">
+    <h2>Subscription plans</h2>
+    <p class="lede">Access runs on a fixed term you renew: 12-month or 24-month. A 24-month term is
+        discounted against two annual terms, and renewing before your term expires locks your price
+        for one further term. Unused download credits carry over on a continuous renewal.</p>
+
+    <div class="term-toggle" id="termToggle" role="group" aria-label="Subscription term">
+        <button type="button" data-term="12" aria-pressed="true">1 year</button>
+        <button type="button" data-term="24" aria-pressed="false">2 years</button>
+    </div>
+    <span class="term-note" id="termNote"></span>
+
+    <div class="plan-grid" id="planGrid"></div>
+    <p class="status" id="planStatus">Loading plans&hellip;</p>
+</section>
+
+<!-- Catalogue -->
+<section class="wrap" id="catalogue">
+    <h2>Catalogue</h2>
+    <p class="lede">Every asset is held with its rights state, its releases and its chain of title.
+        What you may do with a frame depends on your plan, the market you are licensing for, and
+        whether anyone else already holds exclusivity over it.</p>
+
+    <div class="filters">
+        <select id="filterPark" aria-label="Filter by park">
+            <option value="">All parks</option>
+            <option value="KRUGER">Kruger National Park</option>
+            <option value="ADDO">Addo Elephant National Park</option>
+            <option value="TABLE_MOUNTAIN">Table Mountain National Park</option>
+            <option value="KGALAGADI">Kgalagadi Transfrontier Park</option>
+            <option value="GOLDEN_GATE">Golden Gate Highlands National Park</option>
+            <option value="ISIMANGALISO">iSimangaliso Wetland Park</option>
+        </select>
+        <select id="filterMedia" aria-label="Filter by media type">
+            <option value="">Stills and footage</option>
+            <option value="IMAGE">Stills only</option>
+            <option value="VIDEO">Footage only</option>
+        </select>
+        <select id="filterRarity" aria-label="Filter by rarity">
+            <option value="">Any rarity</option>
+            <option value="NOTABLE">Notable</option>
+            <option value="RARE">Rare</option>
+            <option value="ONCE_IN_A_LIFETIME">Once in a lifetime</option>
+        </select>
+        <input type="search" id="filterSearch" placeholder="Species or title" aria-label="Search the catalogue">
+        <button type="button" class="btn btn-ghost" id="filterApply">Search</button>
+    </div>
+
+    <div class="asset-grid" id="assetGrid"></div>
+    <p class="status" id="assetStatus">Loading catalogue&hellip;</p>
+</section>
+
+<!-- How rights transfer works -->
+<section class="how">
+    <div class="wrap">
+        <h2>How the rights transfer works</h2>
+        <p class="lede">A licence is not a receipt for a file. It is an instrument, and it is recorded
+            as one.</p>
+        <div class="steps">
+            <div class="step">
+                <div class="num">01</div>
+                <h3>The asset is locked</h3>
+                <p>Before anything is priced, the asset row is locked. Two buyers cannot be told they
+                   both hold exclusivity over the same footage.</p>
+            </div>
+            <div class="step">
+                <div class="num">02</div>
+                <h3>Conflicts are checked</h3>
+                <p>Live grants, plan entitlement, property and model releases, and conservation
+                   controls are all evaluated before a cent moves.</p>
+            </div>
+            <div class="step">
+                <div class="num">03</div>
+                <h3>Sale and transfer settle together</h3>
+                <p>The licence, the payment, the revenue split and the rights transfer are written in
+                   one transaction. If any part fails, none of it happened.</p>
+            </div>
+            <div class="step">
+                <div class="num">04</div>
+                <h3>The chain of title is appended</h3>
+                <p>Each transfer adds a hash-linked entry to the asset's chain of title, and you get a
+                   rights certificate carrying that hash. Provenance stays verifiable.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Rights and conservation notes -->
+<section class="wrap tight">
+    <h2>What the licence carries</h2>
+    <p class="lede">
+        Scope, territory and duration are priced separately because they are separate rights.
+        A personal print, an editorial still, a brand campaign and a worldwide broadcast are not the
+        same grant, and exclusivity is only available on the Broadcast &amp; Rights tier. A full
+        buyout assigns the copyright outright &mdash; the asset leaves the catalogue permanently and
+        the chain of title records the new holder.
+    </p>
+    <p class="lede">
+        Two rules are conservation policy rather than commerce. Commercial use of imagery captured on
+        SANParks land requires a signed property release. And no asset featuring a species at
+        poaching risk is ever released with its location metadata attached, at any licence scope, to
+        anyone &mdash; a geotagged rhino is a map.
+    </p>
+</section>
+
+<!-- Licence configurator -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Licence configurator">
+    <div class="drawer-head">
+        <h3 id="drawerTitle">Configure licence</h3>
+        <button type="button" class="close" id="drawerClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="drawer-body">
+        <div class="field">
+            <label for="cfgSubscription">Subscription</label>
+            <select id="cfgSubscription"></select>
+            <p class="hint" id="cfgSubscriptionHint"></p>
+        </div>
+        <div class="field">
+            <label for="cfgScope">Licence scope</label>
+            <select id="cfgScope">
+                <option value="PERSONAL">Personal use</option>
+                <option value="EDITORIAL">Editorial</option>
+                <option value="COMMERCIAL">Commercial</option>
+                <option value="BROADCAST">Broadcast</option>
+                <option value="EXCLUSIVE_BUYOUT">Full rights buyout</option>
+            </select>
+            <p class="hint">A buyout assigns the copyright. Broadcast &amp; Rights tier only.</p>
+        </div>
+        <div class="field">
+            <label for="cfgTerritory">Territory</label>
+            <select id="cfgTerritory">
+                <option value="SINGLE_COUNTRY">Single country</option>
+                <option value="REGIONAL">Region</option>
+                <option value="WORLDWIDE" selected>Worldwide</option>
+            </select>
+        </div>
+        <div class="field" id="cfgTerritoryCodeField" style="display:none">
+            <label for="cfgTerritoryCode">Territory code</label>
+            <input type="text" id="cfgTerritoryCode" placeholder="ZA, EU, APAC" maxlength="12">
+        </div>
+        <div class="field">
+            <label for="cfgTerm">Licence duration</label>
+            <select id="cfgTerm">
+                <option value="ONE_YEAR">One year</option>
+                <option value="THREE_YEARS">Three years</option>
+                <option value="PERPETUAL">Perpetual</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="cfgResolution">Delivered resolution</label>
+            <select id="cfgResolution">
+                <option value="WEB">Web</option>
+                <option value="FULL">Full</option>
+                <option value="MASTER">Master</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="cfgExclusive">Exclusivity</label>
+            <select id="cfgExclusive">
+                <option value="false">Non-exclusive</option>
+                <option value="true">Exclusive in this scope and territory</option>
+            </select>
+        </div>
+
+        <div id="quoteOut"></div>
+
+        <button type="button" class="btn btn-dark" id="btnQuote" style="width:100%">Price this licence</button>
+        <button type="button" class="btn btn-primary" id="btnLicence" disabled>Complete licence &amp; transfer rights</button>
+
+        <div id="certificateOut"></div>
+    </div>
+</aside>
+
+<noscript>
+    <div class="wrap tight">
+        <p class="status">The SANParks Media Licensing catalogue requires JavaScript. Plans, pricing and
+        the catalogue are loaded from an authenticated API after the page starts, so there is nothing
+        to show without it. Please enable JavaScript and sign in.</p>
+    </div>
+</noscript>
+
+<footer class="site-footer">
+    <p>&copy; 2026 PaySick South Africa. All rights reserved. &nbsp;|&nbsp;
+        <a href="terms-of-service.html">Terms of Service</a> &nbsp;|&nbsp;
+        <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="accessibility.html">Accessibility</a> &nbsp;|&nbsp;
+        <a href="licenses.html">Licensing Disclosure</a>
+    </p>
+</footer>
+
+<!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
+     Invisible to real users, screen readers and keyboard nav. Any client that
+     follows it hits GET /api/hp-check and is blocked for the session. -->
+<a href="/api/hp-check" style="display:none" aria-hidden="true" tabindex="-1" rel="nofollow">Media archive index</a>
+
+<script>
+(function () {
+    'use strict';
+
+    var API_ORIGIN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:3000'
+        : '';
+
+    var state = {
+        termMonths: 12,
+        plans: [],
+        assets: [],
+        subscriptions: [],
+        asset: null,
+        quote: null
+    };
+
+    function token() {
+        return localStorage.getItem('paysick_auth_token');
+    }
+
+    function api(path, options) {
+        options = options || {};
+        var headers = { 'Content-Type': 'application/json' };
+        var t = token();
+        if (t) { headers['Authorization'] = 'Bearer ' + t; }
+
+        return fetch(API_ORIGIN + path, {
+            method: options.method || 'GET',
+            headers: headers,
+            body: options.body ? JSON.stringify(options.body) : undefined
+        }).then(function (response) {
+            return response.json().catch(function () {
+                throw new Error('Server error (' + response.status + '). Please try again shortly.');
+            }).then(function (data) {
+                if (!response.ok) {
+                    var err = new Error(data.error || 'Request failed');
+                    err.code = data.code;
+                    err.blockers = data.blockers;
+                    throw err;
+                }
+                return data;
+            });
+        });
+    }
+
+    function money(cents) {
+        var rands = Number(cents || 0) / 100;
+        return 'R' + rands.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function multiple(bps) {
+        return (Number(bps) / 10000).toFixed(2).replace(/\.00$/, '') + '×';
+    }
+
+    function humanise(value) {
+        return String(value || '').replace(/_/g, ' ').toLowerCase()
+            .replace(/^./, function (c) { return c.toUpperCase(); });
+    }
+
+    function el(id) { return document.getElementById(id); }
+
+    function setStatus(id, message, isError) {
+        var node = el(id);
+        node.textContent = message || '';
+        node.style.display = message ? 'block' : 'none';
+        node.className = 'status' + (isError ? ' error' : '');
+    }
+
+    function requireSignIn(message) {
+        var html = '<div class="signin-note">' + message +
+            ' <a href="login.html">Sign in</a> or <a href="register.html">create an account</a> to continue.</div>';
+        el('planGrid').innerHTML = '';
+        el('assetGrid').innerHTML = '';
+        setStatus('planStatus', '');
+        setStatus('assetStatus', '');
+        el('catalogue').insertAdjacentHTML('beforeend', html);
+    }
+
+    // ── Plans ───────────────────────────────────────────────────────────────
+
+    function renderPlans() {
+        var grid = el('planGrid');
+        grid.innerHTML = state.plans.map(function (plan) {
+            var term = plan.terms.filter(function (t) { return t.termMonths === state.termMonths; })[0];
+            if (!term) { return ''; }
+
+            var perMonth = money(Math.round(term.netCents / term.termMonths));
+            var saving = term.termDiscountCents > 0
+                ? 'Saves ' + money(term.termDiscountCents) + ' against two annual terms'
+                : '';
+
+            return '<div class="plan-card' + (plan.exclusivityEligible ? ' is-top' : '') + '">' +
+                '<h3>' + plan.name + '</h3>' +
+                '<p class="audience">' + plan.audience + '</p>' +
+                '<div class="price">' + money(term.netCents) + '</div>' +
+                '<div class="price-sub">excl. VAT &middot; ' + perMonth + ' per month &middot; ' +
+                    term.termMonths + '-month term</div>' +
+                '<div class="saving">' + saving + '</div>' +
+                '<ul>' +
+                    '<li>' + term.creditsIncluded + ' download credits over the term</li>' +
+                    '<li>Up to ' + humanise(plan.maxResolutionTier) + ' resolution</li>' +
+                    '<li>' + plan.allowedScopes.map(humanise).join(', ') + ' licensing</li>' +
+                    '<li>' + (plan.exclusivityEligible
+                        ? 'Exclusive rights and full buyouts available'
+                        : (plan.subscriberDiscountBps / 100) + '% off every licence') + '</li>' +
+                '</ul>' +
+                '<button type="button" class="btn btn-primary" data-subscribe="' + plan.code + '">' +
+                    'Subscribe for ' + (state.termMonths / 12) + (state.termMonths === 12 ? ' year' : ' years') +
+                '</button>' +
+            '</div>';
+        }).join('');
+
+        el('termNote').textContent = state.termMonths === 24
+            ? 'Two-year terms are discounted and renew as one continuous period.'
+            : 'Renew before expiry to lock this price for a further term.';
+
+        Array.prototype.forEach.call(grid.querySelectorAll('[data-subscribe]'), function (button) {
+            button.addEventListener('click', function () { subscribe(button.getAttribute('data-subscribe')); });
+        });
+    }
+
+    function loadPlans() {
+        return api('/api/sanparks/plans').then(function (data) {
+            state.plans = data.plans || [];
+            setStatus('planStatus', '');
+            renderPlans();
+        });
+    }
+
+    function subscribe(planCode) {
+        api('/api/sanparks/subscriptions', {
+            method: 'POST',
+            body: { planCode: planCode, termMonths: state.termMonths }
+        }).then(function (data) {
+            setStatus('planStatus', 'Subscription active until ' +
+                new Date(data.subscription.expiresAt).toLocaleDateString('en-ZA') + '.');
+            return loadSubscriptions();
+        }).catch(function (err) {
+            setStatus('planStatus', err.message, true);
+        });
+    }
+
+    // ── Catalogue ───────────────────────────────────────────────────────────
+
+    function assetFlags(asset) {
+        var flags = [];
+        if (asset.rarityTier && asset.rarityTier !== 'STANDARD') {
+            flags.push('<span class="flag">' + humanise(asset.rarityTier) + '</span>');
+        }
+        if (asset.demandIndex >= 40) {
+            flags.push('<span class="flag warn">High demand</span>');
+        }
+        if (asset.sensitiveSpecies) {
+            flags.push('<span class="flag warn">Location redacted</span>');
+        }
+        if (asset.rightsStatus === 'ASSIGNED') {
+            flags.push('<span class="flag stop">Rights assigned</span>');
+        } else if (asset.rightsStatus === 'EXCLUSIVELY_LICENSED') {
+            flags.push('<span class="flag stop">Exclusively licensed</span>');
+        }
+        return flags.join('');
+    }
+
+    function renderAssets() {
+        var grid = el('assetGrid');
+        if (state.assets.length === 0) {
+            grid.innerHTML = '';
+            setStatus('assetStatus', 'No assets match those filters.');
+            return;
+        }
+        setStatus('assetStatus', '');
+
+        grid.innerHTML = state.assets.map(function (asset, index) {
+            var duration = asset.mediaType === 'VIDEO' && asset.durationSeconds
+                ? ' · ' + Math.round(asset.durationSeconds) + 's'
+                : '';
+            var thumb = asset.previewUrl
+                ? '<img src="' + asset.previewUrl + '" alt="">'
+                : '';
+            return '<article class="asset-card">' +
+                '<div class="asset-thumb">' + thumb +
+                    '<span class="badge' + (asset.demandIndex >= 40 ? ' hot' : '') + '">' +
+                        (asset.mediaType === 'VIDEO' ? 'Footage' : 'Still') + duration +
+                    '</span>' +
+                '</div>' +
+                '<div class="asset-body">' +
+                    '<h3>' + asset.title + '</h3>' +
+                    '<p class="asset-meta">' + humanise(asset.park) +
+                        (asset.species ? ' · ' + asset.species : '') + '</p>' +
+                    '<div class="asset-flags">' + assetFlags(asset) + '</div>' +
+                    '<button type="button" class="btn btn-ghost" data-asset="' + index + '" ' +
+                        (asset.rightsStatus === 'ASSIGNED' ? 'disabled' : '') + '>' +
+                        (asset.rightsStatus === 'ASSIGNED' ? 'No longer licensable' : 'Licence this') +
+                    '</button>' +
+                '</div>' +
+            '</article>';
+        }).join('');
+
+        Array.prototype.forEach.call(grid.querySelectorAll('[data-asset]'), function (button) {
+            button.addEventListener('click', function () {
+                openDrawer(state.assets[Number(button.getAttribute('data-asset'))]);
+            });
+        });
+    }
+
+    function loadAssets() {
+        var params = [];
+        if (el('filterPark').value) { params.push('park=' + encodeURIComponent(el('filterPark').value)); }
+        if (el('filterMedia').value) { params.push('mediaType=' + encodeURIComponent(el('filterMedia').value)); }
+        if (el('filterRarity').value) { params.push('rarityTier=' + encodeURIComponent(el('filterRarity').value)); }
+        if (el('filterSearch').value) { params.push('search=' + encodeURIComponent(el('filterSearch').value)); }
+
+        setStatus('assetStatus', 'Loading catalogue…');
+        return api('/api/sanparks/assets' + (params.length ? '?' + params.join('&') : ''))
+            .then(function (data) {
+                state.assets = data.assets || [];
+                renderAssets();
+            });
+    }
+
+    function loadSubscriptions() {
+        return api('/api/sanparks/subscriptions').then(function (data) {
+            state.subscriptions = (data.subscriptions || []).filter(function (s) {
+                return s.status === 'ACTIVE';
+            });
+            var select = el('cfgSubscription');
+            select.innerHTML = state.subscriptions.map(function (sub) {
+                return '<option value="' + sub.subscriptionId + '">' + sub.planCode +
+                    ' — ' + sub.creditsRemaining + ' credits, to ' +
+                    new Date(sub.expiresAt).toLocaleDateString('en-ZA') + '</option>';
+            }).join('');
+            el('cfgSubscriptionHint').textContent = state.subscriptions.length === 0
+                ? 'No active subscription. Subscribe above before licensing.'
+                : 'Licences are granted against this subscription.';
+        });
+    }
+
+    // ── Configurator ────────────────────────────────────────────────────────
+
+    function openDrawer(asset) {
+        state.asset = asset;
+        state.quote = null;
+        el('drawerTitle').textContent = asset.title;
+        el('quoteOut').innerHTML = '';
+        el('certificateOut').innerHTML = '';
+        el('btnLicence').disabled = true;
+        el('cfgResolution').value = asset.maxResolutionTier || 'FULL';
+        el('drawer').classList.add('open');
+        el('drawer').setAttribute('aria-hidden', 'false');
+        el('drawerBackdrop').classList.add('open');
+    }
+
+    function closeDrawer() {
+        el('drawer').classList.remove('open');
+        el('drawer').setAttribute('aria-hidden', 'true');
+        el('drawerBackdrop').classList.remove('open');
+    }
+
+    function configuration() {
+        var territory = el('cfgTerritory').value;
+        return {
+            subscriptionId: el('cfgSubscription').value,
+            assetId: state.asset ? state.asset.assetId : null,
+            scope: el('cfgScope').value,
+            territory: territory,
+            territoryCode: territory === 'WORLDWIDE' ? null : (el('cfgTerritoryCode').value || null),
+            licenceTerm: el('cfgTerm').value,
+            resolutionTier: el('cfgResolution').value,
+            exclusive: el('cfgExclusive').value === 'true'
+        };
+    }
+
+    function renderQuote(data) {
+        var q = data.quote;
+        var rights = data.rights;
+        var html = '<div class="quote-panel">' +
+            '<div class="quote-line"><span>Base rate</span><span>' + money(q.baseCents) + '</span></div>' +
+            '<div class="quote-line"><span>Rarity <span class="mult">' + multiple(q.rarityMultiplierBps) + '</span></span><span></span></div>' +
+            '<div class="quote-line"><span>Demand surge <span class="mult">' + multiple(q.surgeMultiplierBps) + '</span></span><span></span></div>' +
+            '<div class="quote-line"><span>Scope <span class="mult">' + multiple(q.scopeMultiplierBps) + '</span></span><span></span></div>' +
+            '<div class="quote-line"><span>Territory <span class="mult">' + multiple(q.territoryMultiplierBps) + '</span></span><span></span></div>' +
+            '<div class="quote-line"><span>Duration <span class="mult">' + multiple(q.licenceTermMultiplierBps) + '</span></span><span></span></div>' +
+            '<div class="quote-line"><span>List</span><span>' + money(q.listCents) + '</span></div>' +
+            '<div class="quote-line"><span>Subscriber discount</span><span>&minus;' + money(q.subscriberDiscountCents) + '</span></div>' +
+            '<div class="quote-line"><span>VAT</span><span>' + money(q.vatCents) + '</span></div>' +
+            '<div class="quote-line total"><span>Total</span><span>' + money(q.grossCents) + '</span></div>' +
+            '<div class="quote-line"><span>Conservation levy to SANParks</span><span>' + money(q.splits.conservationLevyCents) + '</span></div>' +
+            '<div class="quote-line"><span>Contributor royalty</span><span>' + money(q.splits.contributorRoyaltyCents) + '</span></div>' +
+            '<div class="quote-line"><span>Credits used</span><span>' + q.creditCost + '</span></div>' +
+        '</div>';
+
+        if (!rights.grantable) {
+            html += '<div class="blockers"><h4>This grant cannot be made</h4><ul>' +
+                rights.blockers.map(function (b) { return '<li>' + b.message + '</li>'; }).join('') +
+                '</ul></div>';
+        }
+
+        el('quoteOut').innerHTML = html;
+        el('btnLicence').disabled = !rights.grantable;
+        state.quote = data;
+    }
+
+    function renderCertificate(receipt) {
+        var cert = receipt.certificate;
+        el('certificateOut').innerHTML = '<div class="certificate">' +
+            '<h4>Rights certificate issued</h4>' +
+            '<div class="cert-row"><span>Certificate</span><span>' + cert.certificateId + '</span></div>' +
+            '<div class="cert-row"><span>Instrument</span><span>' + humanise(cert.instrumentType) + '</span></div>' +
+            '<div class="cert-row"><span>Granted to</span><span>' + cert.grantedTo + '</span></div>' +
+            '<div class="cert-row"><span>Scope</span><span>' + humanise(cert.scope) + '</span></div>' +
+            '<div class="cert-row"><span>Territory</span><span>' + humanise(cert.territory) + '</span></div>' +
+            '<div class="cert-row"><span>Expires</span><span>' +
+                (cert.expiresAt ? new Date(cert.expiresAt).toLocaleDateString('en-ZA') : 'Perpetual') + '</span></div>' +
+            '<div class="cert-row"><span>Chain entry</span><span>#' + cert.chainSequence + '</span></div>' +
+            '<p style="font-size:12px;color:#7A7A7A;margin-top:12px">' + cert.instrumentDescription + '</p>' +
+            '<div class="cert-hash">' + cert.verificationHash + '</div>' +
+            '<ul class="cert-restrictions">' +
+                cert.restrictions.map(function (r) { return '<li>' + r + '</li>'; }).join('') +
+            '</ul>' +
+        '</div>';
+    }
+
+    function requestQuote() {
+        if (!state.asset) { return; }
+        el('quoteOut').innerHTML = '<p class="status">Pricing…</p>';
+        api('/api/sanparks/quotes', { method: 'POST', body: configuration() })
+            .then(renderQuote)
+            .catch(function (err) {
+                el('quoteOut').innerHTML = '<p class="status error">' + err.message + '</p>';
+                el('btnLicence').disabled = true;
+            });
+    }
+
+    function buyLicence() {
+        var body = configuration();
+        body.idempotencyKey = 'lic-' + body.assetId + '-' + Date.now();
+        el('btnLicence').disabled = true;
+
+        api('/api/sanparks/licences', { method: 'POST', body: body })
+            .then(function (receipt) {
+                renderCertificate(receipt);
+                return Promise.all([loadSubscriptions(), loadAssets()]);
+            })
+            .catch(function (err) {
+                var detail = (err.blockers || []).map(function (b) { return b.message; }).join(' ');
+                el('certificateOut').innerHTML =
+                    '<p class="status error">' + err.message + ' ' + detail + '</p>';
+                el('btnLicence').disabled = false;
+            });
+    }
+
+    // ── Boot ────────────────────────────────────────────────────────────────
+
+    function boot() {
+        Array.prototype.forEach.call(el('termToggle').querySelectorAll('button'), function (button) {
+            button.addEventListener('click', function () {
+                state.termMonths = Number(button.getAttribute('data-term'));
+                Array.prototype.forEach.call(el('termToggle').querySelectorAll('button'), function (b) {
+                    b.setAttribute('aria-pressed', String(b === button));
+                });
+                renderPlans();
+            });
+        });
+
+        el('filterApply').addEventListener('click', function () {
+            loadAssets().catch(function (err) { setStatus('assetStatus', err.message, true); });
+        });
+        el('cfgTerritory').addEventListener('change', function () {
+            el('cfgTerritoryCodeField').style.display =
+                el('cfgTerritory').value === 'WORLDWIDE' ? 'none' : 'block';
+        });
+        el('drawerClose').addEventListener('click', closeDrawer);
+        el('drawerBackdrop').addEventListener('click', closeDrawer);
+        el('btnQuote').addEventListener('click', requestQuote);
+        el('btnLicence').addEventListener('click', buyLicence);
+
+        if (!token()) {
+            setStatus('planStatus', '');
+            setStatus('assetStatus', '');
+            requireSignIn('The media catalogue and its pricing are only available to signed-in licensees.');
+            return;
+        }
+
+        el('sessionChip').textContent = 'Signed in';
+
+        loadPlans().catch(function (err) { setStatus('planStatus', err.message, true); });
+        loadAssets().catch(function (err) { setStatus('assetStatus', err.message, true); });
+        loadSubscriptions().catch(function () { /* no subscription yet is not an error */ });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+    } else {
+        boot();
+    }
+})();
+</script>
+</body>
+</html>
