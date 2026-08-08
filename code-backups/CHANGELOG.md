@@ -6,6 +6,77 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.0] — 2026-08-08
+
+**Type**: MINOR — new outreach vertical, two new message-gate modules
+
+### Summary
+The provider outreach plan now targets dentists alongside aesthetics, and every
+outreach message is rebuilt around a single ask: register the practice as a
+provider on the PaySick website. The 15 minute demo becomes a secondary option,
+offered only after the registration link, and anything a practice needs first
+goes to hello@paysick.co.za. Two house rules move out of the prompt and into
+code: no em dashes anywhere in a message, and the registration call to action is
+always present.
+
+### Added
+- **Dental as an active vertical.** `activeVerticals` is `['aesthetics',
+  'dental']`, dental fit weight raised 0.8 → 1.0, and dental sources on six
+  Places terms (`dentist`, `dental practice`, `dental clinic`, `dental
+  implants`, `orthodontist`, `cosmetic dentist`) instead of one, because
+  practices list themselves inconsistently.
+- **List-valued search terms.** A vertical's `VERTICAL_SEARCH_TERMS` entry may be
+  a string or a list; every term in a list is searched per metro.
+- **Per-vertical share of the daily source cap.** Without it, aesthetics (first
+  in the list) would consume the whole daily budget and no dentist would ever be
+  sourced.
+- **`services/outreach/style.js`** — strips every em dash, en dash, horizontal
+  bar, figure dash and minus sign from a message. Deterministic and idempotent:
+  comma between clauses, "to" in numeric ranges, hyphen bullet at the start of a
+  line. Ordinary hyphens are untouched.
+- **`services/outreach/cta.js`** — guarantees the register-as-a-provider ask,
+  inserted above the sign-off, in a full email variant and a short LinkedIn
+  variant. The link always ends its own line, because mail and DM clients swallow
+  a trailing full stop into the href.
+- **`PUBLIC_SITE_URL`** — the origin used for links in outreach copy. Falls back
+  to `APP_URL` only when that is not a localhost address, then to
+  `https://paysick.co.za`, so a staging origin cannot reach a prospect.
+
+### Changed
+- **Drafting prompt** bans em dashes, makes registering the one call to action,
+  demotes the demo, carries `hello@paysick.co.za`, and gained a dental angle:
+  treatment plans that stall on price and the chair slots lost with them. Both
+  gates still run on the model's output, so an ignored instruction changes
+  nothing.
+- **Follow-up steps 1-3** rewritten without em dashes and without pre-empting the
+  call to action. Subjects: `Quick follow-up — {name}` → `Quick follow up for
+  {name}`, and likewise for steps 2 and 3.
+- **Approve Queue** — the edit endpoint re-applies both gates to a founder's edit
+  before storing it; the approve endpoint applies them once more, persists the
+  final copy, then sends. Previously each re-ran the terminology linter only, so
+  an edit could remove the registration link or reintroduce an em dash.
+- **Daily brief** subject and heading no longer use an em dash.
+- **Bot blocklist review** (required at every MINOR bump): added
+  `Perplexity-User`, `Claude-User`, `meta-externalfetcher`, `Firecrawl` and
+  `Webzio-Extended`, none of which carry a `bot`/`crawler`/`spider` token, plus
+  `AI2Bot`, `PanguBot`, `DuckAssistBot`, `okhttp` and `Apache-HttpClient`.
+- **Rate limits**: `/api/outreach` gained a dedicated 60-per-15-minutes bucket.
+  It had only the general 100-per-15-minutes allowance despite carrying the
+  public Resend inbound webhook and the cron route, where one call runs a Places
+  + Anthropic pipeline.
+
+### Tests
+46 new test-first assertions across `outreach-style.test.js`,
+`outreach-dental.test.js` and `bot-blocklist-review-v1.10.0.test.js`. 655 of 656
+unit assertions pass; `email-service.test.js` still cannot resolve `nodemailer`
+where the npm registry is unreachable, unchanged from v1.9.0.
+
+### Not changed
+The human gate, the terminology linter, the POPIA sourcing basis and the audit
+trail are untouched. No migration, and no patient-facing page changed.
+
+---
+
 ## [v1.9.0] — 2026-08-01
 
 **Type**: MINOR — new API surface, new page, new security modules
