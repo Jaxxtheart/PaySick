@@ -6,6 +6,50 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.1] — 2026-09-16
+
+**Type**: PATCH — bug fixes to marketplace / Shield Gate 3
+
+### Summary
+Hardens the lender-marketplace code path against three bugs found in
+review: the 22.25% APR rate cap was defined but never enforced on any
+offer-write path; `acceptOffer()` could be raced by two concurrent accepts
+on the same application into creating two loans; and Gate 3's lender
+matching (`lender-gate.service.js`) queried columns that don't exist on
+the real `lenders`/`marketplace_loans` tables, so it silently returned
+zero lenders and 0% balance-sheet utilization on every call. All three
+were reproduced with a failing test before the fix (CLAUDE.md test-first
+workflow), then fixed, then proven passing. Also closes a rate-limiting
+gap on `/v2/shield/*`. No route, page, or table added or removed.
+
+### Fixed
+- `backend/src/services/marketplace-auction.service.js`: `createLenderOffer()`
+  now calls `lenderGateService.validateRate()` before every insert;
+  `acceptOffer()` now locks the parent application (`SELECT ... FOR UPDATE`)
+  before creating a loan and rejects (`409`) if it's already `OFFER_SELECTED`
+- `backend/src/services/lender-gate.service.js`: `findEligibleLenders()`,
+  `getPortfolioAllocation()`, and `checkBalanceSheetCapacity()` now query
+  the real column names and status values from `001_marketplace_tables.sql`
+- `backend/src/routes/marketplace.js`: webhook, manual-offer, and accept-offer
+  handlers now surface `error.statusCode` instead of always returning `500`
+- `backend/src/server.js`: `globalLimiter` now applies to `/v2/shield`
+- `backend/src/migrations/011_marketplace_loan_integrity.sql` (new): DB-level
+  backstops — a `CHECK` on `lender_offers.interest_rate` and a unique index
+  on `marketplace_loans(application_id)`
+
+### Added
+- `tests/unit/marketplace-lender-gate.test.js`: 6 new test-first assertions
+  (672 total, 671 pass in this sandbox — see release notes for the one
+  pre-existing, unrelated `nodemailer`-availability failure)
+
+### Flagged, not fixed
+- `marketplace-offers.html` and `lender-dashboard.html` still use loan/lender/APR
+  language that `v1.5.5` and `v1.7.1`–`v1.7.5` deliberately removed from
+  patient-facing surfaces for NCA-positioning reasons. See
+  `v1.10.1/RELEASE_NOTES.md` — this is a positioning decision, not fixed here.
+
+---
+
 ## [v1.10.0] — 2026-09-16
 
 **Type**: MINOR — new API module
