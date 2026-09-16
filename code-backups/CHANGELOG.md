@@ -6,6 +6,68 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.0] — 2026-09-16
+
+**Type**: MINOR — new API module
+
+### Summary
+Ships the PaySick Recovery Engine: an automated collections capability run
+entirely inside the platform, designed so a partner medical provider never
+builds, staffs, or operates a collections desk of its own. Consolidates
+case stage, the mandatory Human Review & Compliance gate, and self-cure
+eligibility behind one authoritative service that composes the existing
+collections-messaging cadence, and adds promise-to-pay tracking, restructure
+offers, credit bureau reporting, and a proportionality-gated external
+referral path.
+
+### Added
+- **`recovery-engine.service.js`** — `RecoveryEngineService`, composing
+  `CollectionsMessagingService` for stage/message resolution and adding the
+  Human Review gate (mandatory from day 30), self-cure eligibility, and a
+  `resolveOutcome()` that closes a case to exactly one of `cured`,
+  `restructured`, `write_off` (human-approved only, day 91+), or `open`.
+- **`promise-to-pay.service.js`** — self-service promise capture and
+  kept/broken evaluation, cents-only integer money.
+- **`restructure-offer.service.js`** + **`utils/restructure-policy.js`** —
+  restructure offers sharing the existing 25% cost-increase cap with
+  `outcome-gate.service.js` from one dependency-free shared constant
+  (extracted so a pure-arithmetic module does not have to pull in a live
+  database connection just to read a number).
+- **`bureau-reporting.service.js`** + **`adapters/credit-bureau.adapter.js`**
+  (mock) — reports arrears to a registered credit bureau at 30+ days
+  overdue, the strongest recovery lever for a book with a ≤R850 average
+  facility.
+- **`external-referral.service.js`** + **`adapters/debt-collector.adapter.js`**
+  (mock) — proportionality-gated referral to a registered debt collector or
+  attorney: never automatic, always human-approved, only at 90+ days
+  overdue and above a R500 balance floor.
+- **`GET /api/providers/dashboard/collections-summary`** — aggregate-only,
+  read-only provider visibility (overdue count, open cases, cured count,
+  cure rate). No patient-level detail is ever returned.
+- **Migration `010_recovery_engine.sql`** — extends `collections` with gate
+  tracking; adds `promise_to_pay`, `restructure_offers`, `bureau_reports`,
+  `external_referrals`.
+
+### Changed
+- `outcome-gate.service.js` now imports `MAX_RESTRUCTURE_COST_INCREASE`
+  from the new `utils/restructure-policy.js` instead of defining it inline
+  — same exported value, no behavior change.
+
+### Test-first workflow
+6 new test files, 56 new assertions, written and confirmed failing before
+any implementation existed (CLAUDE.md test-first requirement). Full suite:
+666 tests, 665 passing — the one failure (`email-service.test.js`,
+`nodemailer` unresolvable without registry access) is pre-existing and
+unrelated to this release.
+
+### Bot crawling prevention review (required at every MINOR/MAJOR bump)
+No changes needed — the new route inherits the global `X-Robots-Tag`, rate
+limiting, bot fingerprinting, and honeypot middleware already in front of
+every `/api/*` route, and is gated by `authenticateToken` +
+`requireRole('provider')`.
+
+---
+
 ## [v1.9.0] — 2026-08-01
 
 **Type**: MINOR — new API surface, new page, new security modules
