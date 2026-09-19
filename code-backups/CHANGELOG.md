@@ -6,6 +6,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.10.2] — 2026-09-19
+
+**Type**: PATCH — bug fixes to lender webhook delivery and scoring
+
+### Summary
+Fixes three gaps surfaced while diagramming a lender's path through the
+marketplace engine: the outbound lender webhook was never actually sent
+(only logged); a lender was never told whether they won or lost a bid;
+and the bid-coverage hard rule (`LENDER_HARD_RULES.min_bid_coverage_pct`)
+had no code computing it despite the column already existing. Each was
+reproduced with a failing test before the fix. Also fixes a fourth
+instance, found in the same function, of the `status` schema-vocabulary
+bug class from v1.10.1 (`'funded'` is not a real `lender_offer_status`
+value — corrected to `'ACCEPTED'`).
+
+### Fixed
+- `backend/src/services/marketplace-auction.service.js`:
+  `sendLoanPackageToLender()` now actually POSTs the webhook, signed with
+  the lender's decrypted API key (was: commented out, and would have
+  signed with the encrypted ciphertext); `acceptOffer()` now notifies
+  every bidding lender of `offer.won`/`offer.lost` after the transaction
+  commits, via a new `notifyOfferOutcomes()` helper
+- `backend/src/services/lender-gate.service.js`: `scoreLender()` now
+  computes and persists `bid_coverage_pct`, and fixes `status = 'funded'`
+  → `status = 'ACCEPTED'`
+
+### Added
+- `tests/unit/marketplace-lender-gate.test.js`: 6 new test-first
+  assertions (678 total, 677 pass — the one pre-existing `nodemailer`
+  environment failure, unrelated)
+
+---
+
 ## [v1.10.1] — 2026-09-16
 
 **Type**: PATCH — bug fixes to marketplace / Shield Gate 3
