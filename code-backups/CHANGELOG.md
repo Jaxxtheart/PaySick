@@ -6,6 +6,75 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.11.0] — 2026-09-19
+
+**Type**: MINOR — UX/trust fixes plus one new user-facing capability
+
+### Summary
+Ships the fixes from an executive UX audit of the onboarding → daily-use
+customer journey. The audit's core finding: the marketing promise, the
+onboarding promise, and what the backend actually did were three different
+products, and that gap is where trust and revenue leak. Each finding was
+verified directly against the live code before fixing — two of the
+original findings turned out to already be resolved (marketplace-apply.html
+already collects and submits affordability data) or to concern only dead
+code (`backend/src/routes/applications.js`'s income defaults, unreachable
+from any live page), so no change was made for those. All six real fixes
+below were built test-first per CLAUDE.md.
+
+### Fixed
+- **README.md** — removed the unconditional "Instant Approval up to R850"
+  and "under 60 seconds" claims, which matched neither `marketplace.js`'s
+  real R1,000-R500,000 range nor the real three-outcome (approve/decline/
+  review) risk-assessment flow.
+- **`onboarding.html`** — removed the "legacy direct-onboarding path" that
+  fabricated a placeholder email (`@example.com`) and a fake 13-digit SA ID
+  number (phone digits, zero-padded) for any authenticated user who reached
+  onboarding without real registration data, then submitted that fabricated
+  data to `/api/users/register`. Such a user is now redirected to
+  `register.html` instead.
+- **`payment-success.html`** — corrected the claim that a payment "will
+  reflect on your dashboard within 24 hours"; `dashboard.html` fetches
+  plans/upcoming payments live on every load, so there is no such lag.
+
+### Added
+- **Late-fee preview before payment** — `api-client.js` gains
+  `payments.getFeePreview()`, wired into `make-payment.html`'s load path,
+  so an overdue payment shows its late fee (already computed server-side by
+  the existing `GET /payments/:id/fee-preview`) *before* the user clicks
+  Pay Now, not only after on the receipt.
+- **Repeat-application banner on `dashboard.html`** — a prominent
+  main-content CTA to `marketplace-apply.html`, shown when the user has
+  zero active plans or an active plan is ≥66% paid off. Previously this
+  path existed only as a side-menu link at the same tier as "Support",
+  despite being the platform's highest-LTV action for a good-standing
+  customer.
+
+### Changed
+- **`dashboard.html`** — extracted the hardcoded demo-mode fixture
+  (`loadDemoData()`, `getDemoNotifications()`) into `js/demo-data.js`, so
+  fabricated financial data is no longer inlined in the same file that
+  renders real users' balances.
+
+### Tests
+6 new test-first suites in `tests/unit/`: `readme-accuracy`,
+`onboarding-identity-integrity`, `fee-preview-surfaced`,
+`payment-success-accuracy`, `dashboard-repeat-application-cta`,
+`dashboard-demo-data-isolation`. All pass. This branch merged `main` after
+v1.10.1/v1.10.2 landed there (see below); full suite re-run on the merged
+tree is 692 tests, 690 pass, 2 fail, both pre-existing and unrelated to
+this release: `email-service.test.js` (`nodemailer` unresolvable, no
+registry access in this sandbox) and `marketplace-lender-gate.test.js`
+(`pg` unresolvable, same cause) — reproduced identically on the pre-merge
+tree.
+
+### Removed / Deprecated
+None. The onboarding fabrication fallback removed above was an unreleased
+internal path, not a documented feature, so it carries no deprecation
+notice.
+
+---
+
 ## [v1.10.2] — 2026-09-19
 
 **Type**: PATCH — bug fixes to lender webhook delivery and scoring
