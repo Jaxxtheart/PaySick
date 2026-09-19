@@ -448,7 +448,7 @@ router.post('/offers/:offerId/accept', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Accept offer error:', error);
-    res.status(500).json({ error: error.message || 'Failed to accept offer' });
+    res.status(error.statusCode || 500).json({ error: error.message || 'Failed to accept offer' });
   }
 });
 
@@ -570,7 +570,7 @@ router.post('/webhooks/offer-response', validateWebhookSignature, async (req, re
 
   } catch (error) {
     console.error('Webhook error:', error);
-    res.status(500).json({ error: error.message || 'Failed to process webhook' });
+    res.status(error.statusCode || 500).json({ error: error.message || 'Failed to process webhook' });
   }
 });
 
@@ -638,7 +638,7 @@ router.post('/admin/manual-offers', [authenticateToken, requireAdmin], async (re
 
   } catch (error) {
     console.error('Manual offer error:', error);
-    res.status(500).json({ error: error.message || 'Failed to create offer' });
+    res.status(error.statusCode || 500).json({ error: error.message || 'Failed to create offer' });
   }
 });
 

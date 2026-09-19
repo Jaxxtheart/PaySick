@@ -5,12 +5,19 @@
 
 ---
 
-## Changes from v1.10.0
+## Changes from v1.10.2
 
 Frontend-only release. No new routes, tables, or services; no schema
 migration. Six targeted fixes to the existing onboarding → daily-use
 customer journey, found by an executive UX audit and verified against the
 live code before implementing.
+
+This branch was developed off v1.10.0 and merged with `main` after v1.10.1
+and v1.10.2 landed there (both PATCH-level marketplace/lender-gate
+hardening — see their own RELEASE_NOTES.md). This snapshot reflects that
+merge; v1.11.0's own changes are entirely on the pages diagrammed below and
+never touch `marketplace-auction.service.js`, `lender-gate.service.js`,
+`marketplace.js`, or `server.js`.
 
 ```
 register.html ──▶ verify-email.html ──▶ onboarding.html ──▶ dashboard.html
@@ -132,23 +139,31 @@ tests/unit/
    ├── payment-success-accuracy.test.js            [NEW]
    ├── dashboard-repeat-application-cta.test.js    [NEW]
    ├── dashboard-demo-data-isolation.test.js       [NEW]
-   └── ... (all v1.10.0 suites, unchanged)
+   ├── marketplace-lender-gate.test.js             [from v1.10.1/v1.10.2, merged]
+   └── ... (all v1.10.2 suites, unchanged)
 ```
 
 Runner: `node --test tests/unit/*.test.js`. All 6 new suites were written
-and confirmed failing before their corresponding fix, per CLAUDE.md.
+and confirmed failing before their corresponding fix, per CLAUDE.md. Full
+suite re-run after merging v1.10.1/v1.10.2 into this branch: 692 tests,
+690 pass, 2 fail — both pre-existing and unrelated (see note below).
 
-**Environmental note (unchanged from v1.9.0/v1.10.0)**:
-`tests/unit/email-service.test.js` cannot resolve `nodemailer` in this
-sandbox (no `node_modules` installed, registry unreachable) and fails
-there regardless of application code — verified unaffected by this
-release's changes by reproducing the same failure against the pre-change
-tree.
+**Environmental note (unchanged from v1.9.0 onward, worse in this
+sandbox than in v1.10.2's)**: no `node_modules` are installed anywhere in
+this repo (no npm registry access), so any test file requiring a package
+that isn't vendored fails at `require()` time regardless of application
+code: `tests/unit/email-service.test.js` (`nodemailer`) and
+`tests/unit/marketplace-lender-gate.test.js` (`pg`, via
+`backend/src/config/database.js`). v1.10.2 recorded only the `nodemailer`
+failure because `pg` happened to be installed in the sandbox that cut that
+release; it is not installed in this one. Both failures were reproduced
+identically against the pre-merge tree, confirming neither is a regression
+from this release's changes.
 
 ---
 
-## Platform architecture (unchanged from v1.10.0)
+## Platform architecture (unchanged from v1.10.2)
 
-See [v1.10.0/ARCHITECTURE.md](../v1.10.0/ARCHITECTURE.md) for the full
+See [v1.10.2/ARCHITECTURE.md](../v1.10.2/ARCHITECTURE.md) for the full
 request path, Recovery Engine, bot-protection layer, and `/api/v1`
 facilitation surface, which this release inherits without modification.

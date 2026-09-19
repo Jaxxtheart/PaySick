@@ -197,6 +197,7 @@ const v1Limiter = rateLimit({
 
 app.use('/api/', globalLimiter);
 app.use('/api/v1', v1Limiter);
+app.use('/v2/shield', globalLimiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);
 app.use('/api/users/demo-login', authLimiter);

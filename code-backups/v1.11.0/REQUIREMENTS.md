@@ -3,9 +3,14 @@
 **Version**: 1.11.0
 **Date**: 2026-09-19
 
-Carries forward all requirements from v1.10.0 and its predecessors, and adds
+Carries forward all requirements from v1.10.2 and its predecessors, and adds
 the requirements below from an executive UX audit of the onboarding →
 daily-use customer journey.
+
+Note: this branch was developed off v1.10.0 and merged with `main` after
+v1.10.1 and v1.10.2 (marketplace/lender-gate hardening, both PATCH) had
+landed there. The merge is reflected in this snapshot and in the version
+history below, but none of v1.11.0's own changes touch that code path.
 
 ---
 
@@ -57,8 +62,8 @@ daily-use customer journey.
 
 ## Inherited Requirements
 
-All requirements from v1.10.0 remain in effect. See
-[v1.10.0/REQUIREMENTS.md](../v1.10.0/REQUIREMENTS.md).
+All requirements from v1.10.2 remain in effect. See
+[v1.10.2/REQUIREMENTS.md](../v1.10.2/REQUIREMENTS.md).
 
 ---
 

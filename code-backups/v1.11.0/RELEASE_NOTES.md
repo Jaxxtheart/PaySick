@@ -19,6 +19,12 @@ All six changes were built test-first per CLAUDE.md: a failing test was
 written and confirmed to fail against the pre-fix code, then the
 implementation was added until it passed.
 
+This branch was developed off v1.10.0 and merged with `main` once open to
+resolve conflicts against v1.10.1 and v1.10.2 (PATCH — marketplace/
+lender-gate hardening), which had landed there in the meantime. That merge
+is folded into this snapshot; none of v1.11.0's own changes touch the
+marketplace/lender-gate code those two PATCHes fixed.
+
 ## Fixed
 
 - **README.md overstated the product.** "Instant Approval up to R850" and

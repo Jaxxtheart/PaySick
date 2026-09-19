@@ -170,9 +170,9 @@ class LenderGateService {
       );
 
       const marketplaceResult = await query(
-        `SELECT COALESCE(SUM(loan_amount), 0) AS marketplace_total
+        `SELECT COALESCE(SUM(principal_amount), 0) AS marketplace_total
          FROM marketplace_loans
-         WHERE status IN ('funded', 'active', 'repaying')`
+         WHERE status IN ('PENDING_DISBURSEMENT', 'ACTIVE', 'CURRENT', 'DELINQUENT', 'DEFAULT', 'RESTRUCTURED')`
       );
 
       const totalBook = parseFloat(totalResult.rows[0]?.total_book || 0);
@@ -211,7 +211,7 @@ class LenderGateService {
          FROM lenders l
          LEFT JOIN lender_scores ls ON l.lender_id = ls.lender_id
            AND ls.period_end = (SELECT MAX(period_end) FROM lender_scores WHERE lender_id = l.lender_id)
-         WHERE l.status = 'active'
+         WHERE l.active = true
            AND (ls.concentration_pct IS NULL OR ls.concentration_pct < $1)
          ORDER BY ls.composite_score DESC NULLS LAST`,
         [LENDER_HARD_RULES.max_lender_concentration_pct]
@@ -219,7 +219,7 @@ class LenderGateService {
 
       return result.rows.map(lender => ({
         lender_id: lender.lender_id,
-        lender_name: lender.institution_name || lender.lender_name,
+        lender_name: lender.name,
         composite_score: lender.composite_score,
         concentration_pct: lender.concentration_pct || 0,
         rate_band: {
@@ -242,10 +242,10 @@ class LenderGateService {
     try {
       const metricsResult = await query(
         `SELECT
-           COUNT(*) FILTER (WHERE status = 'funded') AS funded_count,
+           COUNT(*) FILTER (WHERE status = 'ACCEPTED') AS funded_count,
            COUNT(*) AS total_offers,
            AVG(interest_rate) AS avg_rate,
-           COUNT(*) FILTER (WHERE status = 'funded')::FLOAT /
+           COUNT(*) FILTER (WHERE status = 'ACCEPTED')::FLOAT /
              NULLIF(COUNT(*), 0) AS approval_rate
          FROM lender_offers
          WHERE lender_id = $1
@@ -254,6 +254,25 @@ class LenderGateService {
       );
 
       const metrics = metricsResult.rows[0] || {};
+
+      // Bid coverage: of the times this lender was actually presented a loan
+      // package (the lender_notified audit event from sendLoanPackageToLender),
+      // how many did they bid on at all? Declining — or never responding —
+      // never creates a lender_offers row, so it's excluded from the count
+      // above but still counts as "presented" here.
+      const presentedResult = await query(
+        `SELECT COUNT(*) AS presented_count
+         FROM marketplace_audit_log
+         WHERE entity_type = 'loan_application'
+           AND action = 'lender_notified'
+           AND created_at BETWEEN $2 AND $3
+           AND new_values->>'lenderId' = $1`,
+        [lenderId, periodStart, periodEnd]
+      );
+
+      const presentedCount = parseInt(presentedResult.rows[0]?.presented_count) || 0;
+      const totalOffers = parseInt(metrics.total_offers) || 0;
+      const bidCoveragePct = presentedCount > 0 ? (totalOffers / presentedCount) * 100 : 0;
 
       // Scoring components (each 0-100)
       const approvalScore = this.scoreApprovalRate(parseFloat(metrics.approval_rate) || 0);
@@ -268,21 +287,22 @@ class LenderGateService {
 
       await query(
         `INSERT INTO lender_scores
-         (lender_id, approval_rate, avg_rate_charged,
+         (lender_id, approval_rate, avg_rate_charged, bid_coverage_pct,
           composite_score, total_loans_funded,
           period_start, period_end)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           lenderId,
           parseFloat(metrics.approval_rate) || 0,
           parseFloat(metrics.avg_rate) || 0,
+          bidCoveragePct,
           composite,
           parseInt(metrics.funded_count) || 0,
           periodStart, periodEnd
         ]
       );
 
-      return { lender_id: lenderId, composite_score: composite };
+      return { lender_id: lenderId, composite_score: composite, bid_coverage_pct: bidCoveragePct };
     } catch (err) {
       console.error('Lender scoring failed:', err.message);
       return null;
@@ -336,13 +356,13 @@ class LenderGateService {
       const result = await query(
         `SELECT
            l.lender_id,
-           l.institution_name,
+           l.name AS institution_name,
            COUNT(ml.loan_id) AS loan_count,
-           COALESCE(SUM(ml.loan_amount), 0) AS total_value
+           COALESCE(SUM(ml.principal_amount), 0) AS total_value
          FROM lenders l
          LEFT JOIN marketplace_loans ml ON l.lender_id = ml.lender_id
-           AND ml.status IN ('funded', 'active', 'repaying')
-         GROUP BY l.lender_id, l.institution_name
+           AND ml.status IN ('PENDING_DISBURSEMENT', 'ACTIVE', 'CURRENT', 'DELINQUENT', 'DEFAULT', 'RESTRUCTURED')
+         GROUP BY l.lender_id, l.name
          ORDER BY total_value DESC`
       );
       lenderConcentration = result.rows;

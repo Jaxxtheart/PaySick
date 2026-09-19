@@ -13,6 +13,8 @@
 const { query, transaction } = require('../config/database');
 const EventEmitter = require('events');
 const crypto = require('crypto');
+const { lenderGateService } = require('./lender-gate.service');
+const { decryptBankingData } = require('./security.service');
 
 class MarketplaceAuctionService extends EventEmitter {
   constructor() {
@@ -245,18 +247,24 @@ class MarketplaceAuctionService extends EventEmitter {
           callback_url: `${process.env.API_BASE_URL || 'https://api.paysick.co.za'}/api/marketplace/webhooks/offer-response`
         };
 
-        // Note: In production, use a proper HTTP client like axios
-        console.log(`📤 Would send webhook to ${lender.name}:`, webhookPayload);
+        // Lenders sign our webhooks the same way we sign theirs (marketplace.js's
+        // validateWebhookSignature): with the plaintext API key, not the
+        // AES-encrypted value stored in api_key_encrypted.
+        const apiKey = decryptBankingData(lender.api_key_encrypted);
+        const signature = this.generateWebhookSignature(apiKey, webhookPayload);
 
-        // Uncomment for production:
-        // const response = await fetch(lender.webhook_url, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'X-PaySick-Signature': this.generateWebhookSignature(lender.api_key_encrypted, webhookPayload)
-        //   },
-        //   body: JSON.stringify(webhookPayload)
-        // });
+        const response = await fetch(lender.webhook_url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-PaySick-Signature': signature
+          },
+          body: JSON.stringify(webhookPayload)
+        });
+
+        if (!response.ok) {
+          console.error(`❌ ${lender.name} rejected the loan package webhook: HTTP ${response.status}`);
+        }
 
       } catch (error) {
         console.error(`❌ Failed to notify ${lender.name}:`, error);
@@ -355,6 +363,19 @@ class MarketplaceAuctionService extends EventEmitter {
       lenderNotes,
       conditions
     } = params;
+
+    // ── POLICY GATE: marketplace rate cap ─────────────────────────────
+    // This is the ONLY function that writes to lender_offers, so this is
+    // the one place the 22.25% cap (LENDER_HARD_RULES.max_rate_apr) has to
+    // be enforced — whether the rate came from a lender's signed webhook,
+    // an ops manual entry, or the balance-sheet auto-bidder.
+    const rateCheck = lenderGateService.validateRate(rate);
+    if (!rateCheck.valid) {
+      const err = new Error(rateCheck.reason);
+      err.statusCode = 400;
+      throw err;
+    }
+    // ───────────────────────────────────────────────────────────────────
 
     // Calculate payment details
     const monthlyPayment = this.calculateMonthlyPayment(amount, rate, term);
@@ -455,7 +476,7 @@ class MarketplaceAuctionService extends EventEmitter {
    * Accept an offer and create the loan
    */
   async acceptOffer(offerId, userId) {
-    return await transaction(async (client) => {
+    const result = await transaction(async (client) => {
       // Get offer details
       const offerResult = await client.query(
         `SELECT lo.*, la.user_id, la.provider_id
@@ -466,14 +487,35 @@ class MarketplaceAuctionService extends EventEmitter {
       );
 
       if (offerResult.rows.length === 0) {
-        throw new Error('Offer not found or no longer available');
+        const err = new Error('Offer not found or no longer available');
+        err.statusCode = 404;
+        throw err;
       }
 
       const offer = offerResult.rows[0];
 
       // Verify user owns this application
       if (offer.user_id !== userId) {
-        throw new Error('Unauthorized');
+        const err = new Error('Unauthorized');
+        err.statusCode = 403;
+        throw err;
+      }
+
+      // Lock the parent application for the rest of this transaction. Two
+      // concurrent accepts on two different PENDING offers for the same
+      // application both pass the check above; only one of them can hold
+      // this lock at a time, and whichever gets it second sees the status
+      // the first one already committed and backs out instead of also
+      // creating a loan.
+      const lockedAppResult = await client.query(
+        `SELECT status FROM loan_applications WHERE application_id = $1 FOR UPDATE`,
+        [offer.application_id]
+      );
+
+      if (lockedAppResult.rows[0]?.status === 'OFFER_SELECTED') {
+        const err = new Error('Application already has a selected offer');
+        err.statusCode = 409;
+        throw err;
       }
 
       // Update offer status to ACCEPTED
@@ -549,8 +591,62 @@ class MarketplaceAuctionService extends EventEmitter {
       // Create repayment schedule
       await this.createRepaymentSchedule(client, loanId, offer);
 
-      return { loanId, offerId, applicationId: offer.application_id };
+      // Every lender who bid on this application — winner and losers alike —
+      // gets notified once the decision is final. Read within the same
+      // transaction so it reflects the ACCEPTED/DECLINED updates above.
+      const offersForNotification = await client.query(
+        `SELECT lo.offer_id, lo.status, l.lender_id, l.name, l.webhook_url, l.api_key_encrypted
+         FROM lender_offers lo
+         JOIN lenders l ON lo.lender_id = l.lender_id
+         WHERE lo.application_id = $1`,
+        [offer.application_id]
+      );
+
+      return {
+        loanId,
+        offerId,
+        applicationId: offer.application_id,
+        offersForNotification: offersForNotification.rows
+      };
     });
+
+    // Webhook delivery is network I/O and must not happen while holding the
+    // DB transaction's connection. It runs after commit, best-effort: a
+    // lender's unreachable webhook must never undo an already-accepted loan.
+    const { offersForNotification, ...publicResult } = result;
+    await this.notifyOfferOutcomes(offersForNotification);
+    return publicResult;
+  }
+
+  /**
+   * Tell every lender who bid on an application whether they won or lost,
+   * now that the patient has picked an offer. Best-effort: one lender's
+   * unreachable webhook must not stop the others from being notified.
+   */
+  async notifyOfferOutcomes(offers) {
+    await Promise.allSettled((offers || []).filter((o) => o.webhook_url).map(async (o) => {
+      const payload = {
+        event: o.status === 'ACCEPTED' ? 'offer.won' : 'offer.lost',
+        offer_id: o.offer_id
+      };
+      try {
+        const apiKey = decryptBankingData(o.api_key_encrypted);
+        const signature = this.generateWebhookSignature(apiKey, payload);
+        const response = await fetch(o.webhook_url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-PaySick-Signature': signature
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          console.error(`❌ ${o.name} rejected the offer-outcome webhook: HTTP ${response.status}`);
+        }
+      } catch (error) {
+        console.error(`❌ Failed to notify ${o.name} of offer outcome:`, error.message);
+      }
+    }));
   }
 
   /**

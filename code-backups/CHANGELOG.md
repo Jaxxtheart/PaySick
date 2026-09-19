@@ -60,15 +60,95 @@ below were built test-first per CLAUDE.md.
 6 new test-first suites in `tests/unit/`: `readme-accuracy`,
 `onboarding-identity-integrity`, `fee-preview-surfaced`,
 `payment-success-accuracy`, `dashboard-repeat-application-cta`,
-`dashboard-demo-data-isolation`. All pass. Full suite re-run confirms no
-regressions; `email-service.test.js`'s pre-existing `nodemailer`-not-found
-failure (no network to the npm registry in this sandbox) was reproduced
-identically on the pre-change tree, confirming it is unrelated.
+`dashboard-demo-data-isolation`. All pass. This branch merged `main` after
+v1.10.1/v1.10.2 landed there (see below); full suite re-run on the merged
+tree is 692 tests, 690 pass, 2 fail, both pre-existing and unrelated to
+this release: `email-service.test.js` (`nodemailer` unresolvable, no
+registry access in this sandbox) and `marketplace-lender-gate.test.js`
+(`pg` unresolvable, same cause) — reproduced identically on the pre-merge
+tree.
 
 ### Removed / Deprecated
 None. The onboarding fabrication fallback removed above was an unreleased
 internal path, not a documented feature, so it carries no deprecation
 notice.
+
+---
+
+## [v1.10.2] — 2026-09-19
+
+**Type**: PATCH — bug fixes to lender webhook delivery and scoring
+
+### Summary
+Fixes three gaps surfaced while diagramming a lender's path through the
+marketplace engine: the outbound lender webhook was never actually sent
+(only logged); a lender was never told whether they won or lost a bid;
+and the bid-coverage hard rule (`LENDER_HARD_RULES.min_bid_coverage_pct`)
+had no code computing it despite the column already existing. Each was
+reproduced with a failing test before the fix. Also fixes a fourth
+instance, found in the same function, of the `status` schema-vocabulary
+bug class from v1.10.1 (`'funded'` is not a real `lender_offer_status`
+value — corrected to `'ACCEPTED'`).
+
+### Fixed
+- `backend/src/services/marketplace-auction.service.js`:
+  `sendLoanPackageToLender()` now actually POSTs the webhook, signed with
+  the lender's decrypted API key (was: commented out, and would have
+  signed with the encrypted ciphertext); `acceptOffer()` now notifies
+  every bidding lender of `offer.won`/`offer.lost` after the transaction
+  commits, via a new `notifyOfferOutcomes()` helper
+- `backend/src/services/lender-gate.service.js`: `scoreLender()` now
+  computes and persists `bid_coverage_pct`, and fixes `status = 'funded'`
+  → `status = 'ACCEPTED'`
+
+### Added
+- `tests/unit/marketplace-lender-gate.test.js`: 6 new test-first
+  assertions (678 total, 677 pass — the one pre-existing `nodemailer`
+  environment failure, unrelated)
+
+---
+
+## [v1.10.1] — 2026-09-16
+
+**Type**: PATCH — bug fixes to marketplace / Shield Gate 3
+
+### Summary
+Hardens the lender-marketplace code path against three bugs found in
+review: the 22.25% APR rate cap was defined but never enforced on any
+offer-write path; `acceptOffer()` could be raced by two concurrent accepts
+on the same application into creating two loans; and Gate 3's lender
+matching (`lender-gate.service.js`) queried columns that don't exist on
+the real `lenders`/`marketplace_loans` tables, so it silently returned
+zero lenders and 0% balance-sheet utilization on every call. All three
+were reproduced with a failing test before the fix (CLAUDE.md test-first
+workflow), then fixed, then proven passing. Also closes a rate-limiting
+gap on `/v2/shield/*`. No route, page, or table added or removed.
+
+### Fixed
+- `backend/src/services/marketplace-auction.service.js`: `createLenderOffer()`
+  now calls `lenderGateService.validateRate()` before every insert;
+  `acceptOffer()` now locks the parent application (`SELECT ... FOR UPDATE`)
+  before creating a loan and rejects (`409`) if it's already `OFFER_SELECTED`
+- `backend/src/services/lender-gate.service.js`: `findEligibleLenders()`,
+  `getPortfolioAllocation()`, and `checkBalanceSheetCapacity()` now query
+  the real column names and status values from `001_marketplace_tables.sql`
+- `backend/src/routes/marketplace.js`: webhook, manual-offer, and accept-offer
+  handlers now surface `error.statusCode` instead of always returning `500`
+- `backend/src/server.js`: `globalLimiter` now applies to `/v2/shield`
+- `backend/src/migrations/011_marketplace_loan_integrity.sql` (new): DB-level
+  backstops — a `CHECK` on `lender_offers.interest_rate` and a unique index
+  on `marketplace_loans(application_id)`
+
+### Added
+- `tests/unit/marketplace-lender-gate.test.js`: 6 new test-first assertions
+  (672 total, 671 pass in this sandbox — see release notes for the one
+  pre-existing, unrelated `nodemailer`-availability failure)
+
+### Flagged, not fixed
+- `marketplace-offers.html` and `lender-dashboard.html` still use loan/lender/APR
+  language that `v1.5.5` and `v1.7.1`–`v1.7.5` deliberately removed from
+  patient-facing surfaces for NCA-positioning reasons. See
+  `v1.10.1/RELEASE_NOTES.md` — this is a positioning decision, not fixed here.
 
 ---
 
