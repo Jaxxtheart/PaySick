@@ -6,6 +6,44 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.15.0] — 2026-09-21
+
+**Type**: MINOR — new capability (Care Agent becomes a real tool-calling LLM agent)
+
+### Summary
+"PaySick 2.0 as a harness for healthcare payments" -- per explicit user
+direction rejecting v1.14.0's local similarity engine as not agentic and
+choosing the full tool-calling architecture: the Care Agent's primary
+reasoning engine is now a real Anthropic Messages API tool-calling loop
+(care-agent-llm.service.js). The model reasons over the whole
+conversation and decides which of PaySick's own deterministic functions
+to call -- update_care_summary, get_shortfall, build_term_options -- and
+when. PaySick remains the harness: it defines the only tools that exist,
+executes every one itself, and independently re-validates every input
+(non-negative amounts, procedureTypeGuess restricted to the fixed known
+categories) before trusting it. No tool exists for anything that moves
+money; /confirm, /approve, /execute remain separate, deterministic,
+human-consent-gated routes, verified unreachable from the tool loop by a
+static test. Falls back to the deterministic engine (v1.13.4-v1.14.0)
+when ANTHROPIC_API_KEY is unset or the API call errors -- the patient is
+never left without a reply, and which path ran is always audited. See
+[v1.15.0/RELEASE_NOTES.md](./v1.15.0/RELEASE_NOTES.md).
+
+### Added
+- `care-agent-llm.service.js`: `runCareAgentTurn`, `CARE_AGENT_TOOLS`,
+  `executeTool`, `buildSystemPrompt`
+- `tests/unit/care-agent-llm.test.js` (25 assertions)
+- `tests/unit/care-agent-route-llm-wiring.test.js` (6 assertions)
+- 2 jest tests in `tests/integration/care-agent.test.js` (LLM path)
+
+### Changed
+- `POST /sessions/:id/messages`: LLM tool-calling agent is now the
+  primary path, with the v1.14.0 deterministic engine retained as a
+  resilience fallback; response no longer includes the unused `intent`
+  field
+
+---
+
 ## [v1.14.0] — 2026-09-21
 
 **Type**: MINOR — new capability (Care Agent procedure matching)
