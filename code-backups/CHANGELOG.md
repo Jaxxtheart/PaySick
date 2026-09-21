@@ -6,6 +6,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.0] — 2026-09-21
+
+**Type**: MINOR — new homepage feature (Google-style Care Agent search bar); reverts v1.12.1's CTA flip
+
+### Summary
+Corrects v1.12.1: the homepage hero's original call to action ("Get
+Started" / "Learn More", original copy) is fully restored, exactly as it
+read before v1.12.0. The Care Agent instead gets its own Google-style
+search bar in the hero — a centered, pill-shaped input a visitor types
+into and submits to start a conversation. Submitting routes to
+`care-agent.html?q=<query>`, which now auto-sends that text as the
+conversation's first message via the existing message endpoint (no new
+API). Built test-first: `homepage-agent-first-cta.test.js` rewritten and
+confirmed failing (7/8) against the v1.12.1 hero before implementing. See
+[v1.13.0/RELEASE_NOTES.md](./v1.13.0/RELEASE_NOTES.md).
+
+### Changed
+- `index.html` hero reverted to original CTA; `.hero-alt-link` CSS
+  removed
+- Hero paragraph: "three easy monthly payments" → "a payment plan that
+  works for you" (matches the Care Agent's flexible terms; scoped to the
+  hero only)
+### Added
+- `.agent-search` Google-style search bar in the hero
+- `care-agent.html` reads `?q=` and auto-sends it as the first message
+
+### Removed / Deprecated
+None as a feature — v1.12.1's CTA-flip amendment to CA-01 is itself
+superseded (see REQUIREMENTS.md).
+
+---
+
 ## [v1.12.1] — 2026-09-21
 
 **Type**: PATCH — homepage hero copy/CTA change
