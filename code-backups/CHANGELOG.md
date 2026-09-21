@@ -6,6 +6,50 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.0] — 2026-09-21
+
+**Type**: MINOR — new user-facing product surface (PaySick Care Agent)
+
+### Summary
+Adds PaySick Care Agent, an AI-native alternative front door to PaySick
+reachable from a new secondary link on the homepage, alongside the
+completely unchanged traditional apply-first journey. Organised around
+intent and outcomes (need → understand → construct → approve → execute →
+manage) rather than a form. "AI reasons, PaySick controls": all extraction
+and question-selection is a deterministic, in-repo regex/keyword engine
+(no external LLM), and every real financial decision and execution step
+reuses existing, unmodified services — patientGateService for the Shield
+Gate 2 affordability recommendation, and the existing
+`POST /api/marketplace/applications` endpoint for execution. Full audit
+trail of every extraction, confirmation, approval and execution. Built
+test-first per CLAUDE.md. See [v1.12.0/RELEASE_NOTES.md](./v1.12.0/RELEASE_NOTES.md)
+for full detail, including honesty notes on deliberate scope limits (no
+OCR, no self-service payment-date change) and this session's sandbox
+test-execution constraints.
+
+### Added
+- `care-agent.html` — six-stage conversational Care Agent UI
+- `backend/src/routes/care-agent.js` — `/api/care-agent/*`, fully
+  authenticated, own rate-limit bucket
+- `backend/src/services/care-agent-nlp.service.js`,
+  `backend/src/services/care-agent.service.js` — pure, DB-free, LLM-free
+  reasoning services
+- `backend/src/migrations/012_care_agent.sql` — sessions, audit log, and
+  manage-requests tables
+- `PaySickAPI.careAgent` in `api-client.js`
+- Secondary "Ask PaySick" entry point on `index.html`'s hero
+
+### Changed (hygiene)
+- `utils/affordability-policy.js` extracted from `patient-gate.service.js`
+  (same names/values, now DB-dependency-free) so the Care Agent can share
+  Shield's affordability comfort-zone threshold without pulling `pg` into
+  a pure unit-tested module
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.11.0] — 2026-09-19
 
 **Type**: MINOR — UX/trust fixes plus one new user-facing capability
