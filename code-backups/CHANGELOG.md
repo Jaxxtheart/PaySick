@@ -6,6 +6,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.4] — 2026-09-21
+
+**Type**: PATCH — bug fix (Care Agent treatment-question infinite loop)
+
+### Summary
+Fixes a reported infinite loop: the Care Agent's "What treatment or
+procedure is this for?" question repeated forever for any answer not
+matching one of ~14 hardcoded phrases. Followed CLAUDE.md's mandated
+bug-fixing workflow (failing test first, two independent subagent fix
+attempts in isolated worktrees, verified with a passing test). Two
+complementary fixes shipped: (1) per explicit follow-up direction, the
+finite recognized-procedure list is now shown as tappable chips
+(`procedureOptions` on the session/message API responses, rendered in
+care-agent.html) instead of left invisible — "aesthetic" and "nose job"
+(the exact reported phrases) were also added as recognized synonyms; (2)
+`mergeCareSummary()` gains a raw-text fallback (both subagents converged
+on this design independently) as a safety net for whatever the next
+unrecognized phrase turns out to be, capped at 200 chars, never
+fabricating a procedure category. See
+[v1.13.4/RELEASE_NOTES.md](./v1.13.4/RELEASE_NOTES.md).
+
+### Changed
+- `care-agent-nlp.service.js`: keyword dictionary restructured into
+  `PROCEDURE_CATEGORIES`; "aesthetic"/"nose job" added
+- `care-agent.service.js`: `mergeCareSummary()` raw-text fallback
+- `routes/care-agent.js`: exposes `procedureOptions`; passes message to
+  `mergeCareSummary()`
+- `care-agent.html`: new tappable procedure-option chips
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.13.3] — 2026-09-21
 
 **Type**: PATCH — real registration number supplied
