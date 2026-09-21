@@ -6,6 +6,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.3] — 2026-09-21
+
+**Type**: PATCH — real registration number supplied
+
+### Summary
+Follow-up to v1.13.2: the tariff-gap disclosure text's stale placeholder
+registration number ("2023/123456/07") is replaced with Tech and Artery
+(Pty) Ltd's real registration number, K2015/346764/07, in
+`backend/src/services/underwriting.service.js` (the only live file that
+carried one). Built test-first: `entity-registration-number.test.js`,
+confirmed failing (3/3) before editing. See
+[v1.13.3/RELEASE_NOTES.md](./v1.13.3/RELEASE_NOTES.md).
+
+### Changed
+- `backend/src/services/underwriting.service.js`: registration number
+  updated to K2015/346764/07
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.13.2] — 2026-09-21
 
 **Type**: PATCH — legal entity rename
