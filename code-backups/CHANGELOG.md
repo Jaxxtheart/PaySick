@@ -6,6 +6,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.6] — 2026-09-21
+
+**Type**: PATCH — bug fix (Care Agent opening message)
+
+### Summary
+Fixes the Care Agent's opening message per explicit feedback. Found two
+problems: `POST /sessions`' friendly fallback greeting was unreachable
+dead code (`nextQuestion({})` is never null, so `nextQuestion(summary) ||
+fallback` always picked the bare amount question instead), and that
+question still had an em dash the site-wide em-dash pass (v1.13.1) missed
+since backend service files weren't in its file scope. New brand-new
+sessions now always get an explicit `OPENING_GREETING` that introduces
+the agent, independent of `nextQuestion()`; per-turn follow-ups from the
+patient's first reply onward are unchanged. See
+[v1.13.6/RELEASE_NOTES.md](./v1.13.6/RELEASE_NOTES.md).
+
+### Changed
+- `routes/care-agent.js`: `POST /sessions` always returns a dedicated
+  `OPENING_GREETING`
+- `care-agent.service.js`: removed a leftover em dash from the amount
+  question
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.13.5] — 2026-09-21
 
 **Type**: PATCH — bug fix (silent Care Agent startup/send failures)
