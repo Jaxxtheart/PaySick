@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.1] — 2026-09-21
+
+**Type**: PATCH — homepage hero copy/CTA change
+
+### Summary
+Follow-up to v1.12.0, per explicit product direction: the PaySick Care
+Agent is now the homepage hero's primary "get started" CTA
+(`primary-btn`, linking to `care-agent.html`), not a secondary teaser.
+The traditional application journey (`login.html`) is never removed —
+it's demoted to a plain text link directly beneath the hero buttons.
+Site nav's own CTA is unchanged. Built test-first: 6 new assertions in
+`tests/unit/homepage-agent-first-cta.test.js`, confirmed failing before
+the hero markup changed. See
+[v1.12.1/RELEASE_NOTES.md](./v1.12.1/RELEASE_NOTES.md).
+
+### Changed
+- `index.html` hero: primary CTA now "Ask PaySick" → `care-agent.html`;
+  traditional "Get Started" → `login.html` demoted to a text link; hero
+  paragraph copy rewritten around the Care Agent's describe-your-situation
+  flow; `.ai-agent-teaser` CSS class renamed to `.hero-alt-link`
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.12.0] — 2026-09-21
 
 **Type**: MINOR — new user-facing product surface (PaySick Care Agent)
