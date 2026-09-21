@@ -6,6 +6,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.14.0] — 2026-09-21
+
+**Type**: MINOR — new capability (Care Agent procedure matching)
+
+### Summary
+Replaces the Care Agent's procedure-recognition fallback with a local,
+lightweight embedding-similarity matcher, per explicit user direction
+after being shown the previous engine was pure exact-substring dictionary
+lookup with a hardcoded confidence label, not anything probabilistic.
+Every category label/keyword set is precomputed into a character-trigram
+vector at module load; an incoming message is scored by sliding a
+2-to-4-word window across it and comparing by cosine similarity when no
+exact phrase is found. Recognizes near-miss phrasing ("nose procedure")
+and typos ("rhinoplastey") the old engine could not. Fully local -- no
+new npm dependency, no new API key -- since neither a real embeddings API
+key nor npm/internet access is available in this sandbox; the design is
+explicitly disclosed as a lexical (not semantic) technique and stays
+swappable for a real embeddings API later. See
+[v1.14.0/RELEASE_NOTES.md](./v1.14.0/RELEASE_NOTES.md).
+
+### Added
+- `care-agent-nlp.service.js`: `buildTrigramVector`, `cosineSimilarity`,
+  `findBestCategoryMatch`, `CATEGORY_EMBEDDINGS`
+- `extractCareRequest()`'s result gains `procedureTypeSimilarity` (0-1)
+- `tests/unit/care-agent-embedding-similarity.test.js` (14 assertions)
+
+### Changed
+- `extractProcedureType()`: falls back to fuzzy similarity matching
+  instead of giving up when no exact keyword phrase is present
+
+---
+
 ## [v1.13.6] — 2026-09-21
 
 **Type**: PATCH — bug fix (Care Agent opening message)

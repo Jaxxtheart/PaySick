@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PaySick Care Agent: describe the care you need help paying for and get a plain-language walkthrough of your options.">
+    <meta name="author" content="PaySick">
+    <title>PaySick Care Agent | Ask PaySick</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            color: #1A1A1A;
+            line-height: 1.5;
+            background: #FAFAFA;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #EEE;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header .brand {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        header .brand span { color: #E01E37; }
+
+        header a.back-link {
+            color: #4A4A4A;
+            text-decoration: none;
+            font-size: 14px;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            padding: 8px 16px;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        header a.back-link:hover { border-color: #E01E37; color: #E01E37; }
+
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px 20px 80px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .intro h1 { font-size: 28px; margin-bottom: 8px; }
+        .intro p { color: #666; font-size: 15px; }
+
+        /* ── Locked (not authenticated) state ───────────────────────────── */
+        .locked-card {
+            background: #fff;
+            border: 1px solid #EEE;
+            border-radius: 16px;
+            padding: 40px 28px;
+            text-align: center;
+        }
+
+        .locked-card p { color: #555; margin-bottom: 20px; }
+
+        .primary-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            display: inline-block;
+            background: white;
+            color: #1A1A1A;
+            padding: 12px 26px;
+            border-radius: 25px;
+            border: 2px solid #E8E8E8;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* ── Chat ─────────────────────────────────────────────────────── */
+        #chat-log {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+
+        .bubble.agent {
+            background: #fff;
+            border: 1px solid #EEE;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble.user {
+            background: #E01E37;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble.system {
+            background: #FFF5F6;
+            color: #7A2230;
+            align-self: center;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        #suggested-prompts,
+        #procedure-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-chip {
+            background: #fff;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .prompt-chip:hover { border-color: #E01E37; color: #E01E37; }
+
+        #composer {
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 16px;
+            background: #FAFAFA;
+            padding-top: 8px;
+        }
+
+        #composer input[type="text"] {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 24px;
+            border: 1px solid #DDD;
+            font-size: 15px;
+        }
+
+        #composer button, #upload-label {
+            background: #1A1A1A;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #upload-label { display: flex; align-items: center; background: white; color: #444; border: 1px solid #DDD; }
+        #file-input { display: none; }
+
+        /* ── Cards (summary / options / approve) ────────────────────────── */
+        .card {
+            background: #fff;
+            border: 1px solid #EEE;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 { font-size: 16px; margin-bottom: 12px; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #F3F3F3;
+            font-size: 14px;
+            gap: 12px;
+        }
+
+        .summary-row label { color: #777; flex-shrink: 0; }
+
+        .summary-row input {
+            border: 1px solid #DDD;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 14px;
+            text-align: right;
+            width: 60%;
+        }
+
+        .card-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .option-card {
+            border: 1px solid #EEE;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-card .amount { font-size: 20px; font-weight: 600; }
+        .option-card .meta { font-size: 13px; color: #777; }
+        .pressure-note { color: #B8620C; font-size: 13px; margin-top: 4px; }
+
+        .disclosure-list {
+            font-size: 14px;
+            color: #444;
+            margin: 12px 0;
+            padding-left: 18px;
+        }
+
+        .disclosure-list li { margin-bottom: 6px; }
+
+        .consent-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        #manage-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">Pay<span>Sick</span> Care Agent</div>
+        <a class="back-link" href="index.html">← Back to traditional PaySick</a>
+    </header>
+
+    <main>
+        <div class="intro">
+            <h1>How can I afford the care I need?</h1>
+            <p>Describe your situation and I'll help you work through the options. No long form up front.</p>
+        </div>
+
+        <!-- Locked state: shown when the visitor has no PaySick session.
+             Per CLAUDE.md, every Care Agent API call requires authentication,
+             so this page never shows business logic to a signed-out visitor. -->
+        <div id="locked-card" class="locked-card hidden">
+            <p>Ask PaySick is part of your PaySick account, so I can safely pull in your existing profile and Shield affordability checks. Log in (or register) to start.</p>
+            <a class="primary-btn" href="login.html">Log in to talk to PaySick</a>
+        </div>
+
+        <div id="app" class="hidden">
+            <div id="chat-log"></div>
+            <div id="suggested-prompts"></div>
+
+            <!-- The recognized procedure list is finite, so it's shown as
+                 tappable choices rather than left for the patient to guess
+                 phrasing against an invisible dictionary. Free text below
+                 still works for anything not listed. -->
+            <div id="procedure-options" class="hidden"></div>
+            <p id="procedure-options-hint" class="hidden" style="font-size:12px;color:#999;margin:-12px 0 16px;">Not listed? Just describe it below.</p>
+
+            <!-- Stage 2: editable, confirmable summary -->
+            <div id="summary-card" class="card hidden">
+                <h3>Your care request</h3>
+                <div id="summary-fields"></div>
+                <p id="shortfall-line" class="summary-row hidden" style="border:none;"></p>
+                <div class="card-actions">
+                    <button class="primary-btn" id="confirm-summary-btn">Confirm</button>
+                </div>
+            </div>
+
+            <!-- Stage 3: constructed options -->
+            <div id="options-card" class="card hidden">
+                <h3>Options that fit what you've told us</h3>
+                <p style="font-size:13px;color:#777;margin-bottom:12px;">Based on what you've told us, these are the options that appear to fit. Not a recommendation to pick any one of them.</p>
+                <div id="options-list"></div>
+                <div id="shield-note" class="bubble system hidden"></div>
+            </div>
+
+            <!-- Stage 4: explicit approval -->
+            <div id="approve-card" class="card hidden">
+                <h3>Before we go further</h3>
+                <p>You're about to submit this request through PaySick's application process. This requires sharing:</p>
+                <ul class="disclosure-list">
+                    <li><strong>What:</strong> the treatment description, quoted amount, and the monthly payment amount you selected.</li>
+                    <li><strong>With whom:</strong> PaySick's application processing, the same Shield-controlled process the traditional PaySick application uses.</li>
+                    <li><strong>For what purpose:</strong> to assess affordability and set up your payment plan.</li>
+                </ul>
+                <label class="consent-row">
+                    <input type="checkbox" id="consent-checkbox">
+                    <span>I consent to PaySick sharing this information to process my request.</span>
+                </label>
+                <div class="card-actions">
+                    <button class="primary-btn" id="approve-btn">Approve &amp; submit</button>
+                </div>
+            </div>
+
+            <!-- Stage 6: manage -->
+            <div id="manage-card" class="card hidden">
+                <h3>Manage your plan</h3>
+                <div id="manage-actions">
+                    <button class="secondary-btn" id="next-payment-btn">When's my next payment?</button>
+                    <button class="secondary-btn" id="change-date-btn">Change my payment date</button>
+                </div>
+            </div>
+
+            <div id="composer">
+                <label id="upload-label" for="file-input">Attach<input id="file-input" type="file" accept=".pdf,.jpg,.jpeg,.png"></label>
+                <input type="text" id="message-input" placeholder="Tell us what's happening. You can describe the treatment, upload a quote, or explain the bill you're dealing with.">
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="api-client.js"></script>
+    <script>
+        const SUGGESTED_PROMPTS = [
+            'I have a medical quote',
+            'I know what treatment I need',
+            'I already have a medical bill',
+            'I need help understanding my medical aid shortfall',
+            "I'm not sure what I can afford"
+        ];
+
+        const state = {
+            sessionId: null,
+            summary: {},
+            missingFields: [],
+            readyToConfirm: false,
+            options: [],
+            selectedTermMonths: null,
+            procedureOptions: []
+        };
+
+        function formatRands(cents) {
+            if (cents === null || cents === undefined) return '-';
+            return 'R' + (cents / 100).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function isAuthenticated() {
+            return !!localStorage.getItem('paysick_auth_token');
+        }
+
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined) node.textContent = text;
+            return node;
+        }
+
+        function addBubble(role, text) {
+            const log = document.getElementById('chat-log');
+            log.appendChild(el('div', `bubble ${role}`, text));
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function renderSuggestedPrompts() {
+            const container = document.getElementById('suggested-prompts');
+            container.innerHTML = '';
+            SUGGESTED_PROMPTS.forEach((prompt) => {
+                const chip = el('button', 'prompt-chip', prompt);
+                chip.addEventListener('click', () => sendMessage(prompt));
+                container.appendChild(chip);
+            });
+        }
+
+        // Shows the finite, recognized procedure list as tappable choices
+        // whenever that's the question currently pending, instead of
+        // leaving the patient to guess phrasing against an invisible list.
+        // Sending a chip's own label is guaranteed to be recognized (see
+        // the backend's own test coverage), so a tap always makes progress.
+        function updateProcedureOptions() {
+            const container = document.getElementById('procedure-options');
+            const hint = document.getElementById('procedure-options-hint');
+            const shouldShow = !state.readyToConfirm && state.missingFields.includes('treatmentDescription');
+
+            if (!shouldShow) {
+                container.classList.add('hidden');
+                hint.classList.add('hidden');
+                return;
+            }
+
+            container.innerHTML = '';
+            state.procedureOptions.forEach((option) => {
+                const chip = el('button', 'prompt-chip', option.label);
+                chip.addEventListener('click', () => sendMessage(option.label));
+                container.appendChild(chip);
+            });
+            container.classList.remove('hidden');
+            hint.classList.remove('hidden');
+        }
+
+        // Starts (or restarts) the conversation. Split out of init() so
+        // sendMessage() can call it too: if the first attempt to start a
+        // session failed, a patient typing anything and hitting Send must
+        // not just silently do nothing -- that's what made this "a
+        // non-starter in the process" when it broke in production.
+        async function startConversation() {
+            try {
+                const res = await PaySickAPI.careAgent.startSession();
+                state.sessionId = res.sessionId;
+                state.summary = res.summary || {};
+                state.missingFields = res.missingFields || [];
+                state.procedureOptions = res.procedureOptions || [];
+                addBubble('agent', res.reply);
+                updateProcedureOptions();
+                return true;
+            } catch (err) {
+                const detail = (err && err.message) || '';
+                if (/session expired|log in again/i.test(detail)) {
+                    // A stale/expired login token looks authenticated client-side
+                    // (isAuthenticated() only checks a token is present, not that
+                    // it's still valid) but fails server-side. Refreshing the page
+                    // won't fix that on its own -- say so plainly.
+                    addBubble('system', 'Your session has expired. Please log in again to continue.');
+                    const relogin = el('a', 'prompt-chip', 'Log in again');
+                    relogin.href = 'login.html';
+                    document.getElementById('chat-log').appendChild(relogin);
+                } else {
+                    addBubble('system', "I couldn't reach PaySick just now -- this may be a temporary connection issue.");
+                    const retry = el('button', 'prompt-chip', 'Try again');
+                    retry.addEventListener('click', async () => {
+                        retry.disabled = true;
+                        retry.textContent = 'Retrying...';
+                        const ok = await startConversation();
+                        if (ok) {
+                            retry.remove();
+                        } else {
+                            retry.disabled = false;
+                            retry.textContent = 'Try again';
+                        }
+                    });
+                    document.getElementById('chat-log').appendChild(retry);
+                }
+                return false;
+            }
+        }
+
+        async function init() {
+            if (!isAuthenticated()) {
+                document.getElementById('locked-card').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('app').classList.remove('hidden');
+            renderSuggestedPrompts();
+
+            const started = await startConversation();
+            if (!started) return;
+
+            // A query typed into the homepage's Google-style search bar
+            // arrives here as ?q= - send it as the conversation's first
+            // message automatically, same as if the patient had typed and
+            // sent it themselves.
+            const searchQuery = new URLSearchParams(window.location.search).get('q');
+            if (searchQuery && searchQuery.trim()) {
+                sendMessage(searchQuery.trim());
+            }
+        }
+
+        async function sendMessage(text) {
+            const message = (text || '').trim();
+            if (!message) return;
+
+            addBubble('user', message);
+            document.getElementById('message-input').value = '';
+
+            if (!state.sessionId) {
+                const recovered = await startConversation();
+                if (!recovered) {
+                    addBubble('system', "I still couldn't start the conversation -- try the button above, or refresh the page.");
+                    return;
+                }
+            }
+
+            try {
+                const res = await PaySickAPI.careAgent.sendMessage(state.sessionId, message);
+                state.summary = res.summary || {};
+                state.missingFields = res.missingFields || [];
+                state.readyToConfirm = res.readyToConfirm;
+                state.procedureOptions = res.procedureOptions || state.procedureOptions;
+                addBubble('agent', res.reply);
+                updateProcedureOptions();
+
+                if (state.readyToConfirm) {
+                    document.getElementById('suggested-prompts').classList.add('hidden');
+                    renderSummaryCard();
+                }
+            } catch (err) {
+                addBubble('system', "I couldn't process that just now. Please try again.");
+            }
+        }
+
+        function renderSummaryCard() {
+            const card = document.getElementById('summary-card');
+            const fields = document.getElementById('summary-fields');
+            fields.innerHTML = '';
+
+            const rows = [
+                { key: 'treatmentDescription', label: 'Treatment', type: 'text' },
+                { key: 'quotedAmountCents', label: 'Quoted amount (R)', type: 'rands' },
+                { key: 'schemeContributionCents', label: 'Medical aid contribution (R)', type: 'rands' }
+            ];
+
+            rows.forEach((row) => {
+                const wrap = el('div', 'summary-row');
+                wrap.appendChild(el('label', null, row.label));
+                const input = document.createElement('input');
+                input.dataset.key = row.key;
+                if (row.type === 'rands') {
+                    const cents = state.summary[row.key];
+                    input.type = 'number';
+                    input.step = '0.01';
+                    input.value = cents !== undefined && cents !== null ? (cents / 100).toFixed(2) : '';
+                } else {
+                    input.type = 'text';
+                    input.value = state.summary[row.key] || '';
+                }
+                wrap.appendChild(input);
+                fields.appendChild(wrap);
+            });
+
+            const shortfallLine = document.getElementById('shortfall-line');
+            const quoted = state.summary.quotedAmountCents;
+            const scheme = state.summary.schemeContributionCents;
+            if (quoted !== undefined && quoted !== null && scheme !== undefined && scheme !== null) {
+                shortfallLine.textContent = `Estimated shortfall: ${formatRands(quoted - scheme)}`;
+                shortfallLine.classList.remove('hidden');
+            } else {
+                shortfallLine.classList.add('hidden');
+            }
+
+            card.classList.remove('hidden');
+        }
+
+        async function confirmSummary() {
+            const inputs = document.querySelectorAll('#summary-fields input');
+            const edits = {};
+            inputs.forEach((input) => {
+                const key = input.dataset.key;
+                if (key === 'treatmentDescription') {
+                    if (input.value.trim()) edits[key] = input.value.trim();
+                } else if (input.value !== '') {
+                    edits[key] = Math.round(parseFloat(input.value) * 100);
+                }
+            });
+
+            try {
+                const res = await PaySickAPI.careAgent.confirmSummary(state.sessionId, { summary: edits });
+                state.summary = res.summary;
+                state.options = res.options;
+                document.getElementById('summary-card').classList.add('hidden');
+                renderOptionsCard(res);
+            } catch (err) {
+                if (err && err.message) addBubble('system', err.message);
+            }
+        }
+
+        function renderOptionsCard(res) {
+            const list = document.getElementById('options-list');
+            list.innerHTML = '';
+
+            res.options.forEach((opt) => {
+                const card = el('div', 'option-card');
+                const left = el('div');
+                left.appendChild(el('div', 'amount', `${formatRands(opt.monthlyPaymentCents)}/month`));
+                left.appendChild(el('div', 'meta', `${opt.termMonths}-month plan · total ${formatRands(opt.totalCostCents)} · 0% interest`));
+                if (opt.pressureWarning) {
+                    left.appendChild(el('div', 'pressure-note', 'This would likely create noticeable monthly pressure based on what you told us.'));
+                }
+                card.appendChild(left);
+
+                const selectBtn = el('button', 'secondary-btn', 'Select');
+                selectBtn.addEventListener('click', () => {
+                    state.selectedTermMonths = opt.termMonths;
+                    renderApproveCard(opt);
+                });
+                card.appendChild(selectBtn);
+                list.appendChild(card);
+            });
+
+            const shieldNote = document.getElementById('shield-note');
+            if (res.shieldAssessment) {
+                shieldNote.textContent = `PaySick's affordability check: ${res.shieldAssessment.decision}. This is a recommendation. Final decisions go through PaySick's standard review.`;
+                shieldNote.classList.remove('hidden');
+            } else {
+                shieldNote.textContent = "I haven't checked this against your affordability profile yet. You can still pick an option and PaySick will assess it during approval.";
+                shieldNote.classList.remove('hidden');
+            }
+
+            document.getElementById('options-card').classList.remove('hidden');
+        }
+
+        function renderApproveCard() {
+            document.getElementById('approve-card').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        async function approveAndExecute() {
+            const consent = document.getElementById('consent-checkbox').checked;
+            if (!consent) {
+                addBubble('system', 'Please check the consent box so PaySick can act on this request.');
+                return;
+            }
+
+            try {
+                const approveRes = await PaySickAPI.careAgent.approve(state.sessionId, {
+                    selectedTermMonths: state.selectedTermMonths,
+                    dataSharingAcknowledged: true
+                });
+
+                // Execution stays on the existing, unmodified marketplace
+                // endpoint - the Care Agent only prepared this payload.
+                const marketplaceRes = await PaySickAPI.marketplace.submitApplication(approveRes.applicationPayload);
+                const applicationId = marketplaceRes.applicationId;
+
+                await PaySickAPI.careAgent.recordExecution(state.sessionId, applicationId);
+
+                document.getElementById('approve-card').classList.add('hidden');
+                document.getElementById('options-card').classList.add('hidden');
+                addBubble('agent', `Done! Your request has been submitted (reference ${applicationId}). I'll stay here if you need anything else about this plan.`);
+                document.getElementById('manage-card').classList.remove('hidden');
+            } catch (err) {
+                addBubble('system', "I couldn't submit that just now. Please try again, or use the traditional PaySick application.");
+            }
+        }
+
+        async function showNextPayment() {
+            try {
+                const res = await PaySickAPI.careAgent.getManageStatus(state.sessionId);
+                addBubble('agent', res.reply);
+            } catch (err) {
+                addBubble('system', "I couldn't check your payment schedule just now.");
+            }
+        }
+
+        async function requestPaymentDateChange() {
+            const reason = window.prompt('What would you like your new payment date to work around? (optional)') || '';
+            try {
+                const res = await PaySickAPI.careAgent.requestPaymentDateChange(state.sessionId, reason);
+                addBubble('agent', res.reply);
+            } catch (err) {
+                addBubble('system', "I couldn't log that request just now.");
+            }
+        }
+
+        document.getElementById('send-btn').addEventListener('click', () => {
+            sendMessage(document.getElementById('message-input').value);
+        });
+        document.getElementById('message-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage(e.target.value);
+        });
+        document.getElementById('file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            addBubble('user', `📎 Attached: ${file.name}`);
+            addBubble('agent', "I can't read inside documents yet, so please tell me the quoted amount and treatment from it in your own words. I'll take it from there.");
+        });
+        document.getElementById('confirm-summary-btn').addEventListener('click', confirmSummary);
+        document.getElementById('approve-btn').addEventListener('click', approveAndExecute);
+        document.getElementById('next-payment-btn').addEventListener('click', showNextPayment);
+        document.getElementById('change-date-btn').addEventListener('click', requestPaymentDateChange);
+
+        init();
+    </script>
+
+    <noscript>
+        <p style="text-align:center;padding:40px;">The PaySick Care Agent needs JavaScript enabled to run. Please enable it, or use the <a href="marketplace-apply.html">traditional PaySick application</a> instead.</p>
+    </noscript>
+
+    <!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
+         Invisible to real users, screen readers and keyboard nav. Any client that
+         follows it hits GET /api/hp-check and is blocked for the session. -->
+    <a href="/api/hp-check" style="display:none" aria-hidden="true" tabindex="-1" rel="nofollow">Directory</a>
+</body>
+</html>
