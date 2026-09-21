@@ -6,6 +6,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.1] — 2026-09-21
+
+**Type**: PATCH — site-wide copy cleanup (payment-plan wording + em dash removal)
+
+### Summary
+Two copy-only passes, released together: (1) extends v1.13.0's hero fix
+("three easy monthly payments" → "a payment plan that works for you") to
+every other page that hardcoded a fixed 3-month term (index.html's
+features card and how-it-works step, about.html, README.md), and trims
+the hero paragraph further; (2) removes every em dash (—) from the live
+site — all root `*.html` pages plus `api-client.js`/`js/demo-data.js` —
+replaced with context-correct punctuation (period, comma, colon, pipe, or
+hyphen), never a blind find/replace. `terms-of-service.html`'s
+substantive legal clause about the product's real payment mechanics is
+explicitly left untouched and pinned by a guardrail test. Built
+test-first: `site-wide-payment-plan-copy.test.js` and
+`no-em-dashes.test.js`, both confirmed failing before their corresponding
+edits. See [v1.13.1/RELEASE_NOTES.md](./v1.13.1/RELEASE_NOTES.md).
+
+### Changed
+- Site-wide "3 month" → "payment plan" wording (index.html, about.html,
+  README.md, CUSTOM_SVG_ICONS.md)
+- Em dash removed from 27 HTML pages + api-client.js + js/demo-data.js
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.13.0] — 2026-09-21
 
 **Type**: MINOR — new homepage feature (Google-style Care Agent search bar); reverts v1.12.1's CTA flip
