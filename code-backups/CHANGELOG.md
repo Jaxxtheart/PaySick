@@ -6,6 +6,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.5] — 2026-09-21
+
+**Type**: PATCH — bug fix (silent Care Agent startup/send failures)
+
+### Summary
+Fixes a reported bug seen live: a Care Agent session-start failure showed
+a generic dead-end message with no diagnosis and no in-page recovery, and
+if that happened, typing a message and hitting Send did nothing at all
+(`sendMessage()`'s `if (!message || !state.sessionId) return;` silently
+discarded the input). Session-starting logic extracted into a reusable
+`startConversation()`, called from both `init()` and, as a recovery path,
+`sendMessage()`. An expired login session is now distinguished from a
+generic failure (with a direct "Log in again" link vs. a "Try again"
+retry button), and the patient's message is always shown, with recovery
+attempted, never silently dropped. See
+[v1.13.5/RELEASE_NOTES.md](./v1.13.5/RELEASE_NOTES.md) — including a note
+that the underlying server-side cause of the original failure couldn't be
+diagnosed from this sandbox (no access to production infrastructure).
+
+### Changed
+- `care-agent.html`: `startConversation()` extracted and reused;
+  actionable, distinct error states; `sendMessage()` never silently drops
+  input
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.13.4] — 2026-09-21
 
 **Type**: PATCH — bug fix (Care Agent treatment-question infinite loop)
