@@ -6,6 +6,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.2] — 2026-09-21
+
+**Type**: PATCH — legal entity rename
+
+### Summary
+Renames the registered company from "PaySick (Pty) Ltd" /
+"PaySick South Africa (Pty) Ltd" to "Tech and Artery (Pty) Ltd" across
+every legal/disclosure document (terms-of-service.html, privacy-policy.html,
+licenses.html, provider-billing-agreement.html, tariff-disclosure.html)
+and the two backend files that generate matching disclosure/email text
+(underwriting.service.js, email.service.js) — 16 occurrences, 7 files.
+The PaySick brand/product name itself is untouched throughout, producing
+the correct "Tech and Artery (Pty) Ltd, trading as PaySick" pattern. Built
+test-first: `legal-entity-rename.test.js`, confirmed failing (14/16)
+before editing. See [v1.13.2/RELEASE_NOTES.md](./v1.13.2/RELEASE_NOTES.md).
+
+### Changed
+- Legal entity name updated in 7 files (see RELEASE_NOTES.md for the
+  full list)
+
+### Removed / Deprecated
+None.
+
+---
+
 ## [v1.13.1] — 2026-09-21
 
 **Type**: PATCH — site-wide copy cleanup (payment-plan wording + em dash removal)
