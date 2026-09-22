@@ -6,6 +6,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.15.1] — 2026-09-22
+
+**Type**: PATCH — bug fix (homepage search-bar hint text size)
+
+### Summary
+Fixes the homepage search-bar's "Powered by the PaySick Care Agent..."
+caption rendering as large and dark as the hero paragraph above it, per
+explicit feedback. Root cause: the caption is a `<p>` tag, so `.hero p`'s
+rule (specificity 0,1,1) was silently outranking `.agent-search-hint`'s
+bare class rule (specificity 0,1,0), regardless of source order. Renamed
+the selector to `p.agent-search-hint` (ties the specificity, wins by
+source order) so its intended small, muted styling actually applies. See
+[v1.15.1/RELEASE_NOTES.md](./v1.15.1/RELEASE_NOTES.md).
+
+### Fixed
+- `index.html`: `.agent-search-hint` → `p.agent-search-hint`
+
+### Added
+- `tests/unit/homepage-search-hint-font-size.test.js` (4 assertions),
+  confirmed failing against the pre-fix file before the fix
+
+---
+
 ## [v1.15.0] — 2026-09-21
 
 **Type**: MINOR — new capability (Care Agent becomes a real tool-calling LLM agent)
