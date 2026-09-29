@@ -69,9 +69,10 @@ test('no em dashes anywhere in the deck (en dashes in ranges are allowed)', () =
   assert.ok(!deck.includes('—'), 'em dash (—) present in deck copy');
 });
 
-test('slide 15 ask updated to $8M with recalculated valuation', () => {
+// The $24M pre-money requirement was dropped when the ask was reframed as a
+// $250K request anchoring the $8M seed (see investor-deck-submission.test.js).
+test('slide 16 ask keeps the $8M seed round as context', () => {
   assert.ok(deck.includes('$8M') && deck.includes('$8 million'), 'ask amount not updated to $8M');
-  assert.ok(deck.includes('$24M'), 'pre-money valuation not recalculated');
   assert.ok(!deck.includes('R25M') && !deck.includes('Raising R25 million'), 'superseded R25M ask still present');
 });
 

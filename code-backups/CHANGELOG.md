@@ -6,6 +6,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.11.1] — 2026-09-29
+
+**Type**: PATCH — investor deck copy fixes for PDF submission
+
+### Fixed
+- `investor-deck.html`: duplicate `13 / 17` slide counter; unsupported 60-second approval and 24-hour payout claims (contradicted the 80/20 payout); self-contradictory R240B vs R259.3B market bullet; pending data integrations presented as live; Africa-expansion bullet inconsistent with the UK roadmap; roadmap dot overflow.
+
+### Changed
+- Ask reframed as a $250,000 request (40/30/20/10 split in dollars) anchoring the planned $8M seed; valuation/equity/runway terms removed until funding type is confirmed.
+
+### Tests
+- New `tests/unit/investor-deck-submission.test.js` (8 tests, written first); `investor-deck.test.js` no longer requires `$24M`.
+
+---
+
 ## [v1.11.0] — 2026-09-19
 
 **Type**: MINOR — UX/trust fixes plus one new user-facing capability

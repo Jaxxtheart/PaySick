@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility - PaySick</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAFAFA; color: #1A1A1A; }
+        .site-header { background: #1A1A1A; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo svg { width: 32px; height: 32px; }
+        .logo-text { font-size: 22px; font-weight: 400; color: #fff; letter-spacing: -0.5px; }
+        .logo-text span { font-weight: 300; color: #8A8A8A; }
+        .back-link { color: #FF4757; text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+        .back-link:hover { opacity: .75; }
+        .hero { background: linear-gradient(135deg, #FF4757 0%, #E01E37 100%); padding: 64px 40px 56px; text-align: center; color: #fff; }
+        .hero h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; }
+        .hero p { font-size: 16px; opacity: .88; }
+        .content { max-width: 860px; margin: 0 auto; padding: 64px 40px 80px; }
+        .effective { background: #FFF5F6; border-left: 3px solid #FF4757; padding: 14px 18px; border-radius: 0 6px 6px 0; margin-bottom: 48px; font-size: 14px; color: #4A4A4A; }
+        .effective strong { color: #E01E37; }
+        h2 { font-size: 20px; font-weight: 700; color: #1A1A1A; margin: 40px 0 14px; padding-bottom: 10px; border-bottom: 2px solid #F0F0F0; }
+        h2:first-of-type { margin-top: 0; }
+        h3 { font-size: 16px; font-weight: 600; color: #1A1A1A; margin: 24px 0 10px; }
+        p { font-size: 15px; line-height: 1.75; color: #3A3A3A; margin-bottom: 14px; }
+        ul { padding-left: 22px; margin-bottom: 14px; }
+        li { font-size: 15px; line-height: 1.75; color: #3A3A3A; margin-bottom: 6px; }
+        a { color: #FF4757; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .status-card { background: #fff; border: 1px solid #E5E5E5; border-radius: 10px; padding: 20px; }
+        .status-card .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #8A8A8A; margin-bottom: 8px; }
+        .status-card .value { font-size: 16px; font-weight: 600; color: #1A1A1A; }
+        .status-card.good { border-top: 3px solid #2ED573; }
+        .status-card.partial { border-top: 3px solid #FFA502; }
+        .contact-box { background: #F8F9FA; border-radius: 10px; padding: 24px; margin-top: 48px; }
+        .contact-box h3 { margin-top: 0; }
+        .contact-box p { margin-bottom: 6px; }
+        .site-footer { background: #1A1A1A; text-align: center; padding: 28px; color: #8A8A8A; font-size: 13px; }
+        .site-footer a { color: #FF4757; text-decoration: none; }
+        @media (max-width: 600px) { .site-header { padding: 14px 20px; } .hero { padding: 48px 20px 40px; } .content { padding: 40px 20px 60px; } }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <a class="logo" href="index.html" aria-label="PaySick home">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><radialGradient id="accCross" cx="40%" cy="40%"><stop offset="0%" style="stop-color:#FF4757"/><stop offset="100%" style="stop-color:#E01E37"/></radialGradient></defs>
+            <rect x="44" y="20" width="12" height="60" rx="6" fill="url(#accCross)"/>
+            <rect x="20" y="44" width="60" height="12" rx="6" fill="url(#accCross)"/>
+            <circle cx="50" cy="50" r="7" fill="#1A1A1A"/>
+            <circle cx="50" cy="50" r="5" fill="#E01E37"/>
+        </svg>
+        <div class="logo-text">Pay<span>Sick</span></div>
+    </a>
+    <a class="back-link" href="index.html">← Back to Home</a>
+</header>
+
+<div class="hero">
+    <h1>Accessibility</h1>
+    <p>Our commitment to making PaySick usable by everyone</p>
+</div>
+
+<main class="content">
+
+    <div class="effective">
+        <strong>Last reviewed:</strong> 3 March 2026 &nbsp;|&nbsp;
+        We are committed to <strong>WCAG 2.1 Level AA</strong> conformance across all PaySick web properties.
+    </div>
+
+    <h2>Our Commitment</h2>
+    <p>PaySick believes that healthcare financial services must be accessible to all South Africans, regardless of disability or assistive technology used. We are actively working to ensure our platform meets the <strong>Web Content Accessibility Guidelines (WCAG) 2.1 Level AA</strong> standard and strives toward Level AAA where practical.</p>
+    <p>We review our pages against these guidelines during every development cycle and prioritise accessibility fixes alongside security and functionality issues.</p>
+
+    <h2>Current Conformance Status</h2>
+
+    <div class="status-grid">
+        <div class="status-card good">
+            <div class="label">Perceivable</div>
+            <div class="value">Largely Conformant</div>
+        </div>
+        <div class="status-card good">
+            <div class="label">Operable</div>
+            <div class="value">Largely Conformant</div>
+        </div>
+        <div class="status-card partial">
+            <div class="label">Understandable</div>
+            <div class="value">Partial (In Progress)</div>
+        </div>
+        <div class="status-card partial">
+            <div class="label">Robust</div>
+            <div class="value">Partial (In Progress)</div>
+        </div>
+    </div>
+
+    <h2>What We Have Done</h2>
+    <ul>
+        <li>All form inputs have associated <code>&lt;label&gt;</code> elements</li>
+        <li>All SVG icons that convey meaning have <code>aria-hidden="true"</code> or descriptive <code>aria-label</code> attributes</li>
+        <li>Interactive buttons and links have clearly visible focus states</li>
+        <li>Colour is never the sole means of conveying information (error states also use icons and text)</li>
+        <li>The page language is declared (<code>lang="en"</code>) on every HTML page</li>
+        <li>Font sizes are set in relative units and the layout reflows at 400% zoom</li>
+        <li>All pages are responsive and usable on mobile devices</li>
+        <li>Form errors are announced programmatically and associated with the relevant input</li>
+        <li>The registration form has real-time validation with clear, plain-language error messages</li>
+        <li>Session timeouts display a warning before expiry (24-hour access token lifetime)</li>
+    </ul>
+
+    <h2>Known Limitations</h2>
+    <p>We are aware of the following gaps and are actively working to address them:</p>
+    <ul>
+        <li><strong>Investor Deck (investor-deck.html):</strong> The presentation slides are not fully accessible to screen readers. A plain-text summary is available on request.</li>
+        <li><strong>Data tables on dashboards:</strong> Some complex data tables lack full <code>scope</code> and <code>headers</code> attributes. This is scheduled for the next sprint.</li>
+        <li><strong>Keyboard trap in modal dialogs:</strong> Some modal-style panels on the lender dashboard do not fully trap keyboard focus. We are refactoring these components.</li>
+        <li><strong>Colour contrast (secondary text):</strong> Some grey text (#8A8A8A on white) falls marginally below the 4.5:1 ratio required for WCAG 2.1 AA. We are updating these in our next design pass.</li>
+    </ul>
+
+    <h2>Technical Specifications</h2>
+    <ul>
+        <li><strong>Guideline:</strong> WCAG 2.1 Level AA (target)</li>
+        <li><strong>Approaches:</strong> Semantic HTML5, ARIA landmarks, skip navigation links (planned)</li>
+        <li><strong>Testing tools:</strong> Axe, WAVE, manual keyboard navigation, VoiceOver (macOS/iOS)</li>
+        <li><strong>Browsers tested:</strong> Chrome, Safari, Firefox (latest versions); iOS Safari; Android Chrome</li>
+    </ul>
+
+    <h2>Alternative Formats</h2>
+    <p>If you need information from PaySick in an alternative format (such as large print, audio, or a plain-text version of any document), please contact us and we will respond within <strong>2 business days</strong>.</p>
+    <p>For telephone assistance with any part of the application process, call us at <a href="tel:+27800000000">0800 000 000</a> (toll-free, weekdays 08:00–17:00).</p>
+
+    <h2>Feedback and Reporting Issues</h2>
+    <p>We welcome feedback on the accessibility of PaySick. If you experience any barriers or encounter a page that does not meet the standards described above:</p>
+    <ul>
+        <li>Email <a href="mailto:accessibility@paysick.co.za">accessibility@paysick.co.za</a></li>
+        <li>We aim to respond within <strong>2 business days</strong> and to fix critical accessibility issues within <strong>5 business days</strong> of confirmation</li>
+    </ul>
+
+    <div class="contact-box">
+        <h3>Accessibility Contact</h3>
+        <p><strong>Email:</strong> <a href="mailto:accessibility@paysick.co.za">accessibility@paysick.co.za</a></p>
+        <p><strong>Phone:</strong> <a href="tel:+27800000000">0800 000 000</a> (toll-free)</p>
+        <p><strong>Response time:</strong> 2 business days</p>
+        <p style="margin-top:12px; font-size:13px; color:#8A8A8A;">If you are not satisfied with our response, you may contact the <a href="https://www.justice.gov.za/inforeg/" target="_blank" rel="noopener">Information Regulator</a> or the <a href="https://www.sahrc.org.za" target="_blank" rel="noopener">South African Human Rights Commission</a>.</p>
+    </div>
+
+</main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 PaySick South Africa. All rights reserved. &nbsp;|&nbsp;
+        <a href="terms-of-service.html">Terms of Service</a> &nbsp;|&nbsp;
+        <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+        <a href="accessibility.html">Accessibility</a>
+    </p>
+</footer>
+
+</body>
+</html>
