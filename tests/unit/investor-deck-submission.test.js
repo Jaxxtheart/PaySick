@@ -18,9 +18,9 @@ const deck = fs.readFileSync(
   'utf8'
 );
 
-test('slide counters run 01 to 17 in order with no duplicates', () => {
-  const counters = [...deck.matchAll(/<span class="slide-number">(\d\d) \/ 17<\/span>/g)].map(m => m[1]);
-  const expected = Array.from({ length: 17 }, (_, i) => String(i + 1).padStart(2, '0'));
+test('slide counters run 01 to 15 in order with no duplicates', () => {
+  const counters = [...deck.matchAll(/<span class="slide-number">(\d\d) \/ 15<\/span>/g)].map(m => m[1]);
+  const expected = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, '0'));
   assert.deepStrictEqual(counters, expected);
 });
 
@@ -63,4 +63,12 @@ test('ask is a $250,000 request with dollar use of funds and no deal terms', () 
   for (const term of ['Pre-Money', '$24M', 'Equity Offered', 'Equity: 25%']) {
     assert.ok(!deck.includes(term), `deal term present before funding type is confirmed: "${term}"`);
   }
+});
+
+test('15-slide cut: Moats table and Medical Risk Score slides are dropped', () => {
+  for (const term of ['Sustainable competitive', 'competitors-table', 'The <span class="highlight">Medical Risk Score</span>', "'The Medical Risk Score'"]) {
+    assert.ok(!deck.includes(term), `dropped slide content still present: "${term}"`);
+  }
+  // Provider scoring, the Medical Risk Score's one distinct idea, moves to the risk slide.
+  assert.ok(deck.includes('Provider risk scoring'), 'provider risk scoring line missing from risk slide');
 });

@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.11.2] — 2026-09-29
+
+**Type**: PATCH — investor deck trimmed to 15 slides
+
+### Removed
+- `investor-deck.html`: Moats (competitor table) slide and Medical Risk Score slide, for the 15-slide submission limit. Provider risk scoring moved to the Risk Management slide as a bullet.
+
+### Tests
+- Slide-count tests updated 17 → 15 first; new test asserts both slides are gone.
+
+---
+
 ## [v1.11.1] — 2026-09-29
 
 **Type**: PATCH — investor deck copy fixes for PDF submission

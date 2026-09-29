@@ -60,16 +60,16 @@ describe('Shield slide is present and navigable', () => {
     assert.match(slide, /IP|moat|proprietary/i, 'slide does not frame Shield as proprietary IP');
   });
 
-  test('deck counters, nav dots and PPTX slides are all 17', () => {
-    const counters = deck.match(/\d\d \/ 17/g) || [];
-    assert.strictEqual(counters.length, 17, `expected 17 "NN / 17" counters, found ${counters.length}`);
-    assert.ok(deck.includes('17 / 17'), 'final counter 17 / 17 missing');
+  test('deck counters, nav dots and PPTX slides are all 15', () => {
+    const counters = deck.match(/\d\d \/ 15/g) || [];
+    assert.strictEqual(counters.length, 15, `expected 15 "NN / 15" counters, found ${counters.length}`);
+    assert.ok(deck.includes('15 / 15'), 'final counter 15 / 15 missing');
 
     const navDots = deck.match(/class="nav-dot(?: active)?" data-slide=/g) || [];
-    assert.strictEqual(navDots.length, 17, `expected 17 nav dots, found ${navDots.length}`);
+    assert.strictEqual(navDots.length, 15, `expected 15 nav dots, found ${navDots.length}`);
 
     const addSlide = deck.match(/pptx\.addSlide\(\)/g) || [];
-    assert.strictEqual(addSlide.length, 17, `expected 17 PPTX slides, found ${addSlide.length}`);
+    assert.strictEqual(addSlide.length, 15, `expected 15 PPTX slides, found ${addSlide.length}`);
   });
 
   test('no stale "/ 16" counters left behind', () => {

@@ -30,7 +30,7 @@ test('superseded market/exit/team figures are gone', () => {
     'Ex-Amazon',
     'Ex-Capitec',
     'Ex-TransUnion',
-    '01 / 15', // old slide-counter denominator
+    // '01 / 15' was banned as a stale counter; the deck is 15 slides again.
   ];
   for (const term of banned) {
     assert.ok(!deck.includes(term), `superseded content still present: "${term}"`);
@@ -82,18 +82,20 @@ test('slide 14 roadmap reflects UK expansion and 2027 shift', () => {
   assert.ok(deck.includes('Exit Potential (2027+)'), 'exit potential not shifted to 2027+');
 });
 
-// Count raised from 16 to 17 when the Shield™ risk-engine slide was added.
+// Count raised from 16 to 17 when the Shield™ risk-engine slide was added,
+// then cut to 15 (Moats table and Medical Risk Score slides dropped) for the
+// 15-slide submission limit.
 // See tests/unit/investor-deck-shield.test.js for that slide's own coverage.
-test('slide counter, nav dots and PPTX slide count are all 17', () => {
-  const counters = deck.match(/\d\d \/ 17/g) || [];
-  assert.strictEqual(counters.length, 17, `expected 17 "NN / 17" counters, found ${counters.length}`);
-  assert.ok(deck.includes('17 / 17'), 'final counter 17 / 17 missing');
+test('slide counter, nav dots and PPTX slide count are all 15', () => {
+  const counters = deck.match(/\d\d \/ 15/g) || [];
+  assert.strictEqual(counters.length, 15, `expected 15 "NN / 15" counters, found ${counters.length}`);
+  assert.ok(deck.includes('15 / 15'), 'final counter 15 / 15 missing');
 
   const navDots = deck.match(/class="nav-dot(?: active)?" data-slide=/g) || [];
-  assert.strictEqual(navDots.length, 17, `expected 17 nav dots, found ${navDots.length}`);
+  assert.strictEqual(navDots.length, 15, `expected 15 nav dots, found ${navDots.length}`);
 
   const addSlide = deck.match(/pptx\.addSlide\(\)/g) || [];
-  assert.strictEqual(addSlide.length, 17, `expected 17 PPTX slides, found ${addSlide.length}`);
+  assert.strictEqual(addSlide.length, 15, `expected 15 PPTX slides, found ${addSlide.length}`);
 });
 
 test('no prohibited customer-facing lending vocabulary introduced', () => {
