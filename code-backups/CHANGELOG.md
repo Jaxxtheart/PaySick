@@ -6,6 +6,49 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.16.0] — 2026-10-12
+
+**Type**: MINOR — new capability (Care Agent document ingestion)
+
+### Summary
+Completes a piece of Care Agent functionality that shipped as a visible
+but non-functional stub since v1.13.4: the attach control in
+care-agent.html always replied "I can't read inside documents yet",
+whatever file was uploaded. It now actually reads a quote, invoice, or
+medical-scheme statement (PDF/JPG/PNG) via the Anthropic Messages API's
+native document/image support, forcing a single structured tool call
+(tool_choice) so the model can never reply with free text. Whatever it
+extracts is fed through the exact same executeTool('update_care_summary', ...)
+guardrail the conversational agent (v1.15.0) already uses -- independently
+re-validated, never trusted directly, never overwriting an already-
+confirmed field. No raw file bytes are ever persisted, only the
+validated extracted fields and audit metadata. Falls back honestly to
+asking the patient to type the figures when the LLM path is unavailable
+or errors -- there's no local OCR fallback for document reading itself.
+See [v1.16.0/RELEASE_NOTES.md](./v1.16.0/RELEASE_NOTES.md).
+
+### Added
+- `care-agent-document.service.js`: `DOCUMENT_EXTRACTION_TOOL`,
+  `extractFromDocument()`, `describeExtraction()`
+- `care-agent-anthropic-client.js`: the shared Anthropic fetch/signing
+  primitive, extracted from care-agent-llm.service.js so the new
+  document service doesn't duplicate it
+- `POST /api/care-agent/sessions/:id/documents`
+- `PaySickAPI.careAgent.uploadDocument()`
+- 35 new test-first assertions across 4 new test files, all confirmed
+  failing before implementation
+
+### Changed
+- `care-agent-llm.service.js`: now uses the shared Anthropic client;
+  `runCareAgentTurn`'s own behaviour unchanged (25 existing assertions
+  pass unmodified)
+- `server.js`: global JSON body limit 1mb -> 6mb, to fit a base64-encoded
+  document upload
+- `care-agent.html`: attach control now uploads for real, with
+  client-side validation and a transient "reading" state
+
+---
+
 ## [v1.15.1] — 2026-09-22
 
 **Type**: PATCH — bug fix (homepage search-bar hint text size)

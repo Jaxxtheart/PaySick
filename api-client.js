@@ -459,6 +459,18 @@ const PaySickAPI = {
     },
 
     /**
+     * Upload a quote, invoice, or medical-scheme statement for automatic
+     * field extraction (Stage 2: Understand). The file must already be
+     * base64-encoded (without the data: URL prefix) and under 4MB.
+     */
+    async uploadDocument(sessionId, { fileBase64, mediaType, filename }) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/documents`, {
+        method: 'POST',
+        body: JSON.stringify({ fileBase64, mediaType, filename })
+      });
+    },
+
+    /**
      * Confirm (optionally with edits) the extracted care summary and
      * receive Stage 3 (Construct) payment-term options
      */

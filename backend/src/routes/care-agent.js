@@ -40,7 +40,13 @@ const {
   buildTermOptions,
   TERM_OPTIONS_MONTHS,
 } = require('../services/care-agent.service');
-const { runCareAgentTurn } = require('../services/care-agent-llm.service');
+const { runCareAgentTurn, executeTool } = require('../services/care-agent-llm.service');
+const {
+  extractFromDocument,
+  describeExtraction,
+  ALLOWED_MEDIA_TYPES,
+  MAX_DOCUMENT_BYTES,
+} = require('../services/care-agent-document.service');
 const { toRands, toCents } = require('../utils/money');
 
 // Bot crawling prevention (CLAUDE.md requirement) — belt-and-braces on top
@@ -261,6 +267,109 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Care Agent message error:', error.message);
     res.status(500).json({ error: 'Failed to process that message' });
+  }
+});
+
+/**
+ * POST /api/care-agent/sessions/:id/documents
+ *
+ * Lets a patient upload a quote, invoice, or medical-scheme statement
+ * (base64-encoded in the JSON body -- no multipart dependency needed,
+ * and it's exactly the shape the Anthropic API itself expects) and have
+ * its fields extracted automatically, replacing the old "I can't read
+ * inside documents yet" stub.
+ *
+ * Same discipline as /messages: extraction never updates the summary
+ * directly. The model's result is fed through the exact same
+ * executeTool('update_care_summary', ...) guardrail the conversational
+ * agent uses (independently re-validates every field; a field already
+ * recorded never gets overwritten) before anything is merged. Falls back
+ * to asking the patient to type the figures when the API is unavailable
+ * or errors -- there is no local OCR fallback for document reading
+ * itself, unlike the conversational agent's deterministic text fallback.
+ */
+router.post('/sessions/:id/documents', authenticateToken, async (req, res) => {
+  try {
+    const { fileBase64, mediaType, filename } = req.body;
+    if (!fileBase64 || typeof fileBase64 !== 'string') {
+      return res.status(400).json({ error: 'fileBase64 is required' });
+    }
+    if (!ALLOWED_MEDIA_TYPES.includes(mediaType)) {
+      return res.status(400).json({ error: `mediaType must be one of: ${ALLOWED_MEDIA_TYPES.join(', ')}` });
+    }
+
+    let decodedBytes;
+    try {
+      decodedBytes = Buffer.byteLength(fileBase64, 'base64');
+    } catch {
+      return res.status(400).json({ error: 'fileBase64 is not valid base64' });
+    }
+    if (decodedBytes > MAX_DOCUMENT_BYTES) {
+      return res.status(400).json({ error: `File is too large (max ${Math.floor(MAX_DOCUMENT_BYTES / (1024 * 1024))}MB)` });
+    }
+
+    const session = await getOwnedSession(req.params.id, req.user.userId);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    const currentSummary = session.structured_summary || {};
+    const safeFilename = String(filename || 'document').slice(0, 120);
+
+    let merged = currentSummary;
+    let reply;
+    let documentType = null;
+    let recorded = [];
+    let rejected = [];
+    let fallbackReason = null;
+
+    if (process.env.ANTHROPIC_API_KEY) {
+      try {
+        const extraction = await extractFromDocument({ base64Data: fileBase64, mediaType });
+        documentType = extraction.documentType;
+        const outcome = executeTool('update_care_summary', extraction.fields, { summary: currentSummary });
+        recorded = outcome.result.recorded;
+        rejected = outcome.result.rejected;
+        if (outcome.summaryPatch) merged = mergeCareSummary(currentSummary, outcome.summaryPatch);
+        reply = describeExtraction({ documentType, recorded });
+      } catch (docError) {
+        console.error('Care Agent document extraction error:', docError.message);
+        fallbackReason = docError.message;
+      }
+    } else {
+      fallbackReason = 'ANTHROPIC_API_KEY not configured';
+    }
+
+    if (fallbackReason) {
+      reply = "I can't read documents right now. Please tell me the quoted amount and treatment from it in your own words instead.";
+    }
+
+    const missing = missingFieldsFor(merged);
+    const readyToConfirm = missing.length === 0;
+
+    await query(
+      `UPDATE care_agent_sessions SET structured_summary = $1, updated_at = NOW() WHERE session_id = $2`,
+      [JSON.stringify(merged), session.session_id]
+    );
+    await recordAudit(session.session_id, 'DOCUMENT_PROCESSED', 'patient', {
+      filename: safeFilename,
+      mediaType,
+      documentType,
+      recorded,
+      rejected,
+      fallbackReason,
+    });
+
+    res.json({
+      sessionId: session.session_id,
+      summary: merged,
+      missingFields: missing,
+      reply,
+      readyToConfirm,
+      procedureOptions: PROCEDURE_OPTIONS,
+      documentType,
+    });
+  } catch (error) {
+    console.error('Care Agent document error:', error.message);
+    res.status(500).json({ error: 'Failed to process that document' });
   }
 });
 

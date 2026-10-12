@@ -139,8 +139,16 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Body parsing middleware with size limits
+// 6mb (not 1mb): the Care Agent's document-ingestion route
+// (POST /api/care-agent/sessions/:id/documents) sends an uploaded quote/
+// invoice/scheme-statement as base64 JSON rather than multipart -- no new
+// npm dependency needed, and it's the same shape the Anthropic API itself
+// expects. Base64 adds ~33% overhead, so care-agent-document.service.js's
+// own MAX_DOCUMENT_BYTES (4MB) comfortably fits with headroom to spare;
+// every other route still enforces its own, usually much smaller, limits
+// on what it actually expects.
 app.use(express.json({
-  limit: '1mb',
+  limit: '6mb',
   // Capture the raw body so webhook signatures (e.g. Resend/Svix on the outreach
   // inbound route) can be verified against the exact received bytes.
   verify: (req, res, buf) => { req.rawBody = buf; }

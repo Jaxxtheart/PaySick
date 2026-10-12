@@ -186,7 +186,9 @@
         }
 
         #upload-label { display: flex; align-items: center; background: white; color: #444; border: 1px solid #DDD; }
+        #upload-label.uploading { opacity: 0.5; pointer-events: none; }
         #file-input { display: none; }
+        .bubble.agent.thinking { color: #999; font-style: italic; }
 
         /* ── Cards (summary / options / approve) ────────────────────────── */
         .card {
@@ -680,11 +682,75 @@
         document.getElementById('message-input').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') sendMessage(e.target.value);
         });
-        document.getElementById('file-input').addEventListener('change', (e) => {
+        const ALLOWED_DOCUMENT_TYPES = { 'application/pdf': true, 'image/jpeg': true, 'image/png': true };
+        const MAX_DOCUMENT_BYTES = 4 * 1024 * 1024;
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = reader.result || '';
+                    const comma = result.indexOf(',');
+                    resolve(comma === -1 ? result : result.slice(comma + 1));
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
+            e.target.value = '';
             if (!file) return;
+
             addBubble('user', `📎 Attached: ${file.name}`);
-            addBubble('agent', "I can't read inside documents yet, so please tell me the quoted amount and treatment from it in your own words. I'll take it from there.");
+
+            if (!ALLOWED_DOCUMENT_TYPES[file.type]) {
+                addBubble('system', "I can only read PDF, JPG, or PNG files. Please tell me the amount and treatment in your own words instead.");
+                return;
+            }
+            if (file.size > MAX_DOCUMENT_BYTES) {
+                addBubble('system', "That file's a bit too large for me to read (max 4MB). Please tell me the amount and treatment in your own words instead.");
+                return;
+            }
+            if (!state.sessionId) {
+                const recovered = await startConversation();
+                if (!recovered) {
+                    addBubble('system', "I still couldn't start the conversation -- try the button above, or refresh the page.");
+                    return;
+                }
+            }
+
+            const uploadLabel = document.getElementById('upload-label');
+            uploadLabel.classList.add('uploading');
+            const thinking = el('div', 'bubble agent thinking', 'Reading your document...');
+            document.getElementById('chat-log').appendChild(thinking);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+            try {
+                const fileBase64 = await fileToBase64(file);
+                const res = await PaySickAPI.careAgent.uploadDocument(state.sessionId, {
+                    fileBase64,
+                    mediaType: file.type,
+                    filename: file.name
+                });
+                thinking.remove();
+                state.summary = res.summary || {};
+                state.missingFields = res.missingFields || [];
+                state.readyToConfirm = res.readyToConfirm;
+                state.procedureOptions = res.procedureOptions || state.procedureOptions;
+                addBubble('agent', res.reply);
+                updateProcedureOptions();
+                if (state.readyToConfirm) {
+                    document.getElementById('suggested-prompts').classList.add('hidden');
+                    renderSummaryCard();
+                }
+            } catch (err) {
+                thinking.remove();
+                addBubble('system', "I couldn't read that file just now. Please tell me the amount and treatment in your own words instead.");
+            } finally {
+                uploadLabel.classList.remove('uploading');
+            }
         });
         document.getElementById('confirm-summary-btn').addEventListener('click', confirmSummary);
         document.getElementById('approve-btn').addEventListener('click', approveAndExecute);

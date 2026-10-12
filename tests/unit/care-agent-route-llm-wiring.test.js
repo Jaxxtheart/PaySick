@@ -43,7 +43,7 @@ describe('routes/care-agent.js — LLM tool-calling wiring', () => {
   test('POST /sessions/:id/messages attempts runCareAgentTurn', () => {
     const messagesRoute = sliceRoute(
       "router.post('/sessions/:id/messages',",
-      "router.post('/sessions/:id/confirm',"
+      "router.post('/sessions/:id/documents',"
     );
     assert.match(messagesRoute, /runCareAgentTurn/);
   });
@@ -51,7 +51,7 @@ describe('routes/care-agent.js — LLM tool-calling wiring', () => {
   test('POST /sessions/:id/messages falls back to the deterministic engine on LLM failure', () => {
     const messagesRoute = sliceRoute(
       "router.post('/sessions/:id/messages',",
-      "router.post('/sessions/:id/confirm',"
+      "router.post('/sessions/:id/documents',"
     );
     assert.match(messagesRoute, /catch/);
     assert.match(messagesRoute, /extractCareRequest/);
@@ -61,7 +61,7 @@ describe('routes/care-agent.js — LLM tool-calling wiring', () => {
   test('POST /sessions/:id/messages records the audit trail exactly once per turn regardless of path', () => {
     const messagesRoute = sliceRoute(
       "router.post('/sessions/:id/messages',",
-      "router.post('/sessions/:id/confirm',"
+      "router.post('/sessions/:id/documents',"
     );
     const auditCalls = messagesRoute.match(/recordAudit\(/g) || [];
     assert.equal(auditCalls.length, 1, 'exactly one recordAudit call, on the single shared success path after either the LLM or fallback branch');

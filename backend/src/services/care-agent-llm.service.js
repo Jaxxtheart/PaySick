@@ -39,10 +39,11 @@
  *     calls into. The tool loop below is reachable only from
  *     POST /sessions/:id/messages.
  *
- * Uses the platform's native `fetch` (Node >=18) via an injectable
- * `fetchImpl`, mirroring outreach/claude.service.js's existing pattern --
- * no new npm dependency. This sandbox has no outbound internet access, so
- * the live API cannot be exercised here; see
+ * The actual API call (fetch, signing, error handling) lives in the
+ * shared care-agent-anthropic-client.js, also used by document ingestion
+ * (care-agent-document.service.js) -- this file only owns the
+ * orchestration loop and the tool guardrails. This sandbox has no
+ * outbound internet access, so the live API cannot be exercised here; see
  * tests/unit/care-agent-llm.test.js, which covers the full orchestration
  * loop and every guardrail with an injected fetchImpl instead.
  *
@@ -61,9 +62,7 @@ const {
 } = require('./care-agent.service');
 const { PROCEDURE_CATEGORIES } = require('./care-agent-nlp.service');
 const { toCents } = require('../utils/money');
-
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const DEFAULT_MODEL = 'claude-sonnet-5';
+const { DEFAULT_MODEL, callAnthropicMessages } = require('./care-agent-anthropic-client');
 
 // Hard cap on tool-call round trips within a single patient message. Bounds
 // latency/cost and guarantees the loop can never run forever even if the
@@ -328,45 +327,6 @@ function executeTool(name, input, context) {
     default:
       return { ok: false, result: { error: `Unknown tool: ${name}` } };
   }
-}
-
-async function callAnthropicMessages({ system, tools, messages, fetchImpl }) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set');
-
-  const doFetch = fetchImpl || globalThis.fetch;
-  if (typeof doFetch !== 'function') {
-    throw new Error('global fetch is unavailable (Node >=18 required)');
-  }
-
-  const body = {
-    model: process.env.ANTHROPIC_MODEL || DEFAULT_MODEL,
-    max_tokens: 1024,
-    system,
-    tools,
-    messages,
-  };
-  if (process.env.ANTHROPIC_TEMPERATURE) {
-    const t = Number(process.env.ANTHROPIC_TEMPERATURE);
-    if (!Number.isNaN(t)) body.temperature = t;
-  }
-
-  const res = await doFetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const detail = await res.text().catch(() => '');
-    throw new Error(`Anthropic API error ${res.status}: ${detail.slice(0, 300)}`);
-  }
-
-  return res.json();
 }
 
 /**
