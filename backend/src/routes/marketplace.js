@@ -17,7 +17,7 @@ const { MarketplaceAuctionService, marketplaceAuctionService } = require('../ser
 const { LoanApprovalBridge } = require('../services/loan-approval-bridge.service');
 const { authenticateToken, requireAdmin, requireLender } = require('../middleware/auth.middleware');
 const { logSecurityEvent, sanitizeObject, decryptBankingData } = require('../services/security.service');
-const { patientGateService } = require('../services/patient-gate.service');
+const shield = require('../shield');
 
 // ============================================
 // MIDDLEWARE
@@ -145,42 +145,89 @@ router.post('/applications', authenticateToken, async (req, res) => {
       });
     }
 
-    // ── SHIELD GATE 2: PATIENT AFFORDABILITY ASSESSMENT ───────────────────────
-    // Run underwriting on every application that includes income data.
-    // A DECLINE result is returned immediately; amber/green proceed to marketplace.
-    if (monthlyIncome) {
-      let shieldAssessment = null;
-      try {
-        const incomeVerified = parseFloat(monthlyIncome);
-        const obligations   = parseFloat(monthlyObligations) || 0;
-        const medAid        = parseFloat(medicalAidCovered)  || 0;
+    // ── SHIELD UNDERWRITING GATE ──────────────────────────────────────────────
+    // Every application is underwritten by the Shield Underwriting Module
+    // before any funding-partner logic runs. Only APPROVED / APPROVED_COOLING_OFF
+    // continue. DECLINED stops here; REFER goes to human review and never
+    // reaches funding partners. Any error fails closed to review.
+    // monthlyIncome from the body is self-declared and is NOT used as verified
+    // income: the context builder reads verified income from
+    // patient_income_verification.
+    let shieldSummary;
+    try {
+      const application = {
+        applicationId: null,
+        patientId: req.user.userId,
+        providerId,
+        segment: parseFloat(medicalAidCovered) > 0 ? 'SEGMENT_1_GAP' : 'SEGMENT_2_OOP',
+        procedureCode: procedureCode || null,
+        procedureType,
+        procedureCategory: shield.procedureCategoryFor(procedureType),
+        urgency: shield.normaliseUrgency(urgencyClassification),
+        amountCents: Math.round(Number(loanAmount) * 100),
+        termMonths: Number(requestedTerm),
+        declaredObligationsCents: monthlyObligations ? Math.round(parseFloat(monthlyObligations) * 100) : undefined,
+        medicalAidScheme: req.body.medicalAidScheme || null,
+        medicalAidPlan: req.body.medicalAidPlan || null
+      };
 
-        shieldAssessment = await patientGateService.assessApplication({
-          patient_id:               req.user.userId,
-          procedure_type:           procedureType,
-          procedure_description:    procedureDescription,
-          quoted_amount:            loanAmount,
-          medical_aid_covered:      medAid,
-          loan_amount_requested:    loanAmount,
-          loan_term_months:         requestedTerm,
-          urgency_classification:   urgencyClassification || 'planned',
-          monthly_income_verified:  incomeVerified,
-          monthly_obligations:      obligations,
-          income_verification:      'manual_verified',
-          segment:                  medAid > 0 ? 'gap_financing' : 'full_procedure'
-        });
-      } catch (shieldErr) {
-        // Shield assessment failure is non-fatal — log and continue
-        console.error('Shield assessment error:', shieldErr.message);
-      }
+      const now = new Date();
+      const allowMockSources = shield.mockSourcesAllowed();
+      const input = await shield.buildUnderwritingInput(application, { query, now });
+      const outcome = shield.underwrite(input, { now, allowMockSources });
+      const record = shield.buildDecisionRecord(input, { now, allowMockSources }, outcome);
+      await shield.recordDecision(query, { record, outcome, channel: 'MARKETPLACE' });
 
-      if (shieldAssessment && shieldAssessment.decision === 'DECLINE') {
-        return res.status(200).json({
-          success: false,
-          shield_declined: true,
-          shield: shieldAssessment
-        });
-      }
+      shieldSummary = {
+        decision: outcome.decision,
+        decisiveStage: outcome.decisiveStage,
+        reasonCodes: outcome.reasonCodes,
+        alternative: outcome.alternative,
+        coolingOff: outcome.coolingOff,
+        patientAffordability: {
+          status: outcome.patientAffordability.status,
+          reasonCodes: outcome.patientAffordability.reasonCodes,
+          maxAffordable: outcome.patientAffordability.maxAffordable
+        },
+        providerRisk: {
+          status: outcome.providerRisk.status,
+          grade: outcome.providerRisk.grade
+        },
+        medicalRiskScore: {
+          score: outcome.medicalRiskScore.score,
+          grade: outcome.medicalRiskScore.grade,
+          pd12m: outcome.medicalRiskScore.pd12m,
+          adverseReasons: outcome.medicalRiskScore.adverseReasons
+        },
+        policyVersion: outcome.policyVersion,
+        modelId: outcome.modelId
+      };
+    } catch (shieldErr) {
+      console.error('Shield underwriting unavailable:', shieldErr.message);
+      return res.status(202).json({
+        success: false,
+        shield_referred: true,
+        status: 'UNDER_REVIEW',
+        reason: 'SHIELD_UNAVAILABLE'
+      });
+    }
+
+    if (shieldSummary.decision === 'DECLINED') {
+      return res.status(200).json({
+        success: false,
+        shield_declined: true,
+        shield: shieldSummary
+      });
+    }
+
+    if (shieldSummary.decision !== 'APPROVED' && shieldSummary.decision !== 'APPROVED_COOLING_OFF') {
+      // REFER (or any unrecognised outcome) goes to human review only.
+      return res.status(202).json({
+        success: false,
+        shield_referred: true,
+        status: 'UNDER_REVIEW',
+        shield: shieldSummary
+      });
     }
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -209,6 +256,7 @@ router.post('/applications', authenticateToken, async (req, res) => {
         success: true,
         demo: true,
         message: 'Application received - Marketplace Preview Mode',
+        shield: shieldSummary,
         applicationId: demoApplicationId,
         status: 'PREVIEW',
         marketplaceStatus: {
@@ -292,6 +340,7 @@ router.post('/applications', authenticateToken, async (req, res) => {
       demo: false,
       message: 'Application submitted to marketplace',
       applicationId,
+      shield: shieldSummary,
       status: 'PENDING',
       marketplaceStatus: {
         ready: true,

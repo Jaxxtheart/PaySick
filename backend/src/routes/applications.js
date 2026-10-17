@@ -75,36 +75,51 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const applicationId = initialApp.rows[0].application_id;
 
+    // Income is never defaulted. Without a usable income figure no approval
+    // can be run: the application is held for review and no plan is created.
+    const rawIncome = userInfo.rows[0]?.declared_income || req.body.monthly_income;
+    const monthlyIncome = Number(rawIncome);
+    const hasIncome = rawIncome !== null && rawIncome !== undefined && rawIncome !== '' &&
+      Number.isFinite(monthlyIncome) && monthlyIncome > 0;
+
     // Run healthcare risk assessment
     let riskAssessment;
-    try {
-      riskAssessment = await healthcareRiskService.calculateRiskAssessment({
-        userId: req.user.userId,
-        applicationId,
-        loanAmount: bill_amount,
-        procedureType: treatment_type,
-        icd10Code: req.body.icd10_code || null,
-        providerId: provider_id || null,
-        monthlyIncome: userInfo.rows[0]?.declared_income || req.body.monthly_income || 15000,
-        existingDebt: userInfo.rows[0]?.monthly_debt_obligations || req.body.existing_debt || 0,
-        medicalAidScheme: req.body.medical_aid_scheme || null,
-        medicalAidOption: req.body.medical_aid_option || null,
-        hasChronicConditions: req.body.has_chronic_conditions || false,
-        applicationBehavior: {
-          completionTimeSeconds: req.body.completion_time_seconds || 180,
-          applicationHour: new Date().getHours(),
-          deviceType: req.get('User-Agent')?.includes('Mobile') ? 'mobile' : 'desktop',
-          locationConsistent: true
-        }
-      });
-    } catch (riskError) {
-      console.error('Risk assessment error:', riskError);
-      // Fallback to basic scoring if risk service fails
+    if (!hasIncome) {
       riskAssessment = {
-        decision: { decision: 'review', reason: 'Risk service unavailable' },
-        pd: { score: 0.05 },
-        healthScore: 50
+        decision: { decision: 'review', reason: 'Verified income required before a decision' },
+        pd: { score: null },
+        healthScore: null
       };
+    } else {
+      try {
+        riskAssessment = await healthcareRiskService.calculateRiskAssessment({
+          userId: req.user.userId,
+          applicationId,
+          loanAmount: bill_amount,
+          procedureType: treatment_type,
+          icd10Code: req.body.icd10_code || null,
+          providerId: provider_id || null,
+          monthlyIncome,
+          existingDebt: userInfo.rows[0]?.monthly_debt_obligations || req.body.existing_debt || 0,
+          medicalAidScheme: req.body.medical_aid_scheme || null,
+          medicalAidOption: req.body.medical_aid_option || null,
+          hasChronicConditions: req.body.has_chronic_conditions || false,
+          applicationBehavior: {
+            completionTimeSeconds: req.body.completion_time_seconds || 180,
+            applicationHour: new Date().getHours(),
+            deviceType: req.get('User-Agent')?.includes('Mobile') ? 'mobile' : 'desktop',
+            locationConsistent: true
+          }
+        });
+      } catch (riskError) {
+        console.error('Risk assessment error:', riskError);
+        // Fallback to basic scoring if risk service fails
+        riskAssessment = {
+          decision: { decision: 'review', reason: 'Risk service unavailable' },
+          pd: { score: 0.05 },
+          healthScore: 50
+        };
+      }
     }
 
     // Determine status based on risk decision
@@ -114,7 +129,9 @@ router.post('/', authenticateToken, async (req, res) => {
     const monthly_payment = status === 'approved' ? Math.round((bill_amount / 3) * 100) / 100 : null;
 
     // Convert PD score to 0-100 scale for legacy risk_score field
-    const risk_score = Math.round((1 - riskAssessment.pd.score) * 100);
+    const risk_score = typeof riskAssessment.pd.score === 'number'
+      ? Math.round((1 - riskAssessment.pd.score) * 100)
+      : null;
 
     // Update application with risk assessment results
     const result = await query(

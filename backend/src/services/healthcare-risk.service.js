@@ -311,46 +311,33 @@ class HealthcareRiskService extends EventEmitter {
   }
 
   /**
-   * Fetch data from healthcare data sources
-   * In production, these would be actual API calls to:
-   * - Medical aid schemes (Discovery, Bonitas, Momentum)
-   * - MedCredits (medical credit bureau)
-   * - Pharmacy dispensing records
+   * Fetch component inputs for the legacy health payment score.
+   *
+   * PROHIBITED SIGNALS: medical-aid scheme brand, claims history and chronic
+   * medication adherence are health information (POPIA special personal
+   * information). They are not obtainable for credit purposes and scoring on
+   * them is an unfair-discrimination risk, so they must never drive a credit
+   * decision. See backend/src/shield/medical-risk-score/feature-registry.js.
+   *
+   * The medicalAid, medicationAdherence, procedureOutcome and
+   * healthcareUtilization values below are FIXED NEUTRAL CONSTANTS. They are
+   * deliberately not derived from any applicant data (and in particular do not
+   * vary with medicalAidScheme or hasChronicConditions); they exist only to
+   * keep the returned shape stable for existing callers. Only PaySick's own
+   * repayment history varies the result.
    */
-  async fetchHealthDataSources(userId, params) {
-    const { medicalAidScheme, hasChronicConditions } = params;
+  async fetchHealthDataSources(userId, _params) {
+    const NEUTRAL_SCORE = 50;
 
-    // Get PaySick internal payment history
+    // PaySick internal repayment history (permitted, first-party data)
     const internalHistory = await this.getInternalPaymentHistory(userId);
 
-    // Simulate fetching from external sources
-    // In production, replace with actual API integrations
-
-    // Medical Aid Score (based on claims history, coverage status)
-    const medicalAidScore = medicalAidScheme
-      ? await this.simulateMedicalAidScore(medicalAidScheme)
-      : 40; // Lower score for uninsured
-
-    // Medication Adherence (chronic medication pickup consistency)
-    const medicationAdherenceScore = hasChronicConditions
-      ? await this.simulateMedicationAdherence()
-      : 70; // Neutral for non-chronic patients
-
-    // Provider Payment History (from PaySick data)
-    const providerPaymentScore = internalHistory.paymentScore;
-
-    // Procedure Outcome Score (historical procedure success)
-    const procedureOutcomeScore = 65; // Default - would come from claims data
-
-    // Healthcare Utilization (frequency and pattern)
-    const healthcareUtilizationScore = 60; // Default - would come from claims data
-
     return {
-      medicalAid: medicalAidScore,
-      medicationAdherence: medicationAdherenceScore,
-      providerPayment: providerPaymentScore,
-      procedureOutcome: procedureOutcomeScore,
-      healthcareUtilization: healthcareUtilizationScore
+      medicalAid: NEUTRAL_SCORE,
+      medicationAdherence: NEUTRAL_SCORE,
+      providerPayment: internalHistory.paymentScore,
+      procedureOutcome: NEUTRAL_SCORE,
+      healthcareUtilization: NEUTRAL_SCORE
     };
   }
 
@@ -392,41 +379,6 @@ class HealthcareRiskService extends EventEmitter {
       isNew: false,
       stats
     };
-  }
-
-  /**
-   * Simulate medical aid score fetch
-   * In production: Integration with Discovery/Bonitas/Momentum APIs
-   */
-  async simulateMedicalAidScore(scheme) {
-    // Different schemes have different claim patterns
-    const schemeScores = {
-      'discovery': 75,
-      'bonitas': 70,
-      'momentum': 70,
-      'gems': 72,
-      'medihelp': 68,
-      'fedhealth': 67,
-      'other': 60
-    };
-
-    const schemeLower = scheme.toLowerCase();
-    for (const [key, score] of Object.entries(schemeScores)) {
-      if (schemeLower.includes(key)) {
-        return score + Math.floor(Math.random() * 15); // Add some variance
-      }
-    }
-    return schemeScores.other;
-  }
-
-  /**
-   * Simulate medication adherence score
-   * In production: Integration with pharmacy dispensing records
-   */
-  async simulateMedicationAdherence() {
-    // Would check prescription pickup consistency
-    // Higher score = consistent medication pickup = responsible patient
-    return 55 + Math.floor(Math.random() * 30);
   }
 
   /**
@@ -579,8 +531,6 @@ class HealthcareRiskService extends EventEmitter {
   analyzeBehavioralSignals(behavior = {}) {
     const {
       completionTimeSeconds = 180,
-      applicationHour = 12,
-      deviceType = 'desktop',
       locationConsistent = true,
       formEditsCount = 2
     } = behavior;
@@ -592,12 +542,10 @@ class HealthcareRiskService extends EventEmitter {
     else if (completionTimeSeconds > 600) score -= 10; // Too slow
     else if (completionTimeSeconds >= 120 && completionTimeSeconds <= 300) score += 10;
 
-    // Application hour (business hours = more reliable)
-    if (applicationHour >= 9 && applicationHour <= 17) score += 5;
-    else if (applicationHour >= 0 && applicationHour <= 5) score -= 10; // Late night
-
-    // Device consistency
-    if (deviceType === 'mobile') score += 5; // Mobile users tend to be more genuine
+    // applicationHour and deviceType are deliberately NOT scored: they are
+    // untested proxies with fairness risk, registered as SHADOW (captured,
+    // never used in decisions) in
+    // backend/src/shield/medical-risk-score/feature-registry.js.
 
     // Location consistency
     if (locationConsistent) score += 5;

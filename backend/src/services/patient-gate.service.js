@@ -18,7 +18,7 @@ const { query, transaction } = require('../config/database');
 const HARD_FLOORS = {
   minimum_income: 4000,              // R4,000 — protects vulnerable populations
   maximum_rti: 0.20,                 // 20% repayment-to-income ceiling
-  maximum_dti_full_procedure: 0.55,  // 55% DTI for full-procedure financing
+  maximum_dti_full_procedure: 0.55,  // 55% post-arrangement DTI hard ceiling (all segments)
   minimum_gap_amount: 2000,          // R2,000 minimum gap financing (below = suggest cash)
   maximum_restructure_cost_increase: 0.25  // 25% max cost increase on restructuring
 };
@@ -164,13 +164,15 @@ class PatientGateService {
     result.affordability.dti_post = dtiPost;
     result.affordability.disposable_income = application.monthly_income_verified - monthlyObligations - proposedRepayment;
 
-    if (dtiPost > HARD_FLOORS.maximum_dti_full_procedure && application.segment !== 'gap_financing') {
+    // Hard ceiling applies to every segment, gap financing included: gap
+    // patients already carry scheme premiums, so they are not less exposed.
+    if (dtiPost > HARD_FLOORS.maximum_dti_full_procedure) {
       result.decision = 'DECLINE';
       result.traffic_light = 'red';
       result.ai_recommendation = 'decline';
       result.ai_confidence = 0.95;
       result.rationale.push(
-        `Post-loan DTI of ${(dtiPost * 100).toFixed(1)}% exceeds 55% for full-procedure financing. ` +
+        `Post-loan DTI of ${(dtiPost * 100).toFixed(1)}% exceeds the 55% hard ceiling (applies to all segments, including gap financing). ` +
         `Patient is over-extended. Lending here creates harm, not value.`
       );
       return await this.persistAssessment(application, result);

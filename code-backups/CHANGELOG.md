@@ -6,6 +6,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.0] — 2026-10-17
+
+**Type**: MINOR — Shield Underwriting Module + fail-open fixes
+
+### Summary
+Replaces three parallel underwriting engines with one module,
+`backend/src/shield/`: one versioned credit policy, a deterministic engine,
+three separated outcomes (patient affordability, provider risk management,
+Medical Risk Score PD), an append-only decision log with replay, and a governed
+model lifecycle for the Medical Risk Score. Built test-first; route bugs
+reproduced by failing tests and fixed by subagents.
+
+### Added
+- `backend/src/shield/` — policy, knock-outs, affordability, provider risk, Medical Risk Score (feature registry, model registry, scoring), engine, decision record, context builder, persistence
+- Mock adapters marked `isMock`: bureau consumer report, Home Affairs / SAFPS / AVS, scheme benefit
+- Migration `012_shield_underwriting_module.sql`
+- Decision rate limiter (10 POST / 15 min) on both underwriting endpoints; three AI fetchers added to the bot blocklist
+
+### Fixed
+- Marketplace Shield gate skipped when income omitted; REFER and errors reached funding partners
+- v1 decisions failed open on missing tables/columns; DSP rate multiple used as coverage
+- Legacy patient gate exempted gap financing from the 55% DTI ceiling
+- Legacy healthcare risk score used `Math.random()`, scheme brand, chronic medication, time of day and device
+- Legacy `/api/applications` defaulted missing income to R15,000
+
+### Deprecated
+- `shield-gates.service.js` as the live v1 decision path; `patient-gate.service.js` on the marketplace path
+
+---
+
 ## [v1.11.0] — 2026-09-19
 
 **Type**: MINOR — UX/trust fixes plus one new user-facing capability

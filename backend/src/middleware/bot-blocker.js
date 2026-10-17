@@ -81,6 +81,10 @@ const BOT_USER_AGENT_PATTERNS = [
   /omgili/i,
   /YouBot/i,
   /TimpiBot/i,
+  // v1.12.0 review — AI retrieval agents with no bot/spider/crawler token
+  /Perplexity-User/i,
+  /MistralAI-User/i,
+  /Meta-ExternalFetcher/i,
 
   // Generic bot / spider / crawler patterns
   /bot\b/i,

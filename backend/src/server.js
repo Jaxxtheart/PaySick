@@ -195,8 +195,27 @@ const v1Limiter = rateLimit({
   legacyHeaders: false
 });
 
+// Underwriting decisions trigger paid third-party lookups (bureau, Home
+// Affairs, SAFPS, bank account verification) and every bureau pull leaves an
+// enquiry on the consumer's credit record. They get the tightest bucket.
+const decisionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  // Only decision-creating POSTs count; patients polling offers are unaffected.
+  skip: (req) => req.method !== 'POST',
+  message: {
+    error: 'Too many underwriting requests. Please try again later.',
+    code: 'DECISION_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use('/api/', globalLimiter);
 app.use('/api/v1', v1Limiter);
+app.use('/api/marketplace/applications', decisionLimiter);
+app.use('/api/v1/decisions', decisionLimiter);
 app.use('/v2/shield', globalLimiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);

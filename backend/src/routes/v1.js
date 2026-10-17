@@ -3,7 +3,7 @@
  *
  * Four endpoints:
  *   POST /api/v1/applications              — submit a new facilitation request
- *   POST /api/v1/decisions/:applicationId  — run the 5 Shield gates
+ *   POST /api/v1/decisions/:applicationId  — run the Shield Underwriting Module
  *   POST /api/v1/payouts/:applicationId    — provisional / final disbursement
  *   GET  /api/v1/schedules/:applicationId  — instalment schedule
  *
@@ -22,11 +22,11 @@ const router = express.Router();
 
 const { query } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth.middleware');
-const { runShieldDecision } = require('../services/shield-gates.service');
 const { buildSchedule } = require('../services/schedule.service');
 const { tierConfig } = require('../services/provider-scoring.service');
 const webhooks = require('../services/webhook-dispatcher.service');
 const dspAdapter = require('../adapters/dsp-check.adapter');
+const shield = require('../shield');
 
 // Anti-crawling header on every response
 router.use((req, res, next) => {
@@ -184,125 +184,47 @@ router.post('/decisions/:applicationId', authenticateToken, async (req, res) => 
       return res.status(404).json({ error: 'Application not found', code: 'NOT_FOUND' });
     }
 
-    // Gather decision context. Each sub-query is small and the route layer
-    // is the right place to assemble the snapshot — the Shield engine itself
-    // stays pure for testability.
-
-    const provider = await loadProvider(app.provider_id);
-    if (!provider) {
-      return res.status(409).json({ error: 'Provider not on file', code: 'PROVIDER_NOT_FOUND' });
-    }
-
-    // Patient income — sourced from the most recent verification record.
-    const incomeRes = await query(
-      `SELECT verified_monthly_income_cents, method, verified_at
-       FROM patient_income_verification
-       WHERE patient_id = $1
-       ORDER BY verified_at DESC LIMIT 1`,
-      [app.patient_id]
-    ).catch(() => ({ rows: [] }));
-    const income = incomeRes.rows[0] || {};
-
-    // Provider portfolio share + procedure-type concentration.
-    const concRes = await query(
-      `SELECT COALESCE(book_share_percent, 0)::float        AS book_share_percent,
-              COALESCE(procedure_type_share_percent, 0)::float AS procedure_type_share_percent,
-              COALESCE(patient_pd_rate, 0)::float          AS patient_pd_rate,
-              COALESCE(billing_agreement_signed, false)    AS billing_agreement_signed
-       FROM provider_scoring_snapshot
-       WHERE provider_id = $1`,
-      [app.provider_id]
-    ).catch(() => ({ rows: [] }));
-    const conc = concRes.rows[0] || {};
-
-    // Portfolio circuit-breaker inputs.
-    const pfRes = await query(
-      `SELECT COALESCE(arrears_rate, 0)::float                AS arrears_rate,
-              COALESCE(balance_sheet_percent, 0)::float       AS balance_sheet_percent,
-              COALESCE(segment1_tariff_flagged_rate, 0)::float AS segment1_tariff_flagged_rate,
-              COALESCE(reserve_fund_balance_cents, 0)::bigint AS reserve_fund_balance_cents,
-              COALESCE(monthly_fee_income_cents, 0)::bigint   AS monthly_fee_income_cents
-       FROM portfolio_metrics
-       ORDER BY snapshot_at DESC LIMIT 1`
-    ).catch(() => ({ rows: [] }));
-    const pf = pfRes.rows[0] || {};
-
-    // Segment-1 benchmark lookup (only meaningful for Segment 1).
-    let segment1 = null;
-    if (app.segment === 'SEGMENT_1_GAP') {
-      const benchRes = await query(
-        `SELECT benchmark_cost_100pct FROM procedure_benchmarks
-         WHERE procedure_code = $1 AND effective_to IS NULL
-         ORDER BY effective_from DESC LIMIT 1`,
-        [app.procedure_code]
-      ).catch(() => ({ rows: [] }));
-      const benchmarkRand = parseFloat(benchRes.rows[0]?.benchmark_cost_100pct || 0);
-      const benchmarkCents = Math.round(benchmarkRand * 100);
-
-      let dspIsOnList = true;
-      let patientPlanCoveragePercent = 1.0;
-      if (app.medical_aid_scheme && app.medical_aid_plan) {
-        try {
-          const dsp = await dspAdapter.checkDspStatus(
-            app.medical_aid_scheme,
-            app.medical_aid_plan,
-            app.provider_id
-          );
-          dspIsOnList = dsp.isDsp;
-          patientPlanCoveragePercent = dsp.schemeRateMultiple / 100;
-        } catch (e) {
-          dspIsOnList = false;
-        }
-      }
-      segment1 = {
-        benchmarkProcedureCost: benchmarkCents,
-        patientPlanCoveragePercent,
-        dspIsOnList
-      };
-    }
-
-    const ctx = {
-      application: {
-        applicationId: app.application_id,
-        segment: app.segment,
-        procedureUrgency: app.procedure_urgency,
-        providerInvoiceAmount: Number(app.provider_invoice_amount_cents),
-        termMonths: app.term_months
-      },
-      provider: {
-        providerId: app.provider_id,
-        status: provider.status,
-        billingAgreementSigned: !!conc.billing_agreement_signed,
-        bookSharePercent: conc.book_share_percent,
-        procedureTypeSharePercent: conc.procedure_type_share_percent,
-        patientPdRate: conc.patient_pd_rate
-      },
-      patient: {
-        patientId: app.patient_id,
-        verifiedMonthlyIncome: income.verified_monthly_income_cents
-          ? Number(income.verified_monthly_income_cents) : null,
-        incomeVerificationMethod: income.method || null,
-        verifiedAt: income.verified_at ? new Date(income.verified_at) : null
-      },
-      portfolio: {
-        arrearsRate: pf.arrears_rate,
-        balanceSheetPercent: pf.balance_sheet_percent,
-        segment1TariffFlaggedRate: pf.segment1_tariff_flagged_rate,
-        reserveFundBalance: Number(pf.reserve_fund_balance_cents || 0),
-        monthlyFeeIncome: Number(pf.monthly_fee_income_cents || 0)
-      },
-      segment1,
-      feePercent: 5
+    // Normalised application for the Shield Underwriting Module. The context
+    // builder reads every data source itself and records provenance; any
+    // missing or failing source fails closed (REFER/DECLINE), never open.
+    const procedureKey = app.procedure_type || app.procedure_description || app.procedure_code;
+    const application = {
+      applicationId: app.application_id,
+      patientId: app.patient_id,
+      providerId: app.provider_id,
+      segment: app.segment,
+      procedureCode: app.procedure_code,
+      procedureType: app.procedure_type || app.procedure_code,
+      procedureCategory: app.procedure_category || shield.procedureCategoryFor(procedureKey),
+      urgency: app.procedure_urgency,
+      amountCents: Number(app.provider_invoice_amount_cents),
+      termMonths: Number(app.term_months),
+      bookingLeadDays: app.booking_lead_days ?? null,
+      medicalAidScheme: app.medical_aid_scheme,
+      medicalAidPlan: app.medical_aid_plan
     };
 
-    const result = runShieldDecision(ctx);
+    const now = new Date();
+    const allowMockSources = shield.mockSourcesAllowed();
+    const input = await shield.buildUnderwritingInput(application, { query, now });
+    const outcome = shield.underwrite(input, { now, allowMockSources });
+    const record = shield.buildDecisionRecord(input, { now, allowMockSources }, outcome);
 
-    // Persist the decision to the application row.
-    const newStatus =
-      result.decision === 'APPROVED' ? 'APPROVED'
-      : result.decision === 'COOLING_OFF' ? 'COOLING_OFF'
-      : result.decision === 'MANUAL_REVIEW' ? 'MANUAL_REVIEW'
-      : 'DECLINED';
+    // Record the immutable decision BEFORE acting on it. If this throws, the
+    // 500 handler responds and the application status is left unchanged.
+    const decisionId = await shield.recordDecision(query, { record, outcome, channel: 'V1_API' });
+
+    const STATUS_BY_DECISION = {
+      APPROVED: 'APPROVED',
+      APPROVED_COOLING_OFF: 'COOLING_OFF',
+      REFER: 'MANUAL_REVIEW',
+      DECLINED: 'DECLINED'
+    };
+    const newStatus = STATUS_BY_DECISION[outcome.decision] || 'MANUAL_REVIEW';
+    const finiteOrNull = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+    const reasonCodes = Array.isArray(outcome.reasonCodes) ? outcome.reasonCodes : [];
+    const conditions = Array.isArray(outcome.disbursementConditions) ? outcome.disbursementConditions : [];
+    const terms = outcome.terms || {};
 
     await query(
       `UPDATE v1_applications SET
@@ -313,60 +235,65 @@ router.post('/decisions/:applicationId', authenticateToken, async (req, res) => 
          affordability_ratio = $10, affordability_ceiling = $11,
          cooling_off_required = $12, cooling_off_expires_at = $13,
          dsp_warning_required = $14, tariff_disclosure_required = $15,
+         shield_decision_id = $16,
          decided_at = NOW(), updated_at = NOW()
-       WHERE application_id = $16`,
+       WHERE application_id = $17`,
       [
-        newStatus, result.decision, result.gate || null, result.reason || null,
-        result.disbursementAmount || null, result.monthlyInstalment || null,
-        result.facilitationFeeTotal || null, result.mdrAmount || null,
-        result.tariffMultipleApplied || null,
-        result.affordabilityRatio || null, result.affordabilityCeiling || null,
-        !!result.coolingOffRequired, result.coolingOffExpiresAt || null,
-        !!result.dspWarningRequired, !!result.tariffDisclosureRequired,
+        newStatus, outcome.decision, outcome.decisiveStage || null,
+        reasonCodes.length ? reasonCodes.join(',') : null,
+        finiteOrNull(terms.facilitationAmountCents), finiteOrNull(terms.instalmentCents),
+        finiteOrNull(terms.mdrCents), finiteOrNull(terms.mdrCents),
+        finiteOrNull(outcome.providerRisk?.measures?.tariffRatio ?? null),
+        finiteOrNull(outcome.patientAffordability?.measures?.rti ?? null),
+        finiteOrNull(outcome.patientAffordability?.measures?.rtiCeiling ?? null),
+        !!outcome.coolingOff?.required, outcome.coolingOff?.expiresAt || null,
+        conditions.includes('DSP_WARNING_ACKNOWLEDGED'),
+        app.segment === 'SEGMENT_1_GAP',
+        decisionId,
         app.application_id
       ]
     );
 
     // Fire webhooks for the terminal decision.
-    if (result.decision === 'APPROVED' || result.decision === 'COOLING_OFF') {
+    if (outcome.decision === 'APPROVED' || outcome.decision === 'APPROVED_COOLING_OFF') {
       await webhooks.fire('application.approved', {
         applicationId: app.application_id,
-        decision: result.decision
+        decision: outcome.decision
       });
-    } else if (result.decision === 'DECLINED') {
+    } else if (outcome.decision === 'DECLINED') {
       await webhooks.fire('application.declined', {
         applicationId: app.application_id,
-        gate: result.gate,
-        reason: result.reason
+        gate: outcome.decisiveStage,
+        reasonCodes
       });
-    } else if (result.decision === 'MANUAL_REVIEW') {
+    } else if (outcome.decision === 'REFER') {
       await webhooks.fire('application.manual_review', {
         applicationId: app.application_id,
-        gate: result.gate,
-        reason: result.reason
+        gate: outcome.decisiveStage,
+        reasonCodes
       });
     }
 
-    if (Array.isArray(result.circuitBreakersFired) && result.circuitBreakersFired.length > 0) {
-      for (const breaker of result.circuitBreakersFired) {
-        const event = breaker === 'RESERVE_FUND'
-          ? 'circuit_breaker.reserve_fund_triggered'
-          : 'circuit_breaker.triggered';
-        await webhooks.fire(event, { breaker, applicationId: app.application_id });
-      }
+    for (const breaker of outcome.circuitBreakers || []) {
+      const event = breaker === 'RESERVE_FUND'
+        ? 'circuit_breaker.reserve_fund_triggered'
+        : 'circuit_breaker.triggered';
+      await webhooks.fire(event, { breaker, applicationId: app.application_id });
     }
-    if (result.circuitBreaker === 'PROVIDER_PD_RATE') {
+    if (reasonCodes.includes('PROVIDER_PERFORMANCE_SUSPENSION') ||
+        reasonCodes.includes('PROVIDER_FIRST_INSTALMENT_FAILURE')) {
       await webhooks.fire('provider.suspended', { providerId: app.provider_id });
     }
-    if (result.decision === 'MANUAL_REVIEW' && result.gate === 'GATE_4_TARIFF') {
+    if (reasonCodes.includes('TARIFF_ABOVE_BENCHMARK') || reasonCodes.includes('TARIFF_ABOVE_HARD_LIMIT')) {
       await webhooks.fire('invoice.flagged_above_tariff', {
         applicationId: app.application_id,
         providerInvoiceAmount: Number(app.provider_invoice_amount_cents),
-        tariffMultipleApplied: result.tariffMultipleApplied
+        tariffMultipleApplied: finiteOrNull(outcome.providerRisk?.measures?.tariffRatio ?? null)
       });
     }
 
-    return res.status(200).json(result);
+    const { featureVector, ...response } = outcome; // eslint-disable-line no-unused-vars
+    return res.status(200).json({ ...response, decisionId });
   } catch (err) {
     console.error('v1.decisions error:', err.message);
     return res.status(500).json({ error: 'Decision processing failed', code: 'SERVER_ERROR' });
