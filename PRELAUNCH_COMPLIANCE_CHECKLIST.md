@@ -1,4 +1,4 @@
-# Pre-production legal & compliance approval checklist — homepage repositioning (v1.12.2)
+# Pre-production legal & compliance approval checklist — homepage repositioning (v1.13.0)
 
 Each item needs sign-off from the business owner and South African legal
 counsel before v1.12.0 is deployed to production. Nothing below has been
@@ -43,6 +43,21 @@ assumed complete.
       burden — we handle patient payment management" and a "growing
       healthcare payment network". The owner should either provide evidence
       for these claims or counsel should approve them before production.
+
+## PaySick Care Agent (v1.13.0)
+- [ ] Counsel reviews the Care Agent journey (`care-agent.html`). It
+      presents term options ("N-month plan · total R… · 0% interest"),
+      runs the Shield affordability check, and hands off to the live
+      marketplace application. Confirm this is acceptable before launch,
+      alongside the homepage disclosures.
+- [ ] POPIA review: the agent stores conversation text, and uploaded
+      quotes, invoices and scheme statements (which can contain health
+      information), in `care_agent_sessions` / `care_agent_audit_log`, and
+      sends them to the Anthropic API for processing. Update
+      `privacy-policy.html` (purpose, operator, cross-border transfer,
+      retention) before production.
+- [ ] Owner sets `ANTHROPIC_API_KEY` in production (otherwise the
+      deterministic engine is used) and runs migration `012_care_agent.sql`.
 
 ## Homepage links into live flows (owner decision, v1.12.1)
 - [ ] Per owner direction, the homepage keeps its existing links to

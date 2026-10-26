@@ -10,24 +10,12 @@
  */
 
 const { query, transaction } = require('../config/database');
+const { HARD_FLOORS, AMBER_THRESHOLDS } = require('../utils/affordability-policy');
 
 // ═══════════════════════════════════════════════════════════════
 // HARD RULES — Absolute, no override
+// (shared with the Care Agent via utils/affordability-policy.js)
 // ═══════════════════════════════════════════════════════════════
-
-const HARD_FLOORS = {
-  minimum_income: 4000,              // R4,000 — protects vulnerable populations
-  maximum_rti: 0.20,                 // 20% repayment-to-income ceiling
-  maximum_dti_full_procedure: 0.55,  // 55% DTI for full-procedure financing
-  minimum_gap_amount: 2000,          // R2,000 minimum gap financing (below = suggest cash)
-  maximum_restructure_cost_increase: 0.25  // 25% max cost increase on restructuring
-};
-
-const AMBER_THRESHOLDS = {
-  rti_comfort_zone: 0.15,            // 15% — above this is amber
-  dti_review_threshold: 0.45,        // 45% — above this is amber
-  elective_cooling_off_amount: 15000 // R15,000 — above this triggers 48hr cooling off
-};
 
 // Elective procedure types (convenience signal)
 const ELECTIVE_PROCEDURES = [

@@ -286,7 +286,9 @@ describe('index.html keeps every existing link working', () => {
   });
 
   test('no non-submitting preview forms on the homepage', () => {
-    assert.doesNotMatch(html, /<form/);
+    // The Care Agent search bar is a real form: it navigates to care-agent.html.
+    const withoutAgentSearch = html.replace(/<form class="agent-search"[\s\S]*?<\/form>/, '');
+    assert.doesNotMatch(withoutAgentSearch, /<form/);
     assert.doesNotMatch(html, /interest-forms\.js/);
     assert.equal(fs.existsSync(path.join(REPO_ROOT, 'js/interest-forms.js')), false);
   });

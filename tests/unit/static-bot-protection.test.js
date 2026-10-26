@@ -46,6 +46,8 @@ const HONEYPOT_PAGES = [
   'register.html',
   'providers.html',
   'investor-deck.html',
+  // PaySick Care Agent: reachable from the homepage search bar.
+  'care-agent.html',
 ];
 
 const HONEYPOT_PATH = '/api/hp-check';

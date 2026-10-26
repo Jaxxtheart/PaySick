@@ -54,7 +54,7 @@ const PaySickAPI = {
               }
               return this.request(endpoint, options, true);
             } catch (_refreshError) {
-              // Refresh failed — clear session and surface the error
+              // Refresh failed - clear session and surface the error
               this.users.logout();
               throw new Error('Session expired. Please log in again.');
             }
@@ -72,7 +72,7 @@ const PaySickAPI = {
 
   /**
    * Exchange a refresh token for a new access token.
-   * Internal — callers should use request() which handles this automatically.
+   * Internal - callers should use request() which handles this automatically.
    */
   async _refreshAccessToken(refreshToken) {
     const url = `${this.baseURL}/users/refresh-token`;
@@ -121,14 +121,14 @@ const PaySickAPI = {
     },
 
     /**
-     * Logout user — revokes the session server-side then clears local storage.
+     * Logout user - revokes the session server-side then clears local storage.
      * Always clears storage even if the network call fails.
      */
     async logout() {
       try {
         await PaySickAPI.request('/users/logout', { method: 'POST' });
       } catch (_) {
-        // Ignore server-side errors — local cleanup always runs
+        // Ignore server-side errors - local cleanup always runs
       } finally {
         localStorage.removeItem('paysick_auth_token');
         localStorage.removeItem('paysick_refresh_token');
@@ -428,6 +428,96 @@ const PaySickAPI = {
      */
     async getLoanRepayments(loanId) {
       return PaySickAPI.request(`/marketplace/loans/${loanId}/repayments`);
+    }
+  },
+
+  // ─── Care Agent (PaySick Care Agent - AI-native alternative journey) ────
+  careAgent: {
+    /**
+     * Start a new Care Agent conversation
+     */
+    async startSession() {
+      return PaySickAPI.request('/care-agent/sessions', { method: 'POST' });
+    },
+
+    /**
+     * Resume an existing conversation
+     */
+    async getSession(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}`);
+    },
+
+    /**
+     * Send a free-text message; the agent extracts what it can and asks
+     * the next progressive question (Stage 1/2: Need, Understand)
+     */
+    async sendMessage(sessionId, message) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ message })
+      });
+    },
+
+    /**
+     * Upload a quote, invoice, or medical-scheme statement for automatic
+     * field extraction (Stage 2: Understand). The file must already be
+     * base64-encoded (without the data: URL prefix) and under 4MB.
+     */
+    async uploadDocument(sessionId, { fileBase64, mediaType, filename }) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/documents`, {
+        method: 'POST',
+        body: JSON.stringify({ fileBase64, mediaType, filename })
+      });
+    },
+
+    /**
+     * Confirm (optionally with edits) the extracted care summary and
+     * receive Stage 3 (Construct) payment-term options
+     */
+    async confirmSummary(sessionId, { summary = {}, monthlyIncome, monthlyObligations } = {}) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/confirm`, {
+        method: 'POST',
+        body: JSON.stringify({ summary, monthlyIncome, monthlyObligations })
+      });
+    },
+
+    /**
+     * Stage 4 (Approve): explicit approval + data-sharing consent.
+     * Returns the payload to submit to the existing marketplace endpoint.
+     */
+    async approve(sessionId, { selectedTermMonths, dataSharingAcknowledged }) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ selectedTermMonths, dataSharingAcknowledged })
+      });
+    },
+
+    /**
+     * Stage 5 (Execute): link the application id created via the existing
+     * marketplace endpoint back to this conversation's audit trail
+     */
+    async recordExecution(sessionId, applicationId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/execute`, {
+        method: 'POST',
+        body: JSON.stringify({ applicationId })
+      });
+    },
+
+    /**
+     * Stage 6 (Manage): "when is my next payment?"
+     */
+    async getManageStatus(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/manage`);
+    },
+
+    /**
+     * Stage 6 (Manage): request a payment-date change (logged for human review)
+     */
+    async requestPaymentDateChange(sessionId, reason) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/manage/payment-date-change`, {
+        method: 'POST',
+        body: JSON.stringify({ reason })
+      });
     }
   },
 

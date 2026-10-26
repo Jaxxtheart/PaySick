@@ -6,6 +6,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.13.0] — 2026-10-26
+
+**Type**: MINOR — PaySick Care Agent on the homepage
+
+### Added
+- An "Ask PaySick" search bar in the homepage hero, which goes to the new
+  `care-agent.html`.
+- The Care Agent backend: the `/api/care-agent/*` routes (authenticated,
+  60 requests per 15 minutes), the conversational, document and
+  deterministic-fallback services, migration `012_care_agent.sql`, and
+  `PaySickAPI.careAgent.*`.
+- Ported from the unmerged `claude/inspiring-bardeen-b97kat` branch (the
+  Care Agent subsystem only).
+
+### Changed (port review)
+- The default model is now `claude-opus-5-5`.
+- Document extraction no longer forces `tool_choice`.
+- Default `max_tokens` is now 16000.
+- A refusal or empty model reply now falls back to the deterministic
+  engine instead of showing a blank message.
+
+---
+
 ## [v1.12.2] — 2026-10-26
 
 **Type**: PATCH — owner-directed homepage copy changes
