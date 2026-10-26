@@ -41,7 +41,7 @@ PaySick uses custom-designed SVG icons instead of platform-dependent emojis (iOS
 - **Color:** Red gradient
 - **Size:** 40px × 40px
 
-#### Calendar - 3-Month Terms
+#### Calendar - Flexible Terms
 ```svg
 <svg viewBox="0 0 24 24" fill="none">
     <rect x="3" y="4" width="18" height="18" rx="2" stroke="url(#calendarGradient)"/>

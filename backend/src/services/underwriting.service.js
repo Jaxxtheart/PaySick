@@ -21,7 +21,7 @@ const { query } = require('../config/database');
 const DISCLOSURE_VERSION = '1.0';
 
 const DISCLOSURE_TEXT = `
-TARIFF GAP FACILITATION DISCLOSURE — PaySick (Pty) Ltd
+TARIFF GAP FACILITATION DISCLOSURE — Tech & Artery (Pty) Ltd
 
 This disclosure explains the gap between your medical scheme's tariff (what your
 scheme pays) and the healthcare provider's actual charge (what the provider bills).
@@ -61,7 +61,7 @@ BY ACKNOWLEDGING THIS DISCLOSURE, YOU CONFIRM THAT:
 - You consent to PaySick facilitating the gap payment on your behalf.
 - You understand the total facilitation amount and monthly instalment schedule.
 
-PaySick (Pty) Ltd | Registration No. 2023/123456/07
+Tech & Artery (Pty) Ltd | Registration No. K2015/346764/07
 NCR Registration: [Pending] | FSCA Registration: [Pending]
 This is a facilitation service, not financial advice.
 `.trim();

@@ -71,7 +71,7 @@ function emailWrapper(bodyHtml) {
           ${bodyHtml}
           <hr style="border:none;border-top:1px solid #F0F0F0;margin:28px 0 20px;">
           <p style="margin:0;color:#AAAAAA;font-size:12px;line-height:1.6;text-align:center;">
-            PaySick (Pty) Ltd &mdash; hello@paysick.co.za<br>
+            Tech &amp; Artery (Pty) Ltd &mdash; hello@paysick.co.za<br>
             Questions? Just reply to this email — a real person reads it.
           </p>
         </td></tr>

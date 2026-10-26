@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>Provider Billing Agreements — PaySick Admin</title>
+  <title>Provider Billing Agreements | PaySick Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
@@ -357,7 +357,7 @@
                 <td style="font-family:monospace;font-size:12px">${providerId}</td>
                 <td><span class="status-badge status-${statusClass}">${statusClass}</span></td>
                 <td>${data.gap_financing_eligible ? 'Eligible' : 'Blocked'}</td>
-                <td>${data.suspension_reason || '—'}</td>
+                <td>${data.suspension_reason || '-'}</td>
                 <td>
                   <div class="action-buttons">
                     ${statusClass === 'ACTIVE' ? `<button class="btn-suspend" onclick="openSuspendModal('${providerId}')">Suspend</button>` : ''}

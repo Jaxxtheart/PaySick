@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>Procedure Benchmarks — PaySick Admin</title>
+  <title>Procedure Benchmarks | PaySick Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
@@ -300,7 +300,7 @@
   }
 
   function formatZAR(val) {
-    return val ? `R ${parseFloat(val).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}` : '—';
+    return val ? `R ${parseFloat(val).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}` : '-';
   }
 
   async function loadBenchmarks() {
@@ -330,12 +330,12 @@
         <tr>
           <td><span class="code-chip">${b.procedure_code}</span></td>
           <td>${b.procedure_name}</td>
-          <td>${b.specialty || '—'}</td>
+          <td>${b.specialty || '-'}</td>
           <td>${b.metro_region ? `<span class="region-chip">${b.metro_region}</span>` : '<span style="color:#999">National</span>'}</td>
           <td class="amount">${formatZAR(b.benchmark_cost_100pct)}</td>
-          <td>${b.benchmark_source || '—'}</td>
+          <td>${b.benchmark_source || '-'}</td>
           <td>${new Date(b.effective_from).toLocaleDateString('en-ZA')}</td>
-          <td>${b.updated_by || '—'}</td>
+          <td>${b.updated_by || '-'}</td>
           <td><button class="btn-edit" onclick="openEditModal(${JSON.stringify(b).replace(/"/g, '&quot;')})">Edit</button></td>
         </tr>
       `).join('');

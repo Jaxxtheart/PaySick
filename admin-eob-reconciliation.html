@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>EOB Reconciliation — PaySick Admin</title>
+  <title>EOB Reconciliation | PaySick Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
@@ -211,15 +211,15 @@
     <div id="summaryRow" class="summary-row" style="display:none">
       <div class="summary-item">
         <div class="label">Pending EOBs</div>
-        <div class="value" id="sumPending">—</div>
+        <div class="value" id="sumPending">-</div>
       </div>
       <div class="summary-item">
         <div class="label">Total Invoice Value</div>
-        <div class="value" id="sumInvoice">—</div>
+        <div class="value" id="sumInvoice">-</div>
       </div>
       <div class="summary-item">
         <div class="label">Facilitation Ceiling Total</div>
-        <div class="value" id="sumCeiling">—</div>
+        <div class="value" id="sumCeiling">-</div>
       </div>
     </div>
     <div class="table-header">
@@ -244,12 +244,12 @@
   }
 
   function formatZAR(val) {
-    if (val === null || val === undefined) return '—';
+    if (val === null || val === undefined) return '-';
     return `R ${parseFloat(val).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
   }
 
   function formatVariance(invoice, ceiling) {
-    if (!invoice || !ceiling) return '—';
+    if (!invoice || !ceiling) return '-';
     const variance = ((parseFloat(invoice) - parseFloat(ceiling)) / parseFloat(ceiling) * 100).toFixed(1);
     const cls = parseFloat(variance) > 0 ? 'variance-positive' : 'variance-negative';
     return `<span class="${cls}">${variance > 0 ? '+' : ''}${variance}%</span>`;
@@ -294,7 +294,7 @@
           <td>${formatVariance(item.provider_invoice_amount, item.facilitation_ceiling)}</td>
           <td class="amount">${formatZAR(item.scheme_residual_amount)}</td>
           <td><span class="status-badge status-${item.reconciliation_status}">${item.reconciliation_status}</span></td>
-          <td>${item.submitted_at ? new Date(item.submitted_at).toLocaleDateString('en-ZA') : '—'}</td>
+          <td>${item.submitted_at ? new Date(item.submitted_at).toLocaleDateString('en-ZA') : '-'}</td>
           <td>
             ${item.reconciliation_status === 'PENDING'
               ? `<button class="btn-reconcile" onclick="reconcileEob('${item.application_id}', this)">Reconcile</button>`

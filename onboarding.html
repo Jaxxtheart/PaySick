@@ -1240,7 +1240,7 @@
 
             try {
                 // User is already in the DB and email-verified via register.html.
-                // Just update profile (cell/postal) — never re-register, and
+                // Just update profile (cell/postal) - never re-register, and
                 // never fabricate identity fields that weren't actually collected.
                 try {
                     await fetch('/api/users/profile', {
@@ -1281,12 +1281,12 @@
                     }
                 }
 
-                // Clear registration data — no longer needed
+                // Clear registration data - no longer needed
                 localStorage.removeItem('paysick_registration_data');
                 localStorage.removeItem('paysick_pending_email');
             } catch (error) {
                 console.error('Onboarding API error:', error);
-                // Continue regardless — local progress is saved
+                // Continue regardless - local progress is saved
             }
 
             // Save onboarding data

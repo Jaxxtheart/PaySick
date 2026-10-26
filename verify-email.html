@@ -414,7 +414,7 @@
     window.openEmailClient = openEmailClient;
 
     // ── verifyToken: called only on explicit user click ──────────
-    // NOT called on page load — prevents email security scanners
+    // NOT called on page load - prevents email security scanners
     // that pre-fetch links from consuming the one-time token.
     async function verifyToken() {
         showState('stateVerifying');

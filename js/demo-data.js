@@ -1,5 +1,5 @@
 /**
- * DEMO DATA — dashboard.html demo mode fixture
+ * DEMO DATA - dashboard.html demo mode fixture
  *
  * Fabricated financial data used only when a demo-mode auth token
  * (`demo-...`) is present. Kept out of dashboard.html so the file that

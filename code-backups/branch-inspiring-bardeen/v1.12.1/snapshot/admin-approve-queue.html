@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <title>Outreach Approve Queue — PaySick Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
+    a { color: #EF476F; }
+
+    .page-header { background: #fff; border-bottom: 1px solid #E5E5E5; padding: 0 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .header-logo { font-size: 20px; font-weight: 700; color: #EF476F; text-decoration: none; letter-spacing: -0.3px; }
+    .header-logo span { font-weight: 300; color: #1B2A4A; }
+    .header-page-title { font-size: 15px; font-weight: 600; color: #1B2A4A; }
+    .admin-badge { background: #EF476F; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .logout-btn { background: transparent; border: 2px solid #1B2A4A; color: #1B2A4A; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .logout-btn:hover { background: #1B2A4A; color: #fff; }
+
+    .main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+    .toolbar h1 { font-size: 20px; color: #1B2A4A; }
+    .btn { border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .btn-primary { background: #EF476F; color: #fff; }
+    .btn-secondary { background: #fff; color: #1B2A4A; border: 1px solid #D5D9E0; }
+    .btn-approve { background: #1B9E6B; color: #fff; }
+    .btn-reject { background: #fff; color: #C0392B; border: 1px solid #E4B4b0; }
+    .btn-edit { background: #fff; color: #1B2A4A; border: 1px solid #D5D9E0; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .funnel { background: #fff; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .funnel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #8A8A8A; margin-bottom: 10px; }
+    .funnel-chips span { display: inline-block; margin: 0 14px 8px 0; font-size: 13px; color: #1B2A4A; }
+    .funnel-chips b { color: #EF476F; }
+
+    .card { background: #fff; border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .card.hold { border-left: 4px solid #EF476F; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .practice { font-size: 16px; font-weight: 700; color: #1B2A4A; }
+    .meta { font-size: 12px; color: #8A8A8A; margin-top: 2px; }
+    .fit { font-size: 12px; font-weight: 700; color: #1B2A4A; background: #EEF1F6; border-radius: 12px; padding: 3px 10px; }
+    .badge { font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 10px; padding: 3px 9px; }
+    .badge-draft { background: #E8F0FE; color: #1B4AA3; }
+    .badge-hold { background: #FDE7EC; color: #C0392B; }
+    .badge-step { background: #EEF1F6; color: #4A4A4A; margin-left: 6px; }
+    .subject { font-weight: 600; margin: 12px 0 4px; font-size: 14px; }
+    .body { white-space: pre-wrap; font-size: 13px; color: #333; line-height: 1.55; background: #FAFBFC; border: 1px solid #EEF1F6; border-radius: 6px; padding: 12px; }
+    .flags { margin: 10px 0 0; font-size: 12px; color: #C0392B; }
+    .flags b { text-transform: uppercase; }
+    .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .loading, .empty { text-align: center; color: #8A8A8A; padding: 40px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #1B2A4A; color: #fff; padding: 12px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 2000; }
+    .toast.show { opacity: 1; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 1500; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 10px; padding: 24px; width: 90%; max-width: 560px; }
+    .modal h2 { font-size: 17px; margin-bottom: 14px; color: #1B2A4A; }
+    .modal label { display: block; font-size: 12px; font-weight: 600; color: #4A4A4A; margin: 10px 0 4px; }
+    .modal input, .modal textarea { width: 100%; border: 1px solid #D5D9E0; border-radius: 6px; padding: 10px; font-family: Arial, sans-serif; font-size: 14px; }
+    .modal textarea { min-height: 160px; resize: vertical; }
+    .modal-actions { margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-content">
+      <a href="admin-dashboard.html" class="header-logo">Pay<span>Sick</span></a>
+      <span class="header-page-title">Outreach Approve Queue</span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="admin-badge">Admin</span>
+        <button class="logout-btn" onclick="handleLogout()">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="toolbar">
+      <h1>Approve Queue</h1>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="runDaily()" id="runBtn">Run pipeline now (dry-run)</button>
+        <button class="btn btn-primary" onclick="refresh()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="funnel">
+      <h3>Funnel snapshot</h3>
+      <div class="funnel-chips" id="funnel"><span>Loading…</span></div>
+    </div>
+
+    <div id="queue"><div class="loading">Loading queue…</div></div>
+  </main>
+
+  <!-- Edit modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h2>Edit draft</h2>
+      <input type="hidden" id="editTouchId">
+      <label>Subject</label>
+      <input type="text" id="editSubject">
+      <label>Body</label>
+      <textarea id="editBody"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeEdit()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEdit()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/api-client.js"></script>
+  <script>
+    // Login stores the token under `paysick_auth_token` (see login.html / admin-dashboard.html).
+    // Fall back to the older `auth_token` key some pages use, and to sessionStorage.
+    function getToken() {
+      return localStorage.getItem('paysick_auth_token')
+          || localStorage.getItem('auth_token')
+          || sessionStorage.getItem('auth_token');
+    }
+    async function apiFetch(path, options = {}) {
+      const token = getToken();
+      const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...options.headers };
+      const res = await fetch(path, { ...options, headers });
+      if (res.status === 401) { window.location.href = '/login.html'; throw new Error('unauthorized'); }
+      return res;
+    }
+    function handleLogout() {
+      localStorage.removeItem('paysick_auth_token'); localStorage.removeItem('paysick_user');
+      localStorage.removeItem('auth_token'); sessionStorage.removeItem('auth_token');
+      window.location.href = '/login.html';
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    let toastTimer;
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    async function loadFunnel() {
+      try {
+        const res = await apiFetch('/api/outreach/brief');
+        const { data } = await res.json();
+        const f = (data && data.funnel) || {};
+        const order = ['sourced','enriched','drafted','approved','contacted','replied','demo','signed','live','disqualified'];
+        document.getElementById('funnel').innerHTML =
+          order.map(s => `<span>${s}: <b>${f[s] || 0}</b></span>`).join('') +
+          `<span style="margin-left:12px;color:#8A8A8A;">Replies needing reply: <b>${(data.replies||[]).length}</b></span>`;
+      } catch (_) {}
+    }
+
+    // Loaded touches, kept so action handlers can look a draft up by id rather
+    // than embedding its subject/body (which contain apostrophes/newlines) in
+    // inline onclick attributes.
+    let currentTouches = [];
+
+    async function loadQueue() {
+      const el = document.getElementById('queue');
+      el.innerHTML = '<div class="loading">Loading queue…</div>';
+      try {
+        const res = await apiFetch('/api/outreach/queue');
+        const { touches } = await res.json();
+        currentTouches = touches || [];
+        if (currentTouches.length === 0) { el.innerHTML = '<div class="empty">Nothing awaiting approval. 🎉</div>'; return; }
+        el.innerHTML = currentTouches.map(renderCard).join('');
+      } catch (err) {
+        el.innerHTML = `<div class="empty">Failed to load queue: ${esc(err.message)}</div>`;
+      }
+    }
+
+    function renderCard(t) {
+      const hold = t.status === 'compliance_hold';
+      const flags = (t.compliance_flags || []).map(f => esc(f)).join(', ');
+      return `
+        <div class="card ${hold ? 'hold' : ''}">
+          <div class="card-top">
+            <div>
+              <div class="practice">${esc(t.practice_name)}
+                <span class="badge ${hold ? 'badge-hold' : 'badge-draft'}">${hold ? 'compliance hold' : 'draft'}</span>
+                <span class="badge badge-step">step ${t.sequence_step ?? 0} · ${esc(t.channel)}</span>
+              </div>
+              <div class="meta">${esc(t.vertical)} · ${esc(t.metro || '—')} · ${t.email ? esc(t.email) : 'no public email'}</div>
+            </div>
+            <span class="fit">fit ${t.fit_score}</span>
+          </div>
+          <div class="subject">${esc(t.subject || '(no subject)')}</div>
+          <div class="body">${esc(t.body || '')}</div>
+          ${hold ? `<div class="flags">Prohibited terms — <b>${flags}</b>. Edit to clear before approving.</div>` : ''}
+          <div class="actions">
+            <button class="btn btn-approve" onclick="approve('${t.id}')" ${hold ? 'disabled title="Edit to clear compliance hold first"' : ''}>Approve &amp; send</button>
+            <button class="btn btn-edit" onclick="openEdit('${t.id}')">Edit</button>
+            <button class="btn btn-reject" onclick="reject('${t.id}')">Reject</button>
+            <button class="btn btn-secondary" onclick="markReplied('${t.provider_id}')">Mark replied</button>
+          </div>
+        </div>`;
+    }
+
+    async function approve(id) {
+      try {
+        const res = await apiFetch(`/api/outreach/touches/${id}/approve`, { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) return toast(data.error || 'Approve failed');
+        toast('Approved & sent'); refresh();
+      } catch (err) { toast(err.message); }
+    }
+    async function reject(id) {
+      if (!confirm('Reject this draft?')) return;
+      try {
+        const res = await apiFetch(`/api/outreach/touches/${id}/reject`, { method: 'POST' });
+        if (!res.ok) return toast('Reject failed');
+        toast('Rejected'); refresh();
+      } catch (err) { toast(err.message); }
+    }
+    async function markReplied(providerId) {
+      if (!confirm('Mark this lead as replied? The sequence will halt so you can respond personally.')) return;
+      try {
+        const res = await apiFetch(`/api/outreach/providers/${providerId}/mark-replied`, { method: 'POST' });
+        if (!res.ok) return toast('Failed to mark replied');
+        toast('Marked replied'); refresh();
+      } catch (err) { toast(err.message); }
+    }
+
+    function openEdit(id) {
+      const t = currentTouches.find(x => x.id === id);
+      if (!t) return toast('Draft not found — refreshing');
+      document.getElementById('editTouchId').value = t.id;
+      document.getElementById('editSubject').value = t.subject || '';
+      document.getElementById('editBody').value = t.body || '';
+      document.getElementById('editModal').classList.add('active');
+    }
+    function closeEdit() { document.getElementById('editModal').classList.remove('active'); }
+    async function saveEdit() {
+      const id = document.getElementById('editTouchId').value;
+      const subject = document.getElementById('editSubject').value;
+      const body = document.getElementById('editBody').value;
+      try {
+        const res = await apiFetch(`/api/outreach/touches/${id}/edit`, { method: 'POST', body: JSON.stringify({ subject, body }) });
+        const data = await res.json();
+        if (!res.ok) return toast(data.error || 'Save failed');
+        closeEdit();
+        toast(data.touch && data.touch.status === 'compliance_hold' ? 'Saved — still on compliance hold' : 'Saved — cleared');
+        refresh();
+      } catch (err) { toast(err.message); }
+    }
+
+    async function runDaily() {
+      const btn = document.getElementById('runBtn');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const res = await apiFetch('/api/outreach/daily?dry=1', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) toast(data.error || 'Run failed');
+        else toast(`Sourced ${data.summary.leads_sourced}, drafted ${data.summary.drafts_created}, holds ${data.summary.compliance_holds}`);
+        refresh();
+      } catch (err) { toast(err.message); }
+      finally { btn.disabled = false; btn.textContent = 'Run pipeline now (dry-run)'; }
+    }
+
+    function refresh() { loadFunnel(); loadQueue(); }
+    refresh();
+  </script>
+</body>
+</html>

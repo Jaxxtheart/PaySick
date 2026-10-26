@@ -2,7 +2,7 @@
 
 > South African Healthcare Payment Platform - Making medical care accessible through flexible payment plans
 
-PaySick is a fintech healthcare platform that enables patients to split their medical bills into manageable 3-month payment plans. We partner with healthcare providers across South Africa to make quality healthcare accessible to everyone.
+PaySick is a fintech healthcare platform that enables patients to split their medical bills into manageable payment plans. We partner with healthcare providers across South Africa to make quality healthcare accessible to everyone.
 
 ## Features
 

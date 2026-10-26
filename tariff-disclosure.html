@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>Tariff Gap Disclosure — PaySick</title>
+  <title>Tariff Gap Disclosure | PaySick</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -220,7 +220,7 @@
   <a href="/" class="logo">PaySick</a>
   <div class="secure-badge">
     <span>&#128274;</span>
-    Secure — Your data is encrypted
+    Secure: Your data is encrypted
   </div>
 </header>
 
@@ -237,7 +237,7 @@
 <main class="main">
   <div class="disclosure-card">
     <div class="disclosure-card-header">
-      <div class="step-label">Step 3 of 4 — Required Reading</div>
+      <div class="step-label">Step 3 of 4: Required Reading</div>
       <h1>Tariff Gap Disclosure</h1>
       <p>Before we can process your payment plan, you must read and acknowledge the following important information about the tariff gap between your medical scheme's payment and your provider's charge.</p>
     </div>
@@ -246,15 +246,15 @@
     <div class="summary-grid" id="summaryGrid" style="display:none">
       <div class="summary-box">
         <div class="label">Provider Charge</div>
-        <div class="value" id="sumProviderAmount">—</div>
+        <div class="value" id="sumProviderAmount">-</div>
       </div>
       <div class="summary-box">
         <div class="label">Scheme Tariff</div>
-        <div class="value" id="sumBenchmark">—</div>
+        <div class="value" id="sumBenchmark">-</div>
       </div>
       <div class="summary-box highlight">
         <div class="label">Estimated Gap</div>
-        <div class="value" id="sumGap">—</div>
+        <div class="value" id="sumGap">-</div>
       </div>
     </div>
 
@@ -283,15 +283,15 @@
         <h3>Your Estimated Gap Breakdown</h3>
         <div class="breakdown-row">
           <span>Provider charge</span>
-          <span class="amount" id="brkProvider">—</span>
+          <span class="amount" id="brkProvider">-</span>
         </div>
         <div class="breakdown-row">
           <span>Medical scheme payment (estimated)</span>
-          <span class="amount" id="brkScheme">—</span>
+          <span class="amount" id="brkScheme">-</span>
         </div>
         <div class="breakdown-row gap">
           <span>Gap amount (your portion)</span>
-          <span class="amount" id="brkGap">—</span>
+          <span class="amount" id="brkGap">-</span>
         </div>
       </div>
 
@@ -312,9 +312,9 @@
       </div>
 
       <button class="confirm-btn" id="confirmBtn" disabled onclick="acknowledgeDisclosure()">
-        I Acknowledge — Proceed to Payment Plan
+        I Acknowledge and Proceed to Payment Plan
       </button>
-      <a class="decline-link" onclick="declineDisclosure()">I do not wish to proceed — decline and return to previous step</a>
+      <a class="decline-link" onclick="declineDisclosure()">I do not wish to proceed, decline and return to previous step</a>
       <p class="legal-note">
         By confirming, you are providing your electronic consent as per the Electronic Communications and Transactions Act (ECT Act), No. 25 of 2002.
         Your IP address and session ID will be recorded for audit purposes.
@@ -345,7 +345,7 @@
   }
 
   function formatZAR(val) {
-    if (!val && val !== 0) return '—';
+    if (!val && val !== 0) return '-';
     return `R ${parseFloat(val).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
   }
 
@@ -393,17 +393,17 @@
   }
 
   const DISCLOSURE_TEXT_HTML = `
-    <h4>TARIFF GAP FACILITATION DISCLOSURE — PaySick (Pty) Ltd</h4>
+    <h4>TARIFF GAP FACILITATION DISCLOSURE | Tech &amp; Artery (Pty) Ltd</h4>
     <p>This disclosure explains the gap between your medical scheme's tariff (what your scheme pays) and the healthcare provider's actual charge (what the provider bills).</p>
     <h4>WHAT IS A GAP?</h4>
-    <p>Your medical scheme pays claims based on a tariff rate — typically the National Health Reference Price List (NHRPL) or a multiple thereof. Many healthcare providers charge above this tariff, resulting in a "tariff gap" — the difference between what your scheme pays and what the provider charges.</p>
+    <p>Your medical scheme pays claims based on a tariff rate, typically the National Health Reference Price List (NHRPL) or a multiple thereof. Many healthcare providers charge above this tariff, resulting in a "tariff gap," the difference between what your scheme pays and what the provider charges.</p>
     <h4>HOW PAYSICK HELPS</h4>
     <p>PaySick facilitates the payment of your tariff gap through a structured payment plan. You agree to pay a facilitation fee in exchange for PaySick settling your gap amount directly with the provider.</p>
     <h4>YOUR RIGHTS</h4>
     <ul>
       <li>You have the right to request an itemised account from the provider.</li>
       <li>You have the right to verify the provider's charges against the applicable tariff schedule.</li>
-      <li>You are not obligated to accept gap payment facilitation — you may negotiate directly with the provider or pay the gap yourself.</li>
+      <li>You are not obligated to accept gap payment facilitation. You may negotiate directly with the provider or pay the gap yourself.</li>
       <li>The facilitation fee is fixed and disclosed upfront. No hidden charges apply.</li>
     </ul>
     <h4>PROVIDER DSP STATUS</h4>
@@ -417,7 +417,7 @@
       <li>You consent to PaySick facilitating the gap payment on your behalf.</li>
       <li>You understand the total facilitation amount and monthly instalment schedule.</li>
     </ul>
-    <p style="margin-top:16px;font-size:11px;color:#999">PaySick (Pty) Ltd | NCR Registration: [Pending] | FSCA Registration: [Pending]<br>This is a facilitation service, not financial advice.</p>
+    <p style="margin-top:16px;font-size:11px;color:#999">Tech &amp; Artery (Pty) Ltd | NCR Registration: [Pending] | FSCA Registration: [Pending]<br>This is a facilitation service, not financial advice.</p>
   `;
 
   async function loadDisclosure() {
@@ -446,7 +446,7 @@
       const userId = getUserId() || params.get('patient_id');
 
       if (!disclosureId || !applicationId || !userId) {
-        // Demo mode — show success
+        // Demo mode - show success
         showSuccess();
         return;
       }
@@ -473,7 +473,7 @@
 
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = 'I Acknowledge — Proceed to Payment Plan';
+      btn.textContent = 'I Acknowledge and Proceed to Payment Plan';
       updateBtn();
       alert('Could not record your acknowledgement: ' + err.message);
     }
