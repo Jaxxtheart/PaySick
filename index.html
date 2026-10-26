@@ -681,6 +681,501 @@
             }
         }
 
+        /* ─── Section themes: each section gets its own look, so neighbours contrast ─── */
+        .section,
+        .hero,
+        .interest-section {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-eyebrow {
+            display: table;
+            margin: 0 auto 18px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(224, 30, 55, 0.08);
+            color: #B5162B;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        /* Curved divider: the previous section's colour flowing into this one */
+        .divider {
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            line-height: 0;
+            pointer-events: none;
+        }
+
+        .divider svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .divider-blush { color: #FFF1F3; }
+        .divider-light { color: #ffffff; }
+        .divider-dark { color: #15171C; }
+        .divider-rose { color: #FFF4F5; }
+        .divider-cream { color: #FBF7F1; }
+
+        /* Hero: blush, brand-red glows, a faint plus pattern and a heartbeat line */
+        .theme-blush {
+            background:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M20 16h4v4h4v4h-4v4h-4v-4h-4v-4h4z' fill='%23E01E37' fill-opacity='0.05'/%3E%3C/svg%3E"),
+                linear-gradient(180deg, #ffffff 0%, #FFF1F3 100%);
+        }
+
+        .theme-blush::before,
+        .theme-blush::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(10px);
+            pointer-events: none;
+        }
+
+        .theme-blush::before {
+            width: 520px;
+            height: 520px;
+            top: -160px;
+            right: -140px;
+            background: radial-gradient(circle, rgba(255, 71, 87, 0.22) 0%, rgba(255, 71, 87, 0) 70%);
+        }
+
+        .theme-blush::after {
+            width: 440px;
+            height: 440px;
+            top: 30%;
+            left: -200px;
+            background: radial-gradient(circle, rgba(224, 30, 55, 0.14) 0%, rgba(224, 30, 55, 0) 70%);
+        }
+
+        .hero > *:not(.pulse-line) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .pulse-line {
+            position: absolute;
+            left: 0;
+            bottom: 28px;
+            width: 100%;
+            height: 80px;
+            pointer-events: none;
+        }
+
+        .pulse-line .pulse-base {
+            stroke: #E01E37;
+            stroke-opacity: 0.16;
+        }
+
+        .pulse-line .pulse-beat {
+            stroke: #E01E37;
+            stroke-opacity: 0.75;
+            stroke-dasharray: 140 2600;
+            stroke-dashoffset: 2740;
+            animation: pulse-draw 4.5s linear infinite;
+        }
+
+        @keyframes pulse-draw {
+            from { stroke-dashoffset: 2740; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Why PaySick: crisp white, cards with an accent bar and big numerals */
+        .theme-light {
+            background: #ffffff;
+        }
+
+        .theme-light .feature-card {
+            position: relative;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #F0E3E5;
+            box-shadow: 0 12px 40px rgba(26, 26, 26, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .theme-light .feature-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF4757, #E01E37 60%, #A5122A);
+        }
+
+        .theme-light .feature-card::after {
+            content: attr(data-num);
+            position: absolute;
+            top: 12px;
+            right: 20px;
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1;
+            color: #E01E37;
+            opacity: 0.07;
+            letter-spacing: -2px;
+        }
+
+        .theme-light .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: #F3C4CA;
+            box-shadow: 0 20px 50px rgba(224, 30, 55, 0.12);
+        }
+
+        /* How it will work: dark, with a glowing track joining the steps */
+        .theme-dark {
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 0%, rgba(224, 30, 55, 0.22) 0%, rgba(224, 30, 55, 0) 70%),
+                #15171C;
+        }
+
+        .theme-dark .section-title { color: #ffffff; }
+        .theme-dark .section-subtitle { color: #C3C8D2; }
+        .theme-dark .section-eyebrow { background: rgba(255, 138, 149, 0.12); color: #FF8A95; }
+        .theme-dark .step h3 { color: #ffffff; }
+        .theme-dark .step p { color: #B9BEC9; }
+
+        .theme-dark .steps {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            position: relative;
+        }
+
+        .theme-dark .steps::before {
+            content: "";
+            position: absolute;
+            top: 28px;
+            left: 12.5%;
+            right: 12.5%;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255, 71, 87, 0.15), #FF4757 50%, rgba(255, 71, 87, 0.15));
+        }
+
+        .theme-dark .step-number {
+            position: relative;
+            background: #15171C;
+            border: 2px solid #FF4757;
+            color: #ffffff;
+            box-shadow: 0 0 0 6px rgba(255, 71, 87, 0.12), 0 0 28px rgba(255, 71, 87, 0.45);
+        }
+
+        .theme-dark .section-note {
+            color: #AEB3BE;
+            border-top-color: rgba(255, 255, 255, 0.12);
+        }
+
+        /* For providers: rose with a fine diagonal texture and a flow illustration */
+        .theme-rose {
+            background:
+                repeating-linear-gradient(135deg, rgba(224, 30, 55, 0.035) 0 2px, transparent 2px 18px),
+                #FFF4F5;
+        }
+
+        .theme-rose .providers-text .section-eyebrow {
+            margin: 0 0 18px;
+        }
+
+        .provider-flow {
+            position: relative;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 36px 32px;
+            box-shadow: 0 30px 60px rgba(165, 18, 42, 0.12);
+            border: 1px solid #F6D5DA;
+            max-width: 380px;
+            justify-self: center;
+            width: 100%;
+        }
+
+        .flow-node {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #FAFAFA;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .flow-node.flow-hub {
+            background: linear-gradient(135deg, #FF4757, #E01E37);
+            color: #ffffff;
+            box-shadow: 0 10px 24px rgba(224, 30, 55, 0.3);
+        }
+
+        .flow-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .flow-hub .flow-icon {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .flow-connector {
+            display: block;
+            width: 40px;
+            height: 34px;
+            margin-left: 16px;
+        }
+
+        .flow-connector line {
+            stroke: #E01E37;
+            stroke-width: 2;
+            stroke-dasharray: 4 5;
+            animation: flow-dash 1.2s linear infinite;
+        }
+
+        @keyframes flow-dash {
+            to { stroke-dashoffset: -18; }
+        }
+
+        /* Technology: deep wine to ink, dot grid, node network and capability chips */
+        .theme-ink {
+            background:
+                radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px) 0 0 / 22px 22px,
+                linear-gradient(160deg, #3A0D19 0%, #1C1013 45%, #15171C 100%);
+        }
+
+        .theme-ink .section-title { color: #ffffff; }
+        .theme-ink .narrow p { color: #D3D6DD; }
+        .theme-ink .section-eyebrow { background: rgba(255, 138, 149, 0.12); color: #FF8A95; }
+
+        .theme-ink .narrow {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tech-network {
+            position: absolute;
+            top: 50%;
+            right: -60px;
+            width: 420px;
+            height: 420px;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .tech-network line {
+            stroke: #FF8A95;
+            stroke-opacity: 0.35;
+            stroke-width: 1;
+        }
+
+        .tech-network circle {
+            fill: #FF4757;
+            animation: node-glow 3s ease-in-out infinite;
+        }
+
+        .tech-network circle:nth-of-type(2n) { animation-delay: 1s; }
+        .tech-network circle:nth-of-type(3n) { animation-delay: 2s; }
+
+        @keyframes node-glow {
+            0%, 100% { opacity: 0.35; }
+            50% { opacity: 1; }
+        }
+
+        .tech-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 36px;
+            list-style: none;
+        }
+
+        .tech-chips li {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .tech-chips li::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FF4757;
+            box-shadow: 0 0 10px #FF4757;
+        }
+
+        /* About: warm cream, logo watermark and a pull-quote tagline */
+        .theme-cream {
+            background: #FBF7F1;
+        }
+
+        .theme-cream .narrow {
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 460px;
+            height: 460px;
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
+            pointer-events: none;
+        }
+
+        .theme-cream .about-tagline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 36px;
+            font-size: 30px !important;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            text-transform: none;
+            color: #1A1A1A !important;
+        }
+
+        .theme-cream .about-tagline::before,
+        .theme-cream .about-tagline::after {
+            content: "";
+            width: 48px;
+            height: 3px;
+            border-radius: 2px;
+            background: #E01E37;
+            flex-shrink: 0;
+        }
+
+        /* Final call to action: bold brand-red band with white buttons */
+        .theme-brand {
+            background:
+                radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.16) 0, rgba(255, 255, 255, 0) 40%),
+                linear-gradient(135deg, #D41A33 0%, #A5122A 100%);
+            color: #ffffff;
+        }
+
+        .theme-brand .section-title { color: #ffffff; }
+        .theme-brand .section-subtitle { color: rgba(255, 255, 255, 0.92); margin-bottom: 40px; }
+        .theme-brand .section-eyebrow { background: rgba(255, 255, 255, 0.16); color: #ffffff; }
+
+        .theme-brand .primary-btn {
+            background: #ffffff;
+            color: #B5162B;
+        }
+
+        .theme-brand .primary-btn:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .theme-brand .secondary-btn {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+        }
+
+        .theme-brand .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        .theme-brand .interest-disclosure,
+        .theme-brand .interest-disclosure a {
+            color: #ffffff;
+        }
+
+        /* Reveal on scroll, only once JavaScript has opted in (html.js-reveal) */
+        .js-reveal [data-reveal] {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            transition-delay: var(--reveal-delay, 0ms);
+        }
+
+        .js-reveal [data-reveal].is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        @media (max-width: 1000px) {
+            .theme-dark .steps {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .theme-dark .steps::before {
+                display: none;
+            }
+
+            .theme-dark .step {
+                padding: 28px 20px;
+                border-radius: 18px;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .divider {
+                height: 36px;
+            }
+
+            .hero {
+                padding-bottom: 120px;
+            }
+
+            .pulse-line {
+                bottom: 16px;
+                height: 60px;
+            }
+
+            .theme-dark .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-network {
+                display: none;
+            }
+
+            .about-watermark {
+                width: 300px;
+                height: 300px;
+            }
+
+            .theme-cream .about-tagline {
+                font-size: 22px !important;
+                gap: 12px;
+            }
+
+            .theme-cream .about-tagline::before,
+            .theme-cream .about-tagline::after {
+                width: 24px;
+            }
+
+            .provider-flow {
+                padding: 28px 20px;
+            }
+        }
+
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
@@ -691,8 +1186,19 @@
                 scroll-behavior: auto;
             }
             .primary-btn:hover,
-            .cta-button:hover {
+            .cta-button:hover,
+            .theme-light .feature-card:hover {
                 transform: none;
+            }
+            .pulse-line .pulse-beat,
+            .flow-connector line,
+            .tech-network circle {
+                animation: none;
+            }
+            [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
             }
         }
     </style>
@@ -732,7 +1238,7 @@
 
     <main>
     <!-- Hero Section -->
-    <section class="hero" id="top">
+    <section class="hero theme-blush" id="top">
         <div class="tagline">HEALTHCARE FINANCING, BUILT AROUND YOU</div>
         <h1>Get the care you need. Find a way to pay.</h1>
         <p>Healthcare costs shouldn't be the reason you delay treatment. PaySick is building a simpler way to finance healthcare, connecting patients and healthcare providers through transparent, responsible financing.</p>
@@ -756,14 +1262,22 @@
             <a href="#how-it-works" class="secondary-btn">Explore how it works</a>
             <a href="#providers" class="secondary-btn">Partner with PaySick</a>
         </div>
+        <svg class="pulse-line" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path class="pulse-base" d="M0,40 H560 L590,40 L606,10 L624,72 L642,20 L658,40 H880 L900,40 L912,28 L926,54 L940,40 H1440" fill="none" stroke-width="2" stroke-linejoin="round"/>
+            <path class="pulse-beat" d="M0,40 H560 L590,40 L606,10 L624,72 L642,20 L658,40 H880 L900,40 L912,28 L926,54 L940,40 H1440" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
     </section>
 
     <!-- Value proposition -->
-    <section class="section" id="features">
+    <section class="section theme-light" id="features">
+        <div class="divider divider-blush" aria-hidden="true">
+            <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,0 H1440 V18 C1080,64 360,64 0,18 Z" fill="currentColor"/></svg>
+        </div>
+        <span class="section-eyebrow">Why PaySick</span>
         <h2 class="section-title">Better access to healthcare starts with affordability.</h2>
         <p class="section-subtitle">Medical expenses don't always arrive when your finances are ready. PaySick is designed to help patients explore financing options that consider their circumstances, the cost of treatment and their ability to repay.</p>
         <div class="feature-grid">
-            <div class="feature-card">
+            <div class="feature-card" data-num="01" data-reveal style="--reveal-delay: 0ms">
                 <div class="feature-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
@@ -779,7 +1293,7 @@
                 <h3>Responsible by design</h3>
                 <p>Financing should be based on verified affordability, not simply how much someone wants to borrow.</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-num="02" data-reveal style="--reveal-delay: 120ms">
                 <div class="feature-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
@@ -797,7 +1311,7 @@
                 <h3>Clear from the beginning</h3>
                 <p>Understand the proposed repayment amount, duration and total cost before making a commitment.</p>
             </div>
-            <div class="feature-card">
+            <div class="feature-card" data-num="03" data-reveal style="--reveal-delay: 240ms">
                 <div class="feature-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
@@ -817,26 +1331,30 @@
     </section>
 
     <!-- How it will work -->
-    <section class="section section-alt" id="how-it-works">
+    <section class="section theme-dark" id="how-it-works">
+        <div class="divider divider-light" aria-hidden="true">
+            <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,0 H1440 V18 C1080,64 360,64 0,18 Z" fill="currentColor"/></svg>
+        </div>
+        <span class="section-eyebrow">The journey</span>
         <h2 class="section-title">How it will work</h2>
         <p class="section-subtitle">The proposed patient journey, once the service is operational.</p>
         <ol class="steps">
-            <li class="step">
+            <li class="step" data-reveal style="--reveal-delay: 0ms">
                 <div class="step-number" aria-hidden="true">1</div>
                 <h3>Tell us about your treatment</h3>
                 <p>Share the healthcare procedure you're considering and the estimated cost.</p>
             </li>
-            <li class="step">
+            <li class="step" data-reveal style="--reveal-delay: 120ms">
                 <div class="step-number" aria-hidden="true">2</div>
                 <h3>Understand your affordability</h3>
                 <p>Our proposed assessment process considers verified income, existing financial commitments and reasonable living expenses.</p>
             </li>
-            <li class="step">
+            <li class="step" data-reveal style="--reveal-delay: 240ms">
                 <div class="step-number" aria-hidden="true">3</div>
                 <h3>Review your financing options</h3>
                 <p>Where eligible, review the proposed loan amount, repayment terms and total cost before deciding whether to proceed.</p>
             </li>
-            <li class="step">
+            <li class="step" data-reveal style="--reveal-delay: 360ms">
                 <div class="step-number" aria-hidden="true">4</div>
                 <h3>Access care and repay over time</h3>
                 <p>Once financing is approved and the service is operational, payment can be arranged with a participating provider, with repayments made according to the agreed credit terms.</p>
@@ -846,9 +1364,13 @@
     </section>
 
     <!-- For Providers Section -->
-    <section class="section" id="providers">
+    <section class="section theme-rose" id="providers">
+        <div class="divider divider-dark" aria-hidden="true">
+            <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,0 H1440 V18 C1080,64 360,64 0,18 Z" fill="currentColor"/></svg>
+        </div>
         <div class="providers-content">
             <div class="providers-text">
+                <span class="section-eyebrow">For providers</span>
                 <h2>Are You a Healthcare Provider?</h2>
                 <p>Join our growing healthcare payment network. Get paid reliably, expand patient access, and eliminate payment collection burden for your practice.</p>
                 <ul class="providers-benefits">
@@ -879,20 +1401,70 @@
                     <a href="providers.html" class="secondary-btn">Browse Provider Directory</a>
                 </div>
             </div>
+            <div class="provider-flow" aria-hidden="true" data-reveal>
+                <div class="flow-node">
+                    <span class="flow-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#E01E37" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="#E01E37" stroke-width="2" stroke-linecap="round"/></svg>
+                    </span>
+                    Patient
+                </div>
+                <svg class="flow-connector" viewBox="0 0 40 34"><line x1="20" y1="0" x2="20" y2="34"/></svg>
+                <div class="flow-node flow-hub">
+                    <span class="flow-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="9.5" y="3" width="5" height="18" rx="2.5" fill="#ffffff"/><rect x="3" y="9.5" width="18" height="5" rx="2.5" fill="#ffffff"/></svg>
+                    </span>
+                    PaySick
+                </div>
+                <svg class="flow-connector" viewBox="0 0 40 34"><line x1="20" y1="0" x2="20" y2="34"/></svg>
+                <div class="flow-node">
+                    <span class="flow-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 21V9l9-6 9 6v12" stroke="#E01E37" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v6M9 13h6" stroke="#E01E37" stroke-width="2" stroke-linecap="round"/></svg>
+                    </span>
+                    Your practice
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Technology -->
-    <section class="section section-alt" id="technology">
+    <section class="section theme-ink" id="technology">
+        <div class="divider divider-rose" aria-hidden="true">
+            <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,0 H1440 V18 C1080,64 360,64 0,18 Z" fill="currentColor"/></svg>
+        </div>
+        <svg class="tech-network" viewBox="0 0 420 420" aria-hidden="true" focusable="false">
+            <line x1="70" y1="90" x2="210" y2="60"/><line x1="210" y1="60" x2="340" y2="140"/>
+            <line x1="70" y1="90" x2="150" y2="220"/><line x1="210" y1="60" x2="150" y2="220"/>
+            <line x1="340" y1="140" x2="290" y2="280"/><line x1="150" y1="220" x2="290" y2="280"/>
+            <line x1="150" y1="220" x2="90" y2="340"/><line x1="290" y1="280" x2="230" y2="370"/>
+            <line x1="90" y1="340" x2="230" y2="370"/><line x1="340" y1="140" x2="380" y2="300"/>
+            <circle cx="70" cy="90" r="5"/><circle cx="210" cy="60" r="7"/><circle cx="340" cy="140" r="5"/>
+            <circle cx="150" cy="220" r="8"/><circle cx="290" cy="280" r="6"/><circle cx="90" cy="340" r="5"/>
+            <circle cx="230" cy="370" r="5"/><circle cx="380" cy="300" r="4"/>
+        </svg>
         <div class="narrow">
+            <span class="section-eyebrow">Technology</span>
             <h2 class="section-title">Technology that understands healthcare financing</h2>
             <p>PaySick combines healthcare-specific workflows, affordability assessment, credit decisioning and financial infrastructure into a single experience. Our goal is to finance earlier medical intervention while building evidence of its financial and clinical impact.</p>
+            <ul class="tech-chips">
+                <li data-reveal>Healthcare-specific workflows</li>
+                <li data-reveal style="--reveal-delay: 100ms">Affordability assessment</li>
+                <li data-reveal style="--reveal-delay: 200ms">Credit decisioning</li>
+                <li data-reveal style="--reveal-delay: 300ms">Financial infrastructure</li>
+            </ul>
         </div>
     </section>
 
     <!-- About / entity disclosure -->
-    <section class="section" id="about">
+    <section class="section theme-cream" id="about">
+        <div class="divider divider-dark" aria-hidden="true">
+            <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,0 H1440 V18 C1080,64 360,64 0,18 Z" fill="currentColor"/></svg>
+        </div>
+        <svg class="about-watermark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <rect x="40" y="8" width="20" height="84" rx="10" fill="#E01E37"/>
+            <rect x="8" y="40" width="84" height="20" rx="10" fill="#E01E37"/>
+        </svg>
         <div class="narrow">
+            <span class="section-eyebrow">About us</span>
             <h2 class="section-title">Built by Tech &amp; Artery</h2>
             <p>PaySick is a healthcare financing platform developed by Tech &amp; Artery (Pty) Ltd. We are building technology that connects patients and healthcare providers through responsible, transparent financing experiences.</p>
             <p class="about-tagline">Better access to healthcare.</p>
@@ -900,7 +1472,11 @@
     </section>
 
     <!-- Final conversion -->
-    <section class="interest-section" id="start">
+    <section class="interest-section theme-brand" id="start">
+        <div class="divider divider-cream" aria-hidden="true">
+            <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,0 H1440 V18 C1080,64 360,64 0,18 Z" fill="currentColor"/></svg>
+        </div>
+        <span class="section-eyebrow">Get involved</span>
         <h2 class="section-title">Be part of what we're building</h2>
         <p class="section-subtitle">Create your PaySick account, or register your practice to work with us.</p>
         <div class="hero-buttons">
@@ -986,6 +1562,24 @@
                 menuToggle.textContent = '☰';
             });
         });
+
+        // Reveal sections' cards as they scroll into view. Opt-in: without
+        // JavaScript (or with reduced motion) everything is simply visible.
+        if ('IntersectionObserver' in window &&
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('js-reveal');
+            const revealObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('[data-reveal]').forEach(function (el) {
+                revealObserver.observe(el);
+            });
+        }
 
         // Care Agent search bar: care-agent.html reads ?q= and, once the
         // visitor is signed in, sends it as the conversation's first message.

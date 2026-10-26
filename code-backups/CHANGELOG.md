@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.17.1] — 2026-10-26
+
+**Type**: PATCH — homepage visual design
+
+### Changed
+- `index.html`: each section has its own theme, in a "pulse" design
+  language.
+  - Blush hero with an animated heartbeat line.
+  - White cards with accent bars and numerals.
+  - Dark "How it will work" with a glowing step track.
+  - Rose providers section with a decorative flow card.
+  - Wine/ink technology section with a node network and chips.
+  - Cream "About" with a logo watermark and pull quote.
+  - Red final call to action.
+- Curved dividers, eyebrow labels, and scroll-reveal (honours reduced
+  motion, works without JS).
+- Copy, links and behaviour unchanged; WCAG AA contrast verified.
+
+---
+
 ## [v1.17.0] — 2026-10-26
 
 **Type**: MINOR — branch reconciliation, privacy policy, held Care Agent question
