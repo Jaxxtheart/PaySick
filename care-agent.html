@@ -73,6 +73,7 @@
         }
 
         .locked-card p { color: #555; margin-bottom: 20px; }
+        .locked-card p.saved-question { background: #FFF5F6; border: 1px solid #F3C4CA; border-radius: 10px; padding: 10px 14px; color: #1A1A1A; font-size: 14px; }
 
         .primary-btn {
             display: inline-block;
@@ -248,6 +249,8 @@
 
         .disclosure-list li { margin-bottom: 6px; }
 
+        .privacy-notice { font-size: 12px; color: #5A5A5A; line-height: 1.5; margin: 8px 4px 0; }
+        .privacy-notice a { color: #B5162B; }
         .consent-row {
             display: flex;
             align-items: flex-start;
@@ -278,6 +281,7 @@
              so this page never shows business logic to a signed-out visitor. -->
         <div id="locked-card" class="locked-card hidden">
             <p>Ask PaySick is part of your PaySick account, so I can safely pull in your existing profile and Shield affordability checks. Log in (or register) to start.</p>
+            <p id="saved-question" class="saved-question hidden"></p>
             <a class="primary-btn" href="login.html">Log in to talk to PaySick</a>
         </div>
 
@@ -342,9 +346,11 @@
                 <input type="text" id="message-input" placeholder="Tell us what's happening. You can describe the treatment, upload a quote, or explain the bill you're dealing with.">
                 <button id="send-btn">Send</button>
             </div>
+            <p class="privacy-notice">Your messages and any document you attach are processed with the help of Anthropic's AI service. Only share the health details needed to describe the treatment and its cost. <a href="privacy-policy.html#care-agent">How we use this information</a></p>
         </div>
     </main>
 
+    <script src="js/care-agent-pending.js"></script>
     <script src="api-client.js"></script>
     <script>
         const SUGGESTED_PROMPTS = [
@@ -472,6 +478,18 @@
         async function init() {
             if (!isAuthenticated()) {
                 document.getElementById('locked-card').classList.remove('hidden');
+                // Hold a question typed into the homepage search bar so it
+                // survives logging in (or registering) and can be sent after.
+                const typed = new URLSearchParams(window.location.search).get('q');
+                if (typed && typed.trim()) {
+                    PaySickCareAgentPending.save(localStorage, typed);
+                }
+                const held = PaySickCareAgentPending.peek(localStorage);
+                if (held) {
+                    const saved = document.getElementById('saved-question');
+                    saved.textContent = `Your question is saved: "${held}". Log in (or register) and I'll pick it up from there.`;
+                    saved.classList.remove('hidden');
+                }
                 return;
             }
             document.getElementById('app').classList.remove('hidden');
@@ -480,13 +498,23 @@
             const started = await startConversation();
             if (!started) return;
 
-            // A query typed into the homepage's Google-style search bar
-            // arrives here as ?q= - send it as the conversation's first
-            // message automatically, same as if the patient had typed and
-            // sent it themselves.
-            const searchQuery = new URLSearchParams(window.location.search).get('q');
-            if (searchQuery && searchQuery.trim()) {
-                sendMessage(searchQuery.trim());
+            // A query typed into the homepage's search bar arrives as ?q= and
+            // is sent as the first message, as if the patient had typed it.
+            // A question held from before sign-in (js/care-agent-pending.js)
+            // is cleared either way. It is only put in the message box, never
+            // sent automatically: on a shared device it may have been typed
+            // by someone other than the person who has now signed in.
+            const urlQuery = new URLSearchParams(window.location.search).get('q');
+            const held = PaySickCareAgentPending.take(localStorage);
+            if (urlQuery !== null) {
+                // Drop ?q= from the address bar so a reload doesn't resend it.
+                history.replaceState(null, '', window.location.pathname);
+            }
+            if (urlQuery && urlQuery.trim()) {
+                sendMessage(urlQuery.trim());
+            } else if (held) {
+                document.getElementById('message-input').value = held;
+                addBubble('system', 'Here is the question you typed before signing in. Check it, then press Send.');
             }
         }
 

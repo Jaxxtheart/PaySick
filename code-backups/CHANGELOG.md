@@ -6,6 +6,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.17.0] — 2026-10-26
+
+**Type**: MINOR — branch reconciliation, privacy policy, held Care Agent question
+
+### Version numbering
+- v1.17.0 is above every number used by this line (up to v1.13.0) and by
+  `claude/inspiring-bardeen-b97kat` (up to v1.16.0).
+- That branch's versions are archived, unchanged, in
+  `code-backups/branch-inspiring-bardeen/` with its own CHANGELOG. They were
+  never released on `main` under those numbers.
+
+### Merged
+- `claude/inspiring-bardeen-b97kat` is merged (real merge, history kept).
+- Taken from it: the entity rename (spelling normalised to "Tech & Artery
+  (Pty) Ltd"), registration number K2015/346764/07, the site-wide
+  payment-plan wording, and the em-dash cleanup.
+- The Care Agent and homepage keep this line's versions.
+
+### Changed
+- **`privacy-policy.html` v1.4**: Care Agent section 4A, health
+  information, Anthropic as an operator and cross-border recipient,
+  retention, and the registration number.
+- **`care-agent.html`**: privacy notice at the message box.
+- **`VERSIONING_GUIDE.md`**: new rule against version collisions across
+  branches.
+
+### Fixed
+- A question typed while signed out is no longer lost at login.
+  - It is held for up to 24 hours (`js/care-agent-pending.js`).
+  - `login.html` and `onboarding.html` return the patient to the Care
+    Agent.
+  - The held question is placed in the message box for review, never
+    auto-sent.
+
+---
+
 ## [v1.13.0] — 2026-10-26
 
 **Type**: MINOR — PaySick Care Agent on the homepage

@@ -1,4 +1,4 @@
-# Pre-production legal & compliance approval checklist — homepage repositioning (v1.13.0)
+# Pre-production legal & compliance approval checklist — homepage repositioning (v1.17.0)
 
 Each item needs sign-off from the business owner and South African legal
 counsel before v1.12.0 is deployed to production. Nothing below has been
@@ -50,12 +50,29 @@ assumed complete.
       runs the Shield affordability check, and hands off to the live
       marketplace application. Confirm this is acceptable before launch,
       alongside the homepage disclosures.
-- [ ] POPIA review: the agent stores conversation text, and uploaded
-      quotes, invoices and scheme statements (which can contain health
-      information), in `care_agent_sessions` / `care_agent_audit_log`, and
-      sends them to the Anthropic API for processing. Update
-      `privacy-policy.html` (purpose, operator, cross-border transfer,
-      retention) before production.
+- [ ] Counsel reviews the updated `privacy-policy.html` (v1.4, 26 October
+      2026), drafted in v1.17.0. It adds:
+      - section 4A on the Care Agent
+      - Care Agent health information under special personal information
+      - Anthropic as an operator and a cross-border recipient
+      - a Care Agent retention row
+      - the registration number K2015/346764/07
+
+      The Care Agent page now has a notice under the message box linking
+      to it.
+- [ ] Owner confirms a data processing agreement with Anthropic is in place
+      before publication. The policy says Anthropic acts as our operator,
+      as it does for Vercel and Neon.
+- [ ] Owner decides how to enforce the Care Agent retention row ("3 years
+      from last activity, then deleted"). There is no automated deletion
+      job yet for the `care_agent_*` tables.
+- [ ] Counsel reviews the policy's existing "Non-Credit Liability Notice"
+      and "payment facilitation platform" wording. It predates the
+      healthcare-financing repositioning and is unchanged.
+- [ ] Counsel confirms the consent basis for health information shared in
+      the Care Agent. Right now the only consent checkbox is at the final
+      approval step; earlier messages rely on the notice under the
+      message box.
 - [ ] Owner sets `ANTHROPIC_API_KEY` in production (otherwise the
       deterministic engine is used) and runs migration `012_care_agent.sql`.
 

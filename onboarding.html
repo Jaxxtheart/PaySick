@@ -932,6 +932,7 @@
         </div>
     </div>
 
+    <script src="js/care-agent-pending.js"></script>
     <script>
         let currentStep = 1;
         const totalSteps = 3;
@@ -1311,7 +1312,12 @@
             if (user.role === 'admin') {
                 window.location.href = 'admin-dashboard.html';
             } else {
-                window.location.href = 'dashboard.html';
+                // A question held for the Care Agent from before sign-in
+                // takes the patient back there instead of the dashboard.
+                const heldQuestion = typeof PaySickCareAgentPending !== 'undefined'
+                    ? PaySickCareAgentPending.peek(localStorage)
+                    : null;
+                window.location.href = heldQuestion ? 'care-agent.html' : 'dashboard.html';
             }
         }
     </script>

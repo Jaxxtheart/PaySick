@@ -110,6 +110,7 @@
                 <li><a href="#s3">3. Legal Framework</a></li>
                 <li><a href="#s4">4. POPIA Eight Conditions</a></li>
                 <li><a href="#s5">5. What We Collect</a></li>
+                <li><a href="#care-agent">Care Agent (Ask PaySick)</a></li>
                 <li><a href="#s6">6. Special Personal Information</a></li>
                 <li><a href="#s7">7. Why We Process Your Data</a></li>
                 <li><a href="#s8">8. Who We Share Data With</a></li>
@@ -130,7 +131,7 @@
     <main class="content">
 
         <div class="effective">
-            <strong>Effective Date:</strong> 3 March 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.3 &nbsp;|&nbsp; <strong>Next review:</strong> 3 March 2027<br>
+            <strong>Effective Date:</strong> 26 October 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.4 &nbsp;|&nbsp; <strong>Next review:</strong> 26 October 2027<br>
             This policy is issued in terms of <strong>Section 18 of POPIA</strong> (duty to notify data subjects at time of collection) and must be read together with our <a href="terms-of-service.html">Terms of Service</a>.
         </div>
 
@@ -142,7 +143,7 @@
         </div>
 
         <h2 id="s1">1. Who We Are</h2>
-        <p><strong>Tech &amp; Artery (Pty) Ltd</strong> ("PaySick", "we", "us", "our") is a private company incorporated under the laws of the Republic of South Africa. We operate a healthcare payment facilitation service that allows eligible patients to spread approved medical bills over structured monthly instalments via debit order.</p>
+        <p><strong>Tech &amp; Artery (Pty) Ltd</strong> (registration number K2015/346764/07) ("PaySick", "we", "us", "our") is a private company incorporated under the laws of the Republic of South Africa. It develops and operates the PaySick website and platform. We operate a healthcare payment facilitation service that allows eligible patients to spread approved medical bills over structured monthly instalments via debit order.</p>
         <p>PaySick is:</p>
         <ul>
             <li>A <strong>payment facilitation platform</strong> operating in compliance with applicable South African law</li>
@@ -206,12 +207,30 @@
             <li><strong>Medical aid administrators</strong>: payment history and scheme status, only where you have consented to disclosure by your scheme</li>
         </ul>
 
+        <h2 id="care-agent">4A. The PaySick Care Agent (Ask PaySick)</h2>
+        <p>The Care Agent is a conversational assistant for signed-in users. You reach it from the "Ask PaySick" search bar on our homepage or at care-agent.html. Using it is optional: you can apply through the standard application journey instead.</p>
+
+        <h3>What the Care Agent collects</h3>
+        <ul>
+            <li><strong>Your conversation:</strong> the messages you type and the replies you receive.</li>
+            <li><strong>Treatment and cost details you share:</strong> a description or type of the treatment, the quoted amount, what your medical scheme will contribute, and, only if you choose to give them, your monthly income and existing obligations.</li>
+            <li><strong>Uploaded documents:</strong> if you attach a quote, invoice or medical scheme statement, we read it to pick out the document type, the treatment description and the amounts. The file itself is not stored. We keep only the details read from it and its file name.</li>
+            <li><strong>A question typed before you sign in:</strong> if you type a question into the "Ask PaySick" search bar while signed out, it is held in your browser for up to 24 hours so it can be picked up after you sign in or register. It stays on your device, is not sent to us until you send it, and is cleared once it is used or expires.</li>
+            <li><strong>An audit trail:</strong> each step of the conversation (questions, confirmations, your approval) is recorded with a date and time, so the process can be checked later.</li>
+        </ul>
+
+        <h3>How it is processed</h3>
+        <p>The Care Agent's replies are produced with the help of an AI model provided by <strong>Anthropic, PBC</strong> (United States). Your messages, the details recorded so far in the conversation, and any document you attach are sent to Anthropic's API so that it can write the reply or read the document. Anthropic acts as our operator (see Section 7.1). If the AI service is not available, a rule-based engine on our own systems replies instead, and nothing is sent to Anthropic.</p>
+        <p>The AI model does not decide whether you qualify, and it cannot submit an application or move money. Amounts and repayment options are calculated by our own systems. The affordability assessment is the same one used for every application, and nothing is submitted until you confirm the details and approve the step yourself.</p>
+        <p>Please share only the health information needed to describe the treatment and its cost. Diagnoses and medical history are not needed.</p>
+
         <h2 id="s6">5. Special Personal Information</h2>
         <p>Section 26 of POPIA prohibits the processing of <strong>"special personal information"</strong> except in limited circumstances. PaySick processes the following special categories:</p>
         <ul>
             <li><strong>Health information</strong> (s26(1)(c)): Treatment type and medical bill context. We process this on the basis of your <strong>explicit consent</strong> (s27(1)(a)) and because it is <strong>necessary for the establishment, exercise, or defence of a right or obligation in law</strong> (s27(1)(b)), specifically for the purpose of facilitating payment of a lawfully rendered medical service.</li>
             <li><strong>Financial information:</strong> Processed on the basis of contractual necessity and your express consent.</li>
         </ul>
+        <p><strong>Care Agent:</strong> treatment details you type into the Care Agent, and details read from a quote, invoice or medical scheme statement you choose to upload, are health information. We process them on the same basis as above, only to help you understand and arrange payment for that treatment (see Section 4A).</p>
         <p>We apply heightened security controls to all special personal information, including field-level AES-256-GCM encryption and access restricted to authorised personnel on a need-to-know basis only.</p>
 
         <h2 id="s7">6. Why We Process Your Information</h2>
@@ -240,6 +259,7 @@
         <ul>
             <li><strong>Vercel Inc.</strong>: hosting and serverless compute (USA; see Section 9 on cross-border transfers)</li>
             <li><strong>Neon Inc.</strong>: PostgreSQL database hosting (USA; see Section 9)</li>
+            <li><strong>Anthropic, PBC</strong>: AI model used by the Care Agent to write replies and read uploaded documents (USA; see Sections 4A and 9)</li>
             <li><strong>SMS and email delivery providers</strong>: transactional notifications only</li>
         </ul>
 
@@ -255,7 +275,7 @@
         <p><strong>We will never disclose your personal information to any political party, political organisation, or for political profiling purposes.</strong></p>
 
         <h2 id="s9">8. Cross-Border Transfers</h2>
-        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes.</p>
+        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes, and, when you use the Care Agent, to <strong>Anthropic, PBC</strong> (United States) solely to produce the Care Agent's replies and read documents you upload.</p>
         <p>These transfers are permissible because:</p>
         <ul>
             <li>Recipient entities are bound by data processing agreements imposing obligations <strong>substantially equivalent to POPIA's conditions</strong> (s72(1)(a)); and</li>
@@ -272,6 +292,7 @@
                 <tr><td>Security audit logs</td><td>3 years</td><td>POPIA Section 19</td></tr>
                 <tr><td>POPIA consent records</td><td>Duration of processing plus 3 years</td><td>POPIA Section 11(1)(a): evidence of lawful basis</td></tr>
                 <tr><td>Payment transaction records</td><td>5 years</td><td>Applicable statutory requirements</td></tr>
+                <tr><td>Care Agent conversations and details read from uploaded documents</td><td>Kept with the payment arrangement records when the conversation leads to an application; otherwise 3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
                 <tr><td>Inactive accounts (no payment arrangement)</td><td>3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
                 <tr><td>Anonymised analytics</td><td>Indefinite (no personal data retained)</td><td>POPIA s1: anonymised data falls outside definition of personal information</td></tr>
             </tbody>
