@@ -6,6 +6,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.0] — 2026-10-26
+
+**Type**: MINOR — homepage repositioning + new `js/interest-forms.js` module
+
+### Summary
+Repositions the homepage from a live "Heal now, pay later" payments product
+to a healthcare financing platform **in development**, developed by Tech &
+Artery (Pty) Ltd. Uses the owner-approved copy, prelaunch disclosures, and
+non-credit interest forms. Detailed NCR / National Credit Act status lives
+only on the Terms of Service page. Built test-first.
+
+### Changed
+- **`index.html`**: new hero, value pillars, "How it will work", provider
+  capabilities (labelled In development), Technology, About and
+  final-conversion sections; new footer and copyright; new title,
+  description, Open Graph and JSON-LD.
+- **`terms-of-service.html`**: new dated "Credit services and regulatory
+  status" section (`#credit-status`). The operator is now Tech & Artery
+  (Pty) Ltd. Removed the "not regulated by the NCR" statement.
+- **`bot-blocker.js`**: MINOR-bump review. Added `Perplexity-User`,
+  `MistralAI-User`, `Claude-User` and `Webzio-Extended`. Rate limits are
+  unchanged because no routes were added.
+
+### Added
+- **`js/interest-forms.js`**: validation, honeypot, and honest no-backend
+  submission handling. Nothing is sent and no success message is shown.
+
+### Removed
+- Homepage "Heal now, pay later" proposition, the "Get Started" links into
+  login, the provider-apply link, and the unsupported claims (instant setup,
+  24-hour settlement, nationwide network, 3-month terms).
+
+---
+
 ## [v1.11.0] — 2026-09-19
 
 **Type**: MINOR — UX/trust fixes plus one new user-facing capability

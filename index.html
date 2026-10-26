@@ -3,25 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PaySick - Healthcare payments made simple. Split your medical bills into 3 easy monthly payments. Heal now, pay later.">
-    <meta name="keywords" content="healthcare payments, medical bills, payment plans, health financing">
-    <meta name="author" content="PaySick">
-    <title>PaySick - Heal Now, Pay Later | Healthcare Payments Made Simple</title>
-    
+    <meta name="description" content="PaySick is a healthcare financing platform in development, built by Tech &amp; Artery (Pty) Ltd to connect patients and healthcare providers through transparent, responsible financing. Financing is not currently available.">
+    <meta name="keywords" content="healthcare financing, medical financing, patient financing, healthcare providers, South Africa">
+    <meta name="author" content="Tech &amp; Artery (Pty) Ltd">
+    <title>PaySick | Healthcare financing platform in development</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://paysick.co.za/">
+    <meta property="og:site_name" content="PaySick">
+    <meta property="og:title" content="PaySick | Healthcare financing platform in development">
+    <meta property="og:description" content="PaySick is a healthcare financing platform in development, connecting patients and healthcare providers through transparent, responsible financing. Financing is not currently available.">
+    <meta property="og:locale" content="en_ZA">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "PaySick",
+        "url": "https://paysick.co.za/",
+        "description": "PaySick is a healthcare financing platform in development. Financing is not currently available through this website.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Tech & Artery (Pty) Ltd",
+            "slogan": "Better access to healthcare.",
+            "address": { "@type": "PostalAddress", "addressCountry": "ZA" }
+        }
+    }
+    </script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             color: #1A1A1A;
+            background: #ffffff;
             line-height: 1.6;
             overflow-x: hidden;
         }
-        
+
         /* Navigation */
         nav {
             position: fixed;
@@ -37,49 +61,50 @@
             z-index: 1000;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         .logo-container {
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
         }
-        
+
         .logo-svg {
             width: 45px;
             height: 45px;
             flex-shrink: 0;
         }
-        
+
         .logo-text {
             font-size: 28px;
             font-weight: 400;
             color: #1A1A1A;
             letter-spacing: -1px;
         }
-        
+
         .logo-text span {
             font-weight: 300;
             color: #4A4A4A;
         }
-        
+
         nav ul {
             display: flex;
             list-style: none;
             gap: 40px;
             align-items: center;
         }
-        
+
         nav a {
             text-decoration: none;
             color: #4A4A4A;
             font-size: 15px;
             transition: color 0.3s ease;
         }
-        
+
         nav a:hover {
             color: #E01E37;
         }
-        
+
         .cta-button {
             background: linear-gradient(135deg, #FF4757, #E01E37);
             color: white !important;
@@ -88,12 +113,12 @@
             font-weight: 500;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .cta-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(224, 30, 55, 0.3);
         }
-        
+
         /* Hero Section */
         .hero {
             padding: 180px 60px 120px;
@@ -105,40 +130,41 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .hero h1 {
-            font-size: 72px;
+            font-size: 64px;
             font-weight: 600;
             color: #1A1A1A;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
             letter-spacing: -2px;
             line-height: 1.1;
+            max-width: 900px;
         }
-        
+
         .hero .tagline {
-            font-size: 32px;
+            font-size: 15px;
             color: #E01E37;
-            font-weight: 300;
-            margin-bottom: 30px;
-            letter-spacing: 2px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
-        
+
         .hero p {
-            font-size: 24px;
+            font-size: 21px;
             color: #4A4A4A;
-            max-width: 700px;
-            margin: 0 auto 50px;
-            line-height: 1.5;
+            max-width: 720px;
+            margin: 0 auto 44px;
+            line-height: 1.6;
         }
-        
+
         .hero-buttons {
             display: flex;
             gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .primary-btn {
             background: linear-gradient(135deg, #FF4757, #E01E37);
             color: white;
@@ -149,13 +175,16 @@
             font-weight: 500;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
-        
+
         .primary-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 40px rgba(224, 30, 55, 0.4);
         }
-        
+
         .secondary-btn {
             background: white;
             color: #1A1A1A;
@@ -168,56 +197,91 @@
             transition: all 0.3s ease;
             display: inline-block;
         }
-        
+
         .secondary-btn:hover {
             border-color: #E01E37;
             color: #E01E37;
         }
-        
-        /* Features Section */
-        .features {
-            padding: 120px 60px;
-            background: white;
+
+        /* Availability notice — short, prominent prelaunch disclosure */
+        .availability-notice {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            max-width: 640px;
+            margin: 40px auto 0;
+            padding: 14px 20px;
+            background: #ffffff;
+            border: 1px solid #F3C4CA;
+            border-left: 4px solid #E01E37;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #1A1A1A;
         }
-        
+
+        .availability-notice svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .availability-notice a {
+            color: #B5162B;
+        }
+
+        .hero .availability-notice p {
+            font-size: 15px;
+            color: #1A1A1A;
+            margin: 0;
+            max-width: none;
+        }
+
+        /* Section scaffolding */
+        .section {
+            padding: 120px 60px;
+        }
+
+        .section-alt {
+            background: #FAFAFA;
+        }
+
         .section-title {
             text-align: center;
-            font-size: 48px;
+            font-size: 44px;
             font-weight: 600;
             margin-bottom: 20px;
             color: #1A1A1A;
             letter-spacing: -1px;
+            line-height: 1.15;
         }
-        
+
         .section-subtitle {
             text-align: center;
-            font-size: 20px;
+            font-size: 19px;
             color: #4A4A4A;
-            margin-bottom: 80px;
-            max-width: 600px;
+            margin-bottom: 70px;
+            max-width: 720px;
             margin-left: auto;
             margin-right: auto;
         }
-        
+
+        /* Value pillars */
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
             max-width: 1200px;
             margin: 0 auto;
         }
-        
+
         .feature-card {
             text-align: center;
             padding: 40px 30px;
             border-radius: 20px;
-            transition: transform 0.3s ease;
+            border: 1px solid #F0F0F0;
         }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        
+
         .feature-icon {
             width: 80px;
             height: 80px;
@@ -227,78 +291,78 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
         }
 
         .feature-icon svg {
             width: 40px;
             height: 40px;
         }
-        
+
         .feature-card h3 {
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 15px;
             color: #1A1A1A;
             font-weight: 600;
         }
-        
+
         .feature-card p {
             font-size: 16px;
             color: #5A5A5A;
             line-height: 1.6;
         }
-        
-        /* How It Works */
-        .how-it-works {
-            padding: 120px 60px;
-            background: #FAFAFA;
-        }
-        
+
+        /* How it will work */
         .steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 60px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 48px;
             max-width: 1200px;
             margin: 0 auto;
+            list-style: none;
         }
-        
+
         .step {
             position: relative;
             text-align: center;
         }
-        
+
         .step-number {
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, #FF4757, #E01E37);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: 600;
-            margin: 0 auto 30px;
-        }
-        
-        .step h3 {
             font-size: 24px;
-            margin-bottom: 15px;
+            font-weight: 600;
+            margin: 0 auto 28px;
+        }
+
+        .step h3 {
+            font-size: 21px;
+            margin-bottom: 12px;
             color: #1A1A1A;
         }
-        
+
         .step p {
             font-size: 16px;
             color: #5A5A5A;
             line-height: 1.6;
         }
 
-        /* Providers Section */
-        .providers-section {
-            padding: 120px 60px;
-            background: white;
+        .section-note {
+            max-width: 720px;
+            margin: 60px auto 0;
+            text-align: center;
+            font-size: 15px;
+            color: #4A4A4A;
+            padding-top: 24px;
+            border-top: 1px solid #E8E8E8;
         }
 
+        /* Providers Section */
         .providers-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -314,6 +378,7 @@
             color: #1A1A1A;
             margin-bottom: 20px;
             letter-spacing: -1px;
+            line-height: 1.15;
         }
 
         .providers-text p {
@@ -323,123 +388,233 @@
             margin-bottom: 30px;
         }
 
-        .providers-benefits {
-            list-style: none;
-            margin-bottom: 40px;
+        .capabilities {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.05) 0%, rgba(224, 30, 55, 0.05) 100%);
+            border-radius: 16px;
+            padding: 36px;
         }
 
-        .providers-benefits li {
+        .capabilities-label {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #B5162B;
+            background: #ffffff;
+            border: 1px solid #F3C4CA;
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-bottom: 20px;
+        }
+
+        .capabilities h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .capabilities ul {
+            list-style: none;
+        }
+
+        .capabilities li {
             display: flex;
             align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 14px;
+            margin-bottom: 18px;
             font-size: 16px;
             color: #2d3748;
         }
 
-        .providers-benefits svg {
+        .capabilities li:last-child {
+            margin-bottom: 0;
+        }
+
+        .capabilities svg {
             flex-shrink: 0;
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
-        .providers-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .providers-stats {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .provider-stat-card {
-            background: linear-gradient(135deg, rgba(255, 71, 87, 0.05) 0%, rgba(224, 30, 55, 0.05) 100%);
-            padding: 30px;
-            border-radius: 15px;
-            border-left: 4px solid #FF4757;
+        /* Technology / About */
+        .narrow {
+            max-width: 820px;
+            margin: 0 auto;
             text-align: center;
         }
 
-        .stat-number {
-            font-size: 48px;
-            font-weight: 700;
-            color: #FF4757;
-            margin-bottom: 8px;
+        .narrow p {
+            font-size: 19px;
+            color: #4A4A4A;
+            line-height: 1.7;
         }
 
-        .stat-label {
-            font-size: 16px;
-            color: #5A5A5A;
+        .about-tagline {
+            margin-top: 28px;
+            font-size: 15px !important;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #E01E37 !important;
             font-weight: 500;
         }
 
-        /* CTA Section */
-        .cta-section {
+        /* Interest / final conversion */
+        .interest-section {
             padding: 120px 60px;
-            background: linear-gradient(135deg, #FF4757, #E01E37);
+            background: linear-gradient(135deg, #fff5f6 0%, #ffffff 100%);
+        }
+
+        .interest-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .interest-card {
+            background: #ffffff;
+            border: 1px solid #F0F0F0;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+            scroll-margin-top: 110px;
+        }
+
+        .interest-card h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .interest-card .card-intro {
+            font-size: 15px;
+            color: #5A5A5A;
+            margin-bottom: 24px;
+        }
+
+        .draft-banner {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #1A1A1A;
+            background: #FFF8E1;
+            border: 1px solid #F1D58A;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 24px;
+        }
+
+        .draft-banner a,
+        .form-notice a {
+            color: #B5162B;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1A1A1A;
+        }
+
+        .form-group .optional {
+            font-weight: 400;
+            color: #5A5A5A;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            font-size: 16px;
+            font-family: inherit;
+            border: 1.5px solid #D8D8D8;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #1A1A1A;
+        }
+
+        .form-group input:focus {
+            outline: 3px solid rgba(224, 30, 55, 0.25);
+            border-color: #E01E37;
+        }
+
+        .form-group input[aria-invalid="true"] {
+            border-color: #B5162B;
+        }
+
+        .field-error {
+            display: block;
+            min-height: 0;
+            font-size: 13px;
+            color: #B5162B;
+            margin-top: 4px;
+        }
+
+        .form-trap {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .interest-card .primary-btn {
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .form-status {
+            font-size: 14px;
+            margin-top: 14px;
+            color: #1A1A1A;
+        }
+
+        .form-status:empty {
+            display: none;
+        }
+
+        .form-notice {
+            font-size: 13px;
+            color: #5A5A5A;
+            line-height: 1.55;
+            margin-top: 18px;
+        }
+
+        .interest-disclosure {
+            max-width: 720px;
+            margin: 48px auto 0;
             text-align: center;
-            color: white;
+            font-size: 15px;
+            color: #1A1A1A;
+            font-weight: 500;
         }
-        
-        .cta-section h2 {
-            font-size: 48px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
+
+        .interest-disclosure a {
+            color: #B5162B;
         }
-        
-        .cta-section p {
-            font-size: 20px;
-            margin-bottom: 40px;
-            opacity: 0.95;
-        }
-        
-        .cta-white-btn {
-            background: white;
-            color: #E01E37;
-            padding: 18px 45px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 600;
-            display: inline-block;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .cta-white-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-        
+
         /* Footer */
         footer {
             padding: 60px 60px 40px;
             background: #1A1A1A;
             color: white;
         }
-        
+
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1.4fr 1fr;
             gap: 60px;
             max-width: 1200px;
             margin: 0 auto 40px;
-        }
-        
-        .footer-logo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 20px;
         }
 
         .footer-logo {
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 14px;
         }
 
         .footer-logo-svg {
@@ -448,54 +623,51 @@
             flex-shrink: 0;
         }
 
-        .footer-logo-text {
-            font-size: 32px;
-            font-weight: 400;
-            color: #1A1A1A;
-            letter-spacing: -0.5px;
+        .footer-brand {
+            color: #E8E8E8;
+            font-size: 15px;
+            letter-spacing: 0.5px;
         }
 
-        .footer-logo-text span {
-            font-weight: 300;
-            color: #4A4A4A;
-        }
-        
-        .footer-tagline {
-            color: #8A8A8A;
+        .footer-disclosure {
+            color: #B0B0B0;
             font-size: 14px;
-            letter-spacing: 1px;
+            line-height: 1.6;
+            margin-top: 14px;
+            max-width: 520px;
         }
-        
-        .footer-links h4 {
-            font-size: 16px;
-            margin-bottom: 20px;
-            font-weight: 600;
+
+        .footer-disclosure a {
+            color: #FF8A95;
         }
-        
+
         .footer-links ul {
             list-style: none;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 30px;
         }
-        
+
         .footer-links a {
-            color: #8A8A8A;
+            color: #B0B0B0;
             text-decoration: none;
             font-size: 14px;
             line-height: 2.2;
             transition: color 0.3s ease;
         }
-        
+
         .footer-links a:hover {
             color: #FF4757;
         }
-        
+
         .footer-bottom {
             text-align: center;
             padding-top: 40px;
             border-top: 1px solid #333;
-            color: #8A8A8A;
+            color: #B0B0B0;
             font-size: 14px;
         }
-        
+
         /* Mobile Menu Toggle */
         .mobile-menu-toggle {
             display: none;
@@ -505,17 +677,26 @@
             color: #1A1A1A;
             cursor: pointer;
         }
-        
+
         /* Responsive Design */
+        @media (max-width: 900px) {
+            .providers-content,
+            .interest-grid,
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
         @media (max-width: 768px) {
             nav {
-                padding: 20px 30px;
+                padding: 20px 16px;
             }
-            
+
             nav ul {
                 display: none;
             }
-            
+
             .mobile-menu-toggle {
                 display: block;
             }
@@ -523,12 +704,13 @@
             nav ul.open {
                 display: flex;
                 flex-direction: column;
+                align-items: stretch;
                 position: absolute;
                 top: 100%;
                 left: 0;
                 right: 0;
                 background: rgba(255, 255, 255, 0.98);
-                padding: 16px 30px 24px;
+                padding: 16px 16px 24px;
                 gap: 0;
                 border-bottom: 1px solid rgba(0,0,0,0.08);
                 z-index: 999;
@@ -543,73 +725,88 @@
                 border-bottom: none;
                 padding-top: 16px;
             }
-            
+
             .hero {
-                padding: 140px 30px 80px;
+                padding: 130px 16px 70px;
+                min-height: auto;
             }
-            
+
             .hero h1 {
-                font-size: 42px;
+                font-size: 38px;
+                letter-spacing: -1px;
             }
-            
+
             .hero .tagline {
-                font-size: 20px;
+                font-size: 12px;
+                letter-spacing: 2px;
             }
-            
+
             .hero p {
-                font-size: 18px;
-            }
-            
-            .features,
-            .how-it-works,
-            .providers-section,
-            .cta-section {
-                padding: 80px 30px;
+                font-size: 17px;
             }
 
-            .providers-content {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .providers-text h2 {
-                font-size: 32px;
-            }
-
-            .providers-actions {
-                flex-direction: column;
-            }
-
-            .providers-actions .primary-btn,
-            .providers-actions .secondary-btn {
+            .hero-buttons a {
                 width: 100%;
                 text-align: center;
             }
 
+            .section,
+            .interest-section {
+                padding: 72px 16px;
+            }
+
+            .providers-text h2 {
+                font-size: 30px;
+            }
+
             .section-title {
-                font-size: 36px;
+                font-size: 30px;
             }
-            
-            .cta-section h2 {
-                font-size: 36px;
+
+            .section-subtitle {
+                font-size: 17px;
+                margin-bottom: 48px;
             }
-            
+
+            .narrow p {
+                font-size: 17px;
+            }
+
+            .capabilities,
+            .interest-card {
+                padding: 28px 20px;
+            }
+
+            .footer-links ul {
+                grid-template-columns: 1fr 1fr;
+            }
+
             footer {
-                padding: 40px 30px 30px;
+                padding: 40px 16px 30px;
             }
         }
-        
+
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            .primary-btn:hover,
+            .cta-button:hover {
+                transform: none;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav>
-        <div class="logo-container">
-            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <nav aria-label="Main">
+        <a href="#top" class="logo-container" aria-label="PaySick home">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                     <radialGradient id="navCrossGradient" cx="40%" cy="40%">
                         <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
@@ -627,72 +824,44 @@
                 <circle cx="50" cy="50" r="6" fill="#E01E37"/>
             </svg>
             <div class="logo-text">Pay<span>Sick</span></div>
-        </div>
+        </a>
         <ul id="nav-links">
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="providers.html">For Providers</a></li>
+            <li><a href="#how-it-works">How it works</a></li>
+            <li><a href="#providers">For providers</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="login.html" class="cta-button">Get Started</a></li>
+            <li><a href="#interest" class="cta-button">Join the interest list</a></li>
         </ul>
-        <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+        <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">☰</button>
     </nav>
 
+    <main>
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="tagline">Heal Now, Pay Later</div>
-        <h1>Healthcare payments<br>made simple</h1>
-        <p>Get the treatment you need today. Split your medical bill into three easy monthly payments. Available at leading South African healthcare providers. No complicated terms, just straightforward payment solutions.</p>
+    <section class="hero" id="top">
+        <div class="tagline">HEALTHCARE FINANCING, BUILT AROUND YOU</div>
+        <h1>Get the care you need. Find a way to pay.</h1>
+        <p>Healthcare costs shouldn't be the reason you delay treatment. PaySick is building a simpler way to finance healthcare, connecting patients and healthcare providers through transparent, responsible financing.</p>
         <div class="hero-buttons">
-            <a href="login.html" class="primary-btn">Get Started</a>
-            <a href="#how-it-works" class="secondary-btn">Learn More</a>
+            <a href="#how-it-works" class="primary-btn">Explore how it works</a>
+            <a href="#provider-interest" class="secondary-btn">Partner with PaySick</a>
+        </div>
+        <div class="availability-notice" role="note">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="#E01E37" stroke-width="2"/>
+                <line x1="12" y1="11" x2="12" y2="17" stroke="#E01E37" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="12" cy="7.5" r="1.2" fill="#E01E37"/>
+            </svg>
+            <p><strong>Healthcare financing services are in development. Credit is not currently available through this website.</strong> <a href="terms-of-service.html#credit-status">Read our Terms</a></p>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <h2 class="section-title">Why Choose PaySick</h2>
-        <p class="section-subtitle">Simple, transparent payment solutions for your healthcare needs</p>
+    <!-- Value proposition -->
+    <section class="section" id="why">
+        <h2 class="section-title">Better access to healthcare starts with affordability.</h2>
+        <p class="section-subtitle">Medical expenses don't always arrive when your finances are ready. PaySick is designed to help patients explore financing options that consider their circumstances, the cost of treatment and their ability to repay.</p>
         <div class="feature-grid">
             <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="lightningGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="url(#lightningGradient)" stroke="url(#lightningGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <h3>Instant Setup</h3>
-                <p>Set up your payment plan in minutes. Quick verification process, immediate access to care.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="calendarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="url(#calendarGradient)" stroke-width="2" fill="none"/>
-                        <line x1="16" y1="2" x2="16" y2="6" stroke="url(#calendarGradient)" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="8" y1="2" x2="8" y2="6" stroke="url(#calendarGradient)" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="3" y1="10" x2="21" y2="10" stroke="url(#calendarGradient)" stroke-width="2"/>
-                        <circle cx="8" cy="14" r="1.5" fill="url(#calendarGradient)"/>
-                        <circle cx="12" cy="14" r="1.5" fill="url(#calendarGradient)"/>
-                        <circle cx="16" cy="14" r="1.5" fill="url(#calendarGradient)"/>
-                    </svg>
-                </div>
-                <h3>3-Month Terms</h3>
-                <p>All payments spread over three months. Simple, manageable installments that fit your budget.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
                             <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
@@ -703,150 +872,210 @@
                         <path d="M9 12l2 2 4-4" stroke="url(#shieldGradient)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
-                <h3>Transparent Pricing</h3>
-                <p>Clear upfront costs with no hidden fees. You know exactly what you'll pay from day one.</p>
+                <h3>Responsible by design</h3>
+                <p>Financing should be based on verified affordability, not simply how much someone wants to borrow.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
-                            <linearGradient id="networkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
                                 <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
                             </linearGradient>
                         </defs>
-                        <circle cx="12" cy="12" r="3" fill="url(#networkGradient)"/>
-                        <circle cx="6" cy="6" r="2.5" fill="url(#networkGradient)"/>
-                        <circle cx="18" cy="6" r="2.5" fill="url(#networkGradient)"/>
-                        <circle cx="6" cy="18" r="2.5" fill="url(#networkGradient)"/>
-                        <circle cx="18" cy="18" r="2.5" fill="url(#networkGradient)"/>
-                        <line x1="8" y1="7" x2="10" y2="10" stroke="url(#networkGradient)" stroke-width="2"/>
-                        <line x1="16" y1="7" x2="14" y2="10" stroke="url(#networkGradient)" stroke-width="2"/>
-                        <line x1="8" y1="17" x2="10" y2="14" stroke="url(#networkGradient)" stroke-width="2"/>
-                        <line x1="16" y1="17" x2="14" y2="14" stroke="url(#networkGradient)" stroke-width="2"/>
+                        <rect x="5" y="2" width="14" height="20" rx="2" stroke="url(#docGradient)" stroke-width="2" fill="none"/>
+                        <line x1="8" y1="7" x2="16" y2="7" stroke="url(#docGradient)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="8" y1="11" x2="16" y2="11" stroke="url(#docGradient)" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="8" y1="15" x2="13" y2="15" stroke="url(#docGradient)" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <h3>Wide Network</h3>
-                <p>Accepted at a comprehensive network of registered healthcare providers nationwide. Contact us to find participating locations near you.</p>
+                <h3>Clear from the beginning</h3>
+                <p>Understand the proposed repayment amount, duration and total cost before making a commitment.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
-                            <linearGradient id="mobileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="crossGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
                                 <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
                             </linearGradient>
                         </defs>
-                        <rect x="5" y="2" width="14" height="20" rx="2" stroke="url(#mobileGradient)" stroke-width="2" fill="none"/>
-                        <line x1="12" y1="18" x2="12" y2="18" stroke="url(#mobileGradient)" stroke-width="2.5" stroke-linecap="round"/>
-                        <line x1="8" y1="6" x2="16" y2="6" stroke="url(#mobileGradient)" stroke-width="1.5"/>
-                        <line x1="8" y1="9" x2="16" y2="9" stroke="url(#mobileGradient)" stroke-width="1.5"/>
-                        <line x1="8" y1="12" x2="13" y2="12" stroke="url(#mobileGradient)" stroke-width="1.5"/>
+                        <rect x="9.5" y="3" width="5" height="18" rx="2.5" fill="url(#crossGradient)"/>
+                        <rect x="3" y="9.5" width="18" height="5" rx="2.5" fill="url(#crossGradient)"/>
                     </svg>
                 </div>
-                <h3>Easy Tracking</h3>
-                <p>Monitor your payments, view schedules, and manage everything from your phone or computer.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="headsetGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M3 11a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2 9 9 0 0 0-14 0 2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z" stroke="url(#headsetGradient)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <h3>Dedicated Support</h3>
-                <p>Real people ready to help with your payment questions anytime you need assistance.</p>
+                <h3>Built for healthcare</h3>
+                <p>A financing experience designed around medical treatment, healthcare providers and patient needs.</p>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <h2 class="section-title">How It Works</h2>
-        <p class="section-subtitle">Get the care you need in three simple steps</p>
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Sign Up</h3>
-                <p>Quick registration process. Provide your information and get verified in minutes. Start immediately.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Receive Care</h3>
-                <p>Visit any participating healthcare provider. Show your PaySick account and receive the treatment you need.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Pay in 3 Months</h3>
-                <p>Your bill is automatically split into three equal monthly payments. Simple, predictable, stress-free.</p>
-            </div>
-        </div>
+    <!-- How it will work -->
+    <section class="section section-alt" id="how-it-works">
+        <h2 class="section-title">How it will work</h2>
+        <p class="section-subtitle">The proposed patient journey, once the service is operational.</p>
+        <ol class="steps">
+            <li class="step">
+                <div class="step-number" aria-hidden="true">1</div>
+                <h3>Tell us about your treatment</h3>
+                <p>Share the healthcare procedure you're considering and the estimated cost.</p>
+            </li>
+            <li class="step">
+                <div class="step-number" aria-hidden="true">2</div>
+                <h3>Understand your affordability</h3>
+                <p>Our proposed assessment process considers verified income, existing financial commitments and reasonable living expenses.</p>
+            </li>
+            <li class="step">
+                <div class="step-number" aria-hidden="true">3</div>
+                <h3>Review your financing options</h3>
+                <p>Where eligible, review the proposed loan amount, repayment terms and total cost before deciding whether to proceed.</p>
+            </li>
+            <li class="step">
+                <div class="step-number" aria-hidden="true">4</div>
+                <h3>Access care and repay over time</h3>
+                <p>Once financing is approved and the service is operational, payment can be arranged with a participating provider, with repayments made according to the agreed credit terms.</p>
+            </li>
+        </ol>
+        <p class="section-note">All financing will be subject to eligibility, affordability assessment, applicable credit law and the availability of the service.</p>
     </section>
 
     <!-- For Providers Section -->
-    <section class="providers-section" id="providers">
+    <section class="section" id="providers">
         <div class="providers-content">
             <div class="providers-text">
-                <h2>Are You a Healthcare Provider?</h2>
-                <p>Join our growing healthcare payment network. Get paid reliably, expand patient access, and eliminate payment collection burden for your practice.</p>
-                <ul class="providers-benefits">
+                <h2>Help more patients move forward with treatment.</h2>
+                <p>Patients sometimes postpone care because they cannot cover the full cost upfront. PaySick is developing a financing solution that healthcare providers can integrate into their patient journey, helping eligible patients consider manageable repayment options.</p>
+                <a href="#provider-interest" class="primary-btn">Register your practice's interest</a>
+            </div>
+            <div class="capabilities">
+                <span class="capabilities-label">In development</span>
+                <h3>Proposed capabilities</h3>
+                <ul>
                     <li>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="#2ED573" stroke-width="2" fill="none"/>
-                            <path d="M9 12l2 2 4-4" stroke="#2ED573" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span><strong>24-hour settlements</strong> - No more 30-90 day waits</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E01E37" stroke-width="2"/></svg>
+                        <span>Patient referral experience</span>
                     </li>
                     <li>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="#2ED573" stroke-width="2" fill="none"/>
-                            <path d="M9 12l2 2 4-4" stroke="#2ED573" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span><strong>Grow your patient base</strong> - Access patients who couldn't afford care</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E01E37" stroke-width="2"/></svg>
+                        <span>Digital affordability and credit decisioning</span>
                     </li>
                     <li>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="#2ED573" stroke-width="2" fill="none"/>
-                            <path d="M9 12l2 2 4-4" stroke="#2ED573" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span><strong>Zero collection burden</strong> - We handle patient payment management</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E01E37" stroke-width="2"/></svg>
+                        <span>Treatment financing and settlement workflows</span>
+                    </li>
+                    <li>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#E01E37" stroke-width="2"/></svg>
+                        <span>Repayment servicing and account management</span>
                     </li>
                 </ul>
-                <div class="providers-actions">
-                    <a href="provider-apply.html" class="primary-btn">Join Our Network</a>
-                    <a href="providers.html" class="secondary-btn">Browse Provider Directory</a>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section" id="start">
-        <h2>Ready to simplify your healthcare payments?</h2>
-        <p>Split your medical bill into three easy monthly payments — straightforward, transparent, and available at registered healthcare providers nationwide.</p>
-        <a href="login.html" class="cta-white-btn">Get Started Today</a>
+    <!-- Technology -->
+    <section class="section section-alt" id="technology">
+        <div class="narrow">
+            <h2 class="section-title">Technology that understands healthcare financing</h2>
+            <p>PaySick combines healthcare-specific workflows, affordability assessment, credit decisioning and financial infrastructure into a single experience. Our goal is to finance earlier medical intervention while building evidence of its financial and clinical impact.</p>
+        </div>
     </section>
+
+    <!-- About / entity disclosure -->
+    <section class="section" id="about">
+        <div class="narrow">
+            <h2 class="section-title">Built by Tech &amp; Artery</h2>
+            <p>PaySick is a healthcare financing platform developed by Tech &amp; Artery (Pty) Ltd. We are building technology that connects patients and healthcare providers through responsible, transparent financing experiences.</p>
+            <p class="about-tagline">Better access to healthcare.</p>
+        </div>
+    </section>
+
+    <!-- Final conversion: interest registration -->
+    <section class="interest-section" id="interest">
+        <h2 class="section-title">Be part of what we're building</h2>
+        <p class="section-subtitle">Hear from us when PaySick launches, or tell us your practice would like to take part.</p>
+
+        <div class="interest-grid">
+            <div class="interest-card" id="patient-interest">
+                <h3>Join the interest list</h3>
+                <p class="card-intro">For patients who would like a general update when PaySick launches.</p>
+                <p class="draft-banner"><strong>Preview:</strong> online registration is not open yet, and this form does not send your details anywhere. To register interest now, email <a href="mailto:hello@paysick.co.za">hello@paysick.co.za</a>.</p>
+                <form id="patient-interest-form" novalidate>
+                    <div class="form-group">
+                        <label for="pi-name">Name</label>
+                        <input type="text" id="pi-name" name="name" autocomplete="name" maxlength="200" required aria-describedby="pi-name-error">
+                        <span class="field-error" id="pi-name-error" data-error-for="name" aria-live="polite"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pi-email">Email</label>
+                        <input type="email" id="pi-email" name="email" autocomplete="email" maxlength="200" required aria-describedby="pi-email-error">
+                        <span class="field-error" id="pi-email-error" data-error-for="email" aria-live="polite"></span>
+                    </div>
+                    <div class="form-trap" aria-hidden="true">
+                        <label for="pi-website">Leave this field empty</label>
+                        <input type="text" id="pi-website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+                    <button type="submit" class="primary-btn">Join the interest list</button>
+                    <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+                    <p class="form-notice">We would use your name and email only to send you launch updates about PaySick, and you could ask us to remove them at any time. Please don't share health or financial information. Registering interest is not a credit application, financing offer or guarantee of approval. See our <a href="privacy-policy.html">Privacy Policy</a> and <a href="terms-of-service.html#credit-status">Terms of Service</a>.</p>
+                </form>
+            </div>
+
+            <div class="interest-card" id="provider-interest">
+                <h3>Become a provider partner</h3>
+                <p class="card-intro">For healthcare practices interested in offering PaySick to their patients once it launches.</p>
+                <p class="draft-banner"><strong>Preview:</strong> online registration is not open yet, and this form does not send your details anywhere. To register your practice's interest now, email <a href="mailto:hello@paysick.co.za">hello@paysick.co.za</a>.</p>
+                <form id="provider-interest-form" novalidate>
+                    <div class="form-group">
+                        <label for="pv-practice">Practice name</label>
+                        <input type="text" id="pv-practice" name="practice_name" autocomplete="organization" maxlength="200" required aria-describedby="pv-practice-error">
+                        <span class="field-error" id="pv-practice-error" data-error-for="practice_name" aria-live="polite"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pv-contact">Contact name</label>
+                        <input type="text" id="pv-contact" name="contact_name" autocomplete="name" maxlength="200" required aria-describedby="pv-contact-error">
+                        <span class="field-error" id="pv-contact-error" data-error-for="contact_name" aria-live="polite"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pv-email">Business email</label>
+                        <input type="email" id="pv-email" name="business_email" autocomplete="work email" maxlength="200" required aria-describedby="pv-email-error">
+                        <span class="field-error" id="pv-email-error" data-error-for="business_email" aria-live="polite"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pv-phone">Contact number <span class="optional">(optional)</span></label>
+                        <input type="tel" id="pv-phone" name="phone" autocomplete="tel" maxlength="20" aria-describedby="pv-phone-error">
+                        <span class="field-error" id="pv-phone-error" data-error-for="phone" aria-live="polite"></span>
+                    </div>
+                    <div class="form-trap" aria-hidden="true">
+                        <label for="pv-website">Leave this field empty</label>
+                        <input type="text" id="pv-website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+                    <button type="submit" class="primary-btn">Become a provider partner</button>
+                    <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+                    <p class="form-notice">We would use these details only to discuss a possible partnership with your practice. Registering interest is not a credit application, financing offer or guarantee of approval. See our <a href="privacy-policy.html">Privacy Policy</a> and <a href="terms-of-service.html#credit-status">Terms of Service</a>.</p>
+                </form>
+            </div>
+        </div>
+
+        <p class="interest-disclosure">Registering interest is not a credit application, financing offer or guarantee of approval. <a href="terms-of-service.html#credit-status">Terms of Service</a></p>
+    </section>
+    </main>
 
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <div class="footer-logo-container">
+            <div>
                 <div class="footer-logo">
-                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="footer-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <defs>
                             <radialGradient id="footerCrossGradient" cx="40%" cy="40%">
                                 <stop offset="0%" style="stop-color:#FF4757;stop-opacity:1" />
                                 <stop offset="100%" style="stop-color:#E01E37;stop-opacity:1" />
                             </radialGradient>
                             <radialGradient id="footerBgCircle" cx="50%" cy="50%">
-                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.12" />
-                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.04" />
+                                <stop offset="0%" style="stop-color:#FF4757;stop-opacity:0.2" />
+                                <stop offset="100%" style="stop-color:#FF4757;stop-opacity:0.08" />
                             </radialGradient>
                         </defs>
                         <circle cx="50" cy="50" r="40" fill="url(#footerBgCircle)"/>
@@ -855,38 +1084,24 @@
                         <circle cx="50" cy="50" r="8" fill="#ffffff"/>
                         <circle cx="50" cy="50" r="6" fill="#E01E37"/>
                     </svg>
-                    <div class="footer-logo-text">Pay<span>Sick</span></div>
+                    <div class="footer-brand">PaySick | A Tech &amp; Artery venture</div>
                 </div>
-                <div class="footer-tagline">HEAL NOW, PAY LATER</div>
+                <p class="footer-disclosure">PaySick is a healthcare financing platform in development. Financing is not currently available through this website. See our <a href="terms-of-service.html#credit-status">Terms of Service</a> for important information.</p>
             </div>
-            <div class="footer-links">
-                <h4>Product</h4>
+            <div class="footer-links" role="navigation" aria-label="Footer">
                 <ul>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#features">Payment Terms</a></li>
-                    <li><a href="providers.html">Find Providers</a></li>
-                    <li><a href="#about">Mobile App</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Company</h4>
-                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#how-it-works">How it works</a></li>
+                    <li><a href="#providers">For providers</a></li>
                     <li><a href="research.html">Research</a></li>
                     <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-of-service.html">Terms of Service</a></li>
-                    <li><a href="licenses.html">Licenses</a></li>
-                    <li><a href="accessibility.html">Accessibility</a></li>
+                    <li><a href="privacy-policy.html">Privacy</a></li>
+                    <li><a href="terms-of-service.html">Terms</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2026 PaySick South Africa. All rights reserved. | Payment services subject to eligibility. POPIA Compliant.
+            &copy; 2026 Tech &amp; Artery (Pty) Ltd. All rights reserved.
         </div>
     </footer>
 
@@ -909,6 +1124,7 @@
             });
         });
     </script>
+    <script src="js/interest-forms.js"></script>
 
 <!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
      Invisible to real users, screen readers and keyboard nav. Any client that

@@ -81,6 +81,11 @@ const BOT_USER_AGENT_PATTERNS = [
   /omgili/i,
   /YouBot/i,
   /TimpiBot/i,
+  // v1.12.0 review: user-triggered AI fetchers with no "bot" token
+  /Perplexity-User/i,
+  /MistralAI-User/i,
+  /Claude-User/i,
+  /Webzio-Extended/i,
 
   // Generic bot / spider / crawler patterns
   /bot\b/i,
