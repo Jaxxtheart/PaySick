@@ -28,6 +28,11 @@
  *   must keep working. The non-submitting preview interest forms are
  *   removed; the conversion CTAs point at the existing working pages.
  *
+ *   v1.12.2 (owner direction): the hero disclaimer is removed, and the
+ *   provider section reverts to its v1.11.0 wording ("Are You a Healthcare
+ *   Provider?", three benefits, Join Our Network / Browse Provider
+ *   Directory). The "in development" capabilities panel is removed.
+ *
  * Run: node --test tests/unit/homepage-repositioning.test.js
  */
 
@@ -111,7 +116,6 @@ describe('index.html approved copy', () => {
     "Healthcare costs shouldn't be the reason you delay treatment. PaySick is building a simpler way to finance healthcare, connecting patients and healthcare providers through transparent, responsible financing.",
     'Explore how it works',
     'Partner with PaySick',
-    'Healthcare financing services are in development. Credit is not currently available through this website.',
     'Better access to healthcare starts with affordability.',
     "Medical expenses don't always arrive when your finances are ready. PaySick is designed to help patients explore financing options that consider their circumstances, the cost of treatment and their ability to repay.",
     'Responsible by design',
@@ -129,9 +133,6 @@ describe('index.html approved copy', () => {
     'Access care and repay over time',
     'Once financing is approved and the service is operational, payment can be arranged with a participating provider, with repayments made according to the agreed credit terms.',
     'All financing will be subject to eligibility, affordability assessment, applicable credit law and the availability of the service.',
-    'Help more patients move forward with treatment.',
-    'Patients sometimes postpone care because they cannot cover the full cost upfront. PaySick is developing a financing solution that healthcare providers can integrate into their patient journey, helping eligible patients consider manageable repayment options.',
-    "Register your practice's interest",
     'Technology that understands healthcare financing',
     'PaySick combines healthcare-specific workflows, affordability assessment, credit decisioning and financial infrastructure into a single experience. Our goal is to finance earlier medical intervention while building evidence of its financial and clinical impact.',
     'Built by Tech & Artery',
@@ -160,8 +161,8 @@ describe('index.html approved copy', () => {
 
   test('provider section keeps the working apply and directory links', () => {
     const providers = section(html, 'providers');
-    assert.match(providers, /<a href="provider-apply.html"[^>]*>\s*Register your practice's interest\s*<\/a>/);
-    assert.match(providers, /<a href="providers.html"[^>]*>/);
+    assert.match(providers, /<a href="provider-apply.html"[^>]*>\s*Join Our Network\s*<\/a>/);
+    assert.match(providers, /<a href="providers.html"[^>]*>\s*Browse Provider Directory\s*<\/a>/);
   });
 
   test('final conversion section links to the working sign-in and provider pages', () => {
@@ -170,17 +171,27 @@ describe('index.html approved copy', () => {
     assert.match(cta, /<a href="provider-apply.html"[^>]*>\s*Become a provider partner\s*<\/a>/);
   });
 
-  test('provider capabilities are listed and labelled as in development', () => {
+  test('provider section uses the original v1.11.0 wording', () => {
     const providers = visibleText(section(html, 'providers'));
-    for (const cap of [
-      'Patient referral experience',
-      'Digital affordability and credit decisioning',
-      'Treatment financing and settlement workflows',
-      'Repayment servicing and account management',
+    for (const phrase of [
+      'Are You a Healthcare Provider?',
+      'Join our growing healthcare payment network. Get paid reliably, expand patient access, and eliminate payment collection burden for your practice.',
+      '24-hour settlements - No more 30-90 day waits',
+      "Grow your patient base - Access patients who couldn't afford care",
+      'Zero collection burden - We handle patient payment management',
     ]) {
-      assert.ok(providers.includes(cap), `missing capability: ${cap}`);
+      assert.ok(providers.includes(phrase), `missing: ${phrase}`);
     }
-    assert.match(providers, /in development/i);
+  });
+
+  test('provider section has no "in development" capabilities panel', () => {
+    const providers = visibleText(section(html, 'providers'));
+    assert.doesNotMatch(providers, /in development|Proposed capabilities|Patient referral experience/i);
+  });
+
+  test('hero has no availability disclaimer', () => {
+    const hero = visibleText(section(html, 'top'));
+    assert.doesNotMatch(hero, /Credit is not currently available|Read our Terms/);
   });
 
   test('footer links: About, How it works, For providers, Contact, Privacy, Terms', () => {
@@ -211,12 +222,10 @@ describe('index.html makes no live-credit or unsupported claims', () => {
     /instant credit/i,
     /guaranteed financing/i,
     /instant setup/i,
-    /24[- ]hour/i,
     /nationwide/i,
     /immediate access/i,
     /3[- ]month|three (equal|easy) monthly/i,
     /verified in minutes/i,
-    /zero collection burden/i,
     /approval rate/i,
   ];
   for (const re of banned) {

@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.2] — 2026-10-26
+
+**Type**: PATCH — owner-directed homepage copy changes
+
+### Changed
+- **`index.html`**: removed the hero availability disclaimer.
+- **`index.html`**: reverted the provider section to its v1.11.0 wording
+  ("Are You a Healthcare Provider?", 24-hour settlements / grow your patient
+  base / zero collection burden, Join Our Network → `provider-apply.html`,
+  Browse Provider Directory → `providers.html`), and removed the
+  "In development / Proposed capabilities" panel.
+- Compliance checklist updated so the owner and counsel confirm the reversed
+  guardrails.
+
+---
+
 ## [v1.12.1] — 2026-10-26
 
 **Type**: PATCH — homepage links restored (wording-only repositioning)
