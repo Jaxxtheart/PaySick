@@ -22,6 +22,12 @@
  *     - detailed NCR / National Credit Act status moved to Terms of Service
  *       only, never on the homepage
  *
+ *   v1.12.1 (owner direction): the repositioning is a WORDING change only.
+ *   Every link and flow the homepage had in v1.11.0 (login, provider apply,
+ *   provider directory, research, licenses, accessibility, in-page anchors)
+ *   must keep working. The non-submitting preview interest forms are
+ *   removed; the conversion CTAs point at the existing working pages.
+ *
  * Run: node --test tests/unit/homepage-repositioning.test.js
  */
 
@@ -132,7 +138,6 @@ describe('index.html approved copy', () => {
     'PaySick is a healthcare financing platform developed by Tech & Artery (Pty) Ltd. We are building technology that connects patients and healthcare providers through responsible, transparent financing experiences.',
     'Better access to healthcare.',
     "Be part of what we're building",
-    'Join the interest list',
     'Become a provider partner',
     'Registering interest is not a credit application, financing offer or guarantee of approval.',
     'PaySick | A Tech & Artery venture',
@@ -146,10 +151,23 @@ describe('index.html approved copy', () => {
     });
   }
 
-  test('hero CTAs scroll to the explainer and the provider form', () => {
+  test('hero keeps the sign-in entry point and adds the approved CTAs', () => {
     const hero = section(html, 'top');
+    assert.match(hero, /<a href="login.html"[^>]*>/);
     assert.match(hero, /<a href="#how-it-works"[^>]*>\s*Explore how it works\s*<\/a>/);
-    assert.match(hero, /<a href="#provider-interest"[^>]*>\s*Partner with PaySick\s*<\/a>/);
+    assert.match(hero, /<a href="#providers"[^>]*>\s*Partner with PaySick\s*<\/a>/);
+  });
+
+  test('provider section keeps the working apply and directory links', () => {
+    const providers = section(html, 'providers');
+    assert.match(providers, /<a href="provider-apply.html"[^>]*>\s*Register your practice's interest\s*<\/a>/);
+    assert.match(providers, /<a href="providers.html"[^>]*>/);
+  });
+
+  test('final conversion section links to the working sign-in and provider pages', () => {
+    const cta = section(html, 'start');
+    assert.match(cta, /<a href="login.html"[^>]*>/);
+    assert.match(cta, /<a href="provider-apply.html"[^>]*>\s*Become a provider partner\s*<\/a>/);
   });
 
   test('provider capabilities are listed and labelled as in development', () => {
@@ -170,7 +188,7 @@ describe('index.html approved copy', () => {
     const links = [
       ['#about', 'About'],
       ['#how-it-works', 'How it works'],
-      ['#providers', 'For providers'],
+      ['providers.html', 'For providers'],
       ['contact.html', 'Contact'],
       ['privacy-policy.html', 'Privacy'],
       ['terms-of-service.html', 'Terms'],
@@ -197,7 +215,6 @@ describe('index.html makes no live-credit or unsupported claims', () => {
     /nationwide/i,
     /immediate access/i,
     /3[- ]month|three (equal|easy) monthly/i,
-    /get started/i,
     /verified in minutes/i,
     /zero collection burden/i,
     /approval rate/i,
@@ -212,11 +229,6 @@ describe('index.html makes no live-credit or unsupported claims', () => {
     assert.doesNotMatch(html, /\bNCR\b|National Credit (Regulator|Act)/i);
   });
 
-  test('no links into live credit / login / provider-onboarding flows', () => {
-    for (const href of ['login.html', 'register.html', 'marketplace-apply.html', 'provider-apply.html', 'onboarding.html']) {
-      assert.ok(!html.includes(`href="${href}"`), `homepage still links to ${href}`);
-    }
-  });
 
   test('no rates, fees or rand repayment examples', () => {
     assert.doesNotMatch(text, /\bR\s?\d[\d,]*/);
@@ -228,100 +240,46 @@ describe('index.html makes no live-credit or unsupported claims', () => {
   });
 });
 
-// ─── Interest forms: minimal data, spam protection, honest submission ────────
+// ─── Links and flows keep working as in v1.11.0 ──────────────────────────────
 
-describe('index.html interest forms', () => {
-  function form(id) {
-    const m = html.match(new RegExp(`<form[^>]*id="${id}"[\\s\\S]*?<\\/form>`));
-    assert.ok(m, `expected <form id="${id}">`);
-    return m[0];
+describe('index.html keeps every existing link working', () => {
+  const previous = read('code-backups/v1.11.0/snapshot/index.html');
+  const hrefs = (src) => new Set([...src.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]));
+  const before = hrefs(previous);
+  const after = hrefs(html);
+
+  for (const href of before) {
+    test(`still links to ${href}`, () => {
+      assert.ok(after.has(href), `link to ${href} was dropped`);
+    });
   }
-  function fieldNames(formHtml) {
-    return [...formHtml.matchAll(/<(?:input|select|textarea)[^>]*name="([^"]+)"/g)].map((m) => m[1]);
-  }
 
-  test('patient form collects name and email only (plus spam trap)', () => {
-    const names = fieldNames(form('patient-interest-form')).filter((n) => n !== 'website');
-    assert.deepEqual(names.sort(), ['email', 'name']);
-  });
-
-  test('provider form collects practice, contact, business email and optional phone', () => {
-    const f = form('provider-interest-form');
-    const names = fieldNames(f).filter((n) => n !== 'website');
-    assert.deepEqual(names.sort(), ['business_email', 'contact_name', 'phone', 'practice_name']);
-    assert.match(f, /<input[^>]*name="practice_name"[^>]*required/);
-    assert.match(f, /<input[^>]*name="contact_name"[^>]*required/);
-    assert.match(f, /<input[^>]*name="business_email"[^>]*required/);
-    assert.doesNotMatch(f.match(/<input[^>]*name="phone"[^>]*>/)[0], /required/);
-  });
-
-  test('neither form asks for underwriting or health data', () => {
-    const both = form('patient-interest-form') + form('provider-interest-form');
-    assert.doesNotMatch(both, /id[_ ]?number|identity number|bank|payslip|salary|income|treatment|condition|diagnosis|bureau|credit check|date of birth/i);
-  });
-
-  test('each form has a hidden honeypot field for spam protection', () => {
-    for (const id of ['patient-interest-form', 'provider-interest-form']) {
-      const f = form(id);
-      assert.match(f, /name="website"[^>]*tabindex="-1"[^>]*autocomplete="off"/, id);
+  test('every page it links to exists', () => {
+    for (const href of after) {
+      if (/^(#|mailto:|https?:|\/api\/)/.test(href)) continue;
+      const file = href.split('#')[0];
+      assert.ok(fs.existsSync(path.join(REPO_ROOT, file)), `${href} does not exist`);
     }
   });
 
-  test('each form carries the not-a-credit-application notice, privacy and terms links', () => {
-    for (const id of ['patient-interest-form', 'provider-interest-form']) {
-      const f = form(id);
-      const t = visibleText(f);
-      assert.ok(t.includes('Registering interest is not a credit application, financing offer or guarantee of approval.'), id);
-      assert.match(f, /href="privacy-policy.html"/, id);
-      assert.match(f, /href="terms-of-service.html(#[\w-]+)?"/, id);
+  test('every in-page anchor has a target', () => {
+    for (const href of after) {
+      if (!href.startsWith('#')) continue;
+      assert.match(html, new RegExp(`id="${href.slice(1)}"`), `${href} has no target`);
     }
   });
 
-  test('loads the interest-form script and does not post anywhere itself', () => {
-    assert.match(html, /<script src="js\/interest-forms\.js"><\/script>/);
-    assert.doesNotMatch(html, /fetch\(/);
-    assert.doesNotMatch(html, /<form[^>]*action=/);
-  });
-});
-
-// ─── js/interest-forms.js behaviour ──────────────────────────────────────────
-
-describe('js/interest-forms.js', () => {
-  const forms = require(path.join(REPO_ROOT, 'js/interest-forms.js'));
-
-  test('validates the patient form: name and a valid email required', () => {
-    assert.deepEqual(forms.validatePatient({ name: 'Thandi', email: 'thandi@example.co.za' }), {});
-    const errs = forms.validatePatient({ name: ' ', email: 'not-an-email' });
-    assert.ok(errs.name);
-    assert.ok(errs.email);
+  test('main nav keeps How it works, Features, providers directory, About and sign-in', () => {
+    const nav = html.match(/<ul id="nav-links">[\s\S]*?<\/ul>/)[0];
+    for (const href of ['#how-it-works', '#features', 'providers.html', '#about', 'login.html']) {
+      assert.ok(nav.includes(`href="${href}"`), `nav lost ${href}`);
+    }
   });
 
-  test('validates the provider form: phone optional but must look like a phone if given', () => {
-    const ok = { practice_name: 'Rondebosch Dental', contact_name: 'Dr N. Mokoena', business_email: 'admin@rdental.co.za', phone: '' };
-    assert.deepEqual(forms.validateProvider(ok), {});
-    const errs = forms.validateProvider({ practice_name: '', contact_name: '', business_email: 'x', phone: 'abc' });
-    assert.ok(errs.practice_name);
-    assert.ok(errs.contact_name);
-    assert.ok(errs.business_email);
-    assert.ok(errs.phone);
-  });
-
-  test('rejects over-long values', () => {
-    const errs = forms.validatePatient({ name: 'a'.repeat(201), email: 'a@b.co' });
-    assert.ok(errs.name);
-  });
-
-  test('a filled honeypot is treated as spam', () => {
-    assert.equal(forms.isSpam({ website: 'http://spam.example' }), true);
-    assert.equal(forms.isSpam({ website: '' }), false);
-  });
-
-  test('no backend is configured, so submission is never reported as successful', () => {
-    assert.equal(forms.SUBMISSION_ENDPOINT, null);
-    const result = forms.submissionOutcome({ name: 'Thandi', email: 'thandi@example.co.za' });
-    assert.equal(result.submitted, false);
-    assert.doesNotMatch(result.message, /thank you|success|received|registered|we('| wi)ll be in touch/i);
-    assert.match(result.message, /not (yet )?open|not been sent|has not been submitted/i);
+  test('no non-submitting preview forms on the homepage', () => {
+    assert.doesNotMatch(html, /<form/);
+    assert.doesNotMatch(html, /interest-forms\.js/);
+    assert.equal(fs.existsSync(path.join(REPO_ROOT, 'js/interest-forms.js')), false);
   });
 });
 

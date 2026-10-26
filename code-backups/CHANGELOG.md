@@ -6,6 +6,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.12.1] — 2026-10-26
+
+**Type**: PATCH — homepage links restored (wording-only repositioning)
+
+### Fixed
+- **`index.html`**: restored every v1.11.0 link destination. That covers
+  Get Started → `login.html` (in the nav, hero and final CTA),
+  `provider-apply.html`, the `providers.html` directory, the `#features`
+  anchor, and the footer's Research, Licenses and Accessibility links. The
+  v1.12.0 wording and disclosures are kept.
+
+### Removed
+- The preview interest forms and `js/interest-forms.js`, which sent
+  nothing. The CTAs now go to the existing working pages.
+
+---
+
 ## [v1.12.0] — 2026-10-26
 
 **Type**: MINOR — homepage repositioning + new `js/interest-forms.js` module

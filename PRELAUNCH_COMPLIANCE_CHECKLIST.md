@@ -1,4 +1,4 @@
-# Pre-production legal & compliance approval checklist — homepage repositioning (v1.12.0)
+# Pre-production legal & compliance approval checklist — homepage repositioning (v1.12.1)
 
 Each item needs sign-off from the business owner and South African legal
 counsel before v1.12.0 is deployed to production. Nothing below has been
@@ -32,20 +32,16 @@ assumed complete.
 - [ ] Counsel confirms that removing "PaySick is not a credit provider … not
       regulated by the NCR" is appropriate.
 
-## Interest forms and data protection (POPIA)
-- [ ] Owner decides how interest is registered. The forms currently send
-      nothing (`SUBMISSION_ENDPOINT = null`) and point visitors to
-      hello@paysick.co.za. Choose one: (a) keep it this way, (b) approve a
-      mailto fallback, or (c) approve a backend endpoint. Option (c) needs a
-      new API route, built test-first, with rate limiting and spam
-      protection.
-- [ ] Counsel approves the purpose statements next to each form.
-- [ ] If any data will be collected, update `privacy-policy.html`. It still
-      names "PaySick South Africa (Pty) Ltd", and it must cover the purpose,
-      retention, the Information Officer, and opt-out for the interest list
-      and the provider enquiry.
-- [ ] Confirm the hello@paysick.co.za mailbox is monitored, and that emailed
-      interest is handled under POPIA.
+## Homepage links into live flows (owner decision, v1.12.1)
+- [ ] Per owner direction, the homepage keeps its existing links to
+      `login.html` ("Get Started"), `provider-apply.html` and `providers.html`,
+      next to the "credit is not currently available" disclosure. Counsel
+      should confirm that this combination does not imply that credit is
+      available, and that the downstream pages (registration, onboarding,
+      marketplace application, provider application with banking details)
+      are acceptable to run before launch.
+- [ ] `privacy-policy.html` still names "PaySick South Africa (Pty) Ltd".
+      Align it with Tech & Artery (Pty) Ltd if counsel agrees.
 
 ## Rest of the public site (not changed in v1.12.0)
 - [ ] Decide what to do with pages that still describe a live product and are

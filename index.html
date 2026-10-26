@@ -388,6 +388,12 @@
             margin-bottom: 30px;
         }
 
+        .providers-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         .capabilities {
             background: linear-gradient(135deg, rgba(255, 71, 87, 0.05) 0%, rgba(224, 30, 55, 0.05) 100%);
             border-radius: 16px;
@@ -463,125 +469,6 @@
             background: linear-gradient(135deg, #fff5f6 0%, #ffffff 100%);
         }
 
-        .interest-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .interest-card {
-            background: #ffffff;
-            border: 1px solid #F0F0F0;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
-            scroll-margin-top: 110px;
-        }
-
-        .interest-card h3 {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .interest-card .card-intro {
-            font-size: 15px;
-            color: #5A5A5A;
-            margin-bottom: 24px;
-        }
-
-        .draft-banner {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #1A1A1A;
-            background: #FFF8E1;
-            border: 1px solid #F1D58A;
-            border-radius: 8px;
-            padding: 10px 14px;
-            margin-bottom: 24px;
-        }
-
-        .draft-banner a,
-        .form-notice a {
-            color: #B5162B;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1A1A1A;
-        }
-
-        .form-group .optional {
-            font-weight: 400;
-            color: #5A5A5A;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 13px 16px;
-            font-size: 16px;
-            font-family: inherit;
-            border: 1.5px solid #D8D8D8;
-            border-radius: 10px;
-            background: #ffffff;
-            color: #1A1A1A;
-        }
-
-        .form-group input:focus {
-            outline: 3px solid rgba(224, 30, 55, 0.25);
-            border-color: #E01E37;
-        }
-
-        .form-group input[aria-invalid="true"] {
-            border-color: #B5162B;
-        }
-
-        .field-error {
-            display: block;
-            min-height: 0;
-            font-size: 13px;
-            color: #B5162B;
-            margin-top: 4px;
-        }
-
-        .form-trap {
-            position: absolute;
-            left: -10000px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-        }
-
-        .interest-card .primary-btn {
-            width: 100%;
-            margin-top: 6px;
-        }
-
-        .form-status {
-            font-size: 14px;
-            margin-top: 14px;
-            color: #1A1A1A;
-        }
-
-        .form-status:empty {
-            display: none;
-        }
-
-        .form-notice {
-            font-size: 13px;
-            color: #5A5A5A;
-            line-height: 1.55;
-            margin-top: 18px;
-        }
-
         .interest-disclosure {
             max-width: 720px;
             margin: 48px auto 0;
@@ -604,8 +491,8 @@
 
         .footer-content {
             display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 60px;
+            grid-template-columns: 1.6fr repeat(3, 1fr);
+            gap: 48px;
             max-width: 1200px;
             margin: 0 auto 40px;
         }
@@ -641,11 +528,14 @@
             color: #FF8A95;
         }
 
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
         .footer-links ul {
             list-style: none;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0 30px;
         }
 
         .footer-links a {
@@ -681,7 +571,6 @@
         /* Responsive Design */
         @media (max-width: 900px) {
             .providers-content,
-            .interest-grid,
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 40px;
@@ -745,7 +634,8 @@
                 font-size: 17px;
             }
 
-            .hero-buttons a {
+            .hero-buttons a,
+            .providers-actions a {
                 width: 100%;
                 text-align: center;
             }
@@ -772,13 +662,8 @@
                 font-size: 17px;
             }
 
-            .capabilities,
-            .interest-card {
+            .capabilities {
                 padding: 28px 20px;
-            }
-
-            .footer-links ul {
-                grid-template-columns: 1fr 1fr;
             }
 
             footer {
@@ -827,9 +712,10 @@
         </a>
         <ul id="nav-links">
             <li><a href="#how-it-works">How it works</a></li>
-            <li><a href="#providers">For providers</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="providers.html">For providers</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="#interest" class="cta-button">Join the interest list</a></li>
+            <li><a href="login.html" class="cta-button">Get Started</a></li>
         </ul>
         <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">☰</button>
     </nav>
@@ -841,8 +727,9 @@
         <h1>Get the care you need. Find a way to pay.</h1>
         <p>Healthcare costs shouldn't be the reason you delay treatment. PaySick is building a simpler way to finance healthcare, connecting patients and healthcare providers through transparent, responsible financing.</p>
         <div class="hero-buttons">
-            <a href="#how-it-works" class="primary-btn">Explore how it works</a>
-            <a href="#provider-interest" class="secondary-btn">Partner with PaySick</a>
+            <a href="login.html" class="primary-btn">Get Started</a>
+            <a href="#how-it-works" class="secondary-btn">Explore how it works</a>
+            <a href="#providers" class="secondary-btn">Partner with PaySick</a>
         </div>
         <div class="availability-notice" role="note">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -855,7 +742,7 @@
     </section>
 
     <!-- Value proposition -->
-    <section class="section" id="why">
+    <section class="section" id="features">
         <h2 class="section-title">Better access to healthcare starts with affordability.</h2>
         <p class="section-subtitle">Medical expenses don't always arrive when your finances are ready. PaySick is designed to help patients explore financing options that consider their circumstances, the cost of treatment and their ability to repay.</p>
         <div class="feature-grid">
@@ -947,7 +834,10 @@
             <div class="providers-text">
                 <h2>Help more patients move forward with treatment.</h2>
                 <p>Patients sometimes postpone care because they cannot cover the full cost upfront. PaySick is developing a financing solution that healthcare providers can integrate into their patient journey, helping eligible patients consider manageable repayment options.</p>
-                <a href="#provider-interest" class="primary-btn">Register your practice's interest</a>
+                <div class="providers-actions">
+                    <a href="provider-apply.html" class="primary-btn">Register your practice's interest</a>
+                    <a href="providers.html" class="secondary-btn">Browse Provider Directory</a>
+                </div>
             </div>
             <div class="capabilities">
                 <span class="capabilities-label">In development</span>
@@ -991,73 +881,14 @@
         </div>
     </section>
 
-    <!-- Final conversion: interest registration -->
-    <section class="interest-section" id="interest">
+    <!-- Final conversion -->
+    <section class="interest-section" id="start">
         <h2 class="section-title">Be part of what we're building</h2>
-        <p class="section-subtitle">Hear from us when PaySick launches, or tell us your practice would like to take part.</p>
-
-        <div class="interest-grid">
-            <div class="interest-card" id="patient-interest">
-                <h3>Join the interest list</h3>
-                <p class="card-intro">For patients who would like a general update when PaySick launches.</p>
-                <p class="draft-banner"><strong>Preview:</strong> online registration is not open yet, and this form does not send your details anywhere. To register interest now, email <a href="mailto:hello@paysick.co.za">hello@paysick.co.za</a>.</p>
-                <form id="patient-interest-form" novalidate>
-                    <div class="form-group">
-                        <label for="pi-name">Name</label>
-                        <input type="text" id="pi-name" name="name" autocomplete="name" maxlength="200" required aria-describedby="pi-name-error">
-                        <span class="field-error" id="pi-name-error" data-error-for="name" aria-live="polite"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="pi-email">Email</label>
-                        <input type="email" id="pi-email" name="email" autocomplete="email" maxlength="200" required aria-describedby="pi-email-error">
-                        <span class="field-error" id="pi-email-error" data-error-for="email" aria-live="polite"></span>
-                    </div>
-                    <div class="form-trap" aria-hidden="true">
-                        <label for="pi-website">Leave this field empty</label>
-                        <input type="text" id="pi-website" name="website" tabindex="-1" autocomplete="off">
-                    </div>
-                    <button type="submit" class="primary-btn">Join the interest list</button>
-                    <p class="form-status" data-form-status role="status" aria-live="polite"></p>
-                    <p class="form-notice">We would use your name and email only to send you launch updates about PaySick, and you could ask us to remove them at any time. Please don't share health or financial information. Registering interest is not a credit application, financing offer or guarantee of approval. See our <a href="privacy-policy.html">Privacy Policy</a> and <a href="terms-of-service.html#credit-status">Terms of Service</a>.</p>
-                </form>
-            </div>
-
-            <div class="interest-card" id="provider-interest">
-                <h3>Become a provider partner</h3>
-                <p class="card-intro">For healthcare practices interested in offering PaySick to their patients once it launches.</p>
-                <p class="draft-banner"><strong>Preview:</strong> online registration is not open yet, and this form does not send your details anywhere. To register your practice's interest now, email <a href="mailto:hello@paysick.co.za">hello@paysick.co.za</a>.</p>
-                <form id="provider-interest-form" novalidate>
-                    <div class="form-group">
-                        <label for="pv-practice">Practice name</label>
-                        <input type="text" id="pv-practice" name="practice_name" autocomplete="organization" maxlength="200" required aria-describedby="pv-practice-error">
-                        <span class="field-error" id="pv-practice-error" data-error-for="practice_name" aria-live="polite"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="pv-contact">Contact name</label>
-                        <input type="text" id="pv-contact" name="contact_name" autocomplete="name" maxlength="200" required aria-describedby="pv-contact-error">
-                        <span class="field-error" id="pv-contact-error" data-error-for="contact_name" aria-live="polite"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="pv-email">Business email</label>
-                        <input type="email" id="pv-email" name="business_email" autocomplete="work email" maxlength="200" required aria-describedby="pv-email-error">
-                        <span class="field-error" id="pv-email-error" data-error-for="business_email" aria-live="polite"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="pv-phone">Contact number <span class="optional">(optional)</span></label>
-                        <input type="tel" id="pv-phone" name="phone" autocomplete="tel" maxlength="20" aria-describedby="pv-phone-error">
-                        <span class="field-error" id="pv-phone-error" data-error-for="phone" aria-live="polite"></span>
-                    </div>
-                    <div class="form-trap" aria-hidden="true">
-                        <label for="pv-website">Leave this field empty</label>
-                        <input type="text" id="pv-website" name="website" tabindex="-1" autocomplete="off">
-                    </div>
-                    <button type="submit" class="primary-btn">Become a provider partner</button>
-                    <p class="form-status" data-form-status role="status" aria-live="polite"></p>
-                    <p class="form-notice">We would use these details only to discuss a possible partnership with your practice. Registering interest is not a credit application, financing offer or guarantee of approval. See our <a href="privacy-policy.html">Privacy Policy</a> and <a href="terms-of-service.html#credit-status">Terms of Service</a>.</p>
-                </form>
-            </div>
+        <p class="section-subtitle">Create your PaySick account, or register your practice to work with us.</p>
+        <div class="hero-buttons">
+            <a href="login.html" class="primary-btn">Get Started</a>
+            <a href="provider-apply.html" class="secondary-btn">Become a provider partner</a>
         </div>
-
         <p class="interest-disclosure">Registering interest is not a credit application, financing offer or guarantee of approval. <a href="terms-of-service.html#credit-status">Terms of Service</a></p>
     </section>
     </main>
@@ -1088,15 +919,29 @@
                 </div>
                 <p class="footer-disclosure">PaySick is a healthcare financing platform in development. Financing is not currently available through this website. See our <a href="terms-of-service.html#credit-status">Terms of Service</a> for important information.</p>
             </div>
-            <div class="footer-links" role="navigation" aria-label="Footer">
+            <div class="footer-links">
+                <h4>Product</h4>
                 <ul>
-                    <li><a href="#about">About</a></li>
                     <li><a href="#how-it-works">How it works</a></li>
-                    <li><a href="#providers">For providers</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="providers.html">For providers</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
                     <li><a href="research.html">Research</a></li>
                     <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
                     <li><a href="privacy-policy.html">Privacy</a></li>
                     <li><a href="terms-of-service.html">Terms</a></li>
+                    <li><a href="licenses.html">Licenses</a></li>
+                    <li><a href="accessibility.html">Accessibility</a></li>
                 </ul>
             </div>
         </div>
@@ -1124,7 +969,6 @@
             });
         });
     </script>
-    <script src="js/interest-forms.js"></script>
 
 <!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
      Invisible to real users, screen readers and keyboard nav. Any client that
