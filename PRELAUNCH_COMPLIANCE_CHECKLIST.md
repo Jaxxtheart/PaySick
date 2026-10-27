@@ -91,6 +91,37 @@ assumed complete.
       ("I authorise PaySick to collect R… now") against the debit order
       mandate.
 
+## Kehr pre-approval, Journey A (v1.21.0)
+- [ ] **Risk-owner sign-off on risk model v1.1** (`risk-model.js`). Two
+      changes from v1.0, both used only by Kehr pre-approval: the
+      behavioural PD component is fixed at a neutral 50 (Kehr has no form
+      behaviour to read; about +0.8 pp PD for a typical applicant), and
+      affordability uses the instalment for the term on offer instead of
+      amount / 3. v1.0 is unchanged for every existing path (833 golden cases).
+- [ ] Risk owner confirms the conservative stance at pre-approval: with no
+      provider chosen, provider score is neutral and network partnership is
+      assumed false, so borderline cases go to a person.
+- [ ] **Standard Bank confirms it can sponsor DebiCheck** for Tech &
+      Artery (Pty) Ltd as creditor, real-time TT1 with batch TT2 fallback,
+      and the abbreviated creditor name `KEHR*PLAN` (the adapter assumes a
+      10-character limit: `SHORT_NAME_MAX_LENGTH`).
+- [ ] Owner opens the Tech & Artery collection account for plan debit
+      orders.
+- [ ] Contracts and DPAs with the live partners that replace the mocks:
+      open banking (Stitch or similar), identity verification (DHA +
+      liveness), medical scheme switch, credit bureau.
+- [ ] Owner sets `KEHR_LINK_SECRET` (32+ random characters) in production.
+      Without it, plan links are refused (503).
+- [ ] Owner runs migration `014_kehr_harness.sql`.
+- [ ] Staff process for the `KEHR_*` review types in `manual_review_queue`
+      (24-hour SLA): identity not verified, documents disagree, risk review,
+      patient-requested review, pass reassessment.
+- [ ] Counsel reviews privacy policy v1.6 (section 4B) and the consent
+      wording in `consent.service.js` (the text shown is the text recorded).
+- [ ] Not built yet, by design: passkeys/WebAuthn sign-in, WhatsApp
+      delivery of plan links, and the document reader for uploaded payslips
+      and statements (the route accepts the figures it would produce).
+
 ## Homepage links into live flows (owner decision, v1.12.1)
 - [ ] Per owner direction, the homepage keeps its existing links to
       `login.html` ("Get Started"), `provider-apply.html` and `providers.html`,

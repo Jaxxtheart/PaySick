@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kehr by PaySick: describe the care you need help paying for and see how to pay for it.">
+    <meta name="author" content="PaySick">
+    <title>Kehr by PaySick</title>
+
+    <style>
+        /* Kehr by PaySick: the harness's identity, built on the PaySick CI
+           (DESIGN_SYSTEM.md). Every colour below is a PaySick CI value except
+           --kehr-wine, Kehr's one deep tone. Full guide: KEHR_BRAND.md. */
+        :root {
+            --kehr-red: #E01E37;
+            --kehr-red-bright: #FF4757;
+            --kehr-gradient: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            --kehr-ink: #1A1A1A;
+            --kehr-slate: #4A4A4A;
+            --kehr-mist: #8A8A8A;
+            --kehr-line: #E5E5E5;
+            --kehr-paper: #FAFAFA;
+            --kehr-blush: #FFF5F6;
+            --kehr-wine: #7A1426;
+            --kehr-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--kehr-font);
+            color: var(--kehr-ink);
+            line-height: 1.5;
+            background: var(--kehr-paper);
+            min-height: 100vh;
+        }
+
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #EEE;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Kehr lockup: mark, wordmark, endorsement. */
+        .kehr-lockup { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--kehr-ink); }
+        .kehr-mark { width: 36px; height: 36px; flex-shrink: 0; }
+        .kehr-type { display: flex; flex-direction: column; line-height: 1; }
+        .kehr-wordmark { font-size: 24px; font-weight: 400; letter-spacing: -0.5px; color: var(--kehr-ink); }
+        .kehr-endorse { font-size: 11px; font-weight: 300; letter-spacing: 0.4px; color: var(--kehr-slate); margin-top: 3px; }
+
+        header a.back-link {
+            color: var(--kehr-slate);
+            text-decoration: none;
+            font-size: 14px;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            padding: 8px 16px;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        header a.back-link:hover { border-color: var(--kehr-red); color: var(--kehr-red); }
+
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px 20px 80px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .intro h1 { font-size: 28px; margin-bottom: 8px; }
+        .intro p { color: #666; font-size: 15px; }
+
+        /* ── Locked (not authenticated) state ───────────────────────────── */
+        .locked-card {
+            background: #fff;
+            border: 1px solid #EEE;
+            border-radius: 16px;
+            padding: 40px 28px;
+            text-align: center;
+        }
+
+        .locked-card p { color: #555; margin-bottom: 20px; }
+        .locked-card p.saved-question { background: var(--kehr-blush); border: 1px solid #F3C4CA; border-radius: 10px; padding: 10px 14px; color: var(--kehr-ink); font-size: 14px; }
+
+        .primary-btn {
+            display: inline-block;
+            background: var(--kehr-gradient);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            display: inline-block;
+            background: white;
+            color: var(--kehr-ink);
+            padding: 12px 26px;
+            border-radius: 25px;
+            border: 2px solid #E8E8E8;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* ── Chat ─────────────────────────────────────────────────────── */
+        #chat-log {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+
+        .bubble.kehr {
+            background: #fff;
+            border: 1px solid #EEE;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble.user {
+            background: var(--kehr-red);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble.system {
+            background: var(--kehr-blush);
+            color: var(--kehr-wine);
+            align-self: center;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        #suggested-prompts,
+        #procedure-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-chip {
+            background: #fff;
+            border: 1px solid #E0E0E0;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .prompt-chip:hover { border-color: var(--kehr-red); color: var(--kehr-red); }
+
+        #composer {
+            display: flex;
+            gap: 8px;
+            position: sticky;
+            bottom: 16px;
+            background: var(--kehr-paper);
+            padding-top: 8px;
+        }
+
+        #composer input[type="text"] {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 24px;
+            border: 1px solid #DDD;
+            font-size: 15px;
+        }
+
+        #composer button, #upload-label {
+            background: var(--kehr-ink);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #upload-label { display: flex; align-items: center; background: white; color: #444; border: 1px solid #DDD; }
+        #upload-label.uploading { opacity: 0.5; pointer-events: none; }
+        #file-input { display: none; }
+        .bubble.kehr.thinking { color: #999; font-style: italic; }
+
+        /* ── Cards (summary / options / approve) ────────────────────────── */
+        .card {
+            background: #fff;
+            border: 1px solid #EEE;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card h3 { font-size: 16px; margin-bottom: 12px; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #F3F3F3;
+            font-size: 14px;
+            gap: 12px;
+        }
+
+        .summary-row label { color: #777; flex-shrink: 0; }
+
+        .summary-row input {
+            border: 1px solid #DDD;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 14px;
+            text-align: right;
+            width: 60%;
+        }
+
+        .card-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .option-card {
+            border: 1px solid #EEE;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-card .amount { font-size: 20px; font-weight: 600; }
+        .option-card .meta { font-size: 13px; color: #777; }
+
+        .disclosure-list {
+            font-size: 14px;
+            color: #444;
+            margin: 12px 0;
+            padding-left: 18px;
+        }
+
+        .disclosure-list li { margin-bottom: 6px; }
+
+        .privacy-notice { font-size: 12px; color: #5A5A5A; line-height: 1.5; margin: 8px 4px 0; }
+        .privacy-notice a { color: #B5162B; }
+        .consent-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        #manage-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+        /* ── Value chain (v1.18.0) ──────────────────────────────────────── */
+        .action-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F3F3; flex-wrap: wrap; }
+        .action-row:last-child { border-bottom: none; }
+        .action-row .action-btn { background: none; border: none; padding: 0; font-size: 15px; color: var(--kehr-ink); cursor: pointer; text-align: left; }
+        .action-row .action-btn:hover { color: var(--kehr-red); }
+
+        .proposal-line { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #F3F3F3; }
+        .proposal-line span:first-child { color: #777; }
+        .form-field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; margin-bottom: 10px; }
+        .form-field input { border: 1px solid #DDD; border-radius: 8px; padding: 8px 10px; font-size: 14px; }
+        .account-status { font-size: 15px; margin-bottom: 8px; }
+        .account-fact { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #F3F3F3; }
+        .account-fact span:first-child { color: #777; }
+        .offer-row { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #F3F3F3; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="kehr-lockup" href="kehr.html" aria-label="Kehr by PaySick">
+            <svg class="kehr-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <radialGradient id="kehrHeaderArm" cx="40%" cy="40%"><stop offset="0%" stop-color="#FF4757"/><stop offset="100%" stop-color="#E01E37"/></radialGradient>
+                    <radialGradient id="kehrHeaderHalo" cx="50%" cy="50%"><stop offset="0%" stop-color="#FF4757" stop-opacity="0.12"/><stop offset="100%" stop-color="#FF4757" stop-opacity="0.04"/></radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#kehrHeaderHalo)"/>
+                <rect x="31" y="20" width="12" height="60" rx="6" fill="url(#kehrHeaderArm)"/>
+                <rect x="37" y="44" width="36" height="12" rx="6" fill="url(#kehrHeaderArm)" transform="rotate(-45 37 50)"/>
+                <rect x="37" y="44" width="36" height="12" rx="6" fill="url(#kehrHeaderArm)" transform="rotate(45 37 50)"/>
+                <circle cx="37" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="37" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <span class="kehr-type"><span class="kehr-wordmark">Kehr</span><span class="kehr-endorse">by PaySick</span></span>
+        </a>
+        <a class="back-link" href="index.html">PaySick home</a>
+    </header>
+
+    <main>
+        <div class="intro">
+            <h1>How can I afford the care I need?</h1>
+            <p>Describe your situation and I'll help you work through the options. No long form up front.</p>
+            <p style="margin-top:10px;font-size:14px;"><a href="kehr-pass.html" style="color:var(--kehr-red);">Planning treatment? Get pre-approved first</a></p>
+        </div>
+
+        <!-- Locked state: shown when the visitor has no PaySick session.
+             Per CLAUDE.md, every Care Agent API call requires authentication,
+             so this page never shows business logic to a signed-out visitor. -->
+        <div id="locked-card" class="locked-card hidden">
+            <p>Kehr is part of your PaySick account. Log in (or register) to start.</p>
+            <p id="saved-question" class="saved-question hidden"></p>
+            <a class="primary-btn" href="login.html">Log in to continue</a>
+        </div>
+
+        <div id="app" class="hidden">
+            <!-- Account card: facts and options only. The agent's decisions
+                 behind the options stay in the backend (v1.19.0). -->
+            <div id="account-card" class="card hidden">
+                <h3>Your account</h3>
+                <p id="account-status" class="account-status"></p>
+                <div id="account-facts"></div>
+                <div id="account-offers"></div>
+                <div id="account-actions"></div>
+            </div>
+
+            <div id="chat-log"></div>
+            <div id="suggested-prompts"></div>
+
+            <!-- The recognized procedure list is finite, so it's shown as
+                 tappable choices rather than left for the patient to guess
+                 phrasing against an invisible dictionary. Free text below
+                 still works for anything not listed. -->
+            <div id="procedure-options" class="hidden"></div>
+            <p id="procedure-options-hint" class="hidden" style="font-size:12px;color:#999;margin:-12px 0 16px;">Not listed? Just describe it below.</p>
+
+            <!-- Stage 2: editable, confirmable summary -->
+            <div id="summary-card" class="card hidden">
+                <h3>Your care request</h3>
+                <div id="summary-fields"></div>
+                <div class="summary-row">
+                    <label for="summary-income">Monthly income before deductions (R), optional</label>
+                    <input id="summary-income" type="number" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <div class="summary-row">
+                    <label for="summary-obligations">Monthly debt repayments (R), optional</label>
+                    <input id="summary-obligations" type="number" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <p id="shortfall-line" class="summary-row hidden" style="border:none;"></p>
+                <div class="card-actions">
+                    <button class="primary-btn" id="confirm-summary-btn">Confirm</button>
+                </div>
+            </div>
+
+            <!-- Stage 3: constructed options -->
+            <div id="options-card" class="card hidden">
+                <h3>Options that fit what you've told us</h3>
+                <p style="font-size:13px;color:#777;margin-bottom:12px;">All plans are 0% interest. Choose the one that suits you.</p>
+                <div id="options-list"></div>
+            </div>
+
+            <!-- Stage 4: explicit approval -->
+            <div id="approve-card" class="card hidden">
+                <h3>Before we go further</h3>
+                <p>You're about to submit this request through PaySick's application process. This requires sharing:</p>
+                <ul class="disclosure-list">
+                    <li><strong>What:</strong> the treatment description, quoted amount, and the monthly payment amount you selected.</li>
+                    <li><strong>With whom:</strong> PaySick, to process your application.</li>
+                    <li><strong>For what purpose:</strong> to assess affordability and set up your payment plan.</li>
+                </ul>
+                <label class="consent-row">
+                    <input type="checkbox" id="consent-checkbox">
+                    <span>I consent to PaySick sharing this information to process my request.</span>
+                </label>
+                <div class="card-actions">
+                    <button class="primary-btn" id="approve-btn">Approve &amp; submit</button>
+                </div>
+            </div>
+
+            <!-- Stage 6: manage -->
+            <div id="manage-card" class="card hidden">
+                <h3>Manage your plan</h3>
+                <div id="manage-actions">
+                    <button class="secondary-btn" id="next-payment-btn">When's my next payment?</button>
+                    <button class="secondary-btn" id="change-date-btn">Change my payment date</button>
+                </div>
+            </div>
+
+            <!-- Proposal cards and detail forms for account actions. -->
+            <div id="action-area"></div>
+
+            <div id="composer">
+                <label id="upload-label" for="file-input">Attach<input id="file-input" type="file" accept=".pdf,.jpg,.jpeg,.png"></label>
+                <input type="text" id="message-input" placeholder="Tell us what's happening. You can describe the treatment, upload a quote, or explain the bill you're dealing with.">
+                <button id="send-btn">Send</button>
+            </div>
+            <p class="privacy-notice">Your messages and any document you attach are processed with the help of Anthropic's AI service. Only share the health details needed to describe the treatment and its cost. <a href="privacy-policy.html#kehr">How we use this information</a></p>
+        </div>
+    </main>
+
+    <script src="js/care-agent-pending.js"></script>
+    <script src="api-client.js"></script>
+    <script>
+        const SUGGESTED_PROMPTS = [
+            'I have a medical quote',
+            'I know what treatment I need',
+            'I already have a medical bill',
+            'I need help understanding my medical aid shortfall',
+            "I'm not sure what I can afford"
+        ];
+
+        const state = {
+            sessionId: null,
+            summary: {},
+            missingFields: [],
+            readyToConfirm: false,
+            options: [],
+            selectedTermMonths: null,
+            procedureOptions: []
+        };
+
+        function formatRands(cents) {
+            if (cents === null || cents === undefined) return '-';
+            // Same "R1,200.00" format as the server's messages, whatever the
+            // browser's locale.
+            const abs = Math.abs(Math.round(cents));
+            const rands = Math.floor(abs / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return `${cents < 0 ? '-' : ''}R${rands}.${String(abs % 100).padStart(2, '0')}`;
+        }
+
+        function isAuthenticated() {
+            return !!localStorage.getItem('paysick_auth_token');
+        }
+
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined) node.textContent = text;
+            return node;
+        }
+
+        function addBubble(role, text) {
+            const log = document.getElementById('chat-log');
+            log.appendChild(el('div', `bubble ${role}`, text));
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function renderSuggestedPrompts() {
+            const container = document.getElementById('suggested-prompts');
+            container.innerHTML = '';
+            SUGGESTED_PROMPTS.forEach((prompt) => {
+                const chip = el('button', 'prompt-chip', prompt);
+                chip.addEventListener('click', () => sendMessage(prompt));
+                container.appendChild(chip);
+            });
+        }
+
+        // Shows the finite, recognized procedure list as tappable choices
+        // whenever that's the question currently pending, instead of
+        // leaving the patient to guess phrasing against an invisible list.
+        // Sending a chip's own label is guaranteed to be recognized (see
+        // the backend's own test coverage), so a tap always makes progress.
+        function updateProcedureOptions() {
+            const container = document.getElementById('procedure-options');
+            const hint = document.getElementById('procedure-options-hint');
+            const shouldShow = !state.readyToConfirm && state.missingFields.includes('treatmentDescription');
+
+            if (!shouldShow) {
+                container.classList.add('hidden');
+                hint.classList.add('hidden');
+                return;
+            }
+
+            container.innerHTML = '';
+            state.procedureOptions.forEach((option) => {
+                const chip = el('button', 'prompt-chip', option.label);
+                chip.addEventListener('click', () => sendMessage(option.label));
+                container.appendChild(chip);
+            });
+            container.classList.remove('hidden');
+            hint.classList.remove('hidden');
+        }
+
+        // Starts (or restarts) the conversation. Split out of init() so
+        // sendMessage() can call it too: if the first attempt to start a
+        // session failed, a patient typing anything and hitting Send must
+        // not just silently do nothing -- that's what made this "a
+        // non-starter in the process" when it broke in production.
+        async function startConversation() {
+            try {
+                const res = await PaySickAPI.careAgent.startSession();
+                state.sessionId = res.sessionId;
+                state.summary = res.summary || {};
+                state.missingFields = res.missingFields || [];
+                state.procedureOptions = res.procedureOptions || [];
+                addBubble('kehr', res.reply);
+                updateProcedureOptions();
+                return true;
+            } catch (err) {
+                const detail = (err && err.message) || '';
+                if (/session expired|log in again/i.test(detail)) {
+                    // A stale/expired login token looks authenticated client-side
+                    // (isAuthenticated() only checks a token is present, not that
+                    // it's still valid) but fails server-side. Refreshing the page
+                    // won't fix that on its own -- say so plainly.
+                    addBubble('system', 'Your session has expired. Please log in again to continue.');
+                    const relogin = el('a', 'prompt-chip', 'Log in again');
+                    relogin.href = 'login.html';
+                    document.getElementById('chat-log').appendChild(relogin);
+                } else {
+                    addBubble('system', "I couldn't reach PaySick just now -- this may be a temporary connection issue.");
+                    const retry = el('button', 'prompt-chip', 'Try again');
+                    retry.addEventListener('click', async () => {
+                        retry.disabled = true;
+                        retry.textContent = 'Retrying...';
+                        const ok = await startConversation();
+                        if (ok) {
+                            retry.remove();
+                        } else {
+                            retry.disabled = false;
+                            retry.textContent = 'Try again';
+                        }
+                    });
+                    document.getElementById('chat-log').appendChild(retry);
+                }
+                return false;
+            }
+        }
+
+        async function init() {
+            if (!isAuthenticated()) {
+                document.getElementById('locked-card').classList.remove('hidden');
+                // Hold a question typed into the homepage search bar so it
+                // survives logging in (or registering) and can be sent after.
+                const typed = new URLSearchParams(window.location.search).get('q');
+                if (typed && typed.trim()) {
+                    PaySickCareAgentPending.save(localStorage, typed);
+                }
+                const held = PaySickCareAgentPending.peek(localStorage);
+                if (held) {
+                    const saved = document.getElementById('saved-question');
+                    saved.textContent = `Your question is saved: "${held}". Log in (or register) and I'll pick it up from there.`;
+                    saved.classList.remove('hidden');
+                }
+                return;
+            }
+            document.getElementById('app').classList.remove('hidden');
+            renderSuggestedPrompts();
+
+            const started = await startConversation();
+            if (!started) return;
+            loadAccount();
+
+            // A query typed into the homepage's search bar arrives as ?q= and
+            // is sent as the first message, as if the patient had typed it.
+            // A question held from before sign-in (js/care-agent-pending.js)
+            // is cleared either way. It is only put in the message box, never
+            // sent automatically: on a shared device it may have been typed
+            // by someone other than the person who has now signed in.
+            const urlQuery = new URLSearchParams(window.location.search).get('q');
+            const held = PaySickCareAgentPending.take(localStorage);
+            if (urlQuery !== null) {
+                // Drop ?q= from the address bar so a reload doesn't resend it.
+                history.replaceState(null, '', window.location.pathname);
+            }
+            if (urlQuery && urlQuery.trim()) {
+                sendMessage(urlQuery.trim());
+            } else if (held) {
+                document.getElementById('message-input').value = held;
+                addBubble('system', 'Here is the question you typed before signing in. Check it, then press Send.');
+            }
+        }
+
+        async function sendMessage(text) {
+            const message = (text || '').trim();
+            if (!message) return;
+
+            addBubble('user', message);
+            document.getElementById('message-input').value = '';
+
+            if (!state.sessionId) {
+                const recovered = await startConversation();
+                if (!recovered) {
+                    addBubble('system', "I still couldn't start the conversation -- try the button above, or refresh the page.");
+                    return;
+                }
+            }
+
+            try {
+                const res = await PaySickAPI.careAgent.sendMessage(state.sessionId, message);
+                state.summary = res.summary || {};
+                state.missingFields = res.missingFields || [];
+                state.readyToConfirm = res.readyToConfirm;
+                state.procedureOptions = res.procedureOptions || state.procedureOptions;
+                addBubble('kehr', res.reply);
+                updateProcedureOptions();
+
+                if (state.readyToConfirm) {
+                    document.getElementById('suggested-prompts').classList.add('hidden');
+                    renderSummaryCard();
+                }
+
+                // Account actions the agent prepared this turn. None of them
+                // has done anything yet, except read-only ones.
+                handleActionResults(res.proposals);
+                if (res.suggestedAction) renderActionForm(res.suggestedAction);
+            } catch (err) {
+                addBubble('system', "I couldn't process that just now. Please try again.");
+            }
+        }
+
+        function renderSummaryCard() {
+            const card = document.getElementById('summary-card');
+            const fields = document.getElementById('summary-fields');
+            fields.innerHTML = '';
+
+            const rows = [
+                { key: 'treatmentDescription', label: 'Treatment', type: 'text' },
+                { key: 'quotedAmountCents', label: 'Quoted amount (R)', type: 'rands' },
+                { key: 'schemeContributionCents', label: 'Medical aid contribution (R)', type: 'rands' }
+            ];
+
+            rows.forEach((row) => {
+                const wrap = el('div', 'summary-row');
+                wrap.appendChild(el('label', null, row.label));
+                const input = document.createElement('input');
+                input.dataset.key = row.key;
+                if (row.type === 'rands') {
+                    const cents = state.summary[row.key];
+                    input.type = 'number';
+                    input.step = '0.01';
+                    input.value = cents !== undefined && cents !== null ? (cents / 100).toFixed(2) : '';
+                } else {
+                    input.type = 'text';
+                    input.value = state.summary[row.key] || '';
+                }
+                wrap.appendChild(input);
+                fields.appendChild(wrap);
+            });
+
+            const shortfallLine = document.getElementById('shortfall-line');
+            const quoted = state.summary.quotedAmountCents;
+            const scheme = state.summary.schemeContributionCents;
+            if (quoted !== undefined && quoted !== null && scheme !== undefined && scheme !== null) {
+                shortfallLine.textContent = `Estimated shortfall: ${formatRands(quoted - scheme)}`;
+                shortfallLine.classList.remove('hidden');
+            } else {
+                shortfallLine.classList.add('hidden');
+            }
+
+            card.classList.remove('hidden');
+        }
+
+        async function confirmSummary() {
+            const inputs = document.querySelectorAll('#summary-fields input');
+            const edits = {};
+            inputs.forEach((input) => {
+                const key = input.dataset.key;
+                if (key === 'treatmentDescription') {
+                    if (input.value.trim()) edits[key] = input.value.trim();
+                } else if (input.value !== '') {
+                    edits[key] = Math.round(parseFloat(input.value) * 100);
+                }
+            });
+
+            // Optional: lets Shield Gate 2 assess affordability now and at submission.
+            const incomeValue = document.getElementById('summary-income').value;
+            const obligationsValue = document.getElementById('summary-obligations').value;
+            const monthlyIncome = incomeValue !== '' && parseFloat(incomeValue) >= 0 ? parseFloat(incomeValue) : undefined;
+            const monthlyObligations = monthlyIncome !== undefined && obligationsValue !== '' ? parseFloat(obligationsValue) || 0 : undefined;
+
+            try {
+                const res = await PaySickAPI.careAgent.confirmSummary(state.sessionId, { summary: edits, monthlyIncome, monthlyObligations });
+                state.summary = res.summary;
+                state.options = res.options;
+                document.getElementById('summary-card').classList.add('hidden');
+                renderOptionsCard(res);
+            } catch (err) {
+                if (err && err.message) addBubble('system', err.message);
+            }
+        }
+
+        function renderOptionsCard(res) {
+            const list = document.getElementById('options-list');
+            list.innerHTML = '';
+
+            res.options.forEach((opt) => {
+                const card = el('div', 'option-card');
+                const left = el('div');
+                left.appendChild(el('div', 'amount', `${formatRands(opt.monthlyPaymentCents)}/month`));
+                left.appendChild(el('div', 'meta', `${opt.termMonths}-month plan · total ${formatRands(opt.totalCostCents)} · 0% interest`));
+                card.appendChild(left);
+
+                const selectBtn = el('button', 'secondary-btn', 'Select');
+                selectBtn.addEventListener('click', () => {
+                    state.selectedTermMonths = opt.termMonths;
+                    renderApproveCard(opt);
+                });
+                card.appendChild(selectBtn);
+                list.appendChild(card);
+            });
+
+            document.getElementById('options-card').classList.remove('hidden');
+        }
+
+        function renderApproveCard() {
+            document.getElementById('approve-card').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        async function approveAndExecute() {
+            const consent = document.getElementById('consent-checkbox').checked;
+            if (!consent) {
+                addBubble('system', 'Please check the consent box so PaySick can act on this request.');
+                return;
+            }
+
+            try {
+                const approveRes = await PaySickAPI.careAgent.approve(state.sessionId, {
+                    selectedTermMonths: state.selectedTermMonths,
+                    dataSharingAcknowledged: true
+                });
+
+                // Execution stays on the existing, unmodified marketplace
+                // endpoint - the Care Agent only prepared this payload.
+                const marketplaceRes = await PaySickAPI.marketplace.submitApplication(approveRes.applicationPayload);
+
+                // A Shield decline comes back as a 200 with no applicationId.
+                // It is an assessed decision, so say so rather than "try again".
+                if (marketplaceRes.shield_declined) {
+                    document.getElementById('approve-card').classList.add('hidden');
+                    addBubble('kehr', "We can't offer this plan right now. A longer term may lower the monthly amount, or you can contact PaySick.");
+                    return;
+                }
+
+                const applicationId = marketplaceRes.applicationId;
+                if (!applicationId) {
+                    addBubble('system', "I couldn't submit that just now. Please try again, or use the traditional PaySick application.");
+                    return;
+                }
+
+                await PaySickAPI.careAgent.recordExecution(state.sessionId, applicationId);
+
+                document.getElementById('approve-card').classList.add('hidden');
+                document.getElementById('options-card').classList.add('hidden');
+                addBubble('kehr', `Submitted. Your reference is ${applicationId}.`);
+                document.getElementById('manage-card').classList.remove('hidden');
+                loadAccount();
+            } catch (err) {
+                addBubble('system', "I couldn't submit that just now. Please try again, or use the traditional PaySick application.");
+            }
+        }
+
+        async function showNextPayment() {
+            try {
+                const res = await PaySickAPI.careAgent.getManageStatus(state.sessionId);
+                addBubble('kehr', res.reply);
+            } catch (err) {
+                addBubble('system', "I couldn't check your payment schedule just now.");
+            }
+        }
+
+        // Collect the details in the page, then the patient sends the
+        // request (window.prompt can't be relied on).
+        function requestPaymentDateChange() {
+            renderActionForm({
+                actionType: 'REQUEST_PAYMENT_DATE_CHANGE',
+                label: 'Move my payment date',
+                params: {},
+                inputs: [
+                    { name: 'preferredDay', type: 'day', label: 'New day of the month (1 to 28)' },
+                    { name: 'reason', type: 'text', label: 'Reason', optional: true }
+                ]
+            });
+        }
+
+        // ── Account (v1.18.0, simplified in v1.19.0) ──────────────────────
+        // The patient sees facts and confirmed outcomes only. Which options
+        // appear, and why, is decided and recorded in the backend; nothing
+        // here describes that process.
+
+        function scrollToEnd() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Only ever link to a page on this site.
+        function safeRedirect(target) {
+            return typeof target === 'string' && /^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/i.test(target) ? target : null;
+        }
+
+        async function loadAccount() {
+            if (!state.sessionId) return;
+            try {
+                renderAccount(await PaySickAPI.careAgent.getAccount(state.sessionId));
+            } catch (err) {
+                // The conversation still works without the account card.
+            }
+        }
+
+        function fact(label, value) {
+            const row = el('div', 'account-fact');
+            row.appendChild(el('span', null, label));
+            row.appendChild(el('strong', null, value));
+            return row;
+        }
+
+        function renderAccount(account) {
+            const card = document.getElementById('account-card');
+            if (!account || !account.hasAccount) {
+                card.classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('account-status').textContent = account.status || '';
+
+            const facts = document.getElementById('account-facts');
+            facts.innerHTML = '';
+            (account.outstanding || []).forEach((item) => facts.appendChild(fact(`Outstanding, due ${item.dueDate}`, formatRands(item.amountCents))));
+            if (account.nextPayment) facts.appendChild(fact(`Next payment, ${account.nextPayment.dueDate}`, formatRands(account.nextPayment.amountCents)));
+            if (account.balanceCents !== null && account.balanceCents !== undefined) facts.appendChild(fact('Balance', formatRands(account.balanceCents)));
+            (account.requests || []).forEach((request) => facts.appendChild(fact(request.label, request.status)));
+
+            const offers = document.getElementById('account-offers');
+            offers.innerHTML = '';
+            (account.offers || []).forEach((offer) => {
+                const row = el('div', 'offer-row');
+                row.appendChild(el('span', null, `${offer.lenderName} · ${formatRands(offer.monthlyPaymentCents)}/month · ${offer.termMonths} months`));
+                row.appendChild(el('span', null, `${formatRands(offer.totalRepayableCents)} total`));
+                const accept = el('button', 'secondary-btn', 'Accept');
+                accept.addEventListener('click', () => proposeAction('ACCEPT_OFFER', { offerId: offer.offerId }));
+                row.appendChild(accept);
+                offers.appendChild(row);
+            });
+
+            const actions = document.getElementById('account-actions');
+            actions.innerHTML = '';
+            (account.options || []).forEach((option) => {
+                if (option.actionType === 'ACCEPT_OFFER' || option.actionType === 'COMPARE_OFFERS') return;
+                const row = el('div', 'action-row');
+                const button = el('button', 'action-btn', option.label);
+                button.addEventListener('click', () => startAction(option));
+                row.appendChild(button);
+                actions.appendChild(row);
+            });
+
+            card.classList.remove('hidden');
+        }
+
+        // A tapped option: ask for details first if it needs them.
+        function startAction(option) {
+            const needsInput = (option.inputs || []).some((input) => !input.optional);
+            if (needsInput) {
+                renderActionForm(option);
+            } else {
+                proposeAction(option.actionType, option.params || {});
+            }
+        }
+
+        async function proposeAction(actionType, params) {
+            try {
+                const res = await PaySickAPI.careAgent.proposeAction(state.sessionId, actionType, params);
+                handleActionResults([res]);
+            } catch (err) {
+                addBubble('system', (err && err.message) || 'That is not available right now.');
+            }
+        }
+
+        function handleActionResults(results) {
+            (results || []).forEach((result) => {
+                if (!result) return;
+                if (result.status === 'awaiting_consent') {
+                    renderProposal(result);
+                } else if (result.status === 'refused') {
+                    addBubble('system', result.message || "That isn't available here.");
+                    const target = safeRedirect(result.redirect);
+                    if (target) {
+                        const link = el('a', 'prompt-chip', 'Open the secure page');
+                        link.href = target;
+                        document.getElementById('chat-log').appendChild(link);
+                    }
+                } else if (result.message) {
+                    addBubble('kehr', result.message);
+                }
+            });
+        }
+
+        // Needs its own consent box ticked; the server re-checks the figures
+        // before anything happens.
+        function renderProposal(proposal) {
+            const area = document.getElementById('action-area');
+            const card = el('div', 'card');
+            card.appendChild(el('h3', null, proposal.title || ''));
+            (proposal.lines || []).forEach((line) => {
+                const row = el('div', 'proposal-line');
+                row.appendChild(el('span', null, line.label));
+                row.appendChild(el('strong', null, line.value));
+                card.appendChild(row);
+            });
+
+            const consentRow = el('label', 'consent-row');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            consentRow.appendChild(checkbox);
+            consentRow.appendChild(el('span', null, proposal.consentText || 'I agree.'));
+            card.appendChild(consentRow);
+
+            const actions = el('div', 'card-actions');
+            const confirmBtn = el('button', 'primary-btn', proposal.confirmLabel || 'Confirm');
+            const declineBtn = el('button', 'secondary-btn', 'Cancel');
+            actions.appendChild(confirmBtn);
+            actions.appendChild(declineBtn);
+            card.appendChild(actions);
+
+            confirmBtn.addEventListener('click', async () => {
+                if (!checkbox.checked) {
+                    addBubble('system', 'Please tick the box to confirm.');
+                    return;
+                }
+                confirmBtn.disabled = true;
+                declineBtn.disabled = true;
+                try {
+                    const res = await PaySickAPI.careAgent.confirmAction(state.sessionId, proposal.proposalId);
+                    card.remove();
+                    addBubble('kehr', res.message);
+                } catch (err) {
+                    card.remove();
+                    addBubble('system', (err && err.message) || 'That could not be completed. Nothing was changed.');
+                }
+                loadAccount();
+            });
+
+            declineBtn.addEventListener('click', async () => {
+                confirmBtn.disabled = true;
+                declineBtn.disabled = true;
+                try {
+                    await PaySickAPI.careAgent.declineAction(state.sessionId, proposal.proposalId);
+                } catch (err) {
+                    // Nothing happens without a confirm anyway.
+                }
+                card.remove();
+            });
+
+            area.appendChild(card);
+            scrollToEnd();
+        }
+
+        // Collects the details an option needs (a date, a day, a term).
+        // Never asks for an amount owed: PaySick supplies those.
+        function renderActionForm(option) {
+            const area = document.getElementById('action-area');
+            const card = el('div', 'card');
+            card.appendChild(el('h3', null, option.label));
+            const fields = [];
+            (option.inputs || []).forEach((input, index) => {
+                const field = el('label', 'form-field');
+                field.appendChild(el('span', null, input.label + (input.optional ? ' (optional)' : '')));
+                const control = document.createElement('input');
+                control.id = `action-input-${option.actionType}-${index}`;
+                if (input.type === 'day') { control.type = 'number'; control.min = '1'; control.max = '28'; }
+                else if (input.type === 'months') { control.type = 'number'; control.min = '1'; control.max = '24'; }
+                else if (input.type === 'date') { control.type = 'date'; }
+                else if (input.type === 'rands') { control.type = 'number'; control.step = '0.01'; control.min = '0'; }
+                else { control.type = 'text'; control.maxLength = 500; }
+                field.appendChild(control);
+                card.appendChild(field);
+                fields.push({ input, control });
+            });
+
+            const actions = el('div', 'card-actions');
+            const next = el('button', 'primary-btn', 'Continue');
+            const cancel = el('button', 'secondary-btn', 'Cancel');
+            actions.appendChild(next);
+            actions.appendChild(cancel);
+            card.appendChild(actions);
+
+            next.addEventListener('click', () => {
+                const params = { ...(option.params || {}) };
+                for (const { input, control } of fields) {
+                    const value = control.value.trim();
+                    if (!value) {
+                        if (!input.optional) {
+                            addBubble('system', `Please fill in: ${input.label}.`);
+                            return;
+                        }
+                        continue;
+                    }
+                    if (input.type === 'day' || input.type === 'months') params[input.name] = parseInt(value, 10);
+                    else if (input.type === 'rands') params[input.name] = Math.round(parseFloat(value) * 100);
+                    else params[input.name] = value;
+                }
+                card.remove();
+                proposeAction(option.actionType, params);
+            });
+            cancel.addEventListener('click', () => card.remove());
+
+            area.appendChild(card);
+            scrollToEnd();
+        }
+
+        document.getElementById('send-btn').addEventListener('click', () => {
+            sendMessage(document.getElementById('message-input').value);
+        });
+        document.getElementById('message-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage(e.target.value);
+        });
+        const ALLOWED_DOCUMENT_TYPES = { 'application/pdf': true, 'image/jpeg': true, 'image/png': true };
+        const MAX_DOCUMENT_BYTES = 4 * 1024 * 1024;
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = reader.result || '';
+                    const comma = result.indexOf(',');
+                    resolve(comma === -1 ? result : result.slice(comma + 1));
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            e.target.value = '';
+            if (!file) return;
+
+            addBubble('user', `📎 Attached: ${file.name}`);
+
+            if (!ALLOWED_DOCUMENT_TYPES[file.type]) {
+                addBubble('system', "I can only read PDF, JPG, or PNG files. Please tell me the amount and treatment in your own words instead.");
+                return;
+            }
+            if (file.size > MAX_DOCUMENT_BYTES) {
+                addBubble('system', "That file's a bit too large for me to read (max 4MB). Please tell me the amount and treatment in your own words instead.");
+                return;
+            }
+            if (!state.sessionId) {
+                const recovered = await startConversation();
+                if (!recovered) {
+                    addBubble('system', "I still couldn't start the conversation -- try the button above, or refresh the page.");
+                    return;
+                }
+            }
+
+            const uploadLabel = document.getElementById('upload-label');
+            uploadLabel.classList.add('uploading');
+            const thinking = el('div', 'bubble kehr thinking', 'Reading your document...');
+            document.getElementById('chat-log').appendChild(thinking);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+            try {
+                const fileBase64 = await fileToBase64(file);
+                const res = await PaySickAPI.careAgent.uploadDocument(state.sessionId, {
+                    fileBase64,
+                    mediaType: file.type,
+                    filename: file.name
+                });
+                thinking.remove();
+                state.summary = res.summary || {};
+                state.missingFields = res.missingFields || [];
+                state.readyToConfirm = res.readyToConfirm;
+                state.procedureOptions = res.procedureOptions || state.procedureOptions;
+                addBubble('kehr', res.reply);
+                updateProcedureOptions();
+                if (state.readyToConfirm) {
+                    document.getElementById('suggested-prompts').classList.add('hidden');
+                    renderSummaryCard();
+                }
+            } catch (err) {
+                thinking.remove();
+                addBubble('system', "I couldn't read that file just now. Please tell me the amount and treatment in your own words instead.");
+            } finally {
+                uploadLabel.classList.remove('uploading');
+            }
+        });
+        document.getElementById('confirm-summary-btn').addEventListener('click', confirmSummary);
+        document.getElementById('approve-btn').addEventListener('click', approveAndExecute);
+        document.getElementById('next-payment-btn').addEventListener('click', showNextPayment);
+        document.getElementById('change-date-btn').addEventListener('click', requestPaymentDateChange);
+
+        init();
+    </script>
+
+    <noscript>
+        <p style="text-align:center;padding:40px;">Kehr needs JavaScript to run. Please enable it, or use the <a href="marketplace-apply.html">traditional PaySick application</a> instead.</p>
+    </noscript>
+
+    <!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
+         Invisible to real users, screen readers and keyboard nav. Any client that
+         follows it hits GET /api/hp-check and is blocked for the session. -->
+    <a href="/api/hp-check" style="display:none" aria-hidden="true" tabindex="-1" rel="nofollow">Directory</a>
+</body>
+</html>

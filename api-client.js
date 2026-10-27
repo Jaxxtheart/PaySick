@@ -557,6 +557,87 @@ const PaySickAPI = {
     }
   },
 
+  // ─── Kehr (Journey A: pre-approval, pass, plan links) ────────────────────
+  kehr: {
+    /**
+     * The patient's consents, one per data source, with status
+     */
+    async getConsents() {
+      return PaySickAPI.request('/kehr/consents');
+    },
+
+    async grantConsent(source) {
+      return PaySickAPI.request('/kehr/consents', {
+        method: 'POST',
+        body: JSON.stringify({ source })
+      });
+    },
+
+    async withdrawConsent(source) {
+      return PaySickAPI.request(`/kehr/consents/${encodeURIComponent(source)}`, { method: 'DELETE' });
+    },
+
+    /**
+     * Start a pre-approval: procedure, estimate (cents), urgency and,
+     * optionally, the medical aid to ask about cover
+     */
+    async startPreapproval({ procedureCode, estimateCents, urgency, scheme }) {
+      return PaySickAPI.request('/kehr/preapprovals', {
+        method: 'POST',
+        body: JSON.stringify({ procedureCode, estimateCents, urgency, scheme })
+      });
+    },
+
+    /**
+     * Figures read from documents and the liveness token; never files
+     */
+    async submitDocuments(preapprovalId, docs) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/documents`, {
+        method: 'POST',
+        body: JSON.stringify(docs || {})
+      });
+    },
+
+    async assess(preapprovalId) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/assess`, { method: 'POST' });
+    },
+
+    /**
+     * Ask a person to look at the outcome
+     */
+    async requestReview(preapprovalId) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/review`, { method: 'POST' });
+    },
+
+    async getPass() {
+      return PaySickAPI.request('/kehr/pass');
+    },
+
+    async redeemPlanLink(token) {
+      return PaySickAPI.request('/kehr/plan-links/redeem', {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+    },
+
+    /**
+     * Provider: send a patient a plan link for a bill (cents)
+     */
+    async createPlanLink({ patientPhone, amountCents, billTotalCents, procedureCode }) {
+      return PaySickAPI.request('/kehr/provider/plan-links', {
+        method: 'POST',
+        body: JSON.stringify({ patientPhone, amountCents, billTotalCents, procedureCode })
+      });
+    },
+
+    /**
+     * Provider: check a patient's pass code before booking
+     */
+    async checkPass(code) {
+      return PaySickAPI.request(`/kehr/provider/passes/${encodeURIComponent(code)}`);
+    }
+  },
+
   // ─── Notifications ──────────────────────────────────────────────────────
   notifications: {
     /**

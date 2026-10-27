@@ -90,6 +90,16 @@ const BOT_USER_AGENT_PATTERNS = [
   /Meta-ExternalFetcher/i,
   /FirecrawlAgent/i,
   /Google-NotebookLM/i,
+  // v1.21.0 review: scripted HTTP clients and AI page readers with no
+  // "bot" token. Kehr's API is called from browsers only.
+  /python-httpx/i,
+  /aiohttp/i,
+  /^undici/i,
+  /Apache-HttpClient/i,
+  /Jina-Reader/i,
+  /Crawl4AI/i,
+  /Firecrawl/i,
+  /Manus-User/i,
 
   // Generic bot / spider / crawler patterns
   /bot\b/i,

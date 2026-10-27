@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kehr by PaySick for providers: check a patient's pass and send a plan link.">
+    <meta name="author" content="PaySick">
+    <title>Kehr for providers</title>
+
+    <style>
+        :root {
+            --kehr-red: #E01E37;
+            --kehr-gradient: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            --kehr-ink: #1A1A1A;
+            --kehr-slate: #4A4A4A;
+            --kehr-paper: #FAFAFA;
+            --kehr-blush: #FFF5F6;
+            --kehr-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--kehr-font); color: var(--kehr-ink); line-height: 1.5; background: var(--kehr-paper); min-height: 100vh; }
+        header { background: #fff; border-bottom: 1px solid #EEE; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .kehr-lockup { display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--kehr-ink); }
+        .kehr-wordmark { font-size: 24px; letter-spacing: -0.5px; }
+        .kehr-endorse { font-size: 12px; color: var(--kehr-slate); }
+        header a.back-link { color: var(--kehr-slate); text-decoration: none; font-size: 14px; border: 1px solid #E0E0E0; border-radius: 20px; padding: 8px 16px; }
+        main { max-width: 560px; margin: 0 auto; padding: 32px 16px 80px; }
+        h1 { font-size: 24px; margin-bottom: 18px; }
+        .card { background: #fff; border: 1px solid #EEE; border-radius: 16px; padding: 22px; margin-bottom: 16px; }
+        .card h2 { font-size: 17px; margin-bottom: 4px; }
+        .sub { color: var(--kehr-slate); font-size: 14px; margin-bottom: 14px; }
+        .field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; margin-bottom: 12px; }
+        .field input { font: inherit; padding: 11px 12px; border: 1px solid #DDD; border-radius: 10px; }
+        .primary-btn { background: var(--kehr-gradient); color: #fff; padding: 13px 28px; border-radius: 25px; border: none; font-size: 15px; font-weight: 500; cursor: pointer; }
+        .primary-btn:disabled { opacity: 0.5; }
+        .out { margin-top: 14px; padding: 12px 14px; background: var(--kehr-blush); border-radius: 10px; font-size: 14px; word-break: break-all; }
+        .row { display: flex; justify-content: space-between; padding: 4px 0; gap: 12px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="kehr-lockup" href="provider-dashboard.html"><span class="kehr-wordmark">Kehr</span><span class="kehr-endorse">for providers</span></a>
+        <a class="back-link" href="provider-dashboard.html">Dashboard</a>
+    </header>
+
+    <main>
+        <h1>Kehr pass and plan links</h1>
+
+        <div id="locked" class="card hidden">
+            <p class="sub">Log in with your practice account to use Kehr.</p>
+            <a class="primary-btn" href="login.html" style="text-decoration:none;display:inline-block;">Log in</a>
+        </div>
+
+        <div id="app" class="hidden">
+            <section class="card">
+                <h2>Check a pass</h2>
+                <p class="sub">Before booking, check the code your patient shows you.</p>
+                <label class="field">Pass code
+                    <input id="pass-code" type="text" maxlength="7" placeholder="ABC-123" autocomplete="off" style="text-transform:uppercase;">
+                </label>
+                <button class="primary-btn" id="check-btn">Check</button>
+                <div id="pass-out" class="out hidden"></div>
+            </section>
+
+            <section class="card">
+                <h2>Send a plan link</h2>
+                <p class="sub">When the bill is final, send your patient a link. They choose a term and approve the debit order in their banking app. The link works only on their number and expires in 7 days.</p>
+                <label class="field">Patient's cellphone
+                    <input id="link-phone" type="tel" maxlength="16" placeholder="082 123 4567" autocomplete="off">
+                </label>
+                <label class="field">Amount the patient pays (R)
+                    <input id="link-amount" type="number" min="1" step="0.01" inputmode="decimal">
+                </label>
+                <label class="field">Total bill (R, optional)
+                    <input id="link-total" type="number" min="1" step="0.01" inputmode="decimal">
+                </label>
+                <label class="field">Procedure (as on the pre-approval)
+                    <input id="link-procedure" type="text" maxlength="100" autocomplete="off">
+                </label>
+                <button class="primary-btn" id="link-btn">Create link</button>
+                <div id="link-out" class="out hidden"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="api-client.js"></script>
+    <script>
+        function formatRands(cents) {
+            const abs = Math.abs(Math.round(cents));
+            const rands = Math.floor(abs / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return `R${rands}.${String(abs % 100).padStart(2, '0')}`;
+        }
+        function formatDate(iso) {
+            return new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        function toCents(id) {
+            const v = document.getElementById(id).value;
+            if (!v) return null;
+            const c = Math.round(parseFloat(v) * 100);
+            return Number.isInteger(c) && c > 0 ? c : NaN;
+        }
+        function rows(box, pairs) {
+            box.innerHTML = '';
+            pairs.forEach(([k, v]) => {
+                const r = document.createElement('div');
+                r.className = 'row';
+                const a = document.createElement('span'); a.textContent = k;
+                const b = document.createElement('strong'); b.textContent = v;
+                r.append(a, b);
+                box.appendChild(r);
+            });
+            box.classList.remove('hidden');
+        }
+
+        const STATUS_LABEL = { active: 'Active', converted: 'Used for a plan', expired: 'Expired', withdrawn: 'Withdrawn' };
+
+        document.getElementById('check-btn').addEventListener('click', async () => {
+            const box = document.getElementById('pass-out');
+            const code = document.getElementById('pass-code').value.trim().toUpperCase();
+            if (!/^[A-Z2-9]{3}-[A-Z2-9]{3}$/.test(code)) { rows(box, [['Code', 'Use the format ABC-123']]); return; }
+            try {
+                const { pass } = await PaySickAPI.kehr.checkPass(code);
+                rows(box, [['Status', STATUS_LABEL[pass.status] || pass.status], ['Pre-approved up to', formatRands(pass.ceilingCents)], ['Valid until', formatDate(pass.expiresAt)]]);
+            } catch (e) {
+                rows(box, [['Result', e.message || 'No pass with that code.']]);
+            }
+        });
+
+        document.getElementById('link-btn').addEventListener('click', async (e) => {
+            const box = document.getElementById('link-out');
+            const amountCents = toCents('link-amount');
+            const billTotalCents = toCents('link-total');
+            if (!amountCents) { rows(box, [['Amount', 'Add the amount the patient pays']]); return; }
+            if (Number.isNaN(billTotalCents)) { rows(box, [['Total', 'Check the total bill']]); return; }
+            e.target.disabled = true;
+            try {
+                const link = await PaySickAPI.kehr.createPlanLink({
+                    patientPhone: document.getElementById('link-phone').value,
+                    amountCents,
+                    billTotalCents: billTotalCents || undefined,
+                    procedureCode: document.getElementById('link-procedure').value.trim() || undefined
+                });
+                const url = new URL(link.url, window.location.href).href;
+                rows(box, [['Link', url], ['Expires', formatDate(link.expiresAt)]]);
+            } catch (err) {
+                rows(box, [['Result', err.message || 'The link was not created.']]);
+            } finally { e.target.disabled = false; }
+        });
+
+        if (localStorage.getItem('paysick_auth_token')) {
+            document.getElementById('app').classList.remove('hidden');
+        } else {
+            document.getElementById('locked').classList.remove('hidden');
+        }
+    </script>
+
+    <noscript>
+        <p style="text-align:center;padding:40px;">Kehr needs JavaScript to run. Please enable it.</p>
+    </noscript>
+
+    <!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention). -->
+    <a href="/api/hp-check" style="display:none" aria-hidden="true" tabindex="-1" rel="nofollow">Directory</a>
+</body>
+</html>

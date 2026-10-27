@@ -6,6 +6,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.21.0] — 2026-10-27
+
+**Type**: MINOR — Kehr harness, Journey A (pre-approval before treatment)
+
+### Added
+- Risk model v1.1 (`risk-model.js`). v1.0 is extracted unchanged (833
+  golden cases); v1.1 has a neutral behavioural component and term-aware
+  affordability.
+- `preapproval.service.js`: Shield Gates 5, 3 and 2 (`runPatientGates`),
+  the hard floors and PD/LGD, then the pass (code, ceiling, maximum term,
+  90 days) and the conversion rules.
+- `consent.service.js`, `document-crosscheck.service.js` and
+  `plan-link.service.js`.
+- `identity-verification.adapter.js` and `medical-scheme.adapter.js`
+  (mocks).
+- `kehr-preapproval-flow.service.js` and `kehr-repository.js`. They write
+  to the underwriting audit log (`RISK_v1.1`) and the manual review queue.
+- `/api/kehr/*` routes and migration `014_kehr_harness.sql`.
+- `kehr-pass.html` (patient) and `provider-kehr.html` (provider).
+- `KEHR_HARNESS.md`.
+
+### Changed
+- `debicheck.adapter.js`: the creditor is Tech & Artery (Pty) Ltd
+  (`KEHR*PLAN`, Standard Bank), with TT1 falling back to TT2.
+- Privacy policy v1.6, section 4B "Kehr pre-approval".
+- Bot blocklist and rate-limit review: 8 new UA patterns, plus
+  `kehrLimiter` and `kehrAssessLimiter`.
+
+### Fixed
+- Provider plan links pointed to `kehr.html`; they now point to
+  `kehr-pass.html`.
+
+---
+
 ## [v1.20.0] — 2026-10-27
 
 **Type**: MINOR — Kehr brand identity for the harness (replaces "Care Agent")

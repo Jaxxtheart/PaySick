@@ -111,6 +111,7 @@
                 <li><a href="#s4">4. POPIA Eight Conditions</a></li>
                 <li><a href="#s5">5. What We Collect</a></li>
                 <li><a href="#kehr">Kehr by PaySick</a></li>
+                <li><a href="#kehr-preapproval">Kehr pre-approval</a></li>
                 <li><a href="#s6">6. Special Personal Information</a></li>
                 <li><a href="#s7">7. Why We Process Your Data</a></li>
                 <li><a href="#s8">8. Who We Share Data With</a></li>
@@ -131,7 +132,7 @@
     <main class="content">
 
         <div class="effective">
-            <strong>Effective Date:</strong> 27 October 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.5 &nbsp;|&nbsp; <strong>Next review:</strong> 27 October 2027<br>
+            <strong>Effective Date:</strong> 27 October 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.6 &nbsp;|&nbsp; <strong>Next review:</strong> 27 October 2027<br>
             This policy is issued in terms of <strong>Section 18 of POPIA</strong> (duty to notify data subjects at time of collection) and must be read together with our <a href="terms-of-service.html">Terms of Service</a>.
         </div>
 
@@ -225,6 +226,23 @@
         <p>The AI model does not decide whether you qualify, and it cannot submit an application or move money. Amounts and repayment options are calculated by our own systems. The affordability assessment is the same one used for every application, and nothing is submitted until you confirm the details and approve the step yourself.</p>
         <p>Please share only the health information needed to describe the treatment and its cost. Diagnoses and medical history are not needed.</p>
 
+        <h2 id="kehr-preapproval">4B. Kehr pre-approval</h2>
+        <p>Before treatment, you can ask Kehr to pre-approve you. Instead of asking you to fill in your income and expenses, Kehr reads what it needs from the source, and only with your consent. Each source has its own separate consent, which you switch on or off in Kehr. You can withdraw any consent at any time; this stops further reads but does not undo an assessment already made.</p>
+        <h3>What we read, and why</h3>
+        <ul>
+            <li><strong>Credit bureau check:</strong> a check of your credit record with a registered credit bureau, required before we offer a payment plan.</li>
+            <li><strong>Your bank account, read once:</strong> through an open-banking provider, we read your salary credits and debit orders for the last 3 months once, to work out what you can comfortably afford. We keep the figures we used, not your transactions.</li>
+            <li><strong>A payslip or bank statement</strong> (instead of connecting your bank): we read the figures on the document you upload and keep only the figures we used.</li>
+            <li><strong>Your identity:</strong> a selfie, matched to your ID number by our identity verification partner. We do not keep the photo; we keep only the result of the check.</li>
+            <li><strong>Your medical scheme:</strong> what your scheme covers for the treatment and whether it is pre-authorised, so that your plan only covers the gap. This is health information (see Section 5).</li>
+            <li><strong>Health history (optional):</strong> sharing it can improve your offer. Declining never counts against you.</li>
+        </ul>
+        <h3>How the assessment is made</h3>
+        <p>The pre-approval is calculated by automated means: our affordability rules (including a repayment limit of 20% of your verified income) and our risk model. Cases where your documents do not agree with each other, or where the risk model is not clear, always go to a person, and documents that do not agree are never a reason, on their own, to decline you. If you are not pre-approved, you can ask for a person to review the outcome and tell us anything you think we missed (POPIA Section 71).</p>
+        <h3>Your pass and your provider</h3>
+        <p>If you are pre-approved, you receive a pass with a code, an amount and an expiry date. A provider you show it to sees only the code, whether it is valid, the amount and the expiry date. A provider never sees your income, bank details or health information. When your bill is ready, your provider can send a plan link to your cellphone; the link works only for your number and expires after 7 days.</p>
+        <p>The debit order for your plan is in the name of <strong>Tech &amp; Artery (Pty) Ltd</strong>, which operates Kehr, and appears in your banking app as <strong>KEHR*PLAN</strong>.</p>
+
         <h2 id="s6">5. Special Personal Information</h2>
         <p>Section 26 of POPIA prohibits the processing of <strong>"special personal information"</strong> except in limited circumstances. PaySick processes the following special categories:</p>
         <ul>
@@ -261,6 +279,8 @@
             <li><strong>Vercel Inc.</strong>: hosting and serverless compute (USA; see Section 9 on cross-border transfers)</li>
             <li><strong>Neon Inc.</strong>: PostgreSQL database hosting (USA; see Section 9)</li>
             <li><strong>Anthropic, PBC</strong>: AI model used by Kehr to write replies and read uploaded documents (USA; see Sections 4A and 9)</li>
+            <li><strong>An open-banking provider</strong>: reads your bank account once, with your consent, for Kehr pre-approval (South Africa; see Section 4B)</li>
+            <li><strong>An identity verification partner</strong>: checks your ID number and selfie for Kehr pre-approval, without keeping the photo (South Africa; see Section 4B)</li>
             <li><strong>SMS and email delivery providers</strong>: transactional notifications only</li>
         </ul>
 
@@ -294,6 +314,7 @@
                 <tr><td>POPIA consent records</td><td>Duration of processing plus 3 years</td><td>POPIA Section 11(1)(a): evidence of lawful basis</td></tr>
                 <tr><td>Payment transaction records</td><td>5 years</td><td>Applicable statutory requirements</td></tr>
                 <tr><td>Kehr conversations and details read from uploaded documents</td><td>Kept with the payment arrangement records when the conversation leads to an application; otherwise 3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
+                <tr><td>Kehr pre-approvals, the figures used and your consents</td><td>Kept with the payment arrangement records when a pass leads to a plan; otherwise 3 years from the assessment, then deleted. Consent records follow the POPIA consent row above</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
                 <tr><td>Inactive accounts (no payment arrangement)</td><td>3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
                 <tr><td>Anonymised analytics</td><td>Indefinite (no personal data retained)</td><td>POPIA s1: anonymised data falls outside definition of personal information</td></tr>
             </tbody>

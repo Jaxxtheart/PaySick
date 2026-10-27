@@ -63,6 +63,7 @@ const underwritingRoutes = require('./routes/underwriting');
 const outreachRoutes = require('./routes/outreach');
 const v1Routes = require('./routes/v1');
 const careAgentRoutes = require('./routes/care-agent');
+const kehrRoutes = require('./routes/kehr');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -233,10 +234,41 @@ const careAgentActionLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// Kehr Journey A (v1.21.0). Assessing reads a bank feed, a bureau and a
+// medical scheme; redeeming a link and checking a pass code are the two
+// places a guesser could probe. Those get a tighter bucket.
+const kehrLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 60,
+  message: {
+    error: 'Too many requests to Kehr. Please try again shortly.',
+    code: 'KEHR_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const kehrAssessLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: {
+    error: 'Too many attempts in a short time. Please wait a few minutes and try again.',
+    code: 'KEHR_ASSESS_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use('/api/', globalLimiter);
 app.use('/api/v1', v1Limiter);
 app.use('/api/care-agent', careAgentLimiter);
 app.use('/api/care-agent/sessions/:id/actions/:proposalId/confirm', careAgentActionLimiter);
+app.use('/api/kehr', kehrLimiter);
+app.use('/api/kehr/preapprovals/:id/assess', kehrAssessLimiter);
+app.use('/api/kehr/plan-links/redeem', kehrAssessLimiter);
+app.use('/api/kehr/provider/passes', kehrAssessLimiter);
 app.use('/v2/shield', globalLimiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);
@@ -310,6 +342,7 @@ app.use('/api/risk', riskRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/outreach', outreachRoutes);
 app.use('/api/care-agent', careAgentRoutes);
+app.use('/api/kehr', kehrRoutes);
 
 // Shield Underwriting Framework (v2 endpoints)
 app.use('/v2/shield', shieldRoutes);

@@ -98,8 +98,9 @@ describe('privacy-policy.html: responsible party and version', () => {
 
   test('is re-dated and re-versioned for this change', () => {
     // v1.5 (v1.20.0): the Care Agent is renamed Kehr.
+    // v1.6 (v1.21.0): Kehr pre-approval (section 4B).
     assert.match(all, /Effective Date: 27 October 2026/);
-    assert.match(all, /Version: 1\.5/);
+    assert.match(all, /Version: 1\.6/);
   });
 });
 

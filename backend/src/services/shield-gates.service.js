@@ -253,6 +253,41 @@ function runShieldDecision(ctx) {
   return out;
 }
 
+/**
+ * The patient-stage gates, for a Kehr pre-approval before a provider is
+ * chosen (v1.21.0). Runs Gate 5 (portfolio breakers, minus the provider's
+ * own rate, which needs a provider), Gate 3 and Gate 2, in the same order
+ * as runShieldDecision. Gates 1 and 4 need a provider and an invoice; they
+ * are reported as pending and run in full through runShieldDecision when
+ * the pre-approval converts against a real bill. Nothing is skipped.
+ */
+function runPatientGates(ctx) {
+  const terms = computeTerms(ctx);
+  const gatesRun = [CIRCUIT_GATE, URGENCY_GATE, AFFORDABILITY_GATE];
+  const gatesPending = [PROVIDER_GATE, TARIFF_GATE];
+  const base = { gatesRun, gatesPending, monthlyInstalment: terms.monthlyInstalment, facilitationAmount: terms.facilitationAmount };
+
+  const cb = gate5CircuitBreakers({ ...ctx, provider: {} });
+  if (cb.decision === 'DECLINED') return { ...cb, ...base };
+
+  const g3 = gate3Urgency(ctx, terms);
+  const g2 = gate2Affordability(ctx, terms, {
+    urgent: ctx.application.procedureUrgency === 'URGENT',
+    tightenedByCircuitBreaker: cb.tightenedByCircuitBreaker
+  });
+  if (g2.decision === 'DECLINED') return { ...g2, ...base, circuitBreakersFired: cb.circuitBreakersFired };
+
+  return {
+    decision: 'PASSED',
+    ...base,
+    affordabilityRatio: g2.affordabilityRatio,
+    affordabilityCeiling: g2.affordabilityCeiling,
+    coolingOffRequired: g3.coolingOffRequired,
+    coolingOffExpiresAt: g3.coolingOffExpiresAt,
+    circuitBreakersFired: cb.circuitBreakersFired
+  };
+}
+
 function termsForResponse(ctx, terms) {
   return {
     applicationId: ctx.application.applicationId,
@@ -267,6 +302,7 @@ function termsForResponse(ctx, terms) {
 
 module.exports = {
   runShieldDecision,
+  runPatientGates,
   computeTerms,
   // exposed for unit testing
   _gates: {
