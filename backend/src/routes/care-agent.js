@@ -29,7 +29,7 @@ const express = require('express');
 const router = express.Router();
 
 const { query, transaction } = require('../config/database');
-const { authenticateToken } = require('../middleware/auth.middleware');
+const { authenticateToken, requireAdmin } = require('../middleware/auth.middleware');
 const { patientGateService } = require('../services/patient-gate.service');
 const { extractCareRequest, PROCEDURE_CATEGORIES } = require('../services/care-agent-nlp.service');
 const {
@@ -51,6 +51,7 @@ const { toRands, toCents } = require('../utils/money');
 const { detectAccountIntent, suggestParamsFor, evaluateProposal, ACTION_REGISTRY } = require('../services/care-agent-actions.service');
 const { loadAccountSnapshot } = require('../services/care-agent-account.service');
 const { createActionExecutor, describeAuditEvent } = require('../services/care-agent-action-executor.service');
+const { patientAccountView, patientActionView } = require('../services/care-agent-patient-view.service');
 const { createPlanPaymentService } = require('../services/plan-payment.service');
 const { marketplaceAuctionService } = require('../services/marketplace-auction.service');
 
@@ -138,23 +139,13 @@ function accountIntentFor(intent, account) {
   return check.ok || ALWAYS_EXPLAIN.includes(check.reason) ? intent : null;
 }
 
-/** The deterministic fallback's reply, from what proposing actually did. */
+/**
+ * The deterministic fallback's reply: a plain fact or a prompt to check
+ * the card, never a description of what happened behind it (v1.19.0).
+ */
 function fallbackReplyFor(proposal) {
-  if (proposal.status === 'awaiting_consent') {
-    return proposal.authority === 'human_review'
-      ? "I've prepared this for the PaySick team. Check it below and send it when you're ready."
-      : "I've prepared this for you to check below. Nothing happens until you confirm.";
-  }
-  if (proposal.status === 'executed' && proposal.result) {
-    if (proposal.result.rankedOffers) {
-      return proposal.result.rankedOffers.length
-        ? "Here are your offers, in order of what you'd repay in total."
-        : "There aren't any offers waiting right now.";
-    }
-    if (proposal.result.decisions && proposal.result.decisions[0]) return proposal.result.decisions[0].rationale;
-    if (proposal.result.explanation) return proposal.result.explanation;
-  }
-  return proposal.message || "I couldn't do that here.";
+  if (proposal.status === 'awaiting_consent') return 'Please check the details below.';
+  return patientActionView(proposal).message || "That isn't available here.";
 }
 
 async function recordAudit(sessionId, eventType, actor, payload) {
@@ -323,10 +314,8 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
       const params = suggestParamsFor(accountIntent, account);
       const needsInput = (def.inputs || []).some((input) => !input.optional);
       if (needsInput) {
-        suggestedAction = { actionType: accountIntent, label: def.label, authority: def.authority, inputs: def.inputs, params };
-        reply = def.authority === 'human_review'
-          ? `I can prepare that for the PaySick team, who decide on changes like this. Add the details below and I'll set it up for you to send.`
-          : `I can set that up. Add the details below and I'll prepare it for you to check.`;
+        suggestedAction = { actionType: accountIntent, label: def.label, inputs: def.inputs, params };
+        reply = 'Please add the details below.';
       } else {
         proposalDrafts = [{ actionType: accountIntent, params }];
       }
@@ -375,7 +364,7 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
       reply,
       readyToConfirm: accountIntent ? false : readyToConfirm,
       procedureOptions: PROCEDURE_OPTIONS,
-      proposals,
+      proposals: proposals.map(patientActionView),
       suggestedAction,
     });
   } catch (error) {
@@ -779,9 +768,11 @@ router.post('/sessions/:id/manage/payment-date-change', authenticateToken, async
 //   prohibited       refused, with where to go instead
 // ============================================
 
+// The patient only ever gets the patient view of a result: facts and
+// outcomes. Tiers, reason codes and routing stay in the backend (v1.19.0).
 function sendResult(res, result) {
   res.status(result.httpStatus || 200).json({
-    ...result,
+    ...patientActionView(result),
     error: result.httpStatus >= 400 ? result.message : undefined,
   });
 }
@@ -789,31 +780,21 @@ function sendResult(res, result) {
 /**
  * GET /api/care-agent/sessions/:id/account
  *
- * The patient's account as the agent sees it, with the agent's decisions.
- * Read-only; the decisions are written to the audit trail as AGENT_DECISION.
+ * The patient's account as facts and options. The agent's decisions behind
+ * the options are written to the audit trail as AGENT_DECISION and stay
+ * there (v1.19.0): the patient never sees reason codes, tiers or stages.
  */
 router.get('/sessions/:id/account', authenticateToken, async (req, res) => {
   try {
     const session = await getOwnedSession(req.params.id, req.user.userId);
     if (!session) return res.status(404).json({ error: 'Session not found' });
 
-    const { account, journeyStage, decisions, actions, rankedOffers } = await actionExecutor.recordAgentDecisions({
+    const { account, ...decided } = await actionExecutor.recordAgentDecisions({
       sessionId: session.session_id,
       userId: req.user.userId,
     });
 
-    res.json({
-      sessionId: session.session_id,
-      journeyStage,
-      decisions,
-      actions: actions.map((a) => ({ ...a, inputs: ACTION_REGISTRY[a.actionType].inputs || [] })),
-      rankedOffers,
-      plans: account.plans,
-      instalments: account.instalments,
-      funderPlans: account.funderPlans,
-      openRequests: account.openRequests,
-      promises: account.promises,
-    });
+    res.json({ sessionId: session.session_id, ...patientAccountView(account, decided) });
   } catch (error) {
     console.error('Care Agent account error:', error.message);
     res.status(500).json({ error: 'Failed to load your account' });
@@ -898,16 +879,21 @@ router.post('/sessions/:id/actions/:proposalId/decline', authenticateToken, asyn
 });
 
 /**
- * GET /api/care-agent/sessions/:id/decisions
+ * GET /api/care-agent/admin/sessions/:id/decisions
  *
- * What the agent read, decided, prepared and did in this conversation,
- * tagged by who acted, plus each proposal and how it ended. Conversation
- * turns themselves are left out: the chat already shows them.
+ * Staff only. What the agent read, decided, prepared and did in a
+ * conversation, tagged by who acted, plus each proposal and how it ended.
+ * v1.19.0 moved this off the patient's screen: the agent's decisions are
+ * a backend record, and the patient sees outcomes only.
  */
-router.get('/sessions/:id/decisions', authenticateToken, async (req, res) => {
+router.get('/admin/sessions/:id/decisions', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const session = await getOwnedSession(req.params.id, req.user.userId);
-    if (!session) return res.status(404).json({ error: 'Session not found' });
+    const sessionResult = await query(
+      `SELECT session_id FROM care_agent_sessions WHERE session_id = $1`,
+      [req.params.id]
+    );
+    if (sessionResult.rows.length === 0) return res.status(404).json({ error: 'Session not found' });
+    const session = sessionResult.rows[0];
 
     const auditResult = await query(
       `SELECT event_type, actor, payload, created_at

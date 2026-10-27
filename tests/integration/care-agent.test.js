@@ -100,9 +100,14 @@ describe('Care Agent routes require authentication', () => {
     ['post', 'actions'],
     ['post', 'actions/prop-1/confirm'],
     ['post', 'actions/prop-1/decline'],
-    ['get', 'decisions'],
   ])('%s /api/care-agent/sessions/:id/%s returns 401 without a token', async (method, suffix) => {
     const res = await request(app)[method](`/api/care-agent/sessions/${sessionId}/${suffix}`);
+    expect(res.status).toBe(401);
+  });
+
+  // v1.19.0: the decision log is staff-only.
+  test('GET /api/care-agent/admin/sessions/:id/decisions returns 401 without a token', async () => {
+    const res = await request(app).get(`/api/care-agent/admin/sessions/${sessionId}/decisions`);
     expect(res.status).toBe(401);
   });
 });

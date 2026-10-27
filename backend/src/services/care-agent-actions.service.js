@@ -74,7 +74,7 @@ const SECURE_BANKING_FORM = 'dashboard.html#banking';
 const DAY_INPUT = Object.freeze({ name: 'preferredDay', type: 'day', label: 'New day of the month (1 to 28)' });
 const MONTHS_INPUT = Object.freeze({ name: 'newTermMonths', type: 'months', label: 'Over how many months?' });
 const DATE_INPUT = Object.freeze({ name: 'promisedDate', type: 'date', label: 'I will pay by' });
-const REASON_INPUT = Object.freeze({ name: 'reason', type: 'text', label: 'Anything the team should know?', optional: true });
+const REASON_INPUT = Object.freeze({ name: 'reason', type: 'text', label: 'Reason', optional: true });
 
 function define(entries) {
   const registry = {};
@@ -382,17 +382,17 @@ const HUMAN_REVIEW_EFFECT = 'A review case is opened for the PaySick team. Your 
  */
 function evaluateProposal(actionType, params, account) {
   const def = ACTION_REGISTRY[actionType];
-  if (!def) return { ok: false, actionType, authority: null, reason: 'UNKNOWN_ACTION', message: "That isn't something I can help with here." };
+  if (!def) return { ok: false, actionType, authority: null, reason: 'UNKNOWN_ACTION', message: "That isn't available here." };
 
   const input = params && typeof params === 'object' ? params : {};
 
   if (def.authority === AUTHORITY.PROHIBITED) {
-    return refuse(actionType, 'NOT_IN_CHAT', `I can't do that in chat. ${actionType === 'UPDATE_BANKING_DETAILS' ? 'Please use the secure banking form instead.' : 'Please contact the PaySick team.'}`, { redirect: def.redirect });
+    return refuse(actionType, 'NOT_IN_CHAT', actionType === 'UPDATE_BANKING_DETAILS' ? 'Banking details can be updated on the secure banking page.' : 'Please contact PaySick about this.', { redirect: def.redirect });
   }
 
   for (const value of Object.values(input)) {
     if (typeof value === 'string' && containsBankingDetails(value)) {
-      return refuse(actionType, 'BANKING_DETAILS_IN_CHAT', "Please don't share banking details in chat. You can change them safely in the secure banking form.", { redirect: SECURE_BANKING_FORM });
+      return refuse(actionType, 'BANKING_DETAILS_IN_CHAT', 'Please leave banking details out of this message. They can be updated on the secure banking page.', { redirect: SECURE_BANKING_FORM });
     }
   }
 
@@ -418,7 +418,7 @@ function evaluateProposal(actionType, params, account) {
 
     case 'MAKE_PAYMENT': {
       const target = unpaidInstalments(account).find((i) => i.paymentId === input.paymentId);
-      if (!target) return refuse(actionType, 'PAYMENT_NOT_DUE', "I can't find that instalment as owing on your plan.");
+      if (!target) return refuse(actionType, 'PAYMENT_NOT_DUE', 'That payment is not due.');
       const lateFeeCents = lateFeeCentsFor(target, account.today);
       const totalDueCents = target.amountCents + lateFeeCents;
       const targetPlan = (account.plans || []).find((p) => p.planId === target.planId) || plan;
@@ -441,14 +441,14 @@ function evaluateProposal(actionType, params, account) {
     case 'PROMISE_TO_PAY': {
       const target = unpaidInstalments(account).find((i) => i.paymentId === input.paymentId);
       const collection = target ? openCollectionFor(account, target.paymentId) : null;
-      if (!target || !collection) return refuse(actionType, 'NO_OPEN_CASE', "There's no missed payment on that instalment to make a promise for.");
+      if (!target || !collection) return refuse(actionType, 'NO_OPEN_CASE', 'That payment is not outstanding.');
       const days = daysOverdueFor(target, account.today);
       if (!recoveryEngine.getCaseView(days).selfCureEligible) {
-        return refuse(actionType, 'PROMISE_NOT_ELIGIBLE', 'At this stage a person needs to agree the way forward with you, so I can send them a request instead.');
+        return refuse(actionType, 'PROMISE_NOT_ELIGIBLE', 'A promise to pay is not available for this payment. You can pay now or send a request instead.');
       }
       const amountCents = input.promisedAmountCents === undefined ? collection.amountOutstandingCents : Number(input.promisedAmountCents);
       if (toDay(input.promisedDate) !== null && daysBetween(account.today, input.promisedDate) > MAX_PROMISE_HORIZON_DAYS) {
-        return refuse(actionType, 'INVALID_PROMISE', `A promise needs to be within ${MAX_PROMISE_HORIZON_DAYS} days. For longer, a person can look at spreading the amount.`);
+        return refuse(actionType, 'INVALID_PROMISE', `Please choose a date within the next ${MAX_PROMISE_HORIZON_DAYS} days.`);
       }
       let promise;
       try {
@@ -460,7 +460,9 @@ function evaluateProposal(actionType, params, account) {
           today: new Date(`${String(account.today).slice(0, 10)}T00:00:00Z`),
         });
       } catch (err) {
-        return refuse(actionType, 'INVALID_PROMISE', `That promise can't be recorded: ${err.message}.`);
+        // createPromise's own messages are written for developers; the patient
+        // gets the plain version.
+        return refuse(actionType, 'INVALID_PROMISE', 'Please choose a date from today onward, for no more than the amount outstanding.');
       }
       return accept(actionType, { paymentId: target.paymentId, collectionId: collection.collectionId, promisedAmountCents: promise.promisedAmountCents, promisedDate: promise.promisedDate }, {
         title: 'Promise to pay',
@@ -481,7 +483,7 @@ function evaluateProposal(actionType, params, account) {
       return accept(actionType, { planId: plan.planId, preferredDay: day, reason }, {
         title: 'Move my payment date',
         lines: [{ label: 'New date', value: `Day ${day} of each month` }, ...(reason ? [{ label: 'Reason', value: reason }] : [])],
-        consentText: 'Send this request to the PaySick team.',
+        consentText: 'Send this request.',
         effect: HUMAN_REVIEW_EFFECT,
       });
     }
@@ -498,7 +500,7 @@ function evaluateProposal(actionType, params, account) {
         remainingBalanceCents: plan.outstandingBalanceCents + lateFees,
         newTermMonths: term,
       });
-      if (!preview.withinCap) return refuse(actionType, 'RESTRUCTURE_OVER_CAP', "That term would raise your total cost by more than PaySick allows, so I can't offer it.");
+      if (!preview.withinCap) return refuse(actionType, 'RESTRUCTURE_OVER_CAP', 'That term is not available. Please choose a shorter one.');
       const reason = cleanText(input.reason);
       return accept(actionType, { planId: plan.planId, newTermMonths: term, reason, preview }, {
         title: 'Spread what I owe',
@@ -506,7 +508,7 @@ function evaluateProposal(actionType, params, account) {
           { label: 'New term', value: `${term} months` },
           { label: 'About', value: `${formatAmount(preview.newMonthlyAmountCents)} a month` },
         ],
-        consentText: 'Send this request to the PaySick team.',
+        consentText: 'Send this request.',
         effect: HUMAN_REVIEW_EFFECT,
       });
     }
@@ -529,7 +531,7 @@ function evaluateProposal(actionType, params, account) {
       return accept(actionType, next, {
         title: def.label,
         lines,
-        consentText: 'Send this request to the PaySick team.',
+        consentText: 'Send this request.',
         effect: actionType === 'REPORT_HARDSHIP'
           ? 'A review case is opened for the PaySick team and payment reminders are paused until they have reviewed it.'
           : HUMAN_REVIEW_EFFECT,
@@ -537,7 +539,7 @@ function evaluateProposal(actionType, params, account) {
     }
 
     default:
-      return refuse(actionType, 'UNKNOWN_ACTION', "That isn't something I can help with here.");
+      return refuse(actionType, 'UNKNOWN_ACTION', "That isn't available here.");
   }
 }
 

@@ -84,12 +84,11 @@ describe('account tools are defined', () => {
 });
 
 describe('executeTool: get_account_overview', () => {
-  test("returns the journey stage and the agent's decisions from the snapshot", () => {
+  test('returns the facts and the options open to the patient', () => {
     const outcome = executeTool('get_account_overview', {}, { summary: {}, account: ACCOUNT });
     assert.equal(outcome.ok, true);
-    assert.equal(outcome.result.journeyStage, 'recover');
-    assert.deepEqual(outcome.result.decisions.map((d) => d.reasonCode), ['SELF_CURE']);
-    assert.equal(outcome.result.instalments[0].paymentId, 'pay-4');
+    assert.deepEqual(outcome.result.options.map((o) => o.actionType), ['MAKE_PAYMENT', 'PROMISE_TO_PAY', 'REPORT_HARDSHIP']);
+    assert.equal(outcome.result.outstanding[0].paymentId, 'pay-4');
     assert.equal(outcome.proposalDraft, undefined);
   });
 
@@ -144,6 +143,20 @@ describe('system prompt covers account actions', () => {
     assert.match(SYSTEM_PROMPT, /propose_account_action/);
     assert.match(SYSTEM_PROMPT, /never say .*(done|paid|accepted)/i);
     assert.match(SYSTEM_PROMPT, /banking details/i);
+  });
+
+  // v1.19.0: the patient sees facts and outcomes, never the process.
+  test('tells the model to keep the backend process out of what it says', () => {
+    assert.match(SYSTEM_PROMPT, /never mention .*(rules|reviews|checks|decisions)/i);
+    assert.match(SYSTEM_PROMPT, /never narrate/i);
+    assert.match(SYSTEM_PROMPT, /please check the details below/i);
+  });
+
+  test('the overview gives the model options without the reasoning behind them', () => {
+    const outcome = executeTool('get_account_overview', {}, { summary: {}, account: ACCOUNT });
+    const json = JSON.stringify(outcome.result);
+    assert.doesNotMatch(json, /rationale|reasonCode|"decisions"|journeyStage|authority/);
+    assert.ok(outcome.result.options.length > 0);
   });
 
   test("includes the patient's journey stage when account data is loaded", () => {

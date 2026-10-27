@@ -42,7 +42,6 @@ const NEW_ROUTES = [
   "router.post('/sessions/:id/actions',",
   "router.post('/sessions/:id/actions/:proposalId/confirm',",
   "router.post('/sessions/:id/actions/:proposalId/decline',",
-  "router.get('/sessions/:id/decisions',",
 ];
 
 describe('new Care Agent routes', () => {
@@ -79,15 +78,37 @@ describe('new Care Agent routes', () => {
     }
   });
 
-  test('GET /decisions reads only this session\'s audit trail and describes each row', () => {
-    const block = routeBlock("router.get('/sessions/:id/decisions',");
+  // v1.19.0: the agent's decisions stay in the backend. The log is for
+  // PaySick staff only; the patient has no route to it.
+  test('the patient has no route to the agent\'s decision log', () => {
+    assert.ok(!routeSource.includes("router.get('/sessions/:id/decisions',"));
+  });
+
+  test('staff read the decision log through an admin-only route', () => {
+    const block = routeBlock("router.get('/admin/sessions/:id/decisions',");
+    assert.match(block, /authenticateToken, requireAdmin/);
     assert.match(block, /WHERE session_id = \$1/);
     assert.match(block, /describeAuditEvent/);
     assert.match(block, /care_agent_action_proposals/);
   });
 
+  test('every patient response passes through the patient-view filter', () => {
+    assert.match(routeSource, /require\(['"]\.\.\/services\/care-agent-patient-view\.service['"]\)/);
+    assert.match(routeBlock("router.get('/sessions/:id/account',"), /patientAccountView/);
+    assert.match(routeSource, /function sendResult[\s\S]*?patientActionView/);
+    assert.match(routeBlock("router.post('/sessions/:id/messages',"), /proposals\.map\(patientActionView\)/);
+  });
+
+  test('the suggested detail form carries no tier', () => {
+    assert.doesNotMatch(routeBlock("router.post('/sessions/:id/messages',"), /suggestedAction = \{[^}]*authority/);
+  });
+
   test('error responses carry the plain message in `error` so the API client shows it', () => {
     assert.match(routeSource, /error: result\.httpStatus >= 400 \? result\.message : undefined/);
+  });
+
+  test('the API client no longer offers the patient the decision log', () => {
+    assert.doesNotMatch(apiClientSource, /getDecisions/);
   });
 });
 
@@ -110,7 +131,7 @@ describe('POST /messages handles account actions', () => {
   });
 
   test('returns proposals and suggested actions to the page', () => {
-    assert.match(block, /proposals,/);
+    assert.match(block, /proposals: proposals\.map\(patientActionView\)/);
     assert.match(block, /suggestedAction/);
   });
 });
@@ -200,7 +221,6 @@ describe('PaySickAPI.careAgent client', () => {
     ['proposeAction', /\/care-agent\/sessions\/\$\{sessionId\}\/actions`/],
     ['confirmAction', /\/actions\/\$\{proposalId\}\/confirm/],
     ['declineAction', /\/actions\/\$\{proposalId\}\/decline/],
-    ['getDecisions', /\/care-agent\/sessions\/\$\{sessionId\}\/decisions/],
   ]) {
     test(`${method} calls its endpoint`, () => {
       assert.match(apiClientSource, new RegExp(`async ${method}\\(`));

@@ -1,14 +1,14 @@
 /**
- * Unit Tests — care-agent.html value-chain screens (v1.18.0)
+ * Unit Tests — care-agent.html account screens
  *
- * Written BEFORE the implementation (test-first, per CLAUDE.md).
+ * v1.18.0 wrote this test-first for the value-chain screens. v1.19.0
+ * (owner direction) rewrites it, again before the change: the agent's
+ * decisions stay in the backend. The patient sees confirmed facts and
+ * statuses only, with nothing that makes it feel like an agent is working
+ * in the background.
  *
- * Static checks on the page that renders the plan's screens: the journey
- * bar, the account home with the agent's decisions and authority badges,
- * the consent-gated proposal card, the detail form for actions that need
- * the patient's input (replacing window.prompt, which the page cannot rely
- * on), the optional income fields that let Shield Gate 2 run, and the
- * "What the agent did" log.
+ * Static checks on the page, since it cannot be loaded here without a
+ * browser (the Chromium run is recorded in the release notes).
  *
  * Run: node --test tests/unit/care-agent-account-ui.test.js
  */
@@ -21,7 +21,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const page = fs.readFileSync(path.join(__dirname, '../../care-agent.html'), 'utf8');
-const { JOURNEY_STAGES } = require('../../backend/src/services/care-agent-actions.service');
 
 function fn(name) {
   const start = page.indexOf(`function ${name}(`);
@@ -30,89 +29,83 @@ function fn(name) {
   return next === -1 ? page.slice(start) : page.slice(start, start + 10 + next);
 }
 
-describe('journey bar', () => {
-  test('has one step per value-chain stage, in order', () => {
-    assert.match(page, /id="journey-tracker"/);
-    const stages = [...page.matchAll(/data-stage="([a-z_]+)"/g)].map((m) => m[1]);
-    assert.deepEqual(stages, JOURNEY_STAGES);
-  });
-
-  test('is updated from the account journey stage', () => {
-    assert.match(fn('renderJourney'), /journeyStage|stage/);
-  });
+describe('no backend process on the patient screen', () => {
+  for (const [what, pattern] of [
+    ['journey bar', /journey-tracker|journeyStage|renderJourney/],
+    ['decision boxes', /agent-decision|reasonCode|rationale/],
+    ['authority badges', /badge-autonomous|badge-patient_consent|badge-human_review|badge-prohibited|authorityLabel|AUTHORITY_LABELS/],
+    ['tier wording', /Agent does it|You approve|Team decides|Not in chat/],
+    ['agent activity log', /decision-log|getDecisions|What the agent did/],
+    ['"what will change" system description', /Will change|proposal\.effect/],
+    ['Shield assessment note', /shield-note|shieldAssessment|affordability check:/],
+    ['affordability pressure flag', /pressure-note|pressureWarning/],
+    ['recommended-offer marker', /recommended|'Lowest'/],
+  ]) {
+    test(`no ${what}`, () => {
+      assert.doesNotMatch(page, pattern);
+    });
+  }
 });
 
-describe('account home', () => {
-  test('loads the account after the conversation starts and after submitting', () => {
+describe('account card shows facts and plain options', () => {
+  test('loads after the conversation starts and after submitting', () => {
     assert.match(fn('init'), /loadAccount\(\)/);
     assert.match(fn('approveAndExecute'), /loadAccount\(\)/);
   });
 
-  test("shows each of the agent's decisions with its reason code and rationale", () => {
+  test('renders the status line, outstanding and next payment, requests and offers', () => {
     const render = fn('renderAccount');
-    assert.match(render, /agent-decision/);
-    assert.match(render, /reasonCode/);
-    assert.match(render, /rationale/);
+    for (const field of ['status', 'outstanding', 'nextPayment', 'requests', 'offers', 'options']) {
+      assert.match(render, new RegExp(`account\\.${field}`), field);
+    }
   });
 
-  test('badges every action with its authority tier', () => {
-    assert.match(page, /\.badge-autonomous/);
-    assert.match(page, /\.badge-patient_consent/);
-    assert.match(page, /\.badge-human_review/);
-    assert.match(page, /\.badge-prohibited/);
-    for (const label of ['Agent does it', 'You approve', 'Team decides', 'Not in chat']) {
-      assert.ok(page.includes(label), label);
-    }
+  test('hides itself when there is nothing on the account', () => {
+    assert.match(fn('renderAccount'), /hasAccount/);
   });
 });
 
-describe('proposal card', () => {
+describe('confirmation card', () => {
   const render = fn('renderProposal');
-
-  test('shows what will change before asking', () => {
-    assert.match(render, /effect/);
-    assert.match(render, /Will change/);
-  });
 
   test('needs its own consent box ticked before confirming', () => {
     assert.match(render, /type = 'checkbox'/);
     const confirmAt = render.indexOf('confirmAction');
     const checkAt = render.indexOf('.checked');
-    assert.ok(checkAt !== -1 && confirmAt !== -1 && checkAt < confirmAt, 'checks the box before calling confirmAction');
+    assert.ok(checkAt !== -1 && confirmAt !== -1 && checkAt < confirmAt);
   });
 
-  test('can be declined', () => {
+  test('uses the server\'s button label and can be cancelled', () => {
+    assert.match(render, /confirmLabel/);
     assert.match(render, /declineAction/);
   });
 
-  test('disables its buttons while confirming, so a double tap sends one request', () => {
+  test('disables its buttons while confirming', () => {
     assert.match(render, /disabled = true/);
   });
 });
 
-describe('detail form for actions that need input', () => {
-  test('builds inputs from the action definition and proposes the action', () => {
+describe('details form', () => {
+  test('builds inputs from the option and submits it', () => {
     const render = fn('renderActionForm');
     assert.match(render, /inputs/);
     assert.match(render, /proposeAction/);
   });
 
-  test('no longer relies on window.prompt', () => {
+  test('does not rely on window.prompt', () => {
     assert.doesNotMatch(page, /window\.prompt\(/);
   });
 });
 
-describe('message replies carry actions', () => {
-  test('sendMessage renders proposals and suggested actions', () => {
+describe('message replies', () => {
+  test('sendMessage renders cards and detail forms', () => {
     const send = fn('sendMessage');
     assert.match(send, /handleActionResults\(res\.proposals\)/);
     assert.match(send, /suggestedAction/);
   });
 
-  test('a refusal is explained and only links to a page on this site', () => {
-    const handle = fn('handleActionResults');
-    assert.match(handle, /refused/);
-    assert.match(page, /function safeRedirect\(/);
+  test('a refusal shows its message and only links within the site', () => {
+    assert.match(fn('handleActionResults'), /refused/);
     assert.match(fn('safeRedirect'), /\\\.html/);
   });
 });
@@ -123,20 +116,9 @@ describe('income on the summary card', () => {
     assert.match(page, /id="summary-obligations"/);
   });
 
-  test('sends them with the confirmation so Shield Gate 2 can run', () => {
+  test('sends them with the confirmation', () => {
     assert.match(fn('confirmSummary'), /monthlyIncome/);
     assert.match(fn('confirmSummary'), /monthlyObligations/);
-  });
-});
-
-describe('what the agent did', () => {
-  test('has a log the patient can open', () => {
-    assert.match(page, /id="decision-log"/);
-    assert.match(fn('showDecisionLog'), /getDecisions/);
-  });
-
-  test('tags each line by who acted', () => {
-    assert.match(fn('showDecisionLog'), /tier/);
   });
 });
 

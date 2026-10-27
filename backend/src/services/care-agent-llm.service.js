@@ -69,6 +69,7 @@ const {
   decideNextBestActions,
   evaluateProposal,
 } = require('./care-agent-actions.service');
+const { patientAccountView } = require('./care-agent-patient-view.service');
 
 // Hard cap on tool-call round trips within a single patient message. Bounds
 // latency/cost and guarantees the loop can never run forever even if the
@@ -152,7 +153,7 @@ const CARE_AGENT_TOOLS = [
   {
     name: 'get_account_overview',
     description:
-      "Read the patient's existing PaySick account: where they are in their journey, PaySick's own decisions about what they can do next (with reason codes), their unpaid instalments, funder offers, and any requests already with the PaySick team. Read-only. Call it whenever the patient asks about a plan, a payment, an offer, or anything after their application. Takes no input.",
+      "Read the patient's existing PaySick account: a one-line status, outstanding and next payments, balance, funder offers, requests already received, and the options open to the patient. Read-only. Call it whenever the patient asks about a plan, a payment, an offer, or anything after their application. Takes no input.",
     input_schema: { type: 'object', properties: {} },
   },
   {
@@ -216,14 +217,23 @@ EXISTING ACCOUNTS (plans, payments, offers, requests):
 - Call get_account_overview before answering anything about an existing
   plan, payment, offer or request. Report only what it returns.
 - To help the patient act, call propose_account_action. It only prepares a
-  card the patient confirms themselves, or a request the PaySick team
-  decides. Never say a payment is done, paid, accepted, promised, moved or
-  approved: say you have prepared it for them to check below.
+  card the patient confirms themselves. Never say a payment is done, paid,
+  accepted, promised, moved or approved. Say only:
+  "Please check the details below."
 - Never ask for or repeat banking details. Banking changes happen only in
   the secure banking form; if they come up, propose UPDATE_BANKING_DETAILS so
   the patient is sent there.
 - If a missed payment comes up, be kind and practical. Medical patients are
-  not defaulters; the aim is getting back on track.`;
+  not defaulters; the aim is getting back on track.
+
+WHAT THE PATIENT SEES:
+- The patient sees facts and confirmed outcomes only.
+- Never mention rules, reviews, checks, decisions, stages, risk, scores,
+  tools, or that anything is being worked on behind the scenes. Never say a person or team
+  will review or decide something; a sent request is simply "received".
+- Never narrate what you are doing ("let me check", "I'm looking at",
+  "I've prepared", "I've decided"). State the fact or ask the one question.
+- Never explain why an option is or isn't offered. Offer what is available.`;
 
 /**
  * Builds the per-turn system prompt: the fixed hard rules, the current
@@ -375,19 +385,11 @@ function executeTool(name, input, context) {
 
     case 'get_account_overview': {
       if (!account) return { ok: false, result: { error: 'No account data is available for this patient right now.' } };
-      const decided = decideNextBestActions(account);
+      // Facts and options only. The reasoning behind the options stays in
+      // the backend, so the model has nothing to relay to the patient.
       return {
         ok: true,
-        result: {
-          journeyStage: decided.journeyStage,
-          decisions: decided.decisions,
-          suggestedActions: decided.actions,
-          rankedOffers: decided.rankedOffers,
-          plans: account.plans,
-          instalments: account.instalments,
-          funderPlans: account.funderPlans || [],
-          openRequests: account.openRequests || [],
-        },
+        result: { ...patientAccountView(account, decideNextBestActions(account)), instalments: account.instalments },
       };
     }
 

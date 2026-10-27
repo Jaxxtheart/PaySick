@@ -1,23 +1,54 @@
-# Care Agent: the patient's whole value chain (v1.18.0)
+# Care Agent: the patient's whole value chain (v1.18.0, revised in v1.19.0)
 
 Until v1.17.1 the Care Agent took a patient from "I have a quote" to a
 submitted application, then stopped. v1.18.0 carries it through everything
 after: choosing a funder, repaying, changing a plan, getting through a
 missed payment, and closing out. Every step is wired to the backend tables
-it changes, and every action the agent takes or recommends is visible to the
-patient.
+it changes.
+
+**v1.19.0 revision (owner direction):** the agent's decisions are pushed to
+the backend, not to the patient's screen. The patient sees only confirmed
+facts and statuses, so it never feels like an agent is working in the
+background: the less the patient sees, the better.
 
 The plan, with phone-screen designs for each step, was also published as a
 page for review ("Care Agent Value Chain").
+
+## What the patient sees, and what stays in the backend
+
+| Patient sees | Backend only |
+|--------------|--------------|
+| A one-line status ("Your next payment of R1,200.00 is due on 14 November.") | Decisions, reason codes, rationales |
+| Outstanding amounts, next payment, balance | Authority tiers (who may perform each action) |
+| Funder offers in a neutral order, each with Accept | Journey and recovery stage, days-overdue thresholds |
+| Plain options ("Pay an instalment now") | Offer ranking and the "lowest" pick |
+| A confirm card: figures, consent box, one button | Affordability flags and the Shield Gate 2 result |
+| The outcome: "Payment received", "Noted", "Request received" | Review routing, priority, response targets, re-check refusal reasons |
+
+`backend/src/services/care-agent-patient-view.service.js` is the single filter
+between the backend and the screen. It builds every patient response from an
+allowlist, so a new internal field can't reach the screen by accident. Staff
+read the decisions through the admin-only
+`GET /api/care-agent/admin/sessions/:id/decisions`.
+
+Patient-facing wording rules, enforced by tests and the LLM prompt:
+- Facts and outcomes only.
+- Never mention rules, reviews, checks, decisions, stages, risk, scores, or a
+  team deciding.
+- No narration ("let me check", "I've prepared"). A card simply appears with
+  "Please check the details below."
+- Never explain why an option is or isn't there.
 
 ## One rule for every action: who may do it
 
 Every action has exactly one authority tier in
 `backend/src/services/care-agent-actions.service.js` (`ACTION_REGISTRY`,
 frozen at load). The tier is set by the registry and nothing else: the
-language model and the request body can't change it.
+language model and the request body can't change it. **Tiers are backend
+only (v1.19.0):** the patient sees an option, a confirm card and an outcome,
+never the tier.
 
-| Tier | Badge | What happens | Actions |
+| Tier | Staff label | What happens | Actions |
 |------|-------|--------------|---------|
 | `autonomous` | Agent does it | Read-only. The agent acts and records that it did. | `VIEW_ACCOUNT`, `COMPARE_OFFERS`, `EXPLAIN_FEE`, `START_CARE_REQUEST` |
 | `patient_consent` | You approve | The agent prepares a card showing what will change. Nothing happens until the patient ticks the box and confirms. The figures are re-checked against live data at that moment. | `ACCEPT_OFFER`, `MAKE_PAYMENT`, `PROMISE_TO_PAY` |
@@ -46,9 +77,9 @@ and an audit trail.
 ## Decisions the agent makes
 
 `decideNextBestActions(account)` runs plain rules on live account data. Each
-decision has a reason code and a plain-language rationale. Each one is
-written to `care_agent_audit_log` as `AGENT_DECISION` and shown on screen in
-a dashed teal box. The recovery thresholds come from
+decision has a reason code and a rationale. Each one is written to
+`care_agent_audit_log` as `AGENT_DECISION` for staff. It decides which
+options the patient sees; the patient never sees the decision itself. The recovery thresholds come from
 `recovery-engine.service.js`, so the agent and the collections team always
 see the same stage.
 
@@ -106,21 +137,21 @@ that.
 
 ## Screens (all inside `care-agent.html`)
 
-1. **Account home**: journey bar (10 steps), the agent's decision boxes, and
-   next actions with tier badges. Opens whenever the account has activity.
-2. **Plan and affordability**: the summary card gains optional income and
-   debt fields, so Shield runs now and again at submission.
-3. **Choose a funder**: offers ranked by total, the lowest marked, then an
-   Accept card.
-4. **Pay an instalment**: a card with the instalment number, amount, late
-   fee, the new balance after paying, and a consent box.
-5. **Missed payment**: the stage-appropriate options with tiers.
-6. **Change request**: an in-page form (replacing `window.prompt`), then a
-   "Send request" card.
-7. **What the agent did**: a timeline from the audit log, each line tagged
-   Agent / You / Team / Not done / PaySick.
+1. **Account card**: a one-line status, the facts (outstanding, next payment,
+   balance, requests as "Received"), and plain option buttons. It is hidden
+   when there's nothing on the account.
+2. **Choosing a plan**: 0% plans and optional income fields. The pressure
+   flag and the Shield note stay in the backend.
+3. **Funder offers**: listed by total to repay, each with Accept, then a
+   confirm card. Nothing is marked as recommended.
+4. **Paying**: a confirm card (amount, late fee, consent box, "Pay
+   R1,200.00"), then "Payment received: R1,200.00."
+5. **Change request**: a short form, a "Send request" card, then "Request
+   received. We'll let you know once it's done."
+6. **Decision log (staff only)**: every read, decision, proposal and
+   outcome, tagged by who acted. Admin API only.
 
-## Endpoints (all require a login and session ownership)
+## Endpoints (all require a login; patient routes also require session ownership)
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -128,7 +159,7 @@ that.
 | POST | `/api/care-agent/sessions/:id/actions` | Propose `{ actionType, params }` |
 | POST | `/api/care-agent/sessions/:id/actions/:proposalId/confirm` | `{ consent: true }`; own rate limit (15 per 15 min) |
 | POST | `/api/care-agent/sessions/:id/actions/:proposalId/decline` | Decline |
-| GET | `/api/care-agent/sessions/:id/decisions` | Timeline and proposals |
+| GET | `/api/care-agent/admin/sessions/:id/decisions` | Staff only (`requireAdmin`): timeline and proposals |
 
 Migration `013_care_agent_actions.sql` adds `care_agent_action_proposals`, and
 adds `details`, `review_queue_id` and `resolved_at` to

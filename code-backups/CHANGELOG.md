@@ -6,6 +6,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.19.0] — 2026-10-27
+
+**Type**: MINOR — Care Agent decisions moved to the backend; the patient sees outcomes only
+
+### Added
+- `care-agent-patient-view.service.js`: an allowlist filter for every
+  patient response.
+- `GET /api/care-agent/admin/sessions/:id/decisions` (staff only).
+- An LLM prompt section that keeps the process out of what the agent says.
+
+### Changed
+- Patient routes return facts, plain options, confirm cards and outcomes
+  only.
+- Patient-facing wording is rewritten as plain facts and outcomes, with no
+  agent narration.
+- The account card shows a status line, payments, balance, requests as
+  "Received", and offers.
+
+### Removed (patient-facing)
+- The journey bar, decision boxes, authority badges, "Lowest" offer marker
+  and "Will change" text.
+- The patient decision log route and `getDecisions`.
+- The affordability-pressure flag and the Shield note on plan options.
+
+---
+
 ## [v1.18.0] — 2026-10-27
 
 **Type**: MINOR — Care Agent workflows across the whole patient value chain

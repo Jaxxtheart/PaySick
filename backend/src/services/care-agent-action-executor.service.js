@@ -108,7 +108,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
     switch (actionType) {
       case 'VIEW_ACCOUNT': {
         const decided = decideNextBestActions(account);
-        return { ...decided, plans: account.plans, instalments: account.instalments, funderPlans: account.funderPlans || [] };
+        return { ...decided, today: account.today, plans: account.plans, instalments: account.instalments, funderPlans: account.funderPlans || [] };
       }
       case 'COMPARE_OFFERS':
         return { rankedOffers: rankOffers((account.applications || []).flatMap((a) => a.pendingOffers || [])) };
@@ -177,7 +177,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
       [proposalId, sessionId, userId]
     );
     if (existing.rows.length === 0) return { outcome: { status: 'not_found', httpStatus: 404, message: 'That request was not found.' } };
-    return { outcome: { status: 'already_decided', httpStatus: 409, currentStatus: existing.rows[0].status, message: 'That request has already been dealt with.' } };
+    return { outcome: { status: 'already_decided', httpStatus: 409, currentStatus: existing.rows[0].status, message: 'This has already been completed or cancelled.' } };
   }
 
   async function runHandler(row, evaluation, userId) {
@@ -186,8 +186,8 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
 
     if (type === 'ACCEPT_OFFER') {
       const result = await acceptOffer(params.offerId, userId);
-      await notify(userId, NOTIFICATION_TYPES.ACCEPT_OFFER, 'Offer accepted', 'You accepted a funder offer through the Care Agent. Your payment schedule is being set up.', 'application', params.applicationId);
-      return { status: 'executed', result, message: "Done. You've accepted the offer and your payment schedule is being set up." };
+      await notify(userId, NOTIFICATION_TYPES.ACCEPT_OFFER, 'Offer accepted', 'You accepted a funder offer. Your payment schedule will follow.', 'application', params.applicationId);
+      return { status: 'executed', result, message: 'Offer accepted. Your payment schedule will follow.' };
     }
 
     if (type === 'MAKE_PAYMENT') {
@@ -208,7 +208,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
         );
       }
       await notify(userId, NOTIFICATION_TYPES.MAKE_PAYMENT, 'Payment received', `We received your payment of ${formatAmount(params.totalDueCents)}.`, 'payment', params.paymentId);
-      return { status: 'executed', result: { ...result, collectionsResolved: closedIds }, message: `Paid. ${formatAmount(params.totalDueCents)} is recorded and a receipt is in your notifications.` };
+      return { status: 'executed', result: { ...result, collectionsResolved: closedIds }, message: `Payment received: ${formatAmount(params.totalDueCents)}.` };
     }
 
     if (type === 'PROMISE_TO_PAY') {
@@ -232,7 +232,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
         return inserted.rows[0].promise_id;
       });
       await notify(userId, NOTIFICATION_TYPES.PROMISE_TO_PAY, 'Promise recorded', `You promised to pay ${formatAmount(params.promisedAmountCents)} by ${params.promisedDate}.`, 'collection', params.collectionId);
-      return { status: 'executed', result: { promiseId }, message: `Recorded. You've promised ${formatAmount(params.promisedAmountCents)} by ${params.promisedDate}, and reminders are held until then.` };
+      return { status: 'executed', result: { promiseId }, message: `Noted: ${formatAmount(params.promisedAmountCents)} by ${params.promisedDate}.` };
     }
 
     // Every remaining consent-gated action is a human_review request.
@@ -253,11 +253,11 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
       );
       return { requestId: request.rows[0].request_id, reviewQueueId };
     });
-    await notify(userId, NOTIFICATION_TYPES.REQUEST, 'Request received', `Your request (${def.label.toLowerCase()}) is with the PaySick team.`, 'care_agent_request', lodged.requestId);
+    await notify(userId, NOTIFICATION_TYPES.REQUEST, 'Request received', `We received your request: ${def.label.toLowerCase()}.`, 'care_agent_request', lodged.requestId);
     return {
       status: 'lodged',
       result: lodged,
-      message: `Sent to the PaySick team. They aim to respond within ${def.slaHours} hours, and nothing changes on your plan until they've decided.`,
+      message: "Request received. We'll let you know once it's done.",
     };
   }
 
@@ -266,7 +266,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
    */
   async function confirm({ sessionId, userId, proposalId, consent }) {
     if (consent !== true) {
-      return { status: 'consent_required', httpStatus: 400, message: 'Please confirm you agree before PaySick acts on this.' };
+      return { status: 'consent_required', httpStatus: 400, message: 'Please tick the box to confirm.' };
     }
 
     const { row, outcome } = await claimOrExplain(
@@ -282,7 +282,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
     if (new Date(row.expires_at).getTime() < now().getTime()) {
       await finalize(proposalId, 'expired', {});
       await audit(sessionId, 'ACTION_EXPIRED', 'system', { proposalId, actionType });
-      return { status: 'expired', httpStatus: 410, proposalId, actionType, message: 'That request timed out. Ask again and I will prepare it with the latest figures.' };
+      return { status: 'expired', httpStatus: 410, proposalId, actionType, message: 'This has timed out. Please try again.' };
     }
 
     const account = await loadAccount(userId);
@@ -290,7 +290,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
     let refusal = evaluation.ok ? null : { reason: evaluation.reason, message: evaluation.message };
     if (!refusal) {
       const changed = CONSENTED_AMOUNT_FIELDS.find((field) => row.params && field in row.params && row.params[field] !== evaluation.params[field]);
-      if (changed) refusal = { reason: 'AMOUNT_CHANGED', message: `The amount has changed since you agreed. It is now ${formatAmount(evaluation.params[changed])}, so please check and confirm again.` };
+      if (changed) refusal = { reason: 'AMOUNT_CHANGED', message: `The amount is now ${formatAmount(evaluation.params[changed])}. Please try again to confirm the new amount.` };
     }
     if (refusal) {
       await finalize(proposalId, 'refused', refusal);
@@ -308,7 +308,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
     } catch (err) {
       await finalize(proposalId, 'failed', { error: err.message });
       await audit(sessionId, 'ACTION_FAILED', 'system', { proposalId, actionType, error: err.message });
-      return { status: 'failed', httpStatus: err.statusCode || 500, proposalId, actionType, message: err.statusCode ? err.message : "I couldn't complete that just now. Nothing was changed." };
+      return { status: 'failed', httpStatus: err.statusCode || 500, proposalId, actionType, message: err.statusCode ? err.message : 'That could not be completed. Nothing was changed.' };
     }
   }
 
@@ -322,7 +322,7 @@ function createActionExecutor({ query, transaction, loadAccount, acceptOffer, pr
     );
     if (outcome) return outcome;
     await audit(sessionId, 'ACTION_DECLINED', 'patient', { proposalId, actionType: row.action_type });
-    return { status: 'declined', httpStatus: 200, proposalId, actionType: row.action_type, message: "No problem, I haven't done anything." };
+    return { status: 'declined', httpStatus: 200, proposalId, actionType: row.action_type, message: 'Cancelled.' };
   }
 
   /** Runs the decision rules on the live account and records them. */

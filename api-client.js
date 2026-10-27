@@ -521,9 +521,8 @@ const PaySickAPI = {
     },
 
     /**
-     * The patient's whole account as the agent sees it: journey stage,
-     * the agent's decisions (with reason codes) and the actions on offer,
-     * each with its authority tier. Read-only.
+     * The patient's account as facts (what is owed and when, requests
+     * received) and the options open to them. Read-only.
      */
     async getAccount(sessionId) {
       return PaySickAPI.request(`/care-agent/sessions/${sessionId}/account`);
@@ -555,14 +554,6 @@ const PaySickAPI = {
       return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions/${proposalId}/decline`, {
         method: 'POST'
       });
-    },
-
-    /**
-     * Everything the agent read, decided, prepared and did in this
-     * conversation, tagged by who acted.
-     */
-    async getDecisions(sessionId) {
-      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/decisions`);
     }
   },
 
