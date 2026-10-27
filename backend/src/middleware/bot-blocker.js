@@ -100,6 +100,13 @@ const BOT_USER_AGENT_PATTERNS = [
   /Crawl4AI/i,
   /Firecrawl/i,
   /Manus-User/i,
+  // v1.22.0 review: AI agents and research fetchers with no "bot" token
+  /GoogleOther/i,
+  /Amzn-User/i,
+  /Gemini-Deep-Research/i,
+  /ChatGPT-Agent/i,
+  /meta-webindexer/i,
+  /Cloudflare-AutoRAG/i,
 
   // Generic bot / spider / crawler patterns
   /bot\b/i,

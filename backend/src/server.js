@@ -64,6 +64,7 @@ const outreachRoutes = require('./routes/outreach');
 const v1Routes = require('./routes/v1');
 const careAgentRoutes = require('./routes/care-agent');
 const kehrRoutes = require('./routes/kehr');
+const passkeyRoutes = require('./routes/passkeys');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -267,6 +268,7 @@ app.use('/api/care-agent', careAgentLimiter);
 app.use('/api/care-agent/sessions/:id/actions/:proposalId/confirm', careAgentActionLimiter);
 app.use('/api/kehr', kehrLimiter);
 app.use('/api/kehr/preapprovals/:id/assess', kehrAssessLimiter);
+app.use('/api/kehr/preapprovals/:id/documents/upload', kehrAssessLimiter);
 app.use('/api/kehr/plan-links/redeem', kehrAssessLimiter);
 app.use('/api/kehr/provider/passes', kehrAssessLimiter);
 app.use('/v2/shield', globalLimiter);
@@ -274,6 +276,8 @@ app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);
 app.use('/api/users/demo-login', authLimiter);
 app.use('/api/users/forgot-password', authLimiter);
+app.use('/api/auth/passkeys/login', authLimiter);
+app.use('/api/auth/passkeys/register', authLimiter);
 
 // ============================================
 // SECURITY HEADERS
@@ -343,6 +347,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/outreach', outreachRoutes);
 app.use('/api/care-agent', careAgentRoutes);
 app.use('/api/kehr', kehrRoutes);
+app.use('/api/auth/passkeys', passkeyRoutes);
 
 // Shield Underwriting Framework (v2 endpoints)
 app.use('/v2/shield', shieldRoutes);

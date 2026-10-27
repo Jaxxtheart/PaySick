@@ -123,13 +123,71 @@ nothing. v1.1 is used only by Kehr pre-approval:
 | `income-verification.adapter.js` | Seeded by patient id | Stitch open banking |
 | `medical-scheme.adapter.js` | Deterministic cover by tier | Scheme switch or broker API |
 | `debicheck.adapter.js` | `PENDING_AUTHENTICATION` | Standard Bank DebiCheck (TT1/TT2) |
+| `whatsapp.adapter.js` | `mock_sent` | Meta WhatsApp Cloud API, template `kehr_plan_link` |
+| `kehr-document-reader.service.js` | none (needs `ANTHROPIC_API_KEY`) | Anthropic Messages API |
 
-Not built yet:
+## v1.22.0 additions
 
-- Passkey sign-in.
-- WhatsApp delivery of links.
-- The reader that turns an uploaded payslip or statement into figures. The
-  documents route accepts the figures it would produce.
+### Document reader
+`kehr-document-reader.service.js` reads an uploaded payslip or bank
+statement into figures.
+
+- It makes one Anthropic call with the `extract_income_document` tool. The
+  output is normalised before use: integer cents, a 13-digit ID and bounded
+  names. Anything malformed makes the document "unreadable", never a guess.
+- The figures go through the same cross-check as a bank feed. The file is
+  never stored.
+- Route: `POST /api/kehr/preapprovals/:id/documents/upload`. It needs the
+  `document_upload` consent, accepts a PDF, JPG or PNG under 4MB, and uses
+  the tight rate limit.
+- Without `ANTHROPIC_API_KEY` the route returns 503, and the page suggests
+  connecting the bank instead.
+
+### WhatsApp delivery
+`whatsapp.adapter.js` sends the plan link as the approved template
+`kehr_plan_link` through the Meta Cloud API.
+
+- It is live when `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`
+  are set; otherwise it is a mock, and the provider sees "Test mode: not
+  sent".
+- It sends only when the provider ticks that the patient agreed to
+  WhatsApp. The message carries the provider name and the link token; no
+  amount, patient name or health information.
+- A failed send never loses the link. The send is audited as
+  `KEHR_PLAN_LINK_SENT`, with no phone number.
+
+### Passkeys
+Passkey sign-in uses WebAuthn, verified with Node's crypto (no package):
+
+- `utils/cbor.js`
+- `webauthn.service.js`: ES256 and RS256, "none" attestation, user
+  verification required, clone detection by signature counter.
+- `passkey.service.js`: single-use challenges, valid 5 minutes and tied to
+  a purpose and a user.
+- `passkey-repository.js`
+- Migration `015_passkeys.sql`
+
+Routes, under `/api/auth/passkeys` with the auth rate limit:
+
+- Register, list and remove need a signed-in user.
+- The two sign-in routes are the authentication itself, like
+  `/api/users/login`. A verified sign-in gets the same `createSession`
+  as a password login, and only active accounts can sign in.
+
+Configuration:
+
+- `WEBAUTHN_RP_ID` (the site's domain) and `WEBAUTHN_ORIGINS`.
+- In production, passkeys return 503 until both are set.
+
+UI:
+
+- "Sign in with a passkey" on `login.html`.
+- "Add a passkey" on the pass.
+- A plan link opened while signed out is held for the tab, and sign-in
+  returns to it.
+
+Tested end to end in Chromium with a virtual platform authenticator:
+register, sign out, open the plan link, passkey sign-in, then plan.
 
 ## Files
 
@@ -157,3 +215,15 @@ Not built yet:
   - `kehr-preapproval-flow`
   - `kehr-wiring`
   - `privacy-policy-kehr-preapproval`
+- v1.22.0:
+  - `kehr-document-reader.service.js`
+  - `whatsapp.adapter.js`
+  - `utils/cbor.js`
+  - `webauthn.service.js`
+  - `passkey.service.js`
+  - `passkey-repository.js`
+  - `routes/passkeys.js` (mounted at `/api/auth/passkeys`)
+  - migration `015_passkeys.sql`
+  - `js/passkey.js`
+  - tests: `kehr-document-reader`, `kehr-whatsapp`, `kehr-passkeys`,
+    `kehr-v1-22-wiring` and `privacy-policy-kehr-v1-22`

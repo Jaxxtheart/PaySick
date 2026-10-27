@@ -33,8 +33,10 @@
         .field input { font: inherit; padding: 11px 12px; border: 1px solid #DDD; border-radius: 10px; }
         .primary-btn { background: var(--kehr-gradient); color: #fff; padding: 13px 28px; border-radius: 25px; border: none; font-size: 15px; font-weight: 500; cursor: pointer; }
         .primary-btn:disabled { opacity: 0.5; }
-        .out { margin-top: 14px; padding: 12px 14px; background: var(--kehr-blush); border-radius: 10px; font-size: 14px; word-break: break-all; }
+        .out { margin-top: 14px; padding: 12px 14px; background: var(--kehr-blush); border-radius: 10px; font-size: 14px; }
         .row { display: flex; justify-content: space-between; padding: 4px 0; gap: 12px; }
+        .out .row span { flex-shrink: 0; white-space: nowrap; }
+        .out .row strong { min-width: 0; text-align: right; overflow-wrap: anywhere; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -78,6 +80,10 @@
                 <label class="field">Procedure (as on the pre-approval)
                     <input id="link-procedure" type="text" maxlength="100" autocomplete="off">
                 </label>
+                <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-bottom:14px;">
+                    <input id="wa-agree" type="checkbox" style="margin-top:4px;">
+                    <span>Send it on WhatsApp. The patient has agreed to receive it there. The message names your practice and carries the link only, never the amount.</span>
+                </label>
                 <button class="primary-btn" id="link-btn">Create link</button>
                 <div id="link-out" class="out hidden"></div>
             </section>
@@ -113,6 +119,8 @@
             box.classList.remove('hidden');
         }
 
+        // mock_sent: WhatsApp is not configured yet, so nothing was sent.
+        const DELIVERY_LABEL = { sent: 'Sent', mock_sent: 'Test mode: not sent. Share the link yourself.', failed: 'Not sent. Share the link yourself.', not_sent: 'Not sent' };
         const STATUS_LABEL = { active: 'Active', converted: 'Used for a plan', expired: 'Expired', withdrawn: 'Withdrawn' };
 
         document.getElementById('check-btn').addEventListener('click', async () => {
@@ -133,16 +141,20 @@
             const billTotalCents = toCents('link-total');
             if (!amountCents) { rows(box, [['Amount', 'Add the amount the patient pays']]); return; }
             if (Number.isNaN(billTotalCents)) { rows(box, [['Total', 'Check the total bill']]); return; }
+            const waAgree = document.getElementById('wa-agree').checked;
             e.target.disabled = true;
             try {
                 const link = await PaySickAPI.kehr.createPlanLink({
                     patientPhone: document.getElementById('link-phone').value,
                     amountCents,
                     billTotalCents: billTotalCents || undefined,
-                    procedureCode: document.getElementById('link-procedure').value.trim() || undefined
+                    procedureCode: document.getElementById('link-procedure').value.trim() || undefined,
+                    ...(waAgree ? { deliver: 'whatsapp', patientAgreedToWhatsApp: true } : {})
                 });
                 const url = new URL(link.url, window.location.href).href;
-                rows(box, [['Link', url], ['Expires', formatDate(link.expiresAt)]]);
+                const out = [['Link', url], ['Expires', formatDate(link.expiresAt)]];
+                if (link.delivery) out.push(['WhatsApp', DELIVERY_LABEL[link.delivery.status] || link.delivery.status]);
+                rows(box, out);
             } catch (err) {
                 rows(box, [['Result', err.message || 'The link was not created.']]);
             } finally { e.target.disabled = false; }

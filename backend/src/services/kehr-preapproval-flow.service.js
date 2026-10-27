@@ -48,6 +48,7 @@ const MESSAGES = Object.freeze({
   coolingOff: 'Your plan is ready to set up after a short pause, in case you change your mind.',
   ready: 'Your plan is ready. Choose how many months suits you.',
   notAvailable: "We can't set up a plan for this right now.",
+  documentUnreadable: "We couldn't read that. Try a clearer photo or the PDF of your latest payslip or bank statement.",
 });
 
 function createKehrFlow({ repo, adapters, secret, now = () => new Date(), random } = {}) {
@@ -120,6 +121,26 @@ function createKehrFlow({ repo, adapters, secret, now = () => new Date(), random
     }
     await repo.saveDocuments(preapprovalId, documents);
     return { received: Object.keys(documents).filter((k) => k !== 'selfieToken').concat(documents.selfieToken ? ['selfie'] : []) };
+  }
+
+  /**
+   * Reads an uploaded payslip or statement into figures (v1.22.0). The file
+   * goes to the document reader and is dropped; only the figures are kept,
+   * and they are cross-checked at assessment like any other document.
+   */
+  async function readDocument(userId, preapprovalId, { base64Data, mediaType } = {}) {
+    await ownedPreapproval(userId, preapprovalId);
+    const records = await repo.listConsents(userId);
+    if (!activeConsent(records, 'document_upload', now())) {
+      return { status: 'needs_consent', missing: ['document_upload'], message: MESSAGES.needsConsent };
+    }
+    if (!adapters.documentReader) throw new Error('Document reading is not configured');
+    const read = await adapters.documentReader.readIncomeDocument({ base64Data, mediaType });
+    if (read.kind === 'payslip' || read.kind === 'statement') {
+      await submitDocuments(userId, preapprovalId, { [read.kind]: read[read.kind] });
+      return { status: 'document_read', kind: read.kind, message: read.kind === 'payslip' ? "We've read your payslip." : "We've read your bank statement." };
+    }
+    return { status: 'document_unreadable', message: MESSAGES.documentUnreadable };
   }
 
   async function recordAndRoute(row, userId, assessment, facts) {
@@ -283,7 +304,7 @@ function createKehrFlow({ repo, adapters, secret, now = () => new Date(), random
 
   // ── Provider plan links ──────────────────────────────────
 
-  async function createProviderPlanLink(providerId, { patientPhone, amountCents, billTotalCents = null, procedureCode = null } = {}) {
+  async function createProviderPlanLink(providerId, { patientPhone, amountCents, billTotalCents = null, procedureCode = null, deliver = null, patientAgreedToWhatsApp = false } = {}) {
     if (!Number.isInteger(amountCents) || amountCents <= 0) throw new Error('amountCents must be a positive integer');
     if (billTotalCents !== null && (!Number.isInteger(billTotalCents) || billTotalCents < amountCents)) {
       throw new Error('billTotalCents must be an integer no less than amountCents');
@@ -292,7 +313,22 @@ function createKehrFlow({ repo, adapters, secret, now = () => new Date(), random
     const { token, expiresAt } = planLink.createPlanLink({ linkId, providerId, patientPhone, secret, now: now() });
     await repo.insertPlanLink({ linkId, providerId, amountCents, billTotalCents, procedureCode, expiresAt });
     await repo.audit({ applicationId: null, providerId, eventType: 'KEHR_PLAN_LINK_CREATED', actor: 'provider', inputData: { linkId, amountCents, procedureCode }, outputDecision: 'sent', outputData: { expiresAt }, ruleVersion: RULE_VERSION });
-    return { linkId, token, expiresAt, url: `/kehr-pass.html?link=${encodeURIComponent(token)}` };
+    const result = { linkId, token, expiresAt, url: `/kehr-pass.html?link=${encodeURIComponent(token)}` };
+    if (deliver === 'whatsapp') result.delivery = await deliverByWhatsApp({ linkId, providerId, patientPhone, token, agreed: patientAgreedToWhatsApp === true });
+    return result;
+  }
+
+  /**
+   * v1.22.0: send the link on WhatsApp. Only when the provider confirms the
+   * patient agreed to receive it there; a failed send never loses the link,
+   * which the provider can still share. The audit holds no phone number.
+   */
+  async function deliverByWhatsApp({ linkId, providerId, patientPhone, token, agreed }) {
+    if (!agreed || !adapters.messenger) return { channel: 'whatsapp', status: 'not_sent' };
+    const providerName = repo.getProviderName ? await repo.getProviderName(providerId) : null;
+    const sent = await adapters.messenger.sendPlanLink({ to: patientPhone, token, providerName: providerName || 'Your provider' });
+    await repo.audit({ applicationId: null, providerId, eventType: 'KEHR_PLAN_LINK_SENT', actor: 'kehr', inputData: { linkId, channel: 'whatsapp' }, outputDecision: sent.status, outputData: { messageId: sent.messageId || null }, ruleVersion: RULE_VERSION });
+    return { channel: 'whatsapp', status: sent.status };
   }
 
   async function refreshIncome(userId, facts, at) {
@@ -442,6 +478,7 @@ function createKehrFlow({ repo, adapters, secret, now = () => new Date(), random
     withdrawConsent,
     startPreapproval,
     submitDocuments,
+    readDocument,
     assess,
     requestReview,
     getPass,

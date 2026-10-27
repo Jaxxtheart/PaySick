@@ -118,9 +118,29 @@ assumed complete.
       patient-requested review, pass reassessment.
 - [ ] Counsel reviews privacy policy v1.6 (section 4B) and the consent
       wording in `consent.service.js` (the text shown is the text recorded).
-- [ ] Not built yet, by design: passkeys/WebAuthn sign-in, WhatsApp
-      delivery of plan links, and the document reader for uploaded payslips
-      and statements (the route accepts the figures it would produce).
+- [x] Passkey sign-in, WhatsApp delivery and the document reader were
+      built in v1.22.0 (see below).
+
+## Kehr document reader, WhatsApp and passkeys (v1.22.0)
+- [ ] Owner sets up a WhatsApp Business account and gets the template
+      `kehr_plan_link` approved. Body: "{{1}} has sent your Kehr payment
+      plan...". The URL button is `https://<site>/kehr-pass.html?link={{1}}`.
+      Then set `WHATSAPP_ACCESS_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`.
+- [ ] Data processing terms with Meta for WhatsApp (operator, cross-border
+      transfer to Ireland and the USA, privacy policy v1.7).
+- [ ] Provider terms: providers confirm the patient agreed to WhatsApp
+      before ticking the box. Counsel checks the wording on
+      `provider-kehr.html`.
+- [ ] Owner sets `WEBAUTHN_RP_ID` (the production domain) and
+      `WEBAUTHN_ORIGINS` (its https origin). Passkeys stay off (503) until
+      both are set. If the domain changes, existing passkeys stop working.
+- [ ] Owner runs migration `015_passkeys.sql`.
+- [ ] Owner schedules a clean-up of used or expired rows in
+      `webauthn_challenges`.
+- [ ] The document reader needs `ANTHROPIC_API_KEY`. Counsel confirms
+      the existing Anthropic DPA covers payslips and bank statements.
+- [ ] Counsel reviews privacy policy v1.7: section 4B (document reader,
+      WhatsApp, passkeys), operators, cross-border transfers.
 
 ## Homepage links into live flows (owner decision, v1.12.1)
 - [ ] Per owner direction, the homepage keeps its existing links to

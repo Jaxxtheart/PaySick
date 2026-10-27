@@ -96,7 +96,7 @@ describe('privacy-policy.html: operators and retention for pre-approval', () => 
     assert.match(sectionById('s10'), /Kehr pre-approvals/);
   });
 
-  test('is re-versioned for this change', () => {
-    assert.match(all, /Version: 1\.6/);
+  test('is re-versioned for this change (1.6; later 1.7 in v1.22.0)', () => {
+    assert.match(all, /Version: 1\.(6|7)/);
   });
 });

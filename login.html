@@ -361,6 +361,9 @@
             <button type="submit" class="btn">Sign In</button>
         </form>
 
+        <!-- v1.22.0: passkey sign-in. Shown only where the browser supports it. -->
+        <button type="button" id="passkey-login" class="btn" style="display:none;background:#fff;color:#1A1A1A;border:2px solid #E8E8E8;">Sign in with a passkey</button>
+
         <div class="register-cta">
             New to PaySick? <a href="register.html">Create an account</a>
         </div>
@@ -375,6 +378,7 @@
     </div>
 
     <script src="js/care-agent-pending.js"></script>
+    <script src="js/passkey.js"></script>
     <script>
         // ── Password visibility toggle ──────────────────────────────────────
         document.getElementById('togglePassword').addEventListener('click', function () {
@@ -452,6 +456,11 @@
                 case 'provider': window.location.href = 'provider-dashboard.html'; break;
                 case 'lender':   window.location.href = 'lender-dashboard.html'; break;
                 default: {
+                    // A plan link opened before sign-in (kehr-pass.html holds
+                    // it for this tab) goes back to the pass page.
+                    let pendingLink = null;
+                    try { pendingLink = sessionStorage.getItem('kehr_pending_link'); } catch (_) { pendingLink = null; }
+                    if (pendingLink) { window.location.href = 'kehr-pass.html'; break; }
                     const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
                     // A question held for Kehr from before sign-in
                     // takes the patient back there instead of the dashboard.
@@ -523,6 +532,29 @@
             } catch {
                 localStorage.removeItem('paysick_remember');
             }
+        })();
+
+        // ── Passkey sign-in (v1.22.0) ───────────────────────────────────────
+        (function () {
+            const btn = document.getElementById('passkey-login');
+            if (!window.KehrPasskey || !KehrPasskey.isSupported()) return;
+            btn.style.display = 'block';
+            btn.addEventListener('click', async () => {
+                btn.disabled = true;
+                btn.textContent = 'Waiting for your passkey...';
+                try {
+                    const data = await KehrPasskey.signIn();
+                    manualLoginCompleted = true;
+                    localStorage.setItem('paysick_auth_token', data.accessToken);
+                    localStorage.setItem('paysick_user', JSON.stringify({ ...data.user, name: data.user.full_name }));
+                    redirectByRole(data.user.role);
+                } catch (err) {
+                    // NotAllowedError: the patient closed the prompt.
+                    if (err && err.name !== 'NotAllowedError') showError(err.message || 'That passkey did not work.', 5000);
+                    btn.disabled = false;
+                    btn.textContent = 'Sign in with a passkey';
+                }
+            });
         })();
 
         // ── Manual login form ───────────────────────────────────────────────

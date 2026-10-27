@@ -141,6 +141,12 @@
             <h2>What we'll read</h2>
             <p class="sub">Switch on what you're happy to share. You can switch anything off later.</p>
             <div id="consent-list"></div>
+            <!-- Shown when "Uploaded documents" is on. The file is read into
+                 figures and not kept. -->
+            <div id="upload-box" class="hidden" style="margin-top:12px;">
+                <label class="secondary-btn" for="doc-input" id="doc-label">Add a payslip or bank statement<input id="doc-input" type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none"></label>
+                <p id="doc-status" class="done-line" style="margin-top:8px;"></p>
+            </div>
             <p class="fine">Health information is special personal information under POPIA. We only read it with your go-ahead.</p>
             <div class="actions"><button class="primary-btn" id="consent-next">Continue</button></div>
         </section>
@@ -173,6 +179,14 @@
             <p class="note">Show this code to your provider. When the bill is ready, they'll send you a link to set up your plan.</p>
         </section>
 
+        <!-- v1.22.0: offer a passkey so opening the plan link later is one tap. -->
+        <section id="passkey-card" class="card hidden">
+            <h2>Sign in faster next time</h2>
+            <p class="sub">Use your phone's fingerprint, face or screen lock instead of a password.</p>
+            <div class="actions"><button class="secondary-btn" id="passkey-add">Add a passkey</button></div>
+            <p class="done-line" id="passkey-status"></p>
+        </section>
+
         <!-- Plan link from a provider: choose a term, then the plan is set up. -->
         <section id="plan-card" class="card hidden">
             <h2>Your plan</h2>
@@ -184,8 +198,9 @@
     </main>
 
     <script src="api-client.js"></script>
+    <script src="js/passkey.js"></script>
     <script>
-        const state = { preapprovalId: null, urgency: 'planned', consents: [], selfieToken: null, plan: null, selectedTerm: null };
+        const state = { documentRead: false, preapprovalId: null, urgency: 'planned', consents: [], selfieToken: null, plan: null, selectedTerm: null };
 
         // The sources shown, in order. Labels and purposes come from the
         // server (GET /api/kehr/consents), so the text the patient reads is
@@ -212,7 +227,7 @@
         }
         function show(id) { document.getElementById(id).classList.remove('hidden'); }
         function hide(id) { document.getElementById(id).classList.add('hidden'); }
-        function hideSteps() { ['step-treatment', 'step-consent', 'step-identity', 'result', 'pass-card', 'plan-card'].forEach(hide); }
+        function hideSteps() { ['step-treatment', 'step-consent', 'step-identity', 'result', 'pass-card', 'passkey-card', 'plan-card'].forEach(hide); }
 
         function isActive(source) {
             return state.consents.some((c) => c.source === source && c.active);
@@ -240,7 +255,8 @@
                 row.appendChild(sw);
                 list.appendChild(row);
             });
-            const ready = isActive('bureau') && (isActive('bank_income_once') || isActive('document_upload'));
+            document.getElementById('upload-box').classList.toggle('hidden', !isActive('document_upload'));
+            const ready = isActive('bureau') && (isActive('bank_income_once') || (isActive('document_upload') && state.documentRead));
             document.getElementById('consent-next').disabled = !ready;
         }
 
@@ -295,7 +311,22 @@
                 cooling.classList.add('hidden');
             }
             show('pass-card');
+            if (window.KehrPasskey && KehrPasskey.isSupported()) show('passkey-card');
         }
+
+        document.getElementById('passkey-add').addEventListener('click', async (e) => {
+            const status = document.getElementById('passkey-status');
+            e.target.disabled = true;
+            try {
+                await KehrPasskey.register();
+                status.textContent = 'Passkey added.';
+                status.classList.add('ok');
+                e.target.classList.add('hidden');
+            } catch (err) {
+                status.textContent = err && err.name === 'NotAllowedError' ? '' : (err.message || 'That passkey could not be added.');
+                e.target.disabled = false;
+            }
+        });
 
         function renderOutcome(view) {
             switch (view.status) {
@@ -344,6 +375,31 @@
             } catch (err) {
                 alert(err.message || 'That did not save. Please try again.');
             } finally { e.target.disabled = false; }
+        });
+
+        const UPLOAD_TYPES = { 'application/pdf': true, 'image/jpeg': true, 'image/png': true };
+        document.getElementById('doc-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            e.target.value = '';
+            const status = document.getElementById('doc-status');
+            status.classList.remove('ok');
+            if (!file) return;
+            if (!UPLOAD_TYPES[file.type]) { status.textContent = 'Upload a PDF, JPG or PNG.'; return; }
+            if (file.size > 4 * 1024 * 1024) { status.textContent = 'The file must be under 4MB.'; return; }
+            status.textContent = 'Reading...';
+            const fr = new FileReader();
+            fr.onload = async () => {
+                try {
+                    const fileBase64 = String(fr.result).split(',')[1];
+                    const r = await PaySickAPI.kehr.uploadDocument(state.preapprovalId, { fileBase64, mediaType: file.type });
+                    status.textContent = r.message;
+                    if (r.status === 'document_read') { state.documentRead = true; status.classList.add('ok'); }
+                } catch (err) {
+                    status.textContent = err.message || 'That did not upload. Please try again.';
+                }
+                renderConsents();
+            };
+            fr.readAsDataURL(file);
         });
 
         document.getElementById('consent-next').addEventListener('click', () => {

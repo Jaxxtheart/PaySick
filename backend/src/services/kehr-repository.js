@@ -220,6 +220,11 @@ function createKehrRepository({ query }) {
       };
     },
 
+    async getProviderName(providerId) {
+      const r = await query('SELECT provider_name FROM providers WHERE provider_id = $1', [providerId]).catch(() => ({ rows: [] }));
+      return r.rows[0] ? r.rows[0].provider_name : null;
+    },
+
     async insertPlanLink(row) {
       await query(
         `INSERT INTO kehr_plan_links (link_id, provider_id, amount_cents, bill_total_cents, procedure_code, expires_at)

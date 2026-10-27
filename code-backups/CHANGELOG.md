@@ -6,6 +6,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.22.0] — 2026-10-27
+
+**Type**: MINOR — Kehr document reader, WhatsApp plan links, passkey sign-in
+
+### Added
+- `kehr-document-reader.service.js` and the
+  `POST /api/kehr/preapprovals/:id/documents/upload` route: a payslip or
+  statement is read into figures and cross-checked. The file is not kept.
+- `whatsapp.adapter.js`: plan links sent through the Meta Cloud API
+  template `kehr_plan_link`, only with the patient's agreement, carrying
+  the provider name and the link only.
+- Passkeys:
+  - `utils/cbor.js`
+  - `webauthn.service.js` (ES256/RS256, no package)
+  - `passkey.service.js`
+  - `passkey-repository.js`
+  - migration `015_passkeys.sql`
+  - `/api/auth/passkeys`
+  - `js/passkey.js`
+  - buttons on `login.html` and the pass
+
+### Changed
+- `login.html` returns to a plan link opened while signed out.
+- Privacy policy v1.7.
+- Bot and rate-limit review: 6 UA patterns. Uploads use the tight bucket
+  and passkeys use `authLimiter`.
+
+### Fixed
+- `provider-kehr.html` result labels no longer break mid-word.
+
+---
+
 ## [v1.21.0] — 2026-10-27
 
 **Type**: MINOR — Kehr harness, Journey A (pre-approval before treatment)

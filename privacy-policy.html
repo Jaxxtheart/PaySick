@@ -132,7 +132,7 @@
     <main class="content">
 
         <div class="effective">
-            <strong>Effective Date:</strong> 27 October 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.6 &nbsp;|&nbsp; <strong>Next review:</strong> 27 October 2027<br>
+            <strong>Effective Date:</strong> 27 October 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.7 &nbsp;|&nbsp; <strong>Next review:</strong> 27 October 2027<br>
             This policy is issued in terms of <strong>Section 18 of POPIA</strong> (duty to notify data subjects at time of collection) and must be read together with our <a href="terms-of-service.html">Terms of Service</a>.
         </div>
 
@@ -232,7 +232,7 @@
         <ul>
             <li><strong>Credit bureau check:</strong> a check of your credit record with a registered credit bureau, required before we offer a payment plan.</li>
             <li><strong>Your bank account, read once:</strong> through an open-banking provider, we read your salary credits and debit orders for the last 3 months once, to work out what you can comfortably afford. We keep the figures we used, not your transactions.</li>
-            <li><strong>A payslip or bank statement</strong> (instead of connecting your bank): we read the figures on the document you upload and keep only the figures we used.</li>
+            <li><strong>A payslip or bank statement</strong> (instead of connecting your bank): the document you upload is read by an AI model provided by Anthropic, PBC (see Section 4A) to pick out the figures. We keep only the figures we used; we do not keep the file.</li>
             <li><strong>Your identity:</strong> a selfie, matched to your ID number by our identity verification partner. We do not keep the photo; we keep only the result of the check.</li>
             <li><strong>Your medical scheme:</strong> what your scheme covers for the treatment and whether it is pre-authorised, so that your plan only covers the gap. This is health information (see Section 5).</li>
             <li><strong>Health history (optional):</strong> sharing it can improve your offer. Declining never counts against you.</li>
@@ -240,7 +240,9 @@
         <h3>How the assessment is made</h3>
         <p>The pre-approval is calculated by automated means: our affordability rules (including a repayment limit of 20% of your verified income) and our risk model. Cases where your documents do not agree with each other, or where the risk model is not clear, always go to a person, and documents that do not agree are never a reason, on their own, to decline you. If you are not pre-approved, you can ask for a person to review the outcome and tell us anything you think we missed (POPIA Section 71).</p>
         <h3>Your pass and your provider</h3>
-        <p>If you are pre-approved, you receive a pass with a code, an amount and an expiry date. A provider you show it to sees only the code, whether it is valid, the amount and the expiry date. A provider never sees your income, bank details or health information. When your bill is ready, your provider can send a plan link to your cellphone; the link works only for your number and expires after 7 days.</p>
+        <p>If you are pre-approved, you receive a pass with a code, an amount and an expiry date. A provider you show it to sees only the code, whether it is valid, the amount and the expiry date. A provider never sees your income, bank details or health information. When your bill is ready, your provider can send a plan link to your cellphone; the link works only for your number and expires after 7 days. Your provider can send it on WhatsApp only if you agreed to receive it there. The WhatsApp message names your provider and carries the link, never the amount or any health information.</p>
+        <h3>Passkeys</h3>
+        <p>You can sign in with a passkey instead of a password. Your fingerprint, face or screen lock is checked by your own device and never reaches us: we receive and store only a public key and a counter, which let us confirm it is the same device signing in. You can remove a passkey at any time.</p>
         <p>The debit order for your plan is in the name of <strong>Tech &amp; Artery (Pty) Ltd</strong>, which operates Kehr, and appears in your banking app as <strong>KEHR*PLAN</strong>.</p>
 
         <h2 id="s6">5. Special Personal Information</h2>
@@ -280,6 +282,7 @@
             <li><strong>Neon Inc.</strong>: PostgreSQL database hosting (USA; see Section 9)</li>
             <li><strong>Anthropic, PBC</strong>: AI model used by Kehr to write replies and read uploaded documents (USA; see Sections 4A and 9)</li>
             <li><strong>An open-banking provider</strong>: reads your bank account once, with your consent, for Kehr pre-approval (South Africa; see Section 4B)</li>
+            <li><strong>WhatsApp (Meta Platforms)</strong>: delivers Kehr plan links when you agreed to receive them there; the message carries your provider's name and the link only (Ireland and USA; see Sections 4B and 9)</li>
             <li><strong>An identity verification partner</strong>: checks your ID number and selfie for Kehr pre-approval, without keeping the photo (South Africa; see Section 4B)</li>
             <li><strong>SMS and email delivery providers</strong>: transactional notifications only</li>
         </ul>
@@ -296,7 +299,7 @@
         <p><strong>We will never disclose your personal information to any political party, political organisation, or for political profiling purposes.</strong></p>
 
         <h2 id="s9">8. Cross-Border Transfers</h2>
-        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes, and, when you use Kehr, to <strong>Anthropic, PBC</strong> (United States) solely to produce Kehr's replies and read documents you upload.</p>
+        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes, and, when you use Kehr, to <strong>Anthropic, PBC</strong> (United States) solely to produce Kehr's replies and read documents you upload. When you agree to receive a plan link on WhatsApp, your cellphone number and the link are transferred to <strong>WhatsApp (Meta Platforms)</strong> (Ireland and United States) solely to deliver that message.</p>
         <p>These transfers are permissible because:</p>
         <ul>
             <li>Recipient entities are bound by data processing agreements imposing obligations <strong>substantially equivalent to POPIA's conditions</strong> (s72(1)(a)); and</li>

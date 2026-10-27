@@ -25,6 +25,8 @@ const { createKehrRepository } = require('../services/kehr-repository');
 const identityAdapter = require('../adapters/identity-verification.adapter');
 const incomeAdapter = require('../adapters/income-verification.adapter');
 const schemeAdapter = require('../adapters/medical-scheme.adapter');
+const documentReader = require('../services/kehr-document-reader.service');
+const whatsappAdapter = require('../adapters/whatsapp.adapter');
 
 // Plan-link tokens are signed with KEHR_LINK_SECRET. Outside production a
 // per-process secret keeps local development working (links then expire on
@@ -35,7 +37,7 @@ const linkSecret = configuredSecret || crypto.randomBytes(32).toString('hex');
 
 const flow = createKehrFlow({
   repo: createKehrRepository({ query }),
-  adapters: { identity: identityAdapter, income: incomeAdapter, scheme: schemeAdapter },
+  adapters: { identity: identityAdapter, income: incomeAdapter, scheme: schemeAdapter, documentReader, messenger: whatsappAdapter },
   secret: linkSecret,
 });
 
@@ -139,6 +141,24 @@ router.post('/preapprovals/:id/documents', authenticateToken, async (req, res) =
   } catch (error) { fail(res, error, 'documents'); }
 });
 
+// v1.22.0: read a payslip or statement into figures. The file goes to the
+// reader and is dropped; only the figures are stored.
+router.post('/preapprovals/:id/documents/upload', authenticateToken, async (req, res) => {
+  try {
+    const { fileBase64, mediaType } = req.body || {};
+    if (!documentReader.ALLOWED_MEDIA_TYPES.includes(mediaType)) {
+      return res.status(400).json({ error: 'Upload a PDF, JPG or PNG.' });
+    }
+    if (typeof fileBase64 !== 'string' || !fileBase64 || Buffer.byteLength(fileBase64, 'base64') > documentReader.MAX_DOCUMENT_BYTES) {
+      return res.status(400).json({ error: 'The file must be under 4MB.' });
+    }
+    if (!documentReader.isAvailable()) {
+      return res.status(503).json({ error: "We can't read documents right now. Connect your bank instead, or try again later." });
+    }
+    res.json(await flow.readDocument(req.user.userId, req.params.id, { base64Data: fileBase64, mediaType }));
+  } catch (error) { fail(res, error, 'read document'); }
+});
+
 router.post('/preapprovals/:id/assess', authenticateToken, async (req, res) => {
   try {
     res.json(await flow.assess(req.user.userId, req.params.id));
@@ -171,12 +191,14 @@ router.post('/provider/plan-links', authenticateToken, requireProvider, async (r
     if (!linksEnabled) return linksUnavailable(res);
     const providerId = await resolveProviderId(req.user);
     if (!providerId) return res.status(403).json({ error: 'No provider practice is linked to this account.' });
-    const { patientPhone, amountCents, billTotalCents, procedureCode } = req.body || {};
+    const { patientPhone, amountCents, billTotalCents, procedureCode, deliver, patientAgreedToWhatsApp } = req.body || {};
     const link = await flow.createProviderPlanLink(providerId, {
       patientPhone,
       amountCents,
       billTotalCents: billTotalCents === undefined ? null : billTotalCents,
       procedureCode: procedureCode ? String(procedureCode).slice(0, 100) : null,
+      deliver: deliver === 'whatsapp' ? 'whatsapp' : null,
+      patientAgreedToWhatsApp: patientAgreedToWhatsApp === true,
     });
     res.status(201).json(link);
   } catch (error) { fail(res, error, 'create plan link'); }

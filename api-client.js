@@ -598,6 +598,17 @@ const PaySickAPI = {
       });
     },
 
+    /**
+     * Upload a payslip or bank statement (base64, no data: prefix, under
+     * 4MB) to be read into figures. The file itself is not kept.
+     */
+    async uploadDocument(preapprovalId, { fileBase64, mediaType }) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/documents/upload`, {
+        method: 'POST',
+        body: JSON.stringify({ fileBase64, mediaType })
+      });
+    },
+
     async assess(preapprovalId) {
       return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/assess`, { method: 'POST' });
     },
@@ -623,10 +634,10 @@ const PaySickAPI = {
     /**
      * Provider: send a patient a plan link for a bill (cents)
      */
-    async createPlanLink({ patientPhone, amountCents, billTotalCents, procedureCode }) {
+    async createPlanLink({ patientPhone, amountCents, billTotalCents, procedureCode, deliver, patientAgreedToWhatsApp }) {
       return PaySickAPI.request('/kehr/provider/plan-links', {
         method: 'POST',
-        body: JSON.stringify({ patientPhone, amountCents, billTotalCents, procedureCode })
+        body: JSON.stringify({ patientPhone, amountCents, billTotalCents, procedureCode, deliver, patientAgreedToWhatsApp })
       });
     },
 
