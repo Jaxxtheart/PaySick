@@ -28,7 +28,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { query } = require('../config/database');
+const { query, transaction } = require('../config/database');
 const { authenticateToken } = require('../middleware/auth.middleware');
 const { patientGateService } = require('../services/patient-gate.service');
 const { extractCareRequest, PROCEDURE_CATEGORIES } = require('../services/care-agent-nlp.service');
@@ -48,6 +48,25 @@ const {
   MAX_DOCUMENT_BYTES,
 } = require('../services/care-agent-document.service');
 const { toRands, toCents } = require('../utils/money');
+const { detectAccountIntent, suggestParamsFor, evaluateProposal, ACTION_REGISTRY } = require('../services/care-agent-actions.service');
+const { loadAccountSnapshot } = require('../services/care-agent-account.service');
+const { createActionExecutor, describeAuditEvent } = require('../services/care-agent-action-executor.service');
+const { createPlanPaymentService } = require('../services/plan-payment.service');
+const { marketplaceAuctionService } = require('../services/marketplace-auction.service');
+
+// The one path by which a Care Agent action changes anything (v1.18.0).
+// acceptOffer and the plan-payment service are the same ones
+// marketplace.js and payments.js use, so the agent never has its own
+// money logic.
+const loadAccount = (userId) => loadAccountSnapshot({ query, userId });
+const planPaymentService = createPlanPaymentService({ query, transaction });
+const actionExecutor = createActionExecutor({
+  query,
+  transaction,
+  loadAccount,
+  acceptOffer: (offerId, userId) => marketplaceAuctionService.acceptOffer(offerId, userId),
+  processPayment: (args) => planPaymentService.processPayment(args),
+});
 
 // Bot crawling prevention (CLAUDE.md requirement) — belt-and-braces on top
 // of the header server.js already sets globally.
@@ -90,6 +109,52 @@ async function getOwnedSession(sessionId, userId) {
   const session = result.rows[0];
   if (session.user_id !== userId) return null;
   return session;
+}
+
+function hasAccountActivity(account) {
+  if (!account) return false;
+  if ((account.plans || []).some((p) => p.status === 'active')) return true;
+  return ['instalments', 'applications', 'funderPlans', 'openRequests'].some((key) => (account[key] || []).length > 0);
+}
+
+// Refusals the patient should hear about even when the message might have
+// been about something else.
+const ALWAYS_EXPLAIN = ['NOT_IN_CHAT', 'BANKING_DETAILS_IN_CHAT'];
+
+/**
+ * The deterministic fallback's account intent, only when it actually fits
+ * this account: "how do I pay for a knee op" from a patient with nothing
+ * owing is a new care request, not a payment.
+ */
+function accountIntentFor(intent, account) {
+  if (!intent) return null;
+  const def = ACTION_REGISTRY[intent];
+  if ((def.inputs || []).some((input) => !input.optional)) {
+    // Needs the patient's details first; just check it applies at all.
+    const probe = evaluateProposal(intent, { preferredDay: 1, newTermMonths: 1, promisedDate: account.today, ...suggestParamsFor(intent, account) }, account);
+    return probe.ok || ALWAYS_EXPLAIN.includes(probe.reason) ? intent : null;
+  }
+  const check = evaluateProposal(intent, suggestParamsFor(intent, account), account);
+  return check.ok || ALWAYS_EXPLAIN.includes(check.reason) ? intent : null;
+}
+
+/** The deterministic fallback's reply, from what proposing actually did. */
+function fallbackReplyFor(proposal) {
+  if (proposal.status === 'awaiting_consent') {
+    return proposal.authority === 'human_review'
+      ? "I've prepared this for the PaySick team. Check it below and send it when you're ready."
+      : "I've prepared this for you to check below. Nothing happens until you confirm.";
+  }
+  if (proposal.status === 'executed' && proposal.result) {
+    if (proposal.result.rankedOffers) {
+      return proposal.result.rankedOffers.length
+        ? "Here are your offers, in order of what you'd repay in total."
+        : "There aren't any offers waiting right now.";
+    }
+    if (proposal.result.decisions && proposal.result.decisions[0]) return proposal.result.decisions[0].rationale;
+    if (proposal.result.explanation) return proposal.result.explanation;
+  }
+  return proposal.message || "I couldn't do that here.";
 }
 
 async function recordAudit(sessionId, eventType, actor, payload) {
@@ -217,14 +282,26 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
     let usedLlm = false;
     let toolCalls = [];
     let fallbackReason = null;
+    let proposalDrafts = [];
+    let suggestedAction = null;
+
+    // The patient's account, read once per turn, so the agent can help with
+    // an existing plan as well as a new request. Read-only.
+    let account = null;
+    try {
+      account = await loadAccountSnapshot({ query, userId: req.user.userId });
+    } catch (accountError) {
+      console.error('Care Agent account snapshot error:', accountError.message);
+    }
 
     if (process.env.ANTHROPIC_API_KEY) {
       try {
         const history = await loadConversationHistory(session.session_id);
-        const turn = await runCareAgentTurn({ summary: currentSummary, history, userMessage: message });
+        const turn = await runCareAgentTurn({ summary: currentSummary, history, userMessage: message, account });
         merged = turn.summary;
         reply = turn.reply || "Here's what I've got so far. Please confirm it's right, or edit anything that's off.";
         toolCalls = turn.toolCalls;
+        proposalDrafts = turn.proposalDrafts || [];
         usedLlm = true;
       } catch (llmError) {
         console.error('Care Agent LLM error, falling back to deterministic extraction:', llmError.message);
@@ -234,12 +311,45 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
       fallbackReason = 'ANTHROPIC_API_KEY not configured';
     }
 
-    if (!usedLlm) {
+    // Deterministic fallback for account requests: only once the patient has
+    // something on their account, so "I need a knee op" still goes to the
+    // care-request extraction below. An action that needs details from the
+    // patient (a date, a day, a term) comes back as a form to fill in, never
+    // a guess.
+    const accountIntent = !usedLlm && hasAccountActivity(account) ? accountIntentFor(detectAccountIntent(message), account) : null;
+    if (accountIntent) {
+      merged = currentSummary;
+      const def = ACTION_REGISTRY[accountIntent];
+      const params = suggestParamsFor(accountIntent, account);
+      const needsInput = (def.inputs || []).some((input) => !input.optional);
+      if (needsInput) {
+        suggestedAction = { actionType: accountIntent, label: def.label, authority: def.authority, inputs: def.inputs, params };
+        reply = def.authority === 'human_review'
+          ? `I can prepare that for the PaySick team, who decide on changes like this. Add the details below and I'll set it up for you to send.`
+          : `I can set that up. Add the details below and I'll prepare it for you to check.`;
+      } else {
+        proposalDrafts = [{ actionType: accountIntent, params }];
+      }
+    } else if (!usedLlm) {
       const extracted = extractCareRequest(message);
       merged = mergeCareSummary(currentSummary, extracted, message);
       const question = nextQuestion(merged);
       reply = question || "Here's what I've got so far. Please confirm it's right, or edit anything that's off.";
     }
+
+    // Drafts from either engine become proposals made by the agent. None of
+    // them does anything until the patient confirms it.
+    const proposals = [];
+    for (const draft of proposalDrafts) {
+      proposals.push(await actionExecutor.propose({
+        sessionId: session.session_id,
+        userId: req.user.userId,
+        actionType: draft.actionType,
+        params: draft.params,
+        proposedBy: 'agent',
+      }));
+    }
+    if (accountIntent && proposals.length > 0) reply = fallbackReplyFor(proposals[0]);
 
     const missing = missingFieldsFor(merged);
     const readyToConfirm = missing.length === 0;
@@ -254,6 +364,8 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
       usedLlm,
       toolCalls,
       fallbackReason,
+      accountIntent,
+      proposalIds: proposals.map((p) => p.proposalId).filter(Boolean),
     });
 
     res.json({
@@ -261,8 +373,10 @@ router.post('/sessions/:id/messages', authenticateToken, async (req, res) => {
       summary: merged,
       missingFields: missing,
       reply,
-      readyToConfirm,
+      readyToConfirm: accountIntent ? false : readyToConfirm,
       procedureOptions: PROCEDURE_OPTIONS,
+      proposals,
+      suggestedAction,
     });
   } catch (error) {
     console.error('Care Agent message error:', error.message);
@@ -399,6 +513,15 @@ router.post('/sessions/:id/confirm', authenticateToken, async (req, res) => {
 
     const shortfallCents = computeShortfallCents(finalSummary);
 
+    // Stored on the summary so /approve can pass them to the marketplace
+    // endpoint, which only runs Shield Gate 2 when monthlyIncome is present.
+    const { monthlyIncome, monthlyObligations } = req.body;
+    const isAmount = (v) => v != null && Number.isFinite(Number(v)) && Number(v) >= 0;
+    if (isAmount(monthlyIncome)) {
+      finalSummary.monthlyIncomeCents = toCents(monthlyIncome);
+      finalSummary.monthlyObligationsCents = isAmount(monthlyObligations) ? toCents(monthlyObligations) : 0;
+    }
+
     await query(
       `UPDATE care_agent_sessions
        SET structured_summary = $1, confirmed = true, stage = 'construct', updated_at = NOW()
@@ -410,7 +533,6 @@ router.post('/sessions/:id/confirm', authenticateToken, async (req, res) => {
       shortfallCents,
     });
 
-    const { monthlyIncome, monthlyObligations } = req.body;
     const monthlyIncomeCents = monthlyIncome != null ? toCents(monthlyIncome) : undefined;
     const options = buildTermOptions({ shortfallCents, monthlyIncomeCents });
 
@@ -501,6 +623,11 @@ router.post('/sessions/:id/approve', authenticateToken, async (req, res) => {
       procedureDescription: summary.treatmentDescription,
       loanAmount: toRands(shortfallCents),
       requestedTerm: selectedTermMonths,
+      // Income from /confirm, so the marketplace runs Shield Gate 2 at
+      // submission. Left undefined when not shared (Gate 2 is then skipped).
+      monthlyIncome: summary.monthlyIncomeCents != null ? toRands(summary.monthlyIncomeCents) : undefined,
+      monthlyObligations: summary.monthlyObligationsCents != null ? toRands(summary.monthlyObligationsCents) : undefined,
+      medicalAidCovered: toRands(summary.schemeContributionCents),
     };
 
     res.json({
@@ -571,11 +698,13 @@ router.get('/sessions/:id/manage', authenticateToken, async (req, res) => {
     if (!session) return res.status(404).json({ error: 'Session not found' });
 
     const result = await query(
-      `SELECT lr.amount, lr.due_date
+      // New instalments default to 'SCHEDULED' (001_marketplace_tables.sql);
+      // 'PENDING' is also treated as upcoming.
+      `SELECT lr.scheduled_amount, lr.scheduled_date
        FROM loan_repayments lr
        JOIN marketplace_loans ml ON lr.loan_id = ml.loan_id
-       WHERE ml.user_id = $1 AND lr.status = 'PENDING'
-       ORDER BY lr.due_date ASC
+       WHERE ml.user_id = $1 AND lr.status IN ('SCHEDULED', 'PENDING')
+       ORDER BY lr.scheduled_date ASC
        LIMIT 1`,
       [req.user.userId]
     );
@@ -589,15 +718,15 @@ router.get('/sessions/:id/manage', authenticateToken, async (req, res) => {
     }
 
     const row = result.rows[0];
-    const dueDateDisplay = new Date(row.due_date).toLocaleDateString('en-ZA', {
+    const dueDateDisplay = new Date(row.scheduled_date).toLocaleDateString('en-ZA', {
       day: 'numeric',
       month: 'long',
     });
 
     res.json({
       hasActiveLoan: true,
-      nextPayment: { amount: Number(row.amount), dueDate: row.due_date },
-      reply: `Your next payment of R${row.amount} is scheduled for ${dueDateDisplay}.`,
+      nextPayment: { amount: Number(row.scheduled_amount), dueDate: row.scheduled_date },
+      reply: `Your next payment of R${row.scheduled_amount} is scheduled for ${dueDateDisplay}.`,
     });
   } catch (error) {
     console.error('Care Agent manage error:', error.message);
@@ -635,6 +764,184 @@ router.post('/sessions/:id/manage/payment-date-change', authenticateToken, async
   } catch (error) {
     console.error('Care Agent manage request error:', error.message);
     res.status(500).json({ error: 'Failed to log that request' });
+  }
+});
+
+// ============================================
+// VALUE CHAIN (v1.18.0) — governed account actions
+//
+// Every action after the first conversation goes through
+// care-agent-action-executor.service.js. Its authority tier comes from
+// the registry in care-agent-actions.service.js, never from the request:
+//   autonomous       read-only, done at once
+//   patient_consent  a proposal the patient confirms here
+//   human_review     a request the patient sends; the team decides
+//   prohibited       refused, with where to go instead
+// ============================================
+
+function sendResult(res, result) {
+  res.status(result.httpStatus || 200).json({
+    ...result,
+    error: result.httpStatus >= 400 ? result.message : undefined,
+  });
+}
+
+/**
+ * GET /api/care-agent/sessions/:id/account
+ *
+ * The patient's account as the agent sees it, with the agent's decisions.
+ * Read-only; the decisions are written to the audit trail as AGENT_DECISION.
+ */
+router.get('/sessions/:id/account', authenticateToken, async (req, res) => {
+  try {
+    const session = await getOwnedSession(req.params.id, req.user.userId);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    const { account, journeyStage, decisions, actions, rankedOffers } = await actionExecutor.recordAgentDecisions({
+      sessionId: session.session_id,
+      userId: req.user.userId,
+    });
+
+    res.json({
+      sessionId: session.session_id,
+      journeyStage,
+      decisions,
+      actions: actions.map((a) => ({ ...a, inputs: ACTION_REGISTRY[a.actionType].inputs || [] })),
+      rankedOffers,
+      plans: account.plans,
+      instalments: account.instalments,
+      funderPlans: account.funderPlans,
+      openRequests: account.openRequests,
+      promises: account.promises,
+    });
+  } catch (error) {
+    console.error('Care Agent account error:', error.message);
+    res.status(500).json({ error: 'Failed to load your account' });
+  }
+});
+
+/**
+ * POST /api/care-agent/sessions/:id/actions
+ * Body: { actionType, params }
+ *
+ * The patient asks for an action from a card or chip. Same path as a draft
+ * from the agent, but recorded as the patient's own request.
+ */
+router.post('/sessions/:id/actions', authenticateToken, async (req, res) => {
+  try {
+    const session = await getOwnedSession(req.params.id, req.user.userId);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    const { actionType, params } = req.body;
+    if (!actionType || typeof actionType !== 'string') {
+      return res.status(400).json({ error: 'actionType is required' });
+    }
+
+    const result = await actionExecutor.propose({
+      sessionId: session.session_id,
+      userId: req.user.userId,
+      actionType,
+      params: params && typeof params === 'object' ? params : {},
+      proposedBy: 'patient',
+    });
+    sendResult(res, result);
+  } catch (error) {
+    console.error('Care Agent propose error:', error.message);
+    res.status(500).json({ error: 'Failed to prepare that' });
+  }
+});
+
+/**
+ * POST /api/care-agent/sessions/:id/actions/:proposalId/confirm
+ * Body: { consent: true }
+ *
+ * The patient's go-ahead. The executor claims the proposal once, checks it
+ * has not expired, re-checks it against live data, then performs it. Has
+ * its own rate limit (server.js careAgentActionLimiter).
+ */
+router.post('/sessions/:id/actions/:proposalId/confirm', authenticateToken, async (req, res) => {
+  try {
+    const session = await getOwnedSession(req.params.id, req.user.userId);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    const result = await actionExecutor.confirm({
+      sessionId: session.session_id,
+      userId: req.user.userId,
+      proposalId: req.params.proposalId,
+      consent: req.body.consent === true,
+    });
+    sendResult(res, result);
+  } catch (error) {
+    console.error('Care Agent confirm action error:', error.message);
+    res.status(500).json({ error: "I couldn't complete that just now. Nothing was changed." });
+  }
+});
+
+/**
+ * POST /api/care-agent/sessions/:id/actions/:proposalId/decline
+ */
+router.post('/sessions/:id/actions/:proposalId/decline', authenticateToken, async (req, res) => {
+  try {
+    const session = await getOwnedSession(req.params.id, req.user.userId);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    const result = await actionExecutor.decline({
+      sessionId: session.session_id,
+      userId: req.user.userId,
+      proposalId: req.params.proposalId,
+    });
+    sendResult(res, result);
+  } catch (error) {
+    console.error('Care Agent decline action error:', error.message);
+    res.status(500).json({ error: 'Failed to record that' });
+  }
+});
+
+/**
+ * GET /api/care-agent/sessions/:id/decisions
+ *
+ * What the agent read, decided, prepared and did in this conversation,
+ * tagged by who acted, plus each proposal and how it ended. Conversation
+ * turns themselves are left out: the chat already shows them.
+ */
+router.get('/sessions/:id/decisions', authenticateToken, async (req, res) => {
+  try {
+    const session = await getOwnedSession(req.params.id, req.user.userId);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+
+    const auditResult = await query(
+      `SELECT event_type, actor, payload, created_at
+       FROM care_agent_audit_log
+       WHERE session_id = $1 AND event_type <> 'CONVERSATION_TURN'
+       ORDER BY created_at ASC`,
+      [session.session_id]
+    );
+    const proposalResult = await query(
+      `SELECT proposal_id, action_type, authority, status, proposed_by, summary, created_at, decided_at, executed_at
+       FROM care_agent_action_proposals
+       WHERE session_id = $1
+       ORDER BY created_at ASC`,
+      [session.session_id]
+    );
+
+    res.json({
+      sessionId: session.session_id,
+      timeline: auditResult.rows.map(describeAuditEvent),
+      proposals: proposalResult.rows.map((p) => ({
+        proposalId: p.proposal_id,
+        actionType: p.action_type,
+        authority: p.authority,
+        status: p.status,
+        proposedBy: p.proposed_by,
+        title: (p.summary && p.summary.title) || p.action_type,
+        createdAt: p.created_at,
+        decidedAt: p.decided_at,
+        executedAt: p.executed_at,
+      })),
+    });
+  } catch (error) {
+    console.error('Care Agent decisions error:', error.message);
+    res.status(500).json({ error: 'Failed to load what the agent did' });
   }
 });
 

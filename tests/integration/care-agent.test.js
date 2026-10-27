@@ -93,6 +93,18 @@ describe('Care Agent routes require authentication', () => {
     const res = await request(app).get(`/api/care-agent/sessions/${sessionId}/manage`);
     expect(res.status).toBe(401);
   });
+
+  // v1.18.0 value-chain routes
+  test.each([
+    ['get', 'account'],
+    ['post', 'actions'],
+    ['post', 'actions/prop-1/confirm'],
+    ['post', 'actions/prop-1/decline'],
+    ['get', 'decisions'],
+  ])('%s /api/care-agent/sessions/:id/%s returns 401 without a token', async (method, suffix) => {
+    const res = await request(app)[method](`/api/care-agent/sessions/${sessionId}/${suffix}`);
+    expect(res.status).toBe(401);
+  });
 });
 
 // ─────────────────────────────────────────────
@@ -413,7 +425,9 @@ describe('GET /api/care-agent/sessions/:id/manage', () => {
   test('reports the next scheduled payment when one exists', async () => {
     setupAuthMock([
       { rows: [careAgentSessionRow()], rowCount: 1 },
-      { rows: [{ amount: 2910, due_date: '2026-10-25' }], rowCount: 1 }
+      // loan_repayments' real columns (v1.18.0 fix: these were amount/due_date,
+      // which the table does not have)
+      { rows: [{ scheduled_amount: 2910, scheduled_date: '2026-10-25' }], rowCount: 1 }
     ]);
 
     const res = await request(app)

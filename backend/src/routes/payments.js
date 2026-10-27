@@ -4,6 +4,9 @@ const { query, transaction } = require('../config/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth.middleware');
 const { logSecurityEvent } = require('../services/security.service');
 const { calculateLateFee } = require('../services/fee.service');
+const { createPlanPaymentService } = require('../services/plan-payment.service');
+
+const planPaymentService = createPlanPaymentService({ query, transaction });
 
 // Get all payment plans for user
 router.get('/plans', authenticateToken, async (req, res) => {
@@ -112,112 +115,24 @@ router.get('/history', authenticateToken, async (req, res) => {
 router.post('/:payment_id/pay', authenticateToken, async (req, res) => {
   try {
     const { payment_id } = req.params;
-    const { amount, payment_method } = req.body;
+    const { payment_method } = req.body;
 
-    // Get payment details
-    const paymentCheck = await query(
-      `SELECT p.*, pp.plan_id, pp.total_paid, pp.payments_made
-       FROM payments p
-       JOIN payment_plans pp ON p.plan_id = pp.plan_id
-       WHERE p.payment_id = $1 AND p.user_id = $2`,
-      [payment_id, req.user.userId]
-    );
-
-    if (paymentCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Payment not found' });
-    }
-
-    const payment = paymentCheck.rows[0];
-
-    if (payment.status === 'paid') {
-      return res.status(400).json({ error: 'Payment already completed' });
-    }
-
-    // Calculate late fee if the payment is overdue (5% per month, no base interest)
-    const daysOverdue = payment.due_date
-      ? Math.max(0, Math.floor((Date.now() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24)))
-      : 0;
-    const feeCalc = calculateLateFee(parseFloat(payment.amount), daysOverdue);
-    const totalAmountDue = feeCalc.total_due;
-    const lateFeeAmount = feeCalc.late_fee_amount;
-
-    // Process payment in transaction
-    const result = await transaction(async (client) => {
-      // Update payment status and record late fee
-      await client.query(
-        `UPDATE payments
-         SET status = 'paid',
-             payment_date = CURRENT_TIMESTAMP,
-             debit_order_status = 'successful',
-             late_fee = $2
-         WHERE payment_id = $1`,
-        [payment_id, lateFeeAmount]
-      );
-
-      // Update payment plan — credit the full amount collected (including late fee)
-      await client.query(
-        `UPDATE payment_plans
-         SET payments_made = payments_made + 1,
-             total_paid = total_paid + $1,
-             outstanding_balance = outstanding_balance - $2,
-             status = CASE
-               WHEN payments_made + 1 >= number_of_payments THEN 'completed'
-               ELSE 'active'
-             END,
-             completion_date = CASE
-               WHEN payments_made + 1 >= number_of_payments THEN CURRENT_DATE
-               ELSE NULL
-             END
-         WHERE plan_id = $3`,
-        [totalAmountDue, parseFloat(payment.amount), payment.plan_id]
-      );
-
-      // Create transaction record for the base payment
-      const txn = await client.query(
-        `INSERT INTO transactions (
-          payment_id, user_id, transaction_type, amount,
-          status, description
-        ) VALUES ($1, $2, $3, $4, 'completed', $5)
-        RETURNING *`,
-        [
-          payment_id,
-          req.user.userId,
-          payment_method || 'manual_payment',
-          parseFloat(payment.amount),
-          `Payment ${payment.payment_number} of ${payment.plan_id}`
-        ]
-      );
-
-      // Record late fee as a separate transaction line if applicable
-      if (lateFeeAmount > 0) {
-        await client.query(
-          `INSERT INTO transactions (
-            payment_id, user_id, transaction_type, amount,
-            status, description
-          ) VALUES ($1, $2, 'fee', $3, 'completed', $4)`,
-          [
-            payment_id,
-            req.user.userId,
-            lateFeeAmount,
-            `Late payment fee — ${feeCalc.months_late} month(s) overdue (5% per month)`
-          ]
-        );
-      }
-
-      return txn.rows[0];
+    // Shared with the Care Agent's MAKE_PAYMENT action: one code path for money.
+    const result = await planPaymentService.processPayment({
+      paymentId: payment_id,
+      userId: req.user.userId,
+      paymentMethod: payment_method
     });
 
     res.json({
       message: 'Payment processed successfully',
-      transaction: result,
-      late_fee: lateFeeAmount > 0 ? {
-        months_late: feeCalc.months_late,
-        late_fee_amount: lateFeeAmount,
-        total_collected: totalAmountDue,
-        policy: '5% per overdue month — no interest on payments made on time'
-      } : null
+      transaction: result.transaction,
+      late_fee: result.lateFee
     });
   } catch (error) {
+    if (error.statusCode === 404 || error.statusCode === 400) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
     console.error('Payment processing error:', error);
     res.status(500).json({ error: 'Failed to process payment' });
   }

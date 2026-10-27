@@ -261,6 +261,51 @@
 
         #manage-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 
+        /* ── Value chain (v1.18.0) ──────────────────────────────────────── */
+        #journey-tracker { margin-bottom: 20px; }
+        #journey-tracker ol { list-style: none; display: flex; gap: 4px; }
+        #journey-tracker li { flex: 1; height: 5px; border-radius: 3px; background: #EEE; }
+        #journey-tracker li.done { background: #E01E37; }
+        #journey-tracker li.current { background: #E01E37; opacity: 0.45; }
+        #journey-label { display: flex; justify-content: space-between; font-size: 12px; color: #777; margin-top: 6px; }
+
+        .agent-decision {
+            border: 1px dashed #0E7C86;
+            background: #E3F4F5;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .agent-decision .code { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: #0E7C86; text-transform: uppercase; margin-bottom: 2px; }
+
+        .action-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F3F3; flex-wrap: wrap; }
+        .action-row:last-child { border-bottom: none; }
+        .action-row .action-btn { background: none; border: none; padding: 0; font-size: 15px; color: #1A1A1A; cursor: pointer; text-align: left; }
+        .action-row .action-btn:hover { color: #E01E37; }
+
+        .badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+        .card-actions .badge { align-self: center; }
+        .badge-autonomous { color: #0E7C86; background: #E3F4F5; }
+        .badge-patient_consent { color: #B5162B; background: #FCE8EB; }
+        .badge-human_review { color: #8A4B00; background: #FBF0DF; }
+        .badge-prohibited { color: #4B5563; background: #ECEEF1; }
+
+        .proposal-line { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #F3F3F3; }
+        .proposal-line span:first-child { color: #777; }
+        .proposal-effect { font-size: 13px; color: #555; margin: 10px 0; }
+        .form-field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; margin-bottom: 10px; }
+        .form-field input { border: 1px solid #DDD; border-radius: 8px; padding: 8px 10px; font-size: 14px; }
+        .offer-row { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #F3F3F3; }
+
+        #decision-log ol { list-style: none; }
+        #decision-log li { display: flex; gap: 10px; align-items: baseline; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #F3F3F3; }
+        #decision-log time { color: #999; font-size: 12px; flex-shrink: 0; }
+        .tier-Agent { color: #0E7C86; background: #E3F4F5; }
+        .tier-You { color: #B5162B; background: #FCE8EB; }
+        .tier-Team { color: #8A4B00; background: #FBF0DF; }
+        .tier-Blocked, .tier-PaySick { color: #4B5563; background: #ECEEF1; }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -286,6 +331,36 @@
         </div>
 
         <div id="app" class="hidden">
+            <!-- The ten steps of the patient value chain; filled from the
+                 account's journey stage (care-agent-actions.service.js). -->
+            <nav id="journey-tracker" aria-label="Where you are">
+                <ol>
+                    <li data-stage="ask" title="Ask"></li>
+                    <li data-stage="understand" title="Understand"></li>
+                    <li data-stage="plan" title="Plan"></li>
+                    <li data-stage="apply" title="Apply"></li>
+                    <li data-stage="choose_offer" title="Choose funder"></li>
+                    <li data-stage="treatment" title="Treatment"></li>
+                    <li data-stage="repay" title="Repay"></li>
+                    <li data-stage="change" title="Change"></li>
+                    <li data-stage="recover" title="Recover"></li>
+                    <li data-stage="close" title="Close"></li>
+                </ol>
+                <div id="journey-label"><span>Ask</span><span id="journey-current"></span><span>Close</span></div>
+            </nav>
+
+            <!-- Account home: the agent's decisions and what the patient can
+                 do next, each badged with who is allowed to do it. -->
+            <div id="account-card" class="card hidden">
+                <h3>Your account</h3>
+                <div id="account-decisions"></div>
+                <div id="account-offers"></div>
+                <div id="account-actions"></div>
+                <div class="card-actions">
+                    <button class="secondary-btn" id="decision-log-btn">What the agent did</button>
+                </div>
+            </div>
+
             <div id="chat-log"></div>
             <div id="suggested-prompts"></div>
 
@@ -300,6 +375,15 @@
             <div id="summary-card" class="card hidden">
                 <h3>Your care request</h3>
                 <div id="summary-fields"></div>
+                <div class="summary-row">
+                    <label for="summary-income">Monthly income before deductions (R), optional</label>
+                    <input id="summary-income" type="number" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <div class="summary-row">
+                    <label for="summary-obligations">Monthly debt repayments (R), optional</label>
+                    <input id="summary-obligations" type="number" step="0.01" min="0" inputmode="decimal">
+                </div>
+                <p style="font-size:12px;color:#777;margin-top:6px;">Adding your income lets PaySick check affordability now, with the same check every application gets.</p>
                 <p id="shortfall-line" class="summary-row hidden" style="border:none;"></p>
                 <div class="card-actions">
                     <button class="primary-btn" id="confirm-summary-btn">Confirm</button>
@@ -341,6 +425,14 @@
                 </div>
             </div>
 
+            <!-- Proposal cards and detail forms for account actions. -->
+            <div id="action-area"></div>
+
+            <div id="decision-log" class="card hidden">
+                <h3>What the agent did</h3>
+                <ol id="decision-log-list"></ol>
+            </div>
+
             <div id="composer">
                 <label id="upload-label" for="file-input">Attach<input id="file-input" type="file" accept=".pdf,.jpg,.jpeg,.png"></label>
                 <input type="text" id="message-input" placeholder="Tell us what's happening. You can describe the treatment, upload a quote, or explain the bill you're dealing with.">
@@ -368,7 +460,21 @@
             readyToConfirm: false,
             options: [],
             selectedTermMonths: null,
-            procedureOptions: []
+            procedureOptions: [],
+            journeyStage: 'ask'
+        };
+
+        const JOURNEY_STAGES = ['ask', 'understand', 'plan', 'apply', 'choose_offer', 'treatment', 'repay', 'change', 'recover', 'close'];
+        const STAGE_NAMES = {
+            ask: 'Ask', understand: 'Understand', plan: 'Plan', apply: 'Apply', choose_offer: 'Choose funder',
+            treatment: 'Treatment', repay: 'Repay', change: 'Change', recover: 'Recover', close: 'Close'
+        };
+        // Fallback labels; the API sends authorityLabel with every action.
+        const AUTHORITY_LABELS = {
+            autonomous: 'Agent does it',
+            patient_consent: 'You approve',
+            human_review: 'Team decides',
+            prohibited: 'Not in chat'
         };
 
         function formatRands(cents) {
@@ -497,6 +603,7 @@
 
             const started = await startConversation();
             if (!started) return;
+            loadAccount();
 
             // A query typed into the homepage's search bar arrives as ?q= and
             // is sent as the first message, as if the patient had typed it.
@@ -546,6 +653,11 @@
                     document.getElementById('suggested-prompts').classList.add('hidden');
                     renderSummaryCard();
                 }
+
+                // Account actions the agent prepared this turn. None of them
+                // has done anything yet, except read-only ones.
+                handleActionResults(res.proposals);
+                if (res.suggestedAction) renderActionForm(res.suggestedAction);
             } catch (err) {
                 addBubble('system', "I couldn't process that just now. Please try again.");
             }
@@ -605,8 +717,14 @@
                 }
             });
 
+            // Optional: lets Shield Gate 2 assess affordability now and at submission.
+            const incomeValue = document.getElementById('summary-income').value;
+            const obligationsValue = document.getElementById('summary-obligations').value;
+            const monthlyIncome = incomeValue !== '' && parseFloat(incomeValue) >= 0 ? parseFloat(incomeValue) : undefined;
+            const monthlyObligations = monthlyIncome !== undefined && obligationsValue !== '' ? parseFloat(obligationsValue) || 0 : undefined;
+
             try {
-                const res = await PaySickAPI.careAgent.confirmSummary(state.sessionId, { summary: edits });
+                const res = await PaySickAPI.careAgent.confirmSummary(state.sessionId, { summary: edits, monthlyIncome, monthlyObligations });
                 state.summary = res.summary;
                 state.options = res.options;
                 document.getElementById('summary-card').classList.add('hidden');
@@ -672,7 +790,20 @@
                 // Execution stays on the existing, unmodified marketplace
                 // endpoint - the Care Agent only prepared this payload.
                 const marketplaceRes = await PaySickAPI.marketplace.submitApplication(approveRes.applicationPayload);
+
+                // A Shield decline comes back as a 200 with no applicationId.
+                // It is an assessed decision, so say so rather than "try again".
+                if (marketplaceRes.shield_declined) {
+                    document.getElementById('approve-card').classList.add('hidden');
+                    addBubble('agent', "PaySick's affordability check couldn't approve this plan right now, based on what you've shared. This is a decision, not an error. A longer term may bring the monthly amount down, or you're welcome to talk to the PaySick team about your options.");
+                    return;
+                }
+
                 const applicationId = marketplaceRes.applicationId;
+                if (!applicationId) {
+                    addBubble('system', "I couldn't submit that just now. Please try again, or use the traditional PaySick application.");
+                    return;
+                }
 
                 await PaySickAPI.careAgent.recordExecution(state.sessionId, applicationId);
 
@@ -680,6 +811,7 @@
                 document.getElementById('options-card').classList.add('hidden');
                 addBubble('agent', `Done! Your request has been submitted (reference ${applicationId}). I'll stay here if you need anything else about this plan.`);
                 document.getElementById('manage-card').classList.remove('hidden');
+                loadAccount();
             } catch (err) {
                 addBubble('system', "I couldn't submit that just now. Please try again, or use the traditional PaySick application.");
             }
@@ -694,13 +826,302 @@
             }
         }
 
-        async function requestPaymentDateChange() {
-            const reason = window.prompt('What would you like your new payment date to work around? (optional)') || '';
+        // The date change is a team decision: collect the details in the
+        // page, then the patient sends it (window.prompt can't be relied on).
+        function requestPaymentDateChange() {
+            renderActionForm({
+                actionType: 'REQUEST_PAYMENT_DATE_CHANGE',
+                label: 'Move my payment date',
+                authority: 'human_review',
+                params: {},
+                inputs: [
+                    { name: 'preferredDay', type: 'day', label: 'New day of the month (1 to 28)' },
+                    { name: 'reason', type: 'text', label: 'Anything the team should know?', optional: true }
+                ]
+            });
+        }
+
+        // ── Value chain (v1.18.0) ─────────────────────────────────────────
+        // The agent reads and recommends on its own; anything that writes
+        // needs the patient's tap; anything that changes terms goes to a
+        // person. The tier on every action comes from the server's registry.
+
+        function scrollToEnd() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function authorityBadge(authority, label) {
+            return el('span', `badge badge-${authority}`, label || AUTHORITY_LABELS[authority] || authority);
+        }
+
+        // Only ever link to a page on this site (the server's registry sets
+        // redirects, but the page never trusts that blindly).
+        function safeRedirect(target) {
+            return typeof target === 'string' && /^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/i.test(target) ? target : null;
+        }
+
+        function renderJourney(stage) {
+            state.journeyStage = stage || 'ask';
+            const index = JOURNEY_STAGES.indexOf(state.journeyStage);
+            document.querySelectorAll('#journey-tracker li').forEach((step) => {
+                const stepIndex = JOURNEY_STAGES.indexOf(step.dataset.stage);
+                step.classList.toggle('done', stepIndex < index);
+                step.classList.toggle('current', stepIndex === index);
+            });
+            document.getElementById('journey-current').textContent = `${STAGE_NAMES[state.journeyStage] || ''} · step ${index + 1} of ${JOURNEY_STAGES.length}`;
+        }
+
+        async function loadAccount() {
+            if (!state.sessionId) return;
             try {
-                const res = await PaySickAPI.careAgent.requestPaymentDateChange(state.sessionId, reason);
-                addBubble('agent', res.reply);
+                const account = await PaySickAPI.careAgent.getAccount(state.sessionId);
+                renderJourney(account.journeyStage);
+                renderAccount(account);
             } catch (err) {
-                addBubble('system', "I couldn't log that request just now.");
+                // The conversation still works without the account view.
+            }
+        }
+
+        function renderAccount(account) {
+            const card = document.getElementById('account-card');
+            if (!account || account.journeyStage === 'ask') {
+                card.classList.add('hidden');
+                return;
+            }
+
+            const decisions = document.getElementById('account-decisions');
+            decisions.innerHTML = '';
+            (account.decisions || []).forEach((decision) => {
+                const box = el('div', 'agent-decision');
+                box.appendChild(el('span', 'code', `Agent decision · ${decision.reasonCode}`));
+                box.appendChild(document.createTextNode(decision.rationale));
+                decisions.appendChild(box);
+            });
+
+            const offers = document.getElementById('account-offers');
+            offers.innerHTML = '';
+            (account.rankedOffers || []).forEach((offer) => {
+                const row = el('div', 'offer-row');
+                row.appendChild(el('span', null, `${offer.lenderName} · ${formatRands(offer.monthlyPaymentCents)}/month · ${offer.termMonths} months`));
+                const right = el('span', null, `${formatRands(offer.totalRepayableCents)} total`);
+                if (offer.recommended) right.appendChild(authorityBadge('autonomous', 'Lowest'));
+                row.appendChild(right);
+                offers.appendChild(row);
+            });
+
+            const actions = document.getElementById('account-actions');
+            actions.innerHTML = '';
+            (account.actions || []).forEach((action) => {
+                const row = el('div', 'action-row');
+                const button = el('button', 'action-btn', action.label);
+                button.addEventListener('click', () => startAction(action));
+                row.appendChild(button);
+                row.appendChild(authorityBadge(action.authority, action.authorityLabel));
+                actions.appendChild(row);
+            });
+
+            card.classList.remove('hidden');
+        }
+
+        // A tapped action: ask for details first if it needs them, else
+        // prepare it straight away.
+        function startAction(action) {
+            if (action.actionType === 'START_CARE_REQUEST') {
+                document.getElementById('message-input').focus();
+                return;
+            }
+            const needsInput = (action.inputs || []).some((input) => !input.optional);
+            if (needsInput) {
+                renderActionForm(action);
+            } else {
+                proposeAction(action.actionType, action.params || {});
+            }
+        }
+
+        async function proposeAction(actionType, params) {
+            try {
+                const res = await PaySickAPI.careAgent.proposeAction(state.sessionId, actionType, params);
+                handleActionResults([res]);
+            } catch (err) {
+                addBubble('system', (err && err.message) || "I couldn't prepare that just now.");
+            }
+        }
+
+        function handleActionResults(results) {
+            (results || []).forEach((result) => {
+                if (!result) return;
+                if (result.status === 'awaiting_consent') {
+                    renderProposal(result);
+                } else if (result.status === 'executed') {
+                    renderReadResult(result);
+                } else if (result.status === 'refused') {
+                    addBubble('system', result.message || "I can't do that here.");
+                    const target = safeRedirect(result.redirect);
+                    if (target) {
+                        const link = el('a', 'prompt-chip', 'Go to the secure page');
+                        link.href = target;
+                        document.getElementById('chat-log').appendChild(link);
+                    }
+                }
+            });
+        }
+
+        // What a read-only action found. The agent did this on its own.
+        function renderReadResult(result) {
+            const data = result.result || {};
+            if (data.rankedOffers) {
+                if (!data.rankedOffers.length) {
+                    addBubble('agent', "There aren't any offers waiting right now.");
+                    return;
+                }
+                addBubble('agent', "Here are your offers, in order of what you'd repay in total.");
+                loadAccount();
+            } else if (data.decisions && data.decisions[0]) {
+                addBubble('agent', data.decisions[0].rationale);
+                const next = (data.instalments || [])[0];
+                if (next) addBubble('agent', `Next instalment: ${formatRands(next.amountCents)} due ${next.dueDate}.`);
+            } else if (data.explanation) {
+                addBubble('agent', data.explanation);
+            }
+        }
+
+        // A proposal the patient must confirm. Shows what will change, and
+        // needs its own consent box ticked; the server re-checks it against
+        // live figures before doing anything.
+        function renderProposal(proposal) {
+            const area = document.getElementById('action-area');
+            const card = el('div', 'card');
+            card.appendChild(el('h3', null, (proposal.summary && proposal.summary.title) || proposal.actionType));
+            ((proposal.summary && proposal.summary.lines) || []).forEach((line) => {
+                const row = el('div', 'proposal-line');
+                row.appendChild(el('span', null, line.label));
+                row.appendChild(el('strong', null, line.value));
+                card.appendChild(row);
+            });
+            if (proposal.effect) card.appendChild(el('p', 'proposal-effect', `Will change: ${proposal.effect}`));
+
+            const consentRow = el('label', 'consent-row');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            consentRow.appendChild(checkbox);
+            consentRow.appendChild(el('span', null, proposal.consentText || 'I agree.'));
+            card.appendChild(consentRow);
+
+            const actions = el('div', 'card-actions');
+            const confirmBtn = el('button', 'primary-btn', proposal.authority === 'human_review' ? 'Send request' : 'Confirm');
+            const declineBtn = el('button', 'secondary-btn', 'Not now');
+            actions.appendChild(confirmBtn);
+            actions.appendChild(declineBtn);
+            actions.appendChild(authorityBadge(proposal.authority, proposal.authorityLabel));
+            card.appendChild(actions);
+
+            confirmBtn.addEventListener('click', async () => {
+                if (!checkbox.checked) {
+                    addBubble('system', 'Please tick the box to confirm you agree.');
+                    return;
+                }
+                confirmBtn.disabled = true;
+                declineBtn.disabled = true;
+                try {
+                    const res = await PaySickAPI.careAgent.confirmAction(state.sessionId, proposal.proposalId);
+                    card.remove();
+                    addBubble('agent', res.message);
+                } catch (err) {
+                    card.remove();
+                    addBubble('system', (err && err.message) || "I couldn't complete that just now. Nothing was changed.");
+                }
+                loadAccount();
+            });
+
+            declineBtn.addEventListener('click', async () => {
+                confirmBtn.disabled = true;
+                declineBtn.disabled = true;
+                try {
+                    await PaySickAPI.careAgent.declineAction(state.sessionId, proposal.proposalId);
+                } catch (err) {
+                    // Nothing was going to happen without a confirm anyway.
+                }
+                card.remove();
+                addBubble('agent', "No problem, I haven't done anything.");
+            });
+
+            area.appendChild(card);
+            scrollToEnd();
+        }
+
+        // Collects the details an action needs (a date, a day, a term), then
+        // prepares it. Never asks for an amount owed: PaySick supplies those.
+        function renderActionForm(action) {
+            const area = document.getElementById('action-area');
+            const card = el('div', 'card');
+            card.appendChild(el('h3', null, action.label));
+            const fields = [];
+            (action.inputs || []).forEach((input, index) => {
+                const field = el('label', 'form-field');
+                field.appendChild(el('span', null, input.label + (input.optional ? ' (optional)' : '')));
+                const control = document.createElement('input');
+                control.id = `action-input-${action.actionType}-${index}`;
+                if (input.type === 'day') { control.type = 'number'; control.min = '1'; control.max = '28'; }
+                else if (input.type === 'months') { control.type = 'number'; control.min = '1'; control.max = '24'; }
+                else if (input.type === 'date') { control.type = 'date'; }
+                else if (input.type === 'rands') { control.type = 'number'; control.step = '0.01'; control.min = '0'; }
+                else { control.type = 'text'; control.maxLength = 500; }
+                field.appendChild(control);
+                card.appendChild(field);
+                fields.push({ input, control });
+            });
+
+            const actions = el('div', 'card-actions');
+            const next = el('button', 'primary-btn', 'Prepare');
+            const cancel = el('button', 'secondary-btn', 'Cancel');
+            actions.appendChild(next);
+            actions.appendChild(cancel);
+            actions.appendChild(authorityBadge(action.authority, action.authorityLabel));
+            card.appendChild(actions);
+
+            next.addEventListener('click', () => {
+                const params = { ...(action.params || {}) };
+                for (const { input, control } of fields) {
+                    const value = control.value.trim();
+                    if (!value) {
+                        if (!input.optional) {
+                            addBubble('system', `Please fill in: ${input.label}.`);
+                            return;
+                        }
+                        continue;
+                    }
+                    if (input.type === 'day' || input.type === 'months') params[input.name] = parseInt(value, 10);
+                    else if (input.type === 'rands') params[input.name] = Math.round(parseFloat(value) * 100);
+                    else params[input.name] = value;
+                }
+                card.remove();
+                proposeAction(action.actionType, params);
+            });
+            cancel.addEventListener('click', () => card.remove());
+
+            area.appendChild(card);
+            scrollToEnd();
+        }
+
+        async function showDecisionLog() {
+            const panel = document.getElementById('decision-log');
+            const list = document.getElementById('decision-log-list');
+            list.innerHTML = '';
+            try {
+                const res = await PaySickAPI.careAgent.getDecisions(state.sessionId);
+                (res.timeline || []).forEach((line) => {
+                    const item = el('li');
+                    const at = new Date(line.at);
+                    item.appendChild(el('time', null, Number.isNaN(at.getTime()) ? '' : at.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })));
+                    item.appendChild(el('span', `badge tier-${line.tier}`, line.tier));
+                    item.appendChild(el('span', null, line.text));
+                    list.appendChild(item);
+                });
+                if (!list.children.length) list.appendChild(el('li', null, 'Nothing yet.'));
+                panel.classList.remove('hidden');
+                panel.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                addBubble('system', "I couldn't load that just now.");
             }
         }
 
@@ -784,6 +1205,7 @@
         document.getElementById('approve-btn').addEventListener('click', approveAndExecute);
         document.getElementById('next-payment-btn').addEventListener('click', showNextPayment);
         document.getElementById('change-date-btn').addEventListener('click', requestPaymentDateChange);
+        document.getElementById('decision-log-btn').addEventListener('click', showDecisionLog);
 
         init();
     </script>

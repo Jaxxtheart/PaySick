@@ -63,6 +63,12 @@ const {
 const { PROCEDURE_CATEGORIES } = require('./care-agent-nlp.service');
 const { toCents } = require('../utils/money');
 const { DEFAULT_MODEL, callAnthropicMessages } = require('./care-agent-anthropic-client');
+const {
+  AUTHORITY,
+  ACTION_REGISTRY,
+  decideNextBestActions,
+  evaluateProposal,
+} = require('./care-agent-actions.service');
 
 // Hard cap on tool-call round trips within a single patient message. Bounds
 // latency/cost and guarantees the loop can never run forever even if the
@@ -143,6 +149,32 @@ const CARE_AGENT_TOOLS = [
       },
     },
   },
+  {
+    name: 'get_account_overview',
+    description:
+      "Read the patient's existing PaySick account: where they are in their journey, PaySick's own decisions about what they can do next (with reason codes), their unpaid instalments, funder offers, and any requests already with the PaySick team. Read-only. Call it whenever the patient asks about a plan, a payment, an offer, or anything after their application. Takes no input.",
+    input_schema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'propose_account_action',
+    description:
+      "Prepare an account action for the patient to review and confirm themselves, for example paying an instalment, accepting an offer, promising to pay by a date, or sending a request (date change, restructure, hardship, dispute) to the PaySick team. This only prepares a card; it never does the action. PaySick fills in every amount itself. Use ids from get_account_overview. A refusal comes back with a reason; explain it plainly and, if there is a redirect, send the patient there.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        actionType: {
+          type: 'string',
+          enum: Object.keys(ACTION_REGISTRY),
+          description: 'The action to prepare.',
+        },
+        params: {
+          type: 'object',
+          description: 'paymentId, offerId, promisedDate (YYYY-MM-DD), preferredDay (1-28), newTermMonths, or reason, as the action needs. Never amounts.',
+        },
+      },
+      required: ['actionType'],
+    },
+  },
 ];
 
 const SYSTEM_PROMPT = `You are the PaySick Care Agent, a warm and direct conversational guide helping a
@@ -178,7 +210,20 @@ HARD RULES, never violate:
   lend, borrow, interest, APR, debt, or default. This is a payment plan, not
   a loan.
 - Warm, plain, concise, normally one to three sentences. No hype, no emojis,
-  no markdown, no em dashes.`;
+  no markdown, no em dashes.
+
+EXISTING ACCOUNTS (plans, payments, offers, requests):
+- Call get_account_overview before answering anything about an existing
+  plan, payment, offer or request. Report only what it returns.
+- To help the patient act, call propose_account_action. It only prepares a
+  card the patient confirms themselves, or a request the PaySick team
+  decides. Never say a payment is done, paid, accepted, promised, moved or
+  approved: say you have prepared it for them to check below.
+- Never ask for or repeat banking details. Banking changes happen only in
+  the secure banking form; if they come up, propose UPDATE_BANKING_DETAILS so
+  the patient is sent there.
+- If a missed payment comes up, be kind and practical. Medical patients are
+  not defaulters; the aim is getting back on track.`;
 
 /**
  * Builds the per-turn system prompt: the fixed hard rules, the current
@@ -189,7 +234,7 @@ HARD RULES, never violate:
  * @param {object} summary current structured_summary for the session
  * @returns {string}
  */
-function buildSystemPrompt(summary) {
+function buildSystemPrompt(summary, account) {
   const safeSummary = summary || {};
   const known = {};
   for (const field of KNOWN_SUMMARY_FIELDS) {
@@ -207,7 +252,9 @@ ${categoryList}
 Already recorded for this conversation (do not ask for these again): ${
     Object.keys(known).length ? JSON.stringify(known) : '(nothing recorded yet)'
   }
-Still missing: ${missing.length ? missing.join(', ') : '(nothing -- everything required is known)'}`;
+Still missing: ${missing.length ? missing.join(', ') : '(nothing -- everything required is known)'}${
+    account ? `\nAccount journey stage: ${decideNextBestActions(account).journeyStage}` : ''
+  }`;
 }
 
 function sanitizeAmountCents(value) {
@@ -226,12 +273,14 @@ function sanitizeAmountCents(value) {
  *
  * @param {string} name
  * @param {object} input
- * @param {{ summary: object }} context current session's structured_summary
- * @returns {{ ok: boolean, result: object, summaryPatch?: object }}
+ * @param {{ summary: object, account?: object }} context current session's
+ *   structured_summary and, when loaded, the patient's account snapshot
+ * @returns {{ ok: boolean, result: object, summaryPatch?: object, proposalDraft?: object }}
  */
 function executeTool(name, input, context) {
   const safeInput = input && typeof input === 'object' ? input : {};
   const summary = (context && context.summary) || {};
+  const account = (context && context.account) || null;
 
   switch (name) {
     case 'update_care_summary': {
@@ -324,6 +373,52 @@ function executeTool(name, input, context) {
       return { ok: true, result: { shortfallCents, options } };
     }
 
+    case 'get_account_overview': {
+      if (!account) return { ok: false, result: { error: 'No account data is available for this patient right now.' } };
+      const decided = decideNextBestActions(account);
+      return {
+        ok: true,
+        result: {
+          journeyStage: decided.journeyStage,
+          decisions: decided.decisions,
+          suggestedActions: decided.actions,
+          rankedOffers: decided.rankedOffers,
+          plans: account.plans,
+          instalments: account.instalments,
+          funderPlans: account.funderPlans || [],
+          openRequests: account.openRequests || [],
+        },
+      };
+    }
+
+    // Drafts only. The route stores a draft as an awaiting_consent proposal;
+    // confirming it is a separate HTTP call only the patient can make, and
+    // nothing in this file can reach it.
+    case 'propose_account_action': {
+      if (!account) return { ok: false, result: { error: 'No account data is available for this patient right now.' } };
+      const params = safeInput.params && typeof safeInput.params === 'object' ? safeInput.params : {};
+      const evaluation = evaluateProposal(safeInput.actionType, params, account);
+      if (!evaluation.ok) {
+        return { ok: false, result: { reason: evaluation.reason, message: evaluation.message, redirect: evaluation.redirect || null } };
+      }
+      if (evaluation.authority === AUTHORITY.AUTONOMOUS) {
+        return { ok: true, result: { authority: evaluation.authority, note: 'This is read-only; use get_account_overview for it.' } };
+      }
+      return {
+        ok: true,
+        proposalDraft: { actionType: safeInput.actionType, params },
+        result: {
+          authority: evaluation.authority,
+          summary: evaluation.summary,
+          consentText: evaluation.consentText,
+          effect: evaluation.effect,
+          note: evaluation.authority === AUTHORITY.HUMAN_REVIEW
+            ? 'Prepared as a request card. Nothing has happened yet: the patient sends it, then the PaySick team decides.'
+            : 'Prepared as a card for the patient to confirm. Nothing has happened yet.',
+        },
+      };
+    }
+
     default:
       return { ok: false, result: { error: `Unknown tool: ${name}` } };
   }
@@ -341,17 +436,19 @@ function executeTool(name, input, context) {
  * @param {object} params.summary current structured_summary for the session
  * @param {Array<{role: 'user'|'assistant', content: string}>} params.history prior turns
  * @param {string} params.userMessage the patient's new message
+ * @param {object} [params.account] the patient's account snapshot, if loaded
  * @param {function} [params.fetchImpl] injectable fetch (for tests)
- * @returns {Promise<{ reply: string, summary: object, toolCalls: object[], hitIterationCap: boolean }>}
+ * @returns {Promise<{ reply: string, summary: object, toolCalls: object[], proposalDrafts: object[], hitIterationCap: boolean }>}
  */
-async function runCareAgentTurn({ summary, history, userMessage, fetchImpl }) {
+async function runCareAgentTurn({ summary, history, userMessage, account, fetchImpl }) {
   let workingSummary = { ...(summary || {}) };
   const messages = [...(history || []), { role: 'user', content: userMessage }];
   const toolCalls = [];
+  const proposalDrafts = [];
 
   for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration += 1) {
     const data = await callAnthropicMessages({
-      system: buildSystemPrompt(workingSummary),
+      system: buildSystemPrompt(workingSummary, account),
       tools: CARE_AGENT_TOOLS,
       messages,
       fetchImpl,
@@ -379,6 +476,7 @@ async function runCareAgentTurn({ summary, history, userMessage, fetchImpl }) {
         reply: text,
         summary: workingSummary,
         toolCalls,
+        proposalDrafts,
         hitIterationCap: false,
       };
     }
@@ -387,10 +485,11 @@ async function runCareAgentTurn({ summary, history, userMessage, fetchImpl }) {
 
     const toolResults = [];
     for (const block of toolUseBlocks) {
-      const outcome = executeTool(block.name, block.input, { summary: workingSummary });
+      const outcome = executeTool(block.name, block.input, { summary: workingSummary, account });
       if (outcome.summaryPatch) {
         workingSummary = mergeCareSummary(workingSummary, outcome.summaryPatch);
       }
+      if (outcome.proposalDraft) proposalDrafts.push(outcome.proposalDraft);
       toolCalls.push({ name: block.name, input: block.input, result: outcome.result, ok: outcome.ok });
       toolResults.push({
         type: 'tool_result',
@@ -406,6 +505,7 @@ async function runCareAgentTurn({ summary, history, userMessage, fetchImpl }) {
     reply: FALLBACK_ITERATION_CAP_REPLY,
     summary: workingSummary,
     toolCalls,
+    proposalDrafts,
     hitIterationCap: true,
   };
 }

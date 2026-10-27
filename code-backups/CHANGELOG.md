@@ -6,6 +6,49 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.18.0] — 2026-10-27
+
+**Type**: MINOR — Care Agent workflows across the whole patient value chain
+
+### Added
+- Governed action layer for the Care Agent after the first conversation:
+  choose a funder, pay an instalment, promise to pay, and send requests to
+  the team (date change, restructure, hardship, dispute, plan adjustment,
+  cancellation).
+- Four authority tiers, fixed in a frozen registry: Agent does it, You
+  approve, Team decides, Not in chat.
+- Decision rules with reason codes, using the Recovery Engine's thresholds,
+  written to the audit log and shown to the patient.
+- Proposals (`care_agent_action_proposals`, migration 013). Confirming needs
+  consent, makes an atomic claim, expires after 30 minutes and re-checks
+  live data, refusing if the amount changed.
+- Backend updates through existing services: `acceptOffer`, a new shared
+  `plan-payment.service.js` (moved from `routes/payments.js`),
+  `promise_to_pay`/`collection_actions`, `manual_review_queue`, and in-app
+  notifications.
+- LLM tools `get_account_overview` (read) and `propose_account_action`
+  (draft only).
+- Five new authenticated routes and matching `PaySickAPI.careAgent` methods.
+- `care-agent.html`:
+  - journey bar
+  - account home
+  - proposal cards
+  - detail forms (no more `window.prompt`)
+  - income fields
+  - "What the agent did" log
+- `CARE_AGENT_WORKFLOW_PLAN.md`.
+
+### Fixed
+- `/manage` queried columns `loan_repayments` does not have.
+- Income never reached Shield Gate 2 on Care Agent submissions.
+- A Shield decline was shown as a failed submission.
+
+### Security review
+- `careAgentActionLimiter`: 15 confirms per 15 minutes.
+- Blocklist: `Meta-ExternalFetcher`, `FirecrawlAgent`, `Google-NotebookLM`.
+
+---
+
 ## [v1.17.1] — 2026-10-26
 
 **Type**: PATCH — homepage visual design

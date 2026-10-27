@@ -218,9 +218,25 @@ const careAgentLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// v1.18.0 review: confirming a Care Agent action can move money (pay an
+// instalment, accept an offer), so it gets its own bucket on top of the
+// conversation limit, like /api/v1's payouts.
+const careAgentActionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15,
+  message: {
+    error: 'Too many confirmations in a short time. Please wait a few minutes and try again.',
+    code: 'CARE_AGENT_ACTION_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use('/api/', globalLimiter);
 app.use('/api/v1', v1Limiter);
 app.use('/api/care-agent', careAgentLimiter);
+app.use('/api/care-agent/sessions/:id/actions/:proposalId/confirm', careAgentActionLimiter);
 app.use('/v2/shield', globalLimiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);

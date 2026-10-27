@@ -518,6 +518,51 @@ const PaySickAPI = {
         method: 'POST',
         body: JSON.stringify({ reason })
       });
+    },
+
+    /**
+     * The patient's whole account as the agent sees it: journey stage,
+     * the agent's decisions (with reason codes) and the actions on offer,
+     * each with its authority tier. Read-only.
+     */
+    async getAccount(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/account`);
+    },
+
+    /**
+     * Prepare an account action. Read-only actions come back done;
+     * everything else comes back as a proposal awaiting confirmAction.
+     */
+    async proposeAction(sessionId, actionType, params = {}) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions`, {
+        method: 'POST',
+        body: JSON.stringify({ actionType, params })
+      });
+    },
+
+    /**
+     * The patient's explicit go-ahead on a proposal. Only ever called from
+     * the patient's own tap on the proposal card.
+     */
+    async confirmAction(sessionId, proposalId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions/${proposalId}/confirm`, {
+        method: 'POST',
+        body: JSON.stringify({ consent: true })
+      });
+    },
+
+    async declineAction(sessionId, proposalId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions/${proposalId}/decline`, {
+        method: 'POST'
+      });
+    },
+
+    /**
+     * Everything the agent read, decided, prepared and did in this
+     * conversation, tagged by who acted.
+     */
+    async getDecisions(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/decisions`);
     }
   },
 

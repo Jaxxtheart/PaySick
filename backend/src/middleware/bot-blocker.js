@@ -86,6 +86,10 @@ const BOT_USER_AGENT_PATTERNS = [
   /MistralAI-User/i,
   /Claude-User/i,
   /Webzio-Extended/i,
+  // v1.18.0 review: AI fetchers and scraping services with no "bot" token
+  /Meta-ExternalFetcher/i,
+  /FirecrawlAgent/i,
+  /Google-NotebookLM/i,
 
   // Generic bot / spider / crawler patterns
   /bot\b/i,
