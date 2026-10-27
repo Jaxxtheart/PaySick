@@ -66,7 +66,7 @@ describe('FIX: session-start always returns a warm, explicit opening greeting', 
     const match = routeSource.match(/OPENING_GREETING\s*=\s*(['"`])([\s\S]*?)\1/);
     assert.ok(match, 'OPENING_GREETING must be a plain string constant');
     const greeting = match[2];
-    assert.match(greeting, /Care Agent/i, 'must introduce itself');
+    assert.match(greeting, /Kehr/, 'must introduce itself (as Kehr since v1.20.0)');
     assert.doesNotMatch(greeting, /—/, 'no em dashes in patient-facing copy (site-wide rule)');
   });
 });

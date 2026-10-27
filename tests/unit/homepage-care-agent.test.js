@@ -34,15 +34,15 @@ describe('homepage hero: Care Agent search bar', () => {
     const h = hero();
     assert.match(h, /<form class="agent-search" id="agent-search-form" role="search"/);
     assert.match(h, /id="agent-search-input"/);
-    assert.match(h, /aria-label="Ask PaySick"/);
+    assert.match(h, /aria-label="Ask Kehr"/);
   });
 
-  test('has a short hint naming the Care Agent', () => {
-    assert.match(hero(), /<p class="agent-search-hint">[^<]*Care Agent[^<]*<\/p>/);
+  test('has a short hint naming Kehr (v1.20.0 rename)', () => {
+    assert.match(hero(), /<p class="agent-search-hint">[^<]*Kehr[^<]*<\/p>/);
   });
 
-  test('submitting routes to care-agent.html, carrying the typed query', () => {
-    assert.ok(html.includes("'care-agent.html?q=' + encodeURIComponent(query)"));
+  test('submitting routes to kehr.html, carrying the typed query', () => {
+    assert.ok(html.includes("'kehr.html?q=' + encodeURIComponent(query)"));
   });
 
   test('the existing hero CTAs are unchanged', () => {
@@ -53,8 +53,8 @@ describe('homepage hero: Care Agent search bar', () => {
   });
 });
 
-describe('care-agent.html exists and accepts the carried-over query', () => {
-  const page = path.join(REPO_ROOT, 'care-agent.html');
+describe('kehr.html exists and accepts the carried-over query', () => {
+  const page = path.join(REPO_ROOT, 'kehr.html');
 
   test('the page exists', () => {
     assert.ok(fs.existsSync(page));

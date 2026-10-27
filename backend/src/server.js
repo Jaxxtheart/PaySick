@@ -210,7 +210,7 @@ const careAgentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 60,
   message: {
-    error: 'Too many Care Agent requests. Please try again shortly.',
+    error: 'Too many requests to Kehr. Please try again shortly.',
     code: 'CARE_AGENT_RATE_LIMITED',
     retryAfter: 900
   },

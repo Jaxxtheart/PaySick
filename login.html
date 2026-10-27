@@ -453,13 +453,13 @@
                 case 'lender':   window.location.href = 'lender-dashboard.html'; break;
                 default: {
                     const onboardingComplete = localStorage.getItem('paysick_onboarding_complete');
-                    // A question held for the Care Agent from before sign-in
+                    // A question held for Kehr from before sign-in
                     // takes the patient back there instead of the dashboard.
                     const heldQuestion = typeof PaySickCareAgentPending !== 'undefined'
                         ? PaySickCareAgentPending.peek(localStorage)
                         : null;
                     if (onboardingComplete === 'true' && heldQuestion) {
-                        window.location.href = 'care-agent.html';
+                        window.location.href = 'kehr.html';
                     } else {
                         window.location.href = onboardingComplete === 'true' ? 'dashboard.html' : 'onboarding.html';
                     }

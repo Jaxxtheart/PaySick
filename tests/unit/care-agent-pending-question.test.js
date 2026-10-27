@@ -96,8 +96,8 @@ describe('js/care-agent-pending.js', () => {
   });
 });
 
-describe('care-agent.html holds and restores the question', () => {
-  const page = read('care-agent.html');
+describe('kehr.html holds and restores the question', () => {
+  const page = read('kehr.html');
 
   test('loads the pending-question module', () => {
     assert.match(page, /<script src="js\/care-agent-pending.js"><\/script>/);
@@ -124,14 +124,14 @@ describe('care-agent.html holds and restores the question', () => {
   });
 });
 
-describe('login.html and onboarding.html return to the Care Agent', () => {
-  test('login.html loads the module and sends a patient with a held question to care-agent.html', () => {
+describe('login.html and onboarding.html return to Kehr', () => {
+  test('login.html loads the module and sends a patient with a held question to kehr.html', () => {
     const login = read('login.html');
     assert.match(login, /<script src="js\/care-agent-pending.js"><\/script>/);
     const fn = login.match(/function redirectByRole\(role\) \{[\s\S]*?\n {8}\}/);
     assert.ok(fn);
     assert.match(fn[0], /PaySickCareAgentPending\.peek\(/);
-    assert.match(fn[0], /care-agent\.html/);
+    assert.match(fn[0], /kehr\.html/);
   });
 
   test('login.html still sends patients who have not finished onboarding to onboarding first', () => {
@@ -143,12 +143,12 @@ describe('login.html and onboarding.html return to the Care Agent', () => {
     assert.doesNotMatch(read('login.html'), /get\(['"]next['"]\)/);
   });
 
-  test('onboarding.html sends a patient with a held question to care-agent.html when finished', () => {
+  test('onboarding.html sends a patient with a held question to kehr.html when finished', () => {
     const onboarding = read('onboarding.html');
     assert.match(onboarding, /<script src="js\/care-agent-pending.js"><\/script>/);
     const fn = onboarding.match(/function goToDashboard\(\) \{[\s\S]*?\n {8}\}/);
     assert.ok(fn);
     assert.match(fn[0], /PaySickCareAgentPending\.peek\(/);
-    assert.match(fn[0], /care-agent\.html/);
+    assert.match(fn[0], /kehr\.html/);
   });
 });

@@ -203,7 +203,7 @@
             color: #E01E37;
         }
 
-        /* Care Agent search bar: hands the typed question to care-agent.html */
+        /* Kehr search bar: hands the typed question to kehr.html */
         .agent-search {
             width: 100%;
             max-width: 600px;
@@ -1242,21 +1242,21 @@
         <div class="tagline">HEALTHCARE FINANCING, BUILT AROUND YOU</div>
         <h1>Get the care you need. Find a way to pay.</h1>
         <p>Healthcare costs shouldn't be the reason you delay treatment. PaySick is building a simpler way to finance healthcare, connecting patients and healthcare providers through transparent, responsible financing.</p>
-        <form class="agent-search" id="agent-search-form" role="search" aria-label="Ask PaySick">
+        <form class="agent-search" id="agent-search-form" role="search" aria-label="Ask Kehr">
             <svg class="agent-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" stroke="#80868B" stroke-width="2"/>
                 <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="#80868B" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <label for="agent-search-input" class="visually-hidden">Ask PaySick</label>
-            <input type="text" id="agent-search-input" name="q" placeholder="What do you need help paying for? Ask PaySick..." autocomplete="off" maxlength="500">
-            <button type="submit" class="agent-search-submit" aria-label="Ask PaySick">
+            <label for="agent-search-input" class="visually-hidden">Ask Kehr</label>
+            <input type="text" id="agent-search-input" name="q" placeholder="What do you need help paying for? Ask Kehr..." autocomplete="off" maxlength="500">
+            <button type="submit" class="agent-search-submit" aria-label="Ask Kehr">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <polyline points="12 5 19 12 12 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
         </form>
-        <p class="agent-search-hint">Powered by the PaySick Care Agent. Describe your situation and get help figuring out how to afford it.</p>
+        <p class="agent-search-hint">Kehr by PaySick. Describe your situation and see how to pay for it.</p>
         <div class="hero-buttons">
             <a href="login.html" class="primary-btn">Get Started</a>
             <a href="#how-it-works" class="secondary-btn">Explore how it works</a>
@@ -1581,7 +1581,7 @@
             });
         }
 
-        // Care Agent search bar: care-agent.html reads ?q= and, once the
+        // Kehr search bar: kehr.html reads ?q= and, once the
         // visitor is signed in, sends it as the conversation's first message.
         const agentSearchForm = document.getElementById('agent-search-form');
         const agentSearchInput = document.getElementById('agent-search-input');
@@ -1589,8 +1589,8 @@
             e.preventDefault();
             const query = agentSearchInput.value.trim();
             window.location.href = query
-                ? 'care-agent.html?q=' + encodeURIComponent(query)
-                : 'care-agent.html';
+                ? 'kehr.html?q=' + encodeURIComponent(query)
+                : 'kehr.html';
         });
     </script>
 

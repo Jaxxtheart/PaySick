@@ -75,6 +75,11 @@ assumed complete.
       message box.
 - [ ] Owner sets `ANTHROPIC_API_KEY` in production (otherwise the
       deterministic engine is used) and runs migration `012_care_agent.sql`.
+- [ ] Trade mark clearance for **Kehr** (CIPC search, and register in the
+      classes PaySick uses) before public launch. v1.20.0 renamed the Care
+      Agent to "Kehr by PaySick" without a search.
+- [ ] Legal sign-off on privacy policy v1.5 (rename only; no change to what
+      is collected or how).
 - [ ] Owner runs migration `013_care_agent_actions.sql` (v1.18.0) after
       `012`, `007` (manual_review_queue) and `010` (promise_to_pay).
 - [ ] Staff process for the new `CARE_AGENT_*` review types in

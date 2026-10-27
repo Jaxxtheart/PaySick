@@ -43,12 +43,12 @@ const all = text(html);
 
 describe('privacy-policy.html: Care Agent section', () => {
   test('has a dedicated Care Agent section linked from the contents', () => {
-    assert.match(html, /<h2[^>]*id="care-agent"[^>]*>[^<]*Care Agent[^<]*<\/h2>/);
-    assert.match(html, /<a href="#care-agent">/);
+    assert.match(html, /<h2[^>]*id="kehr"[^>]*>[^<]*Kehr[^<]*<\/h2>/);
+    assert.match(html, /<a href="#kehr">/);
   });
 
   test('says what the Care Agent collects', () => {
-    const s = sectionById('care-agent');
+    const s = sectionById('kehr');
     assert.match(s, /conversation/i);
     assert.match(s, /quote/i);
     assert.match(s, /invoice/i);
@@ -56,25 +56,25 @@ describe('privacy-policy.html: Care Agent section', () => {
   });
 
   test('says the uploaded file itself is not stored, only the details read from it', () => {
-    assert.match(sectionById('care-agent'), /file itself is not stored/i);
+    assert.match(sectionById('kehr'), /file itself is not stored/i);
   });
 
   test('says messages and documents are sent to Anthropic for processing', () => {
-    assert.match(sectionById('care-agent'), /Anthropic/);
+    assert.match(sectionById('kehr'), /Anthropic/);
   });
 
   test('says a question typed before signing in is held in the browser for up to 24 hours', () => {
-    assert.match(sectionById('care-agent'), /held in your browser for up to 24 hours/i);
+    assert.match(sectionById('kehr'), /held in your browser for up to 24 hours/i);
   });
 
   test('says using the Care Agent is optional', () => {
-    assert.match(sectionById('care-agent'), /optional/i);
+    assert.match(sectionById('kehr'), /optional/i);
   });
 });
 
 describe('privacy-policy.html: Care Agent reflected in the existing sections', () => {
   test('special personal information covers health details shared with the Care Agent', () => {
-    assert.match(sectionById('s6'), /Care Agent/);
+    assert.match(sectionById('s6'), /Kehr/);
   });
 
   test('Anthropic is listed as an operator', () => {
@@ -86,7 +86,7 @@ describe('privacy-policy.html: Care Agent reflected in the existing sections', (
   });
 
   test('retention table has a Care Agent row', () => {
-    assert.match(sectionById('s10'), /Care Agent/);
+    assert.match(sectionById('s10'), /Kehr/);
   });
 });
 
@@ -97,18 +97,19 @@ describe('privacy-policy.html: responsible party and version', () => {
   });
 
   test('is re-dated and re-versioned for this change', () => {
-    assert.match(all, /Effective Date: 26 October 2026/);
-    assert.match(all, /Version: 1\.4/);
+    // v1.5 (v1.20.0): the Care Agent is renamed Kehr.
+    assert.match(all, /Effective Date: 27 October 2026/);
+    assert.match(all, /Version: 1\.5/);
   });
 });
 
 describe('care-agent.html: notice at the point of collection (POPIA s18)', () => {
-  const page = fs.readFileSync(path.resolve(__dirname, '../../care-agent.html'), 'utf8');
+  const page = fs.readFileSync(path.resolve(__dirname, '../../kehr.html'), 'utf8');
 
   test('shows a privacy notice next to the message composer, linking to the Care Agent section', () => {
     const notice = page.match(/<p class="privacy-notice"[\s\S]*?<\/p>/);
     assert.ok(notice, 'expected a <p class="privacy-notice"> on the Care Agent page');
-    assert.match(notice[0], /href="privacy-policy.html#care-agent"/);
+    assert.match(notice[0], /href="privacy-policy.html#kehr"/);
     assert.match(text(notice[0]), /Anthropic/);
   });
 

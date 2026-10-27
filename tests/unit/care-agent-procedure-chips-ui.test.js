@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const html = fs.readFileSync(path.join(__dirname, '../../care-agent.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, '../../kehr.html'), 'utf8');
 
 describe('care-agent.html — visible procedure-option chips', () => {
   test('has a dedicated container for the procedure-option chips', () => {

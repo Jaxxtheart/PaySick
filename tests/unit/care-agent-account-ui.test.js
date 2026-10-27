@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const page = fs.readFileSync(path.join(__dirname, '../../care-agent.html'), 'utf8');
+const page = fs.readFileSync(path.join(__dirname, '../../kehr.html'), 'utf8');
 
 function fn(name) {
   const start = page.indexOf(`function ${name}(`);

@@ -91,7 +91,7 @@ const PROCEDURE_OPTIONS = PROCEDURE_CATEGORIES.map(({ id, label }) => ({ id, lab
 // follow-ups from nextQuestion() take over from the patient's first reply
 // onward, once the conversation is already under way.
 const OPENING_GREETING =
-  "Hi, I'm the PaySick Care Agent. Tell me what's going on, the treatment, a quote you've received, or a bill you're dealing with, and I'll help you work out how to afford it.";
+  "Hi, I'm Kehr from PaySick. Tell me about the treatment, a quote you've received, or a bill you're dealing with, and we'll work out how to pay for it.";
 
 /**
  * Fetches a session and verifies it belongs to the requesting user.
@@ -188,7 +188,7 @@ router.post('/sessions', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Care Agent session create error:', error.message);
-    res.status(500).json({ error: 'Failed to start a Care Agent conversation' });
+    res.status(500).json({ error: 'Failed to start a conversation with Kehr' });
   }
 });
 

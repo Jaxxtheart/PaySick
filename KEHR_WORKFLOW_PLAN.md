@@ -1,6 +1,11 @@
-# Care Agent: the patient's whole value chain (v1.18.0, revised in v1.19.0)
+# Kehr: the patient's whole value chain (v1.18.0, revised in v1.19.0)
 
-Until v1.17.1 the Care Agent took a patient from "I have a quote" to a
+> **v1.20.0:** the harness is now called **Kehr by PaySick** (formerly the
+> Care Agent). Brand identity: [`KEHR_BRAND.md`](./KEHR_BRAND.md). Internal
+> code names (`care-agent.*`, `/api/care-agent`) are unchanged; the page is
+> `kehr.html`, and `kehr.html` forwards to it.
+
+Until v1.17.1 the harness (then called the Care Agent) took a patient from "I have a quote" to a
 submitted application, then stopped. v1.18.0 carries it through everything
 after: choosing a funder, repaying, changing a plan, getting through a
 missed payment, and closing out. Every step is wired to the backend tables
@@ -12,7 +17,7 @@ facts and statuses, so it never feels like an agent is working in the
 background: the less the patient sees, the better.
 
 The plan, with phone-screen designs for each step, was also published as a
-page for review ("Care Agent Value Chain").
+page for review ("Kehr Value Chain").
 
 ## What the patient sees, and what stays in the backend
 
@@ -56,7 +61,7 @@ never the tier.
 | `prohibited` | Not in chat | Refused. The patient is sent to the right place. | `UPDATE_BANKING_DETAILS` (secure form), `CHANGE_AMOUNT_OWED`, `WRITE_OFF` |
 
 The Make Payment and Accept Offer screens elsewhere on the site still work
-as before. The Care Agent path to the same actions adds consent, re-checks
+as before. The Kehr path to the same actions adds consent, re-checks
 and an audit trail.
 
 ## The value chain
@@ -135,7 +140,7 @@ The language model has two new tools. `get_account_overview` is read-only.
 the executor, the payment service or the marketplace, and a test checks
 that.
 
-## Screens (all inside `care-agent.html`)
+## Screens (all inside `kehr.html`)
 
 1. **Account card**: a one-line status, the facts (outstanding, next payment,
    balance, requests as "Received"), and plain option buttons. It is hidden

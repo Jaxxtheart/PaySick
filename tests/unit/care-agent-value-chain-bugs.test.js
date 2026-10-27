@@ -36,7 +36,7 @@ const path = require('node:path');
 
 const REPO_ROOT = path.join(__dirname, '../..');
 const routeSource = fs.readFileSync(path.join(REPO_ROOT, 'backend/src/routes/care-agent.js'), 'utf8');
-const pageSource = fs.readFileSync(path.join(REPO_ROOT, 'care-agent.html'), 'utf8');
+const pageSource = fs.readFileSync(path.join(REPO_ROOT, 'kehr.html'), 'utf8');
 
 function slice(source, startMarker, endMarker) {
   const start = source.indexOf(startMarker);

@@ -6,6 +6,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.20.0] — 2026-10-27
+
+**Type**: MINOR — Kehr brand identity for the harness (replaces "Care Agent")
+
+### Added
+- `KEHR_BRAND.md`: the Kehr by PaySick identity, built on the PaySick CI.
+  It covers the mark (the PaySick cross with its arms turned 45° into a K),
+  the wordmark and lockups, colour tokens (CI plus Kehr Wine `#7A1426`),
+  type and voice.
+- `kehr.html`: the harness page (moved from `care-agent.html`), with the
+  Kehr lockup and tokens.
+
+### Changed
+- `care-agent.html` is now a redirect stub to `kehr.html`, keeping `?q=`.
+- The homepage search bar is "Ask Kehr". Login and onboarding return to
+  `kehr.html`.
+- Privacy policy v1.5: section 4A is "Kehr by PaySick" (formerly the Care
+  Agent). Substance is unchanged.
+- The greeting, the LLM prompt and patient-visible errors speak as Kehr,
+  never "agent" or "assistant".
+- The plan doc is renamed `KEHR_WORKFLOW_PLAN.md`.
+
+### Not changed
+- Internal code names (`care-agent.*`, `/api/care-agent`, `care_agent_*`).
+
+---
+
 ## [v1.19.0] — 2026-10-27
 
 **Type**: MINOR — Care Agent decisions moved to the backend; the patient sees outcomes only

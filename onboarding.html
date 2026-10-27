@@ -1312,12 +1312,12 @@
             if (user.role === 'admin') {
                 window.location.href = 'admin-dashboard.html';
             } else {
-                // A question held for the Care Agent from before sign-in
+                // A question held for Kehr from before sign-in
                 // takes the patient back there instead of the dashboard.
                 const heldQuestion = typeof PaySickCareAgentPending !== 'undefined'
                     ? PaySickCareAgentPending.peek(localStorage)
                     : null;
-                window.location.href = heldQuestion ? 'care-agent.html' : 'dashboard.html';
+                window.location.href = heldQuestion ? 'kehr.html' : 'dashboard.html';
             }
         }
     </script>

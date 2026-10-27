@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const html = fs.readFileSync(path.join(__dirname, '../../care-agent.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, '../../kehr.html'), 'utf8');
 
 describe('Starting the conversation is retryable and its failure is diagnosable', () => {
   test('session-start logic is a reusable function, not inlined only in init()', () => {
