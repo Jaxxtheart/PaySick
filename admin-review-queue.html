@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>Manual Review Queue — PaySick Admin</title>
+  <title>Manual Review Queue | PaySick Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
@@ -354,19 +354,19 @@
   <!-- Stats Row -->
   <div class="stats-row" id="statsRow">
     <div class="stat-card critical">
-      <div class="number" id="statCritical">—</div>
+      <div class="number" id="statCritical">-</div>
       <div class="label">Critical Priority</div>
     </div>
     <div class="stat-card high">
-      <div class="number" id="statHigh">—</div>
+      <div class="number" id="statHigh">-</div>
       <div class="label">High Priority</div>
     </div>
     <div class="stat-card">
-      <div class="number" id="statStandard">—</div>
+      <div class="number" id="statStandard">-</div>
       <div class="label">Standard</div>
     </div>
     <div class="stat-card">
-      <div class="number" id="statOverdue">—</div>
+      <div class="number" id="statOverdue">-</div>
       <div class="label">SLA Overdue</div>
     </div>
   </div>
@@ -465,7 +465,7 @@
   }
 
   function formatSlaCountdown(deadline) {
-    if (!deadline) return '<span class="sla-ok">—</span>';
+    if (!deadline) return '<span class="sla-ok">-</span>';
     const diff = new Date(deadline) - new Date();
     const hours = Math.floor(diff / 3600000);
     const mins = Math.floor((diff % 3600000) / 60000);

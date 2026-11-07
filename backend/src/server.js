@@ -62,6 +62,9 @@ const notificationRoutes = require('./routes/notifications');
 const underwritingRoutes = require('./routes/underwriting');
 const outreachRoutes = require('./routes/outreach');
 const v1Routes = require('./routes/v1');
+const careAgentRoutes = require('./routes/care-agent');
+const kehrRoutes = require('./routes/kehr');
+const passkeyRoutes = require('./routes/passkeys');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -138,8 +141,16 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Body parsing middleware with size limits
+// 6mb (not 1mb): the Care Agent's document-ingestion route
+// (POST /api/care-agent/sessions/:id/documents) sends an uploaded quote/
+// invoice/scheme-statement as base64 JSON rather than multipart -- no new
+// npm dependency needed, and it's the same shape the Anthropic API itself
+// expects. Base64 adds ~33% overhead, so care-agent-document.service.js's
+// own MAX_DOCUMENT_BYTES (4MB) comfortably fits with headroom to spare;
+// every other route still enforces its own, usually much smaller, limits
+// on what it actually expects.
 app.use(express.json({
-  limit: '1mb',
+  limit: '6mb',
   // Capture the raw body so webhook signatures (e.g. Resend/Svix on the outreach
   // inbound route) can be verified against the exact received bytes.
   verify: (req, res, buf) => { req.rawBody = buf; }
@@ -195,13 +206,78 @@ const v1Limiter = rateLimit({
   legacyHeaders: false
 });
 
+// Care Agent is a conversational surface — cap it tighter than a plain
+// read endpoint, since each turn does extraction + DB writes.
+const careAgentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 60,
+  message: {
+    error: 'Too many requests to Kehr. Please try again shortly.',
+    code: 'CARE_AGENT_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// v1.18.0 review: confirming a Care Agent action can move money (pay an
+// instalment, accept an offer), so it gets its own bucket on top of the
+// conversation limit, like /api/v1's payouts.
+const careAgentActionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15,
+  message: {
+    error: 'Too many confirmations in a short time. Please wait a few minutes and try again.',
+    code: 'CARE_AGENT_ACTION_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Kehr Journey A (v1.21.0). Assessing reads a bank feed, a bureau and a
+// medical scheme; redeeming a link and checking a pass code are the two
+// places a guesser could probe. Those get a tighter bucket.
+const kehrLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 60,
+  message: {
+    error: 'Too many requests to Kehr. Please try again shortly.',
+    code: 'KEHR_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const kehrAssessLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: {
+    error: 'Too many attempts in a short time. Please wait a few minutes and try again.',
+    code: 'KEHR_ASSESS_RATE_LIMITED',
+    retryAfter: 900
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use('/api/', globalLimiter);
 app.use('/api/v1', v1Limiter);
+app.use('/api/care-agent', careAgentLimiter);
+app.use('/api/care-agent/sessions/:id/actions/:proposalId/confirm', careAgentActionLimiter);
+app.use('/api/kehr', kehrLimiter);
+app.use('/api/kehr/preapprovals/:id/assess', kehrAssessLimiter);
+app.use('/api/kehr/preapprovals/:id/documents/upload', kehrAssessLimiter);
+app.use('/api/kehr/plan-links/redeem', kehrAssessLimiter);
+app.use('/api/kehr/provider/passes', kehrAssessLimiter);
 app.use('/v2/shield', globalLimiter);
 app.use('/api/users/login', authLimiter);
 app.use('/api/users/register', authLimiter);
 app.use('/api/users/demo-login', authLimiter);
 app.use('/api/users/forgot-password', authLimiter);
+app.use('/api/auth/passkeys/login', authLimiter);
+app.use('/api/auth/passkeys/register', authLimiter);
 
 // ============================================
 // SECURITY HEADERS
@@ -269,6 +345,9 @@ app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/risk', riskRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/outreach', outreachRoutes);
+app.use('/api/care-agent', careAgentRoutes);
+app.use('/api/kehr', kehrRoutes);
+app.use('/api/auth/passkeys', passkeyRoutes);
 
 // Shield Underwriting Framework (v2 endpoints)
 app.use('/v2/shield', shieldRoutes);
@@ -300,6 +379,7 @@ app.get('/', (req, res) => {
       risk: '/api/risk',
       notifications: '/api/notifications',
       outreach: '/api/outreach',
+      careAgent: '/api/care-agent',
       shield: '/v2/shield',
       v1: '/api/v1'
     }

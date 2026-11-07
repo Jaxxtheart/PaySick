@@ -81,6 +81,32 @@ const BOT_USER_AGENT_PATTERNS = [
   /omgili/i,
   /YouBot/i,
   /TimpiBot/i,
+  // v1.12.0 review: user-triggered AI fetchers with no "bot" token
+  /Perplexity-User/i,
+  /MistralAI-User/i,
+  /Claude-User/i,
+  /Webzio-Extended/i,
+  // v1.18.0 review: AI fetchers and scraping services with no "bot" token
+  /Meta-ExternalFetcher/i,
+  /FirecrawlAgent/i,
+  /Google-NotebookLM/i,
+  // v1.21.0 review: scripted HTTP clients and AI page readers with no
+  // "bot" token. Kehr's API is called from browsers only.
+  /python-httpx/i,
+  /aiohttp/i,
+  /^undici/i,
+  /Apache-HttpClient/i,
+  /Jina-Reader/i,
+  /Crawl4AI/i,
+  /Firecrawl/i,
+  /Manus-User/i,
+  // v1.22.0 review: AI agents and research fetchers with no "bot" token
+  /GoogleOther/i,
+  /Amzn-User/i,
+  /Gemini-Deep-Research/i,
+  /ChatGPT-Agent/i,
+  /meta-webindexer/i,
+  /Cloudflare-AutoRAG/i,
 
   // Generic bot / spider / crawler patterns
   /bot\b/i,

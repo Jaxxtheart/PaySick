@@ -110,6 +110,8 @@
                 <li><a href="#s3">3. Legal Framework</a></li>
                 <li><a href="#s4">4. POPIA Eight Conditions</a></li>
                 <li><a href="#s5">5. What We Collect</a></li>
+                <li><a href="#kehr">Kehr by PaySick</a></li>
+                <li><a href="#kehr-preapproval">Kehr pre-approval</a></li>
                 <li><a href="#s6">6. Special Personal Information</a></li>
                 <li><a href="#s7">7. Why We Process Your Data</a></li>
                 <li><a href="#s8">8. Who We Share Data With</a></li>
@@ -130,7 +132,7 @@
     <main class="content">
 
         <div class="effective">
-            <strong>Effective Date:</strong> 3 March 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.3 &nbsp;|&nbsp; <strong>Next review:</strong> 3 March 2027<br>
+            <strong>Effective Date:</strong> 27 October 2026 &nbsp;|&nbsp; <strong>Version:</strong> 1.7 &nbsp;|&nbsp; <strong>Next review:</strong> 27 October 2027<br>
             This policy is issued in terms of <strong>Section 18 of POPIA</strong> (duty to notify data subjects at time of collection) and must be read together with our <a href="terms-of-service.html">Terms of Service</a>.
         </div>
 
@@ -142,7 +144,7 @@
         </div>
 
         <h2 id="s1">1. Who We Are</h2>
-        <p><strong>PaySick South Africa (Pty) Ltd</strong> ("PaySick", "we", "us", "our") is a private company incorporated under the laws of the Republic of South Africa. We operate a healthcare payment facilitation service that allows eligible patients to spread approved medical bills over structured monthly instalments via debit order.</p>
+        <p><strong>Tech &amp; Artery (Pty) Ltd</strong> (registration number K2015/346764/07) ("PaySick", "we", "us", "our") is a private company incorporated under the laws of the Republic of South Africa. It develops and operates the PaySick website and platform. We operate a healthcare payment facilitation service that allows eligible patients to spread approved medical bills over structured monthly instalments via debit order.</p>
         <p>PaySick is:</p>
         <ul>
             <li>A <strong>payment facilitation platform</strong> operating in compliance with applicable South African law</li>
@@ -206,12 +208,50 @@
             <li><strong>Medical aid administrators</strong>: payment history and scheme status, only where you have consented to disclosure by your scheme</li>
         </ul>
 
+        <span id="care-agent"></span>
+        <h2 id="kehr">4A. Kehr by PaySick</h2>
+        <p>Kehr (formerly called the PaySick Care Agent) is a conversational service for signed-in users. You reach it from the "Ask Kehr" search bar on our homepage or at kehr.html. Using it is optional: you can apply through the standard application journey instead.</p>
+
+        <h3>What Kehr collects</h3>
+        <ul>
+            <li><strong>Your conversation:</strong> the messages you type and the replies you receive.</li>
+            <li><strong>Treatment and cost details you share:</strong> a description or type of the treatment, the quoted amount, what your medical scheme will contribute, and, only if you choose to give them, your monthly income and existing obligations.</li>
+            <li><strong>Uploaded documents:</strong> if you attach a quote, invoice or medical scheme statement, we read it to pick out the document type, the treatment description and the amounts. The file itself is not stored. We keep only the details read from it and its file name.</li>
+            <li><strong>A question typed before you sign in:</strong> if you type a question into the "Ask Kehr" search bar while signed out, it is held in your browser for up to 24 hours so it can be picked up after you sign in or register. It stays on your device, is not sent to us until you send it, and is cleared once it is used or expires.</li>
+            <li><strong>An audit trail:</strong> each step of the conversation (questions, confirmations, your approval) is recorded with a date and time, so the process can be checked later.</li>
+        </ul>
+
+        <h3>How it is processed</h3>
+        <p>Kehr's replies are produced with the help of an AI model provided by <strong>Anthropic, PBC</strong> (United States). Your messages, the details recorded so far in the conversation, and any document you attach are sent to Anthropic's API so that it can write the reply or read the document. Anthropic acts as our operator (see Section 7.1). If the AI service is not available, a rule-based engine on our own systems replies instead, and nothing is sent to Anthropic.</p>
+        <p>The AI model does not decide whether you qualify, and it cannot submit an application or move money. Amounts and repayment options are calculated by our own systems. The affordability assessment is the same one used for every application, and nothing is submitted until you confirm the details and approve the step yourself.</p>
+        <p>Please share only the health information needed to describe the treatment and its cost. Diagnoses and medical history are not needed.</p>
+
+        <h2 id="kehr-preapproval">4B. Kehr pre-approval</h2>
+        <p>Before treatment, you can ask Kehr to pre-approve you. Instead of asking you to fill in your income and expenses, Kehr reads what it needs from the source, and only with your consent. Each source has its own separate consent, which you switch on or off in Kehr. You can withdraw any consent at any time; this stops further reads but does not undo an assessment already made.</p>
+        <h3>What we read, and why</h3>
+        <ul>
+            <li><strong>Credit bureau check:</strong> a check of your credit record with a registered credit bureau, required before we offer a payment plan.</li>
+            <li><strong>Your bank account, read once:</strong> through an open-banking provider, we read your salary credits and debit orders for the last 3 months once, to work out what you can comfortably afford. We keep the figures we used, not your transactions.</li>
+            <li><strong>A payslip or bank statement</strong> (instead of connecting your bank): the document you upload is read by an AI model provided by Anthropic, PBC (see Section 4A) to pick out the figures. We keep only the figures we used; we do not keep the file.</li>
+            <li><strong>Your identity:</strong> a selfie, matched to your ID number by our identity verification partner. We do not keep the photo; we keep only the result of the check.</li>
+            <li><strong>Your medical scheme:</strong> what your scheme covers for the treatment and whether it is pre-authorised, so that your plan only covers the gap. This is health information (see Section 5).</li>
+            <li><strong>Health history (optional):</strong> sharing it can improve your offer. Declining never counts against you.</li>
+        </ul>
+        <h3>How the assessment is made</h3>
+        <p>The pre-approval is calculated by automated means: our affordability rules (including a repayment limit of 20% of your verified income) and our risk model. Cases where your documents do not agree with each other, or where the risk model is not clear, always go to a person, and documents that do not agree are never a reason, on their own, to decline you. If you are not pre-approved, you can ask for a person to review the outcome and tell us anything you think we missed (POPIA Section 71).</p>
+        <h3>Your pass and your provider</h3>
+        <p>If you are pre-approved, you receive a pass with a code, an amount and an expiry date. A provider you show it to sees only the code, whether it is valid, the amount and the expiry date. A provider never sees your income, bank details or health information. When your bill is ready, your provider can send a plan link to your cellphone; the link works only for your number and expires after 7 days. Your provider can send it on WhatsApp only if you agreed to receive it there. The WhatsApp message names your provider and carries the link, never the amount or any health information.</p>
+        <h3>Passkeys</h3>
+        <p>You can sign in with a passkey instead of a password. Your fingerprint, face or screen lock is checked by your own device and never reaches us: we receive and store only a public key and a counter, which let us confirm it is the same device signing in. You can remove a passkey at any time.</p>
+        <p>The debit order for your plan is in the name of <strong>Tech &amp; Artery (Pty) Ltd</strong>, which operates Kehr, and appears in your banking app as <strong>KEHR*PLAN</strong>.</p>
+
         <h2 id="s6">5. Special Personal Information</h2>
         <p>Section 26 of POPIA prohibits the processing of <strong>"special personal information"</strong> except in limited circumstances. PaySick processes the following special categories:</p>
         <ul>
             <li><strong>Health information</strong> (s26(1)(c)): Treatment type and medical bill context. We process this on the basis of your <strong>explicit consent</strong> (s27(1)(a)) and because it is <strong>necessary for the establishment, exercise, or defence of a right or obligation in law</strong> (s27(1)(b)), specifically for the purpose of facilitating payment of a lawfully rendered medical service.</li>
             <li><strong>Financial information:</strong> Processed on the basis of contractual necessity and your express consent.</li>
         </ul>
+        <p><strong>Kehr:</strong> treatment details you type into Kehr, and details read from a quote, invoice or medical scheme statement you choose to upload, are health information. We process them on the same basis as above, only to help you understand and arrange payment for that treatment (see Section 4A).</p>
         <p>We apply heightened security controls to all special personal information, including field-level AES-256-GCM encryption and access restricted to authorised personnel on a need-to-know basis only.</p>
 
         <h2 id="s7">6. Why We Process Your Information</h2>
@@ -240,6 +280,10 @@
         <ul>
             <li><strong>Vercel Inc.</strong>: hosting and serverless compute (USA; see Section 9 on cross-border transfers)</li>
             <li><strong>Neon Inc.</strong>: PostgreSQL database hosting (USA; see Section 9)</li>
+            <li><strong>Anthropic, PBC</strong>: AI model used by Kehr to write replies and read uploaded documents (USA; see Sections 4A and 9)</li>
+            <li><strong>An open-banking provider</strong>: reads your bank account once, with your consent, for Kehr pre-approval (South Africa; see Section 4B)</li>
+            <li><strong>WhatsApp (Meta Platforms)</strong>: delivers Kehr plan links when you agreed to receive them there; the message carries your provider's name and the link only (Ireland and USA; see Sections 4B and 9)</li>
+            <li><strong>An identity verification partner</strong>: checks your ID number and selfie for Kehr pre-approval, without keeping the photo (South Africa; see Section 4B)</li>
             <li><strong>SMS and email delivery providers</strong>: transactional notifications only</li>
         </ul>
 
@@ -255,7 +299,7 @@
         <p><strong>We will never disclose your personal information to any political party, political organisation, or for political profiling purposes.</strong></p>
 
         <h2 id="s9">8. Cross-Border Transfers</h2>
-        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes.</p>
+        <p>Section 72 of POPIA restricts the transfer of personal information to foreign countries. We transfer information to <strong>Vercel Inc. and Neon Inc.</strong> (both headquartered in the United States) solely for hosting purposes, and, when you use Kehr, to <strong>Anthropic, PBC</strong> (United States) solely to produce Kehr's replies and read documents you upload. When you agree to receive a plan link on WhatsApp, your cellphone number and the link are transferred to <strong>WhatsApp (Meta Platforms)</strong> (Ireland and United States) solely to deliver that message.</p>
         <p>These transfers are permissible because:</p>
         <ul>
             <li>Recipient entities are bound by data processing agreements imposing obligations <strong>substantially equivalent to POPIA's conditions</strong> (s72(1)(a)); and</li>
@@ -272,6 +316,8 @@
                 <tr><td>Security audit logs</td><td>3 years</td><td>POPIA Section 19</td></tr>
                 <tr><td>POPIA consent records</td><td>Duration of processing plus 3 years</td><td>POPIA Section 11(1)(a): evidence of lawful basis</td></tr>
                 <tr><td>Payment transaction records</td><td>5 years</td><td>Applicable statutory requirements</td></tr>
+                <tr><td>Kehr conversations and details read from uploaded documents</td><td>Kept with the payment arrangement records when the conversation leads to an application; otherwise 3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
+                <tr><td>Kehr pre-approvals, the figures used and your consents</td><td>Kept with the payment arrangement records when a pass leads to a plan; otherwise 3 years from the assessment, then deleted. Consent records follow the POPIA consent row above</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
                 <tr><td>Inactive accounts (no payment arrangement)</td><td>3 years from last activity, then deleted</td><td>POPIA Section 14: destruction when no longer necessary</td></tr>
                 <tr><td>Anonymised analytics</td><td>Indefinite (no personal data retained)</td><td>POPIA s1: anonymised data falls outside definition of personal information</td></tr>
             </tbody>
@@ -353,7 +399,7 @@
             <h3>17. Contact Our Information Officer</h3>
             <p><strong>Email:</strong> <a href="mailto:privacy@paysick.co.za">privacy@paysick.co.za</a></p>
             <p><strong>Subject line:</strong> "POPIA Request: [Access / Correction / Deletion / Objection / Complaint]"</p>
-            <p><strong>Postal:</strong> Information Officer, PaySick South Africa (Pty) Ltd, Cape Town, South Africa</p>
+            <p><strong>Postal:</strong> Information Officer, Tech &amp; Artery (Pty) Ltd, Cape Town, South Africa</p>
             <p><strong>Response time:</strong> 3 business days acknowledgement; 30-day substantive response (POPIA s23(3))</p>
             <div class="regulator">
                 <strong>Information Regulator of South Africa</strong> (if unsatisfied with our response):<br>

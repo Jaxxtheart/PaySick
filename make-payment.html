@@ -495,7 +495,7 @@
                     </div>
                 </div>
 
-                <!-- Late Fee Notice — shown before Pay Now if this payment is overdue -->
+                <!-- Late Fee Notice - shown before Pay Now if this payment is overdue -->
                 <div class="message error" id="lateFeeNotice" style="display: none;"></div>
 
                 <!-- Security Notice -->
@@ -619,7 +619,7 @@
                         if (feePreview.late_fee_amount > 0) {
                             const notice = document.getElementById('lateFeeNotice');
                             notice.textContent = `This payment is ${feePreview.days_overdue} day${feePreview.days_overdue === 1 ? '' : 's'} overdue. ` +
-                                `A late fee of R${feePreview.late_fee_amount.toFixed(2)} has been added — total due today: R${feePreview.total_due.toFixed(2)}.`;
+                                `A late fee of R${feePreview.late_fee_amount.toFixed(2)} has been added. Total due today: R${feePreview.total_due.toFixed(2)}.`;
                             notice.style.display = 'block';
                         }
                     } catch (feeErr) {

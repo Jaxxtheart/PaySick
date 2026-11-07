@@ -1,0 +1,1312 @@
+# PaySick Master Changelog
+
+All notable changes to the PaySick platform are documented here in reverse chronological order.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and versioning follows [Semantic Versioning](https://semver.org/).
+
+---
+
+## [v1.16.0] — 2026-10-12
+
+**Type**: MINOR — new capability (Care Agent document ingestion)
+
+### Summary
+Completes a piece of Care Agent functionality that shipped as a visible
+but non-functional stub since v1.13.4: the attach control in
+care-agent.html always replied "I can't read inside documents yet",
+whatever file was uploaded. It now actually reads a quote, invoice, or
+medical-scheme statement (PDF/JPG/PNG) via the Anthropic Messages API's
+native document/image support, forcing a single structured tool call
+(tool_choice) so the model can never reply with free text. Whatever it
+extracts is fed through the exact same executeTool('update_care_summary', ...)
+guardrail the conversational agent (v1.15.0) already uses -- independently
+re-validated, never trusted directly, never overwriting an already-
+confirmed field. No raw file bytes are ever persisted, only the
+validated extracted fields and audit metadata. Falls back honestly to
+asking the patient to type the figures when the LLM path is unavailable
+or errors -- there's no local OCR fallback for document reading itself.
+See [v1.16.0/RELEASE_NOTES.md](./v1.16.0/RELEASE_NOTES.md).
+
+### Added
+- `care-agent-document.service.js`: `DOCUMENT_EXTRACTION_TOOL`,
+  `extractFromDocument()`, `describeExtraction()`
+- `care-agent-anthropic-client.js`: the shared Anthropic fetch/signing
+  primitive, extracted from care-agent-llm.service.js so the new
+  document service doesn't duplicate it
+- `POST /api/care-agent/sessions/:id/documents`
+- `PaySickAPI.careAgent.uploadDocument()`
+- 35 new test-first assertions across 4 new test files, all confirmed
+  failing before implementation
+
+### Changed
+- `care-agent-llm.service.js`: now uses the shared Anthropic client;
+  `runCareAgentTurn`'s own behaviour unchanged (25 existing assertions
+  pass unmodified)
+- `server.js`: global JSON body limit 1mb -> 6mb, to fit a base64-encoded
+  document upload
+- `care-agent.html`: attach control now uploads for real, with
+  client-side validation and a transient "reading" state
+
+---
+
+## [v1.15.1] — 2026-09-22
+
+**Type**: PATCH — bug fix (homepage search-bar hint text size)
+
+### Summary
+Fixes the homepage search-bar's "Powered by the PaySick Care Agent..."
+caption rendering as large and dark as the hero paragraph above it, per
+explicit feedback. Root cause: the caption is a `<p>` tag, so `.hero p`'s
+rule (specificity 0,1,1) was silently outranking `.agent-search-hint`'s
+bare class rule (specificity 0,1,0), regardless of source order. Renamed
+the selector to `p.agent-search-hint` (ties the specificity, wins by
+source order) so its intended small, muted styling actually applies. See
+[v1.15.1/RELEASE_NOTES.md](./v1.15.1/RELEASE_NOTES.md).
+
+### Fixed
+- `index.html`: `.agent-search-hint` → `p.agent-search-hint`
+
+### Added
+- `tests/unit/homepage-search-hint-font-size.test.js` (4 assertions),
+  confirmed failing against the pre-fix file before the fix
+
+---
+
+## [v1.15.0] — 2026-09-21
+
+**Type**: MINOR — new capability (Care Agent becomes a real tool-calling LLM agent)
+
+### Summary
+"PaySick 2.0 as a harness for healthcare payments" -- per explicit user
+direction rejecting v1.14.0's local similarity engine as not agentic and
+choosing the full tool-calling architecture: the Care Agent's primary
+reasoning engine is now a real Anthropic Messages API tool-calling loop
+(care-agent-llm.service.js). The model reasons over the whole
+conversation and decides which of PaySick's own deterministic functions
+to call -- update_care_summary, get_shortfall, build_term_options -- and
+when. PaySick remains the harness: it defines the only tools that exist,
+executes every one itself, and independently re-validates every input
+(non-negative amounts, procedureTypeGuess restricted to the fixed known
+categories) before trusting it. No tool exists for anything that moves
+money; /confirm, /approve, /execute remain separate, deterministic,
+human-consent-gated routes, verified unreachable from the tool loop by a
+static test. Falls back to the deterministic engine (v1.13.4-v1.14.0)
+when ANTHROPIC_API_KEY is unset or the API call errors -- the patient is
+never left without a reply, and which path ran is always audited. See
+[v1.15.0/RELEASE_NOTES.md](./v1.15.0/RELEASE_NOTES.md).
+
+### Added
+- `care-agent-llm.service.js`: `runCareAgentTurn`, `CARE_AGENT_TOOLS`,
+  `executeTool`, `buildSystemPrompt`
+- `tests/unit/care-agent-llm.test.js` (25 assertions)
+- `tests/unit/care-agent-route-llm-wiring.test.js` (6 assertions)
+- 2 jest tests in `tests/integration/care-agent.test.js` (LLM path)
+
+### Changed
+- `POST /sessions/:id/messages`: LLM tool-calling agent is now the
+  primary path, with the v1.14.0 deterministic engine retained as a
+  resilience fallback; response no longer includes the unused `intent`
+  field
+
+---
+
+## [v1.14.0] — 2026-09-21
+
+**Type**: MINOR — new capability (Care Agent procedure matching)
+
+### Summary
+Replaces the Care Agent's procedure-recognition fallback with a local,
+lightweight embedding-similarity matcher, per explicit user direction
+after being shown the previous engine was pure exact-substring dictionary
+lookup with a hardcoded confidence label, not anything probabilistic.
+Every category label/keyword set is precomputed into a character-trigram
+vector at module load; an incoming message is scored by sliding a
+2-to-4-word window across it and comparing by cosine similarity when no
+exact phrase is found. Recognizes near-miss phrasing ("nose procedure")
+and typos ("rhinoplastey") the old engine could not. Fully local -- no
+new npm dependency, no new API key -- since neither a real embeddings API
+key nor npm/internet access is available in this sandbox; the design is
+explicitly disclosed as a lexical (not semantic) technique and stays
+swappable for a real embeddings API later. See
+[v1.14.0/RELEASE_NOTES.md](./v1.14.0/RELEASE_NOTES.md).
+
+### Added
+- `care-agent-nlp.service.js`: `buildTrigramVector`, `cosineSimilarity`,
+  `findBestCategoryMatch`, `CATEGORY_EMBEDDINGS`
+- `extractCareRequest()`'s result gains `procedureTypeSimilarity` (0-1)
+- `tests/unit/care-agent-embedding-similarity.test.js` (14 assertions)
+
+### Changed
+- `extractProcedureType()`: falls back to fuzzy similarity matching
+  instead of giving up when no exact keyword phrase is present
+
+---
+
+## [v1.13.6] — 2026-09-21
+
+**Type**: PATCH — bug fix (Care Agent opening message)
+
+### Summary
+Fixes the Care Agent's opening message per explicit feedback. Found two
+problems: `POST /sessions`' friendly fallback greeting was unreachable
+dead code (`nextQuestion({})` is never null, so `nextQuestion(summary) ||
+fallback` always picked the bare amount question instead), and that
+question still had an em dash the site-wide em-dash pass (v1.13.1) missed
+since backend service files weren't in its file scope. New brand-new
+sessions now always get an explicit `OPENING_GREETING` that introduces
+the agent, independent of `nextQuestion()`; per-turn follow-ups from the
+patient's first reply onward are unchanged. See
+[v1.13.6/RELEASE_NOTES.md](./v1.13.6/RELEASE_NOTES.md).
+
+### Changed
+- `routes/care-agent.js`: `POST /sessions` always returns a dedicated
+  `OPENING_GREETING`
+- `care-agent.service.js`: removed a leftover em dash from the amount
+  question
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.13.5] — 2026-09-21
+
+**Type**: PATCH — bug fix (silent Care Agent startup/send failures)
+
+### Summary
+Fixes a reported bug seen live: a Care Agent session-start failure showed
+a generic dead-end message with no diagnosis and no in-page recovery, and
+if that happened, typing a message and hitting Send did nothing at all
+(`sendMessage()`'s `if (!message || !state.sessionId) return;` silently
+discarded the input). Session-starting logic extracted into a reusable
+`startConversation()`, called from both `init()` and, as a recovery path,
+`sendMessage()`. An expired login session is now distinguished from a
+generic failure (with a direct "Log in again" link vs. a "Try again"
+retry button), and the patient's message is always shown, with recovery
+attempted, never silently dropped. See
+[v1.13.5/RELEASE_NOTES.md](./v1.13.5/RELEASE_NOTES.md) — including a note
+that the underlying server-side cause of the original failure couldn't be
+diagnosed from this sandbox (no access to production infrastructure).
+
+### Changed
+- `care-agent.html`: `startConversation()` extracted and reused;
+  actionable, distinct error states; `sendMessage()` never silently drops
+  input
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.13.4] — 2026-09-21
+
+**Type**: PATCH — bug fix (Care Agent treatment-question infinite loop)
+
+### Summary
+Fixes a reported infinite loop: the Care Agent's "What treatment or
+procedure is this for?" question repeated forever for any answer not
+matching one of ~14 hardcoded phrases. Followed CLAUDE.md's mandated
+bug-fixing workflow (failing test first, two independent subagent fix
+attempts in isolated worktrees, verified with a passing test). Two
+complementary fixes shipped: (1) per explicit follow-up direction, the
+finite recognized-procedure list is now shown as tappable chips
+(`procedureOptions` on the session/message API responses, rendered in
+care-agent.html) instead of left invisible — "aesthetic" and "nose job"
+(the exact reported phrases) were also added as recognized synonyms; (2)
+`mergeCareSummary()` gains a raw-text fallback (both subagents converged
+on this design independently) as a safety net for whatever the next
+unrecognized phrase turns out to be, capped at 200 chars, never
+fabricating a procedure category. See
+[v1.13.4/RELEASE_NOTES.md](./v1.13.4/RELEASE_NOTES.md).
+
+### Changed
+- `care-agent-nlp.service.js`: keyword dictionary restructured into
+  `PROCEDURE_CATEGORIES`; "aesthetic"/"nose job" added
+- `care-agent.service.js`: `mergeCareSummary()` raw-text fallback
+- `routes/care-agent.js`: exposes `procedureOptions`; passes message to
+  `mergeCareSummary()`
+- `care-agent.html`: new tappable procedure-option chips
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.13.3] — 2026-09-21
+
+**Type**: PATCH — real registration number supplied
+
+### Summary
+Follow-up to v1.13.2: the tariff-gap disclosure text's stale placeholder
+registration number ("2023/123456/07") is replaced with Tech and Artery
+(Pty) Ltd's real registration number, K2015/346764/07, in
+`backend/src/services/underwriting.service.js` (the only live file that
+carried one). Built test-first: `entity-registration-number.test.js`,
+confirmed failing (3/3) before editing. See
+[v1.13.3/RELEASE_NOTES.md](./v1.13.3/RELEASE_NOTES.md).
+
+### Changed
+- `backend/src/services/underwriting.service.js`: registration number
+  updated to K2015/346764/07
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.13.2] — 2026-09-21
+
+**Type**: PATCH — legal entity rename
+
+### Summary
+Renames the registered company from "PaySick (Pty) Ltd" /
+"PaySick South Africa (Pty) Ltd" to "Tech and Artery (Pty) Ltd" across
+every legal/disclosure document (terms-of-service.html, privacy-policy.html,
+licenses.html, provider-billing-agreement.html, tariff-disclosure.html)
+and the two backend files that generate matching disclosure/email text
+(underwriting.service.js, email.service.js) — 16 occurrences, 7 files.
+The PaySick brand/product name itself is untouched throughout, producing
+the correct "Tech and Artery (Pty) Ltd, trading as PaySick" pattern. Built
+test-first: `legal-entity-rename.test.js`, confirmed failing (14/16)
+before editing. See [v1.13.2/RELEASE_NOTES.md](./v1.13.2/RELEASE_NOTES.md).
+
+### Changed
+- Legal entity name updated in 7 files (see RELEASE_NOTES.md for the
+  full list)
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.13.1] — 2026-09-21
+
+**Type**: PATCH — site-wide copy cleanup (payment-plan wording + em dash removal)
+
+### Summary
+Two copy-only passes, released together: (1) extends v1.13.0's hero fix
+("three easy monthly payments" → "a payment plan that works for you") to
+every other page that hardcoded a fixed 3-month term (index.html's
+features card and how-it-works step, about.html, README.md), and trims
+the hero paragraph further; (2) removes every em dash (—) from the live
+site — all root `*.html` pages plus `api-client.js`/`js/demo-data.js` —
+replaced with context-correct punctuation (period, comma, colon, pipe, or
+hyphen), never a blind find/replace. `terms-of-service.html`'s
+substantive legal clause about the product's real payment mechanics is
+explicitly left untouched and pinned by a guardrail test. Built
+test-first: `site-wide-payment-plan-copy.test.js` and
+`no-em-dashes.test.js`, both confirmed failing before their corresponding
+edits. See [v1.13.1/RELEASE_NOTES.md](./v1.13.1/RELEASE_NOTES.md).
+
+### Changed
+- Site-wide "3 month" → "payment plan" wording (index.html, about.html,
+  README.md, CUSTOM_SVG_ICONS.md)
+- Em dash removed from 27 HTML pages + api-client.js + js/demo-data.js
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.13.0] — 2026-09-21
+
+**Type**: MINOR — new homepage feature (Google-style Care Agent search bar); reverts v1.12.1's CTA flip
+
+### Summary
+Corrects v1.12.1: the homepage hero's original call to action ("Get
+Started" / "Learn More", original copy) is fully restored, exactly as it
+read before v1.12.0. The Care Agent instead gets its own Google-style
+search bar in the hero — a centered, pill-shaped input a visitor types
+into and submits to start a conversation. Submitting routes to
+`care-agent.html?q=<query>`, which now auto-sends that text as the
+conversation's first message via the existing message endpoint (no new
+API). Built test-first: `homepage-agent-first-cta.test.js` rewritten and
+confirmed failing (7/8) against the v1.12.1 hero before implementing. See
+[v1.13.0/RELEASE_NOTES.md](./v1.13.0/RELEASE_NOTES.md).
+
+### Changed
+- `index.html` hero reverted to original CTA; `.hero-alt-link` CSS
+  removed
+- Hero paragraph: "three easy monthly payments" → "a payment plan that
+  works for you" (matches the Care Agent's flexible terms; scoped to the
+  hero only)
+### Added
+- `.agent-search` Google-style search bar in the hero
+- `care-agent.html` reads `?q=` and auto-sends it as the first message
+
+### Removed / Deprecated
+None as a feature — v1.12.1's CTA-flip amendment to CA-01 is itself
+superseded (see REQUIREMENTS.md).
+
+---
+
+## [v1.12.1] — 2026-09-21
+
+**Type**: PATCH — homepage hero copy/CTA change
+
+### Summary
+Follow-up to v1.12.0, per explicit product direction: the PaySick Care
+Agent is now the homepage hero's primary "get started" CTA
+(`primary-btn`, linking to `care-agent.html`), not a secondary teaser.
+The traditional application journey (`login.html`) is never removed —
+it's demoted to a plain text link directly beneath the hero buttons.
+Site nav's own CTA is unchanged. Built test-first: 6 new assertions in
+`tests/unit/homepage-agent-first-cta.test.js`, confirmed failing before
+the hero markup changed. See
+[v1.12.1/RELEASE_NOTES.md](./v1.12.1/RELEASE_NOTES.md).
+
+### Changed
+- `index.html` hero: primary CTA now "Ask PaySick" → `care-agent.html`;
+  traditional "Get Started" → `login.html` demoted to a text link; hero
+  paragraph copy rewritten around the Care Agent's describe-your-situation
+  flow; `.ai-agent-teaser` CSS class renamed to `.hero-alt-link`
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.12.0] — 2026-09-21
+
+**Type**: MINOR — new user-facing product surface (PaySick Care Agent)
+
+### Summary
+Adds PaySick Care Agent, an AI-native alternative front door to PaySick
+reachable from a new secondary link on the homepage, alongside the
+completely unchanged traditional apply-first journey. Organised around
+intent and outcomes (need → understand → construct → approve → execute →
+manage) rather than a form. "AI reasons, PaySick controls": all extraction
+and question-selection is a deterministic, in-repo regex/keyword engine
+(no external LLM), and every real financial decision and execution step
+reuses existing, unmodified services — patientGateService for the Shield
+Gate 2 affordability recommendation, and the existing
+`POST /api/marketplace/applications` endpoint for execution. Full audit
+trail of every extraction, confirmation, approval and execution. Built
+test-first per CLAUDE.md. See [v1.12.0/RELEASE_NOTES.md](./v1.12.0/RELEASE_NOTES.md)
+for full detail, including honesty notes on deliberate scope limits (no
+OCR, no self-service payment-date change) and this session's sandbox
+test-execution constraints.
+
+### Added
+- `care-agent.html` — six-stage conversational Care Agent UI
+- `backend/src/routes/care-agent.js` — `/api/care-agent/*`, fully
+  authenticated, own rate-limit bucket
+- `backend/src/services/care-agent-nlp.service.js`,
+  `backend/src/services/care-agent.service.js` — pure, DB-free, LLM-free
+  reasoning services
+- `backend/src/migrations/012_care_agent.sql` — sessions, audit log, and
+  manage-requests tables
+- `PaySickAPI.careAgent` in `api-client.js`
+- Secondary "Ask PaySick" entry point on `index.html`'s hero
+
+### Changed (hygiene)
+- `utils/affordability-policy.js` extracted from `patient-gate.service.js`
+  (same names/values, now DB-dependency-free) so the Care Agent can share
+  Shield's affordability comfort-zone threshold without pulling `pg` into
+  a pure unit-tested module
+
+### Removed / Deprecated
+None.
+
+---
+
+## [v1.11.0] — 2026-09-19
+
+**Type**: MINOR — UX/trust fixes plus one new user-facing capability
+
+### Summary
+Ships the fixes from an executive UX audit of the onboarding → daily-use
+customer journey. The audit's core finding: the marketing promise, the
+onboarding promise, and what the backend actually did were three different
+products, and that gap is where trust and revenue leak. Each finding was
+verified directly against the live code before fixing — two of the
+original findings turned out to already be resolved (marketplace-apply.html
+already collects and submits affordability data) or to concern only dead
+code (`backend/src/routes/applications.js`'s income defaults, unreachable
+from any live page), so no change was made for those. All six real fixes
+below were built test-first per CLAUDE.md.
+
+### Fixed
+- **README.md** — removed the unconditional "Instant Approval up to R850"
+  and "under 60 seconds" claims, which matched neither `marketplace.js`'s
+  real R1,000-R500,000 range nor the real three-outcome (approve/decline/
+  review) risk-assessment flow.
+- **`onboarding.html`** — removed the "legacy direct-onboarding path" that
+  fabricated a placeholder email (`@example.com`) and a fake 13-digit SA ID
+  number (phone digits, zero-padded) for any authenticated user who reached
+  onboarding without real registration data, then submitted that fabricated
+  data to `/api/users/register`. Such a user is now redirected to
+  `register.html` instead.
+- **`payment-success.html`** — corrected the claim that a payment "will
+  reflect on your dashboard within 24 hours"; `dashboard.html` fetches
+  plans/upcoming payments live on every load, so there is no such lag.
+
+### Added
+- **Late-fee preview before payment** — `api-client.js` gains
+  `payments.getFeePreview()`, wired into `make-payment.html`'s load path,
+  so an overdue payment shows its late fee (already computed server-side by
+  the existing `GET /payments/:id/fee-preview`) *before* the user clicks
+  Pay Now, not only after on the receipt.
+- **Repeat-application banner on `dashboard.html`** — a prominent
+  main-content CTA to `marketplace-apply.html`, shown when the user has
+  zero active plans or an active plan is ≥66% paid off. Previously this
+  path existed only as a side-menu link at the same tier as "Support",
+  despite being the platform's highest-LTV action for a good-standing
+  customer.
+
+### Changed
+- **`dashboard.html`** — extracted the hardcoded demo-mode fixture
+  (`loadDemoData()`, `getDemoNotifications()`) into `js/demo-data.js`, so
+  fabricated financial data is no longer inlined in the same file that
+  renders real users' balances.
+
+### Tests
+6 new test-first suites in `tests/unit/`: `readme-accuracy`,
+`onboarding-identity-integrity`, `fee-preview-surfaced`,
+`payment-success-accuracy`, `dashboard-repeat-application-cta`,
+`dashboard-demo-data-isolation`. All pass. This branch merged `main` after
+v1.10.1/v1.10.2 landed there (see below); full suite re-run on the merged
+tree is 692 tests, 690 pass, 2 fail, both pre-existing and unrelated to
+this release: `email-service.test.js` (`nodemailer` unresolvable, no
+registry access in this sandbox) and `marketplace-lender-gate.test.js`
+(`pg` unresolvable, same cause) — reproduced identically on the pre-merge
+tree.
+
+### Removed / Deprecated
+None. The onboarding fabrication fallback removed above was an unreleased
+internal path, not a documented feature, so it carries no deprecation
+notice.
+
+---
+
+## [v1.10.2] — 2026-09-19
+
+**Type**: PATCH — bug fixes to lender webhook delivery and scoring
+
+### Summary
+Fixes three gaps surfaced while diagramming a lender's path through the
+marketplace engine: the outbound lender webhook was never actually sent
+(only logged); a lender was never told whether they won or lost a bid;
+and the bid-coverage hard rule (`LENDER_HARD_RULES.min_bid_coverage_pct`)
+had no code computing it despite the column already existing. Each was
+reproduced with a failing test before the fix. Also fixes a fourth
+instance, found in the same function, of the `status` schema-vocabulary
+bug class from v1.10.1 (`'funded'` is not a real `lender_offer_status`
+value — corrected to `'ACCEPTED'`).
+
+### Fixed
+- `backend/src/services/marketplace-auction.service.js`:
+  `sendLoanPackageToLender()` now actually POSTs the webhook, signed with
+  the lender's decrypted API key (was: commented out, and would have
+  signed with the encrypted ciphertext); `acceptOffer()` now notifies
+  every bidding lender of `offer.won`/`offer.lost` after the transaction
+  commits, via a new `notifyOfferOutcomes()` helper
+- `backend/src/services/lender-gate.service.js`: `scoreLender()` now
+  computes and persists `bid_coverage_pct`, and fixes `status = 'funded'`
+  → `status = 'ACCEPTED'`
+
+### Added
+- `tests/unit/marketplace-lender-gate.test.js`: 6 new test-first
+  assertions (678 total, 677 pass — the one pre-existing `nodemailer`
+  environment failure, unrelated)
+
+---
+
+## [v1.10.1] — 2026-09-16
+
+**Type**: PATCH — bug fixes to marketplace / Shield Gate 3
+
+### Summary
+Hardens the lender-marketplace code path against three bugs found in
+review: the 22.25% APR rate cap was defined but never enforced on any
+offer-write path; `acceptOffer()` could be raced by two concurrent accepts
+on the same application into creating two loans; and Gate 3's lender
+matching (`lender-gate.service.js`) queried columns that don't exist on
+the real `lenders`/`marketplace_loans` tables, so it silently returned
+zero lenders and 0% balance-sheet utilization on every call. All three
+were reproduced with a failing test before the fix (CLAUDE.md test-first
+workflow), then fixed, then proven passing. Also closes a rate-limiting
+gap on `/v2/shield/*`. No route, page, or table added or removed.
+
+### Fixed
+- `backend/src/services/marketplace-auction.service.js`: `createLenderOffer()`
+  now calls `lenderGateService.validateRate()` before every insert;
+  `acceptOffer()` now locks the parent application (`SELECT ... FOR UPDATE`)
+  before creating a loan and rejects (`409`) if it's already `OFFER_SELECTED`
+- `backend/src/services/lender-gate.service.js`: `findEligibleLenders()`,
+  `getPortfolioAllocation()`, and `checkBalanceSheetCapacity()` now query
+  the real column names and status values from `001_marketplace_tables.sql`
+- `backend/src/routes/marketplace.js`: webhook, manual-offer, and accept-offer
+  handlers now surface `error.statusCode` instead of always returning `500`
+- `backend/src/server.js`: `globalLimiter` now applies to `/v2/shield`
+- `backend/src/migrations/011_marketplace_loan_integrity.sql` (new): DB-level
+  backstops — a `CHECK` on `lender_offers.interest_rate` and a unique index
+  on `marketplace_loans(application_id)`
+
+### Added
+- `tests/unit/marketplace-lender-gate.test.js`: 6 new test-first assertions
+  (672 total, 671 pass in this sandbox — see release notes for the one
+  pre-existing, unrelated `nodemailer`-availability failure)
+
+### Flagged, not fixed
+- `marketplace-offers.html` and `lender-dashboard.html` still use loan/lender/APR
+  language that `v1.5.5` and `v1.7.1`–`v1.7.5` deliberately removed from
+  patient-facing surfaces for NCA-positioning reasons. See
+  `v1.10.1/RELEASE_NOTES.md` — this is a positioning decision, not fixed here.
+
+---
+
+## [v1.10.0] — 2026-09-16
+
+**Type**: MINOR — new API module
+
+### Summary
+Ships the PaySick Recovery Engine: an automated collections capability run
+entirely inside the platform, designed so a partner medical provider never
+builds, staffs, or operates a collections desk of its own. Consolidates
+case stage, the mandatory Human Review & Compliance gate, and self-cure
+eligibility behind one authoritative service that composes the existing
+collections-messaging cadence, and adds promise-to-pay tracking, restructure
+offers, credit bureau reporting, and a proportionality-gated external
+referral path.
+
+### Added
+- **`recovery-engine.service.js`** — `RecoveryEngineService`, composing
+  `CollectionsMessagingService` for stage/message resolution and adding the
+  Human Review gate (mandatory from day 30), self-cure eligibility, and a
+  `resolveOutcome()` that closes a case to exactly one of `cured`,
+  `restructured`, `write_off` (human-approved only, day 91+), or `open`.
+- **`promise-to-pay.service.js`** — self-service promise capture and
+  kept/broken evaluation, cents-only integer money.
+- **`restructure-offer.service.js`** + **`utils/restructure-policy.js`** —
+  restructure offers sharing the existing 25% cost-increase cap with
+  `outcome-gate.service.js` from one dependency-free shared constant
+  (extracted so a pure-arithmetic module does not have to pull in a live
+  database connection just to read a number).
+- **`bureau-reporting.service.js`** + **`adapters/credit-bureau.adapter.js`**
+  (mock) — reports arrears to a registered credit bureau at 30+ days
+  overdue, the strongest recovery lever for a book with a ≤R850 average
+  facility.
+- **`external-referral.service.js`** + **`adapters/debt-collector.adapter.js`**
+  (mock) — proportionality-gated referral to a registered debt collector or
+  attorney: never automatic, always human-approved, only at 90+ days
+  overdue and above a R500 balance floor.
+- **`GET /api/providers/dashboard/collections-summary`** — aggregate-only,
+  read-only provider visibility (overdue count, open cases, cured count,
+  cure rate). No patient-level detail is ever returned.
+- **Migration `010_recovery_engine.sql`** — extends `collections` with gate
+  tracking; adds `promise_to_pay`, `restructure_offers`, `bureau_reports`,
+  `external_referrals`.
+
+### Changed
+- `outcome-gate.service.js` now imports `MAX_RESTRUCTURE_COST_INCREASE`
+  from the new `utils/restructure-policy.js` instead of defining it inline
+  — same exported value, no behavior change.
+
+### Test-first workflow
+6 new test files, 56 new assertions, written and confirmed failing before
+any implementation existed (CLAUDE.md test-first requirement). Full suite:
+666 tests, 665 passing — the one failure (`email-service.test.js`,
+`nodemailer` unresolvable without registry access) is pre-existing and
+unrelated to this release.
+
+### Bot crawling prevention review (required at every MINOR/MAJOR bump)
+No changes needed — the new route inherits the global `X-Robots-Tag`, rate
+limiting, bot fingerprinting, and honeypot middleware already in front of
+every `/api/*` route, and is gated by `authenticateToken` +
+`requireRole('provider')`.
+
+---
+
+## [v1.9.0] — 2026-08-01
+
+**Type**: MINOR — new API surface, new page, new security modules
+
+### Summary
+Branch reconciliation. The repository held 31 remote branches, 7 with commits
+that had never reached `main`. This release lands what was genuinely missing,
+deliberately drops what `main` had since superseded, and records the reasoning
+so the same branches are not re-litigated.
+
+### Added
+- **`/api/v1` facilitation surface** (from `claude/setup-paysick-api-ZhJ7v`,
+  unmerged since May). `main` carried this work's v1.8.0 snapshot but never the
+  source. Applications, decisions, payouts and schedules; the Shield five-gate
+  engine; schedule, provider-scoring and webhook-dispatcher services; DebiCheck,
+  DSP-check and income-verification adapters; `money.js`; migration
+  `009_v1_api_surface.sql` (renumbered from a colliding `008`).
+- **Bot-crawling protections.** `robots.txt` at the repository root (`main` had
+  none, a standing CLAUDE.md violation); `bot-blocker` and `honeypot` middleware;
+  a catch-all `X-Robots-Tag` header in `vercel.json`, because statically served
+  HTML never passes through Express; hidden honeypot anchors on six entry-point
+  pages — the trap handler existed but nothing linked to it.
+- **Server-side SA ID validation** (`backend/src/utils/sa-id.js`). Registration
+  previously asserted only `/^\d{13}$/` server-side.
+- **Shield™ risk-engine slide** in the investor deck (slide 12 of 17).
+- **`/research` page**, without the stale White Paper V4 payload.
+
+### Changed
+- Rate limits: 5/hour on `forgot-password` and `resend-verification`; a dedicated
+  30-per-15-minutes bucket on `/api/v1`, which previously inherited only the
+  general read-endpoint allowance despite triggering payouts.
+- Bot blocklist review (required at every MINOR bump): 20 AI training and
+  retrieval crawlers named explicitly. `anthropic-ai`, `Google-Extended`,
+  `Meta-ExternalAgent`, `cohere-ai` and `omgili` carry no "bot" token and had
+  been passing straight through.
+- `POST /forgot-password` no longer returns 500 on email-send failure; the
+  distinct response leaked which addresses are registered.
+- Email links use clean URLs, matching `cleanUrls: true`.
+- `api-client.js` gained `users.refreshToken()`.
+- Index footer regained a Company group (Research, Contact). This section was
+  removed site-wide in v1.4.1 "pending content"; that content now exists.
+
+### Rejected (not merged, with reasons)
+- **v1.8.3 atomic reset-token index** — `main` commit `5a800fc`, one day newer,
+  deliberately stopped invalidating prior unused tokens so a re-requested link
+  does not kill the first email. The proposed
+  `UNIQUE (user_id) WHERE used = false` index would have reintroduced that bug.
+- **Investor-deck balance-sheet pivot** (R30M ask, marketplace removed) —
+  contradicts the July v1.8.1 deck. Only the Shield IP slide was taken.
+- **January legal-page rewrite** — `main`'s pages passed through the v1.5.5
+  regulatory terminology audit; re-introducing the older copy would undo it.
+- **Mock-data provider dashboard** — `main`'s is backend-wired.
+
+### Testing
+Test-first throughout. Five new suites, each confirmed red first:
+`static-bot-protection` (13), `sa-id-validation` (27),
+`investor-deck-shield` (23), `research-page` (14), `bot-blocklist-review` (29).
+
+Full suite: **609 pass, 1 fail**. The failure is `email-service.test.js`, which
+cannot resolve `nodemailer` where `registry.npmjs.org` is unreachable. It is
+pre-existing and environmental, and fails identically on `main`.
+
+Two bugs were caught by tests rather than review: the ported SA ID validator's
+century pivot was hardcoded at `22` and had already rotted (a 2024-born applicant
+decoded as 1924); and the first bot-blocklist test fixture embedded a
+`+https://example.com/bot` URL that by itself tripped `/bot\b/`, making 24 of 29
+cases pass vacuously and hiding all five real gaps.
+
+---
+
+## [v1.8.1] — 2026-07-26
+
+**Type**: PATCH — investor-deck market-sizing correction and copy/figure edits
+
+### Summary
+Aligns the `/investor-deck` presentation (page + client-side `downloadPPTX()`
+generator) with PaySick White Paper V6.0 (July 2026). Content-only edits to an
+existing page; no backend, API, or platform change. The Daily Provider Outreach
+Agent shipped in v1.8.0 is carried through unchanged.
+
+> Consolidation note: this work was drafted on the pre-outreach base as
+> v1.8.0 + v1.8.1. Because `v1.8.0` was released to `main` for the (unrelated)
+> Outreach Agent in the interim, the investor-deck work is merged here as a
+> single v1.8.1 whose snapshot reflects the true merged tree (Outreach Agent +
+> these deck edits).
+
+### Changed (`investor-deck.html`)
+- **Slide 03 (Market):** R240B/R85B/R12B TAM ladder → credit-addressable
+  R25–50B / R4.8–9B / R150–400M with modelled-estimates footnote.
+- **Slide 04 (Sequencing):** new slide — Phase 1 / Phase 2 (Elective Four wedge);
+  framing "Phase 1 is our Trojan Horse".
+- **Slide 05 (Why Now):** fragmented-not-empty framing; "0 Dominant Players" card
+  re-described; niche competitors flagged sub-scale.
+- **Slide 09 (Risk):** Phase-1 figures — PD 3.2% → 1.4%, net loss 1.4% → 0.63%
+  (LGD 45% unchanged).
+- **Slide 13 (Operating Model):** Leadership reframed to a target operating model;
+  founder-led, no named individuals.
+- **Slide 14 (Roadmap & Exit):** exit R2.2B–R3.5B → R300M–R2.5B (SA-only); final
+  milestone Africa Expansion → UK Expansion; 2028 → 2027.
+- **Slide 15 (The Ask):** R25M → $8M; pre-money R50M → $24M, equity 33% → 25%,
+  runway 18 → 24 months (post-money $32M, USD).
+- **Diction:** all 23 em dashes removed (en-dash numeric ranges retained).
+- **Structure:** deck grows 15 → 16 slides; counters, nav dots and PPTX updated to 16.
+
+### Tests
+- `tests/unit/investor-deck.test.js` (test-first, 11 assertions) — locks the
+  corrected figures, absence of superseded figures on page + PPTX, Trojan Horse
+  framing, $8M ask, UK/2027 roadmap, no-em-dash rule, and counter consistency (16).
+
+### Versioning
+- Archived v1.8.1 snapshot with RELEASE_NOTES / REQUIREMENTS / ARCHITECTURE;
+  updated CHANGELOG and code-backups README.
+
+---
+
+## [v1.8.0] — 2026-07-26
+
+**Type**: MINOR — new feature/module: Daily Provider Outreach Agent
+
+### Summary
+Adds a daily, human-gated provider-acquisition agent. Each run it sources target
+practices (Google Places), enriches and scores them for fit, drafts compliant
+personalised outreach via Claude, schedules follow-ups, and compiles a founder
+brief. The agent never sends autonomously — approving a draft in the new admin
+Approve Queue is the only path that sends it. Fully additive; references the
+existing `providers` entity.
+
+### Added
+- Migration `008_outreach_agent.sql` — `outreach_providers`, `outreach_touches`,
+  `outreach_runs` (+ indexes), referencing `providers(provider_id)`.
+- `backend/src/config/outreach.config.js` — targeting/pacing config, fit weights,
+  Places search terms.
+- `backend/src/services/outreach/` — pipeline orchestrator + composable stage
+  services (places, scoring, compliance linter, Claude drafting, sequencing,
+  brief, repo).
+- `backend/src/routes/outreach.js` — `CRON_SECRET`-guarded daily route + admin
+  Approve-Queue API.
+- `admin-approve-queue.html` — the human gate (Approve / Edit / Reject /
+  Mark-replied + funnel snapshot).
+- `tests/unit/outreach-compliance.test.js`, `outreach-scoring.test.js`,
+  `outreach-pipeline.test.js` — test-first coverage (17 assertions).
+
+### Changed
+- `backend/src/server.js` mounts `/api/outreach`.
+- `vercel.json` adds the daily `crons` entry (`0 5 * * *`).
+- `api-client.js` adds `PaySickAPI.outreach.*`.
+- `admin-dashboard.html` adds an "Outreach Approve Queue" nav link.
+- `backend/.env.example` documents the new env vars.
+
+### Deprecated
+- None.
+
+---
+
+## [v1.7.5] — 2026-04-15
+
+**Type**: PATCH — UI change: replace multi-lender preview cards with single PaySick arrangement card and dashboard links
+
+### Summary
+Post-submission screen now shows one PaySick payment arrangement card (amount, instalment, term, ref, pending status) plus direct links to the Admin Review Queue and Provider Dashboard. Removed all fake lender offer cards (MediFinance SA, HealthCredit Plus, CareCapital).
+
+### Changed
+- `marketplace-apply.html` — replaced 3-card lender preview with single arrangement card; added admin and provider dashboard deep links; updated mock response, toast, and success message copy
+
+### Deprecated
+- Multi-lender preview offer cards (last in v1.7.4)
+
+---
+
+## [v1.7.4] — 2026-04-15
+
+**Type**: PATCH — Copy change: replace lender marketplace messaging with PaySick direct disbursement messaging
+
+### Summary
+Until external lenders are onboarded, PaySick handles all fund disbursements directly. Replaced all lender marketplace copy ("network of lenders", "best rate", "multiple offers") on the application flow with accurate PaySick direct disbursement copy.
+
+### Changed
+- `marketplace-apply.html` — "What happens next?" blurb, loading overlay, success message, post-submit banner, section heading, and primary button updated to reflect PaySick direct disbursement
+
+---
+
+## [v1.7.3] — 2026-04-15
+
+**Type**: PATCH — Copy change: replace "Loan Amount" with "Payment Arrangement" on application review screen
+
+### Summary
+The review step of the application form displayed the prohibited label "Loan Amount". Replaced with "Payment Arrangement" per Shield framework LANG-02.
+
+### Changed
+- `marketplace-apply.html` — review summary label `Loan Amount` → `Payment Arrangement`
+
+---
+
+## [v1.7.2] — 2026-04-15
+
+**Type**: PATCH — UI and terms update: cap payment plan slider at R10,000
+
+### Summary
+Reduced the maximum selectable amount on the marketplace-apply amount slider from R500,000 to R10,000. Updated Terms of Service section 4.3 to state R10,000 per-payment-plan maximum. Default slider value adjusted to R7,500; step reduced to R500.
+
+### Changed
+- `marketplace-apply.html` — slider max R500,000 → R10,000; step 1000 → 500; default value R50,000 → R7,500; range label updated; `applyWithAlternative` cap updated
+- `terms-of-service.html` — section 4.3 Bill Amount Limits: R500,000 → R10,000 per payment plan
+
+---
+
+## [v1.7.1] — 2026-04-15
+
+**Type**: PATCH — Copy change: align application page heading with Shield framework approved terminology
+
+### Summary
+Updated `marketplace-apply.html` `<h1>` and `<title>` from "Apply for Medical Finance" to "Apply for a Medical Payment Plan" to comply with Shield framework LANG-01 language requirement mandating the approved term "payment plan" in all user-facing copy.
+
+### Changed
+- `marketplace-apply.html` — `<h1>` and `<title>` updated to "Apply for a Medical Payment Plan"
+
+---
+
+## [v1.7.0] — 2026-04-10
+
+**Type**: MINOR — New feature set: Shield Framework v5.0 Segment 1 Tariff Billing Risk Controls
+
+### Summary
+Implements five Segment 1 tariff billing risk controls: DSP Status Verification, Tariff-Anchored Facilitation Ceiling, Provider Billing Agreement Gate, Tariff Disclosure Screen, and Post-Procedure EOB Reconciliation Gate. Includes database migration (007), underwriting service, 18 new API routes, 7 new frontend pages (admin + patient + provider), and 25 integration tests.
+
+### Added
+- `backend/src/migrations/007_shield_v5_controls.sql` — 15 new tables/column additions for Shield v5.0 data model
+- `backend/src/services/underwriting.service.js` — `dspCheck`, `calculateCeiling`, `checkBillingAgreement`, `createDisclosure`, `acknowledgeDisclosure`, `checkDisclosureGate`, `triggerProvisionalPayout`, `submitEob`, `reconcileEob`, `addToManualReviewQueue`, `logAuditEvent`
+- `backend/src/routes/underwriting.js` — 18 new API endpoints under `/api/v1/underwriting`, `/api/v1/providers`, `/api/v1/payouts`, `/api/admin`
+- `admin-review-queue.html` — Manual review queue with SLA countdowns and Approve/Reject/Escalate actions
+- `admin-billing-agreements.html` — Provider billing agreements management
+- `admin-benchmarks.html` — Procedure benchmark CRUD
+- `admin-eob-reconciliation.html` — EOB submissions and one-click reconciliation
+- `admin-circuit-breaker.html` — Segment 1 tariff inflation monitor and circuit breaker events
+- `provider-billing-agreement.html` — Provider onboarding billing agreement signing
+- `tariff-disclosure.html` — Patient tariff gap disclosure with checkbox acknowledgement
+
+### Modified
+- `backend/src/server.js` — registered `underwritingRoutes` at `/api`; added global `X-Robots-Tag` header to security middleware
+
+### Tests
+- `tests/integration/shield-v5.test.js` — 25 integration tests for all 5 controls (written before implementation)
+
+---
+
+## [v1.6.0] — 2026-04-05
+
+**Type**: MINOR — New feature: Customer Messaging Journey
+
+### Summary
+Introduces the complete customer messaging journey — all 43 message types across 10 lifecycle stages, a 13-rung collections escalation ladder (day 1 → day 90), a notification dispatcher service, and a `/api/notifications` inbox API.
+
+### Added
+- `backend/src/services/messaging-journey.service.js` — `MessagingJourneyService`, `MESSAGE_TYPES` (43 types), `CHANNELS`, `JOURNEY_STAGES` (10 stages), `COLLECTIONS_LADDER` (13 rungs), email/SMS/in_app templates for every message type, `getTriggerRules()` canonical event-to-channel map
+- `backend/src/services/collections-messaging.service.js` — `CollectionsMessagingService`, `ESCALATION_STAGES`, `getStrategyForDaysOverdue()`, `getFullSequenceForPayment()`
+- `backend/src/services/notification.service.js` — `NotificationService` with `send()`, `sendAll()`, `schedule()`, `getUserNotifications()`, `getUnreadCount()`, `markRead()`, `markAllRead()`
+- `backend/src/routes/notifications.js` — REST API: `GET /api/notifications`, `GET /api/notifications/unread-count`, `PUT /api/notifications/:id/read`, `PUT /api/notifications/read-all`
+- `tests/unit/messaging-journey.test.js` — 173 unit tests (total: 443 unit tests)
+
+### Modified
+- `backend/src/services/email.service.js` — added `sendJourneyEmail({ to, subject, html })`
+- `backend/src/server.js` — registered `/api/notifications` route
+
+---
+
+## [v1.5.6] — 2026-03-31
+
+**Type**: PATCH — Bug fix: password reset email delivery
+
+### Summary
+Fixed two bugs causing password reset emails to silently fail in production: reset links pointed to `localhost:3000` (APP_URL missing from vercel.json), and emails were delivered to a fake Ethereal test inbox instead of the user (SMTP_HOST not set in production, Ethereal fallback triggered silently).
+
+### Fixed
+- `vercel.json`: Added `APP_URL=https://paysick.co.za` to env block
+- `backend/src/services/email.service.js`: Added production guard — throws clear error when `NODE_ENV=production` and `SMTP_HOST` is not set, preventing silent Ethereal fallback
+
+### Added
+- `tests/unit/email-service.test.js`: 5 new unit tests covering APP_URL domain correctness and production SMTP configuration guard (total: 102 unit tests)
+
+---
+
+## [v1.5.5] — 2026-03-27
+
+**Type**: PATCH — Regulatory terminology compliance audit & update
+
+### Summary
+Comprehensive audit and update of all customer-facing, provider-facing, investor-facing, and internal documents to ensure consistent positioning of PaySick as a **healthcare payment facilitation platform** — not a credit provider, medical scheme, or insurer.
+
+### Fixed
+- `about.html`: Removed false NCA credit provider claim; replaced with correct CPA/POPIA positioning
+- `terms-of-service.html`: Removed NCA credit agreement conditional; added explicit non-credit/non-NCR disclaimer
+- `privacy-policy.html`: Removed NCA row from legal framework table; fixed "claims history" → "payment history"
+- `index.html`: "credit risk" → "collection burden" in provider section (2 instances)
+- `providers.html`: "Zero Credit Risk" heading and copy → "Zero Collection Burden"
+- `provider-apply.html`: "credit risk" language → payment management language (2 instances)
+- `marketplace-offers.html`: "loan offer/application/processed" → payment arrangement language
+- `investor-deck.html`: All prohibited terms replaced — underwriting/lenders/loans/credit risk/NIM/healthcare financing → approved payment facilitation equivalents (both HTML and PPTX generation code)
+- `marketplace-apply.html`: APR comment → service fee rate; loan UI text → arrangement language
+
+---
+
+## [v1.5.4] — 2026-03-26
+
+**Type**: PATCH — Root cause fix for all API 500 errors: missing `requireRole` export
+
+### Summary
+`providers.js` imported `requireRole` from `auth.middleware.js`, but the function was never defined or exported. At module load time, Express route registration hit `requireRole('admin')` as `undefined`, throwing `TypeError: requireRole is not a function`. This crashed `server.js` before `module.exports = app` was reached, causing every API route to return 500. Root cause was identified via the v1.5.3 diagnostic wrapper, which converted the opaque Vercel HTML 500 into a JSON error logged as: `[PaySick] FATAL: server failed to load: requireRole is not a function`.
+
+### Fixed
+- `auth.middleware.js`: added `requireRole(role)` factory function and added it to `module.exports`
+
+---
+
+## [v1.5.3] — 2026-03-26
+
+**Type**: PATCH — Diagnostic crash wrapper + integration test coverage for forgot/reset-password
+
+### Summary
+Production API returning Vercel HTML 500 (instead of JSON) on all `/api/*` routes. Root cause still under diagnosis. Added crash-safe wrapper to `api/index.js` and `api/[...slug].js` that catches any module-load exception and returns `{"error":"Server failed to start","code":"SERVER_LOAD_ERROR"}` as `application/json` — converting an opaque HTML crash into a parseable JSON error. Also added 14 integration tests for `POST /api/users/forgot-password` and `POST /api/users/reset-password` which had zero prior integration test coverage.
+
+### Added
+- `api/index.js`: try/catch wrapper around `require('../backend/src/server')` — crash → JSON 500
+- `api/[...slug].js`: same crash wrapper for the Vercel file-system catch-all function
+- `tests/integration/users.test.js`: 14 new integration tests for forgot-password and reset-password
+
+### Fixed
+- Module-load crashes in Vercel functions now return `application/json` instead of Vercel HTML 500
+
+---
+
+## [v1.5.2] — 2026-03-26
+
+**Type**: PATCH — Bug fix: explicit `/api/(.*)` rewrite in vercel.json to guarantee function invocation
+
+### Summary
+File-based catch-all `api/[...slug].js` was not reliably routing `/api/*` requests to the Express function in Vercel production. Added explicit rewrite `"/api/(.*)" → "/api/index.js"` in vercel.json. Combined with the v1.5.1 fix (deps in root package.json), this ensures all API routes are correctly handled.
+
+### Fixed
+- `vercel.json`: added `{ "source": "/api/(.*)", "destination": "/api/index.js" }` rewrite
+
+---
+
+## [v1.5.1] — 2026-03-26
+
+**Type**: PATCH — Bug fix: API routes returning HTML 404 in Vercel production
+
+### Summary
+All `/api/*` routes were returning Vercel's HTML 404 page instead of JSON responses in production. Root cause: backend production dependencies lived only in `backend/package.json`. Vercel's `postinstall` script (`cd backend && npm install`) could fail silently, leaving `backend/node_modules` empty. With no `express` discoverable, `@vercel/nft` could not bundle the serverless functions, so Vercel had no function to invoke and returned HTML 404.
+
+### Fixed
+- Moved all backend production dependencies (`express`, `pg`, `helmet`, `cors`, `morgan`, `dotenv`, `express-rate-limit`, `helmet`, `jsonwebtoken`, `nodemailer`, `uuid`) to root `package.json`
+- Removed `postinstall` script from root `package.json` — no longer needed
+
+---
+
+## [v1.5.0] — 2026-03-26
+
+**Type**: MINOR — New feature: forgot password / reset password flow
+
+### Summary
+Users who have forgotten their password can now request a reset link via email. Backend: `POST /forgot-password` (anti-enumeration, SHA-256 token storage, 1-hour expiry) and `POST /reset-password` (transaction: mark token used, rehash password, revoke all sessions). Frontend: `forgot-password.html` and `reset-password.html` with client-side validation and friendly non-JSON error handling. "Forgot password?" link added to `login.html`. 30 new unit tests (total: 97).
+
+### Added
+- `POST /api/users/forgot-password` — anti-enumeration; sends branded reset email with 1-hour token
+- `POST /api/users/reset-password` — validates token, updates password in transaction, revokes all sessions
+- `backend/src/services/email.service.js` — `sendPasswordResetEmail()`
+- `forgot-password.html` — email entry form, generic success message
+- `reset-password.html` — new password form, client-side length/match validation, auto-redirect to login on success
+- `login.html` — "Forgot password?" link
+- `tests/unit/password-reset.test.js` — 30 new tests (token format, expiry, SHA-256 hashing, password requirements, API response handling)
+
+---
+
+## [v1.4.4] — 2026-03-26
+
+**Type**: PATCH — Bug fix: login shows raw SyntaxError to user on non-JSON server response
+
+### Summary
+`login.html` was calling `response.json()` bare inside the outer try/catch. When the API returned an HTML error page, the SyntaxError ("Unexpected token 'T', "The page c"... is not valid JSON") propagated to the catch block and was shown verbatim to users. Fixed by wrapping `response.json()` in an inner try/catch (same pattern already used in `register.html` since v1.3.1). Added 8-test regression suite.
+
+### Fixed
+- `login.html` — inner try/catch around `response.json()`; non-JSON responses now show "Server error (N). Please try again shortly."
+
+### Added
+- `tests/unit/login-error-handling.test.js` — 8 tests covering the full login response handling path (non-JSON 404/500, no SyntaxError in message, success, EMAIL_UNVERIFIED, 401 with/without error body)
+- Total unit tests: 67 (was 59)
+
+---
+
+## [v1.4.3] — 2026-03-24
+
+**Type**: PATCH — Bug fix: lender webhook HMAC used ciphertext instead of plaintext key
+
+### Summary
+Fixed marketplace.js webhook signature middleware. The AES-encrypted API key ciphertext was being passed directly to `crypto.createHmac()` as the signing secret. Lenders sign requests with the plaintext key; the server was verifying with the ciphertext — so all webhook signatures for external lenders would fail with 401. Fixed by decrypting before HMAC. Also imported `decryptBankingData` which was missing from the import.
+
+### Fixed
+- `backend/src/routes/marketplace.js` — decrypt `api_key_encrypted` before using as HMAC key in webhook validation middleware
+
+---
+
+## [v1.4.2] — 2026-03-24
+
+**Type**: PATCH — Critical bug fix: registration returning "Server error (404)"
+
+### Summary
+Removed `process.exit(1)` from the startup `validateEnvironment()` error handler in `server.js`. In Vercel serverless, calling `process.exit()` during module initialization kills the function before it can send any response — Vercel then returns an HTML error page. The frontend's `response.json()` call throws on the HTML body, triggering the misleading "Server error (404)" message. Same class of bug as the `process.exit(-1)` fixed in v1.3.1 (database pool), but in the startup validation path.
+
+### Fixed
+- `backend/src/server.js` — removed `process.exit(1)` from `validateEnvironment()` catch block; startup errors are now logged only; routes that require `TOKEN_SECRET` / `ENCRYPTION_KEY` return JSON 500 from their own error handlers
+
+---
+
+## [v1.4.1] — 2026-03-24
+
+**Type**: PATCH — Footer Company section removed; login page mobile layout improved
+
+### Summary
+Removed the placeholder "Company" footer section site-wide (index, login, onboarding, provider-apply, providers). The section will be restored in a future version once content is defined. Improved login page mobile UX with new 768px and 480px breakpoints: top-aligned layout, reduced padding, 16px input font-size to prevent iOS zoom, and scaled-down logo for small screens.
+
+### Changed
+- `index.html` — removed Company footer section
+- `login.html` — removed Company footer section; added mobile CSS breakpoints (768px, 480px)
+- `onboarding.html` — removed Company footer section
+- `provider-apply.html` — removed Company footer section
+- `providers.html` — removed Company footer section
+
+---
+
+## [v1.4.0] — 2026-03-16
+
+**Type**: MINOR — Provider charge and patient late-payment fee
+
+### Summary
+Introduced the platform's fee model. A central `fee.service.js` module defines all fee rates. Providers are charged a flat 5% service fee on every settlement payout. Patients pay zero interest on regular instalments; if a payment is missed, a 5% late fee is charged per full calendar month overdue (compounding). Frontend pages updated with full fee disclosure.
+
+### Added
+- `backend/src/services/fee.service.js` — `PROVIDER_SERVICE_FEE_PCT` (5%), `PATIENT_LATE_FEE_PCT_PER_MONTH` (5%), `PATIENT_BASE_INTEREST_RATE` (0%), `calculateLateFee()`, `calculateProviderSettlement()`
+- `POST /api/payments/:id/pay` — calculates and applies late fee if payment is overdue; logs fee as separate transaction
+- `GET /api/payments/:id/fee-preview` — returns late fee preview for any payment
+- `POST /api/payments/admin/process-overdue` — bulk overdue marking and late fee update (admin/cron)
+- `GET /api/providers/admin/:id/settlements` — list settlements with service fee pct
+- `POST /api/providers/admin/:id/settle` — create settlement with 5% deduction per line item
+- `provider-apply.html` — "How You Get Paid" section: provider tier table, 5% fee disclosure, updated consent checkbox
+- `payments.html` — fee policy banner (0% interest, 5% late fee), overdue card late fee display, history late fee line
+
+---
+
+## [v1.3.6] — 2026-03-13
+
+**Type**: MINOR — Shield underwriting activation
+
+### Summary
+Activated the PaySick Shield underwriting framework on the live patient application flow. Three missing form fields were added to the marketplace application (procedure urgency, existing monthly obligations, medical aid cover). The backend marketplace route now calls Shield Gate 2 (patient affordability assessment) before any lender matching occurs. Declined applications surface a detailed decline card with rationale and an alternative loan suggestion.
+
+### Added
+- **Application form**: New required fields on Step 3 — procedure urgency (elective/planned/semi_urgent/urgent), existing monthly debt repayments, and medical aid cover amount. All three feed directly into the Shield affordability engine.
+- **Shield Gate 2 integration**: `POST /api/marketplace/applications` now calls `patientGateService.assessApplication()` for every application that includes income data. DECLINE outcomes return `{ shield_declined: true, shield }` and stop processing. Amber and green outcomes proceed to marketplace.
+- **Decline UX**: `showShieldDecline()` in marketplace-apply.html renders a decline card with the Shield engine's rationale bullets and, when available, an alternative loan amount that fits within the 18% RTI comfort ceiling.
+- **Demo Shield simulation**: `buildDemoResponse()` now computes and returns a simulated Shield assessment (RTI, DTI, borrower profile, risk tier) from the user's demo inputs.
+
+---
+
+## [v1.3.5] — 2026-03-13
+
+**Type**: PATCH — Bug fix / Demo hardening
+
+### Summary
+Made the demo site fully self-contained and independent of the backend API. Demo login, dashboard data, and marketplace application submission all now resolve locally from hardcoded data — no network requests are made in demo mode.
+
+### Fixed
+- **Demo login**: Replaced `fetch('/api/users/demo-login', ...)` with a synchronous hardcoded `DEMO_USERS` lookup in `demo-login.html`. Token, user profile, and onboarding flag written directly to `localStorage`.
+- **Demo dashboard**: `dashboard.html` now detects demo mode via `isDemoMode()` (checks `paysick_auth_token` prefix). When true, `loadDemoData()` populates all stat cards and renders a hardcoded active plan (Netcare Dental Centre, R18,500, 3 months) and upcoming payment (R6,167, 15 April 2026) without any API call.
+- **Demo marketplace**: `marketplace-apply.html` now detects demo mode and calls `buildDemoResponse()` instead of the API. Returns computed preview offers for 3 lenders (MediFinance SA 16.5%, HealthCredit Plus 18.5%, CareCapital 19.5%) using standard amortisation on the user-selected loan amount and term.
+
+---
+
+## [v1.3.4] — 2026-03-13
+
+**Type**: PATCH — UI fix
+
+### Summary
+Cleaned up the demo access entry point on the login page. Removed the duplicate "Demo" link; the single remaining "Demo access" link is now positioned below the fold.
+
+### Fixed
+- **Login page**: Removed duplicate "Demo" link from `.back-home` row. Single "Demo access" link repositioned with 80px top margin so it is below the fold and does not compete with the primary login CTA.
+
+---
+
+## [v1.3.3] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed demo site breaking after selecting a procedure type. Three bugs combined to make the marketplace funding flow unreachable or non-functional.
+
+### Fixed
+- **Navigation**: `dashboard.html` "Apply for Funding" nav link and "Apply now" inline link both pointed to `onboarding.html`. A user who had already completed onboarding was bounced straight back to the dashboard, with no path to `marketplace-apply.html` (the procedure-type selection). Both links now point to `marketplace-apply.html`.
+- **API client resilience**: `api-client.js` `response.json()` was inside the same `try/catch` as `fetch()`. Non-JSON responses (HTML error pages) produced a raw `SyntaxError` toast. `response.json()` is now wrapped in its own inner try/catch; non-JSON responses surface as `Server error (N)`.
+- **Demo login resilience**: `demo-login.html` had the same non-JSON pattern — if the API returned HTML, the catch message was a raw `SyntaxError`, and the auth token was never stored, making all subsequent API calls fail with 401. Same fix applied.
+
+---
+
+## [v1.3.2] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Applied the same server-resilience and error-display fixes from v1.3.1 to the provider registration flow (`provider-apply.html`).
+
+### Fixed
+- **Provider application**: `response.json()` now wrapped in its own try/catch — non-JSON server responses (e.g. HTML error page from hosting layer) surface as `Server error (N)` instead of a raw SyntaxError
+- **Provider application**: `alert()` replaced with `#errorBanner` inline element for all error paths
+- **Provider application**: Eliminated double `response.json()` call (was called once for error path and once for success path); now called once and result used for both
+
+---
+
+## [v1.3.1] — 2026-03-13
+
+**Type**: PATCH — Bug fix
+
+### Summary
+Fixed "Unable to connect to the server" failure on new account creation. Root cause: `pool.on('error')` called `process.exit(-1)` in a serverless context, killing the function process. A secondary frontend issue masked the real server error as a misleading network error.
+
+### Fixed
+- **Database**: `pool.on('error')` in `database.js` called `process.exit(-1)` — removed the exit call. In Vercel serverless this terminated the function handler, causing the next request to receive a non-JSON HTML error page and trigger the frontend's catch block.
+- **Registration UX**: `register.html` `response.json()` was in the same try/catch as `fetch()`. When the server returned a non-JSON body, a `SyntaxError` was caught and shown as "Unable to connect to the server." — wrapping `response.json()` in its own try/catch now surfaces the actual HTTP status code instead.
+
+---
+
+## [v1.3.0] — 2026-03-12
+
+**Type**: MINOR — Generic provider statement, new public pages, production compliance fixes
+
+### Summary
+Removed third-party healthcare brand names from the landing page (generic compliant language). Added About and Contact pages. Fixed Vercel guard pattern, root package.json bloat, and legacy page link references.
+
+### Added
+- `about.html` — About Us page with company mission, stats, team section
+- `contact.html` — Contact page with async form submission (fetch POST)
+
+### Fixed
+- **Compliance**: `index.html` provider network statement no longer names specific SA healthcare brands
+- **Serverless**: `server.js` VERCEL guard fixed from `NODE_ENV !== 'production' || !process.env.VERCEL` to correct `VERCEL !== '1'`
+- **Deployment**: `vercel.json` serverless destination fixed to `/api/index.js`
+- **package.json**: Removed duplicate Express dependencies from root; restored `node >= 18.0.0`
+- **Legacy pages**: `privacy.html` / `terms.html` footer links corrected to `privacy-policy.html` / `terms-of-service.html`
+- **UX**: `contact.html` form submit replaced `alert()` with inline success/error divs + `fetch()` POST
+
+---
+
+## [v1.2.0] — 2026-03-12
+
+**Type**: MINOR — new pages, extended provider API, serverless deployment fix
+
+### Summary
+Added complete payments UI (payments.html, make-payment.html, payment-success.html), extended the provider API with self-service application and full admin CRUD, added Vercel serverless entry point (api/index.js), fixed critical security bug (base64 → AES-256-GCM for provider banking data), and added auth protection to all admin routes.
+
+### Added
+- `payments.html` — My Payments page (active plans, upcoming, history tabs)
+- `make-payment.html` — Payment execution flow
+- `payment-success.html` — Post-payment confirmation
+- `api/index.js` — Vercel serverless function entry point
+- `POST /api/providers/apply` — self-service provider application
+- `POST /api/providers/track-cta` — CTA analytics (never fails caller)
+- `GET /api/providers/admin/all` — admin: all providers
+- `GET /api/providers/admin/stats` — admin: aggregate statistics
+- `PUT /api/providers/admin/:id/approve` — admin: approve with tier
+- `PUT /api/providers/admin/:id/status` — admin: activate/suspend
+- `PUT /api/providers/admin/:id` — admin: update details
+- `DELETE /api/providers/admin/:id` — admin: delete
+- `backend/database/seed-providers.sql` — fictional SA provider seed data
+- Provider network section on `index.html` homepage
+- 24 new integration tests for providers routes (now 27 total)
+
+### Fixed
+- **Security**: `/api/providers/apply` used `Buffer.from(...).toString('base64')` as "encryption" — replaced with `encryptBankingData()` (AES-256-GCM)
+- **Auth**: All 6 admin provider routes were unauthenticated — added `authenticateToken + requireRole('admin')`
+- **Serverless**: `server.js` now guards `app.listen()` with `VERCEL !== '1'`
+- **vercel.json**: Updated to `rewrites` syntax (deprecated `routes`/`builds` removed); restored CORS_ORIGIN + ALLOW_DEMO_LOGIN env vars
+- **Navigation**: `index.html` nav "For Providers" linked to `provider-apply.html` → corrected to `providers.html`
+- **Footer links**: `providers.html` footer used `privacy.html`/`terms.html` → fixed to `privacy-policy.html`/`terms-of-service.html`; removed dead Careers/Press links
+- **Dashboard icons**: Replaced emoji icons (💳 📅 📊 🏠) with SVG design-system icons
+
+---
+
+## [v1.1.0] — 2026-03-12
+
+**Type**: MINOR — Bug fixes + test suite
+
+### Summary
+Production cleanup for the live `paysick.co.za` domain launch. Fixed critical login token storage bug, added CORS for the production domain, and introduced a comprehensive test suite (59 unit tests, integration test stubs for all 6 route modules).
+
+### Fixed
+- `api-client.js`: login response used `response.token` but backend returns `response.accessToken` — tokens were never stored
+- `api-client.js`: logout now clears `paysick_refresh_token` from localStorage
+- CORS: added `https://paysick.co.za` and `https://www.paysick.co.za` to allow-list in `server.js`
+- `vercel.json`: added `CORS_ORIGIN` env variable pointing to production domain
+
+### Added
+- `tests/unit/security.service.test.js` — 19 tests for crypto functions
+- `tests/unit/security-utils.test.js` — 40 tests for frontend security utilities
+- `tests/integration/health.test.js` — health endpoint and 404 handler
+- `tests/integration/users.test.js` — user auth flows
+- `tests/integration/applications.test.js` — application CRUD + validation
+- `tests/integration/payments.test.js` — payment plan flows
+- `tests/integration/providers.test.js` — provider directory (public)
+- `tests/integration/risk.test.js` — risk analytics (admin-only)
+- `tests/setup.js`, `tests/__mocks__/database.js`, `tests/__mocks__/email.service.js`
+
+---
+
+## [v1.0.0] — 2026-03-09
+
+**Type**: Initial Official Release
+
+### Summary
+First officially archived version of the PaySick platform. Captures the complete South African healthcare payment platform including core patient flows, multi-lender marketplace, proprietary healthcare risk scoring engine, provider network, admin dashboards, investor deck, and full backend API.
+
+### Added
+- **Core Platform**
+  - Patient registration and JWT authentication
+  - Payment application workflow (up to R850)
+  - 3-month payment plan scheduling
+  - Collections management for overdue payments
+  - POPIA compliance audit logging
+  - Transaction ledger
+
+- **Multi-Lender Marketplace**
+  - Lender onboarding and management
+  - Auction-based loan offer system
+  - Patient-facing offer comparison (`marketplace-offers.html`)
+  - Patient application flow (`marketplace-apply.html`)
+  - Lender dashboard for reviewing applications (`lender-dashboard.html`)
+  - Loan approval bridge service
+  - Marketplace auction service
+
+- **Healthcare Risk Scoring Engine**
+  - Proprietary PD (Probability of Default) model — target 3.2%
+  - LGD (Loss Given Default) model — target 45%
+  - Expected Loss calculation (PD × LGD × EAD)
+  - ICD-10 procedure risk weighting
+  - Patient health score (bureau-like score)
+  - Healthcare affordability assessment
+  - Risk-adjusted pricing recommendations
+  - Automated approve/review/decline decisions
+  - Integration placeholders: Discovery, Bonitas, Momentum, MedCredits SA
+
+- **Provider Network**
+  - Public provider directory with search/filter (`providers.html`)
+  - Provider application form (`provider-apply.html`)
+  - Admin provider management (`admin-providers.html`)
+
+- **Admin Dashboards**
+  - Main admin dashboard (`admin-dashboard.html`)
+  - Risk portfolio section with real-time PD/LGD/EL metrics
+  - Healthcare data source status monitoring
+  - Model performance metrics (AUC-ROC, Gini, KS)
+  - Collections management (`collections.html`)
+
+- **Frontend & Design**
+  - Landing page (`index.html`)
+  - User login (`login.html`)
+  - User onboarding (`onboarding.html`)
+  - User dashboard (`dashboard.html`)
+  - Custom SVG icon system (29 icons, minimalist 2px stroke)
+  - PaySick brand design system
+
+- **Investor Materials**
+  - 12-slide investor deck (`investor-deck.html`)
+  - Risk management slides with PD/LGD model detail
+
+- **Backend API**
+  - Express.js REST API
+  - PostgreSQL schema (14 tables)
+  - Routes: users, applications, payments, providers, marketplace, risk
+  - Services: healthcare-risk, marketplace-auction, loan-approval-bridge, security
+  - JWT authentication middleware
+  - Security tables migration
+  - Vercel deployment configuration
+
+### Architecture
+- **Frontend**: HTML5 / CSS3 / Vanilla JS
+- **Backend**: Node.js / Express.js
+- **Database**: PostgreSQL (Vercel Postgres in production)
+- **Auth**: JWT
+- **Hosting**: Vercel
+- **Security**: Helmet.js, CORS, rate limiting, bcrypt, parameterized queries
+
+---
+
+*Next version: v1.1.0 — to be created when the next feature ships.*

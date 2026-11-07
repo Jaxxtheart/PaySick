@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>Outreach Approve Queue — PaySick Admin</title>
+  <title>Outreach Approve Queue | PaySick Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
@@ -182,13 +182,13 @@
                 <span class="badge ${hold ? 'badge-hold' : 'badge-draft'}">${hold ? 'compliance hold' : 'draft'}</span>
                 <span class="badge badge-step">step ${t.sequence_step ?? 0} · ${esc(t.channel)}</span>
               </div>
-              <div class="meta">${esc(t.vertical)} · ${esc(t.metro || '—')} · ${t.email ? esc(t.email) : 'no public email'}</div>
+              <div class="meta">${esc(t.vertical)} · ${esc(t.metro || '-')} · ${t.email ? esc(t.email) : 'no public email'}</div>
             </div>
             <span class="fit">fit ${t.fit_score}</span>
           </div>
           <div class="subject">${esc(t.subject || '(no subject)')}</div>
           <div class="body">${esc(t.body || '')}</div>
-          ${hold ? `<div class="flags">Prohibited terms — <b>${flags}</b>. Edit to clear before approving.</div>` : ''}
+          ${hold ? `<div class="flags">Prohibited terms: <b>${flags}</b>. Edit to clear before approving.</div>` : ''}
           <div class="actions">
             <button class="btn btn-approve" onclick="approve('${t.id}')" ${hold ? 'disabled title="Edit to clear compliance hold first"' : ''}>Approve &amp; send</button>
             <button class="btn btn-edit" onclick="openEdit('${t.id}')">Edit</button>
@@ -225,7 +225,7 @@
 
     function openEdit(id) {
       const t = currentTouches.find(x => x.id === id);
-      if (!t) return toast('Draft not found — refreshing');
+      if (!t) return toast('Draft not found, refreshing');
       document.getElementById('editTouchId').value = t.id;
       document.getElementById('editSubject').value = t.subject || '';
       document.getElementById('editBody').value = t.body || '';
@@ -241,7 +241,7 @@
         const data = await res.json();
         if (!res.ok) return toast(data.error || 'Save failed');
         closeEdit();
-        toast(data.touch && data.touch.status === 'compliance_hold' ? 'Saved — still on compliance hold' : 'Saved — cleared');
+        toast(data.touch && data.touch.status === 'compliance_hold' ? 'Saved, still on compliance hold' : 'Saved, cleared');
         refresh();
       } catch (err) { toast(err.message); }
     }

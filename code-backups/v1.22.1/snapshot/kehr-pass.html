@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kehr by PaySick: get pre-approved before treatment and take your pass to any provider.">
+    <meta name="author" content="PaySick">
+    <title>Your Kehr pass</title>
+
+    <style>
+        /* Kehr by PaySick tokens (KEHR_BRAND.md), as on kehr.html. */
+        :root {
+            --kehr-red: #E01E37;
+            --kehr-red-bright: #FF4757;
+            --kehr-gradient: linear-gradient(135deg, #FF4757 0%, #E01E37 100%);
+            --kehr-ink: #1A1A1A;
+            --kehr-slate: #4A4A4A;
+            --kehr-mist: #8A8A8A;
+            --kehr-line: #E5E5E5;
+            --kehr-paper: #FAFAFA;
+            --kehr-blush: #FFF5F6;
+            --kehr-wine: #7A1426;
+            --kehr-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--kehr-font); color: var(--kehr-ink); line-height: 1.5; background: var(--kehr-paper); min-height: 100vh; }
+        header { background: #fff; border-bottom: 1px solid #EEE; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        .kehr-lockup { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--kehr-ink); }
+        .kehr-mark { width: 36px; height: 36px; flex-shrink: 0; }
+        .kehr-type { display: flex; flex-direction: column; line-height: 1; }
+        .kehr-wordmark { font-size: 24px; font-weight: 400; letter-spacing: -0.5px; color: var(--kehr-ink); }
+        .kehr-endorse { font-size: 11px; font-weight: 300; letter-spacing: 0.4px; color: var(--kehr-slate); margin-top: 3px; }
+        header a.back-link { color: var(--kehr-slate); text-decoration: none; font-size: 14px; border: 1px solid #E0E0E0; border-radius: 20px; padding: 8px 16px; }
+        header a.back-link:hover { border-color: var(--kehr-red); color: var(--kehr-red); }
+
+        main { max-width: 560px; margin: 0 auto; padding: 32px 16px 80px; }
+        .intro { text-align: center; margin-bottom: 24px; }
+        .intro h1 { font-size: 26px; margin-bottom: 6px; }
+        .intro p { color: #666; font-size: 15px; }
+
+        .card { background: #fff; border: 1px solid #EEE; border-radius: 16px; padding: 22px; margin-bottom: 16px; }
+        .card h2 { font-size: 17px; margin-bottom: 4px; }
+        .card .sub { color: var(--kehr-slate); font-size: 14px; margin-bottom: 14px; }
+        .primary-btn { display: inline-block; background: var(--kehr-gradient); color: #fff; padding: 14px 30px; border-radius: 25px; text-decoration: none; font-weight: 500; border: none; font-size: 15px; cursor: pointer; }
+        .primary-btn:disabled { opacity: 0.5; cursor: default; }
+        .secondary-btn { display: inline-block; background: #fff; color: var(--kehr-ink); padding: 11px 22px; border-radius: 25px; border: 2px solid #E8E8E8; font-weight: 500; font-size: 14px; cursor: pointer; text-decoration: none; }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+        .field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; margin-bottom: 12px; }
+        .field input { font: inherit; padding: 11px 12px; border: 1px solid #DDD; border-radius: 10px; }
+        .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .chip { background: #fff; border: 1px solid #DDD; border-radius: 20px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
+        .chip[aria-pressed="true"] { border-color: var(--kehr-red); color: var(--kehr-red); background: var(--kehr-blush); }
+
+        .consent { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 12px 0; border-top: 1px solid #F3F3F3; }
+        .consent:first-of-type { border-top: none; }
+        .consent .label { font-size: 15px; font-weight: 500; }
+        .consent .purpose { font-size: 13px; color: var(--kehr-slate); margin-top: 2px; }
+        .consent .tag { font-size: 11px; color: var(--kehr-wine); letter-spacing: 0.3px; text-transform: uppercase; margin-top: 4px; }
+        .switch { flex-shrink: 0; width: 46px; height: 28px; border-radius: 14px; border: none; background: #DDD; position: relative; cursor: pointer; }
+        .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left 0.15s ease; }
+        .switch[aria-checked="true"] { background: var(--kehr-red); }
+        .switch[aria-checked="true"]::after { left: 21px; }
+
+        .done-line { font-size: 14px; color: var(--kehr-slate); }
+        .done-line.ok::before { content: '\2713  '; color: var(--kehr-red); font-weight: 600; }
+
+        .pass { background: var(--kehr-gradient); color: #fff; border: none; }
+        .pass .code { font-size: 30px; font-weight: 600; letter-spacing: 3px; margin: 8px 0 14px; }
+        .pass .row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.25); }
+        .pass .note { font-size: 13px; opacity: 0.9; margin-top: 12px; }
+        .pass .secondary-btn { border-color: rgba(255,255,255,0.6); }
+
+        .status { font-size: 16px; margin-bottom: 6px; }
+        .term { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border: 1px solid #EEE; border-radius: 12px; margin-bottom: 8px; cursor: pointer; background: #fff; width: 100%; font: inherit; text-align: left; }
+        .term[aria-pressed="true"] { border-color: var(--kehr-red); background: var(--kehr-blush); }
+        .fine { font-size: 12px; color: #6A6A6A; margin-top: 10px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="kehr-lockup" href="kehr.html" aria-label="Kehr by PaySick">
+            <svg class="kehr-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <radialGradient id="kehrPassArm" cx="40%" cy="40%"><stop offset="0%" stop-color="#FF4757"/><stop offset="100%" stop-color="#E01E37"/></radialGradient>
+                    <radialGradient id="kehrPassHalo" cx="50%" cy="50%"><stop offset="0%" stop-color="#FF4757" stop-opacity="0.12"/><stop offset="100%" stop-color="#FF4757" stop-opacity="0.04"/></radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#kehrPassHalo)"/>
+                <rect x="31" y="20" width="12" height="60" rx="6" fill="url(#kehrPassArm)"/>
+                <rect x="37" y="44" width="36" height="12" rx="6" fill="url(#kehrPassArm)" transform="rotate(-45 37 50)"/>
+                <rect x="37" y="44" width="36" height="12" rx="6" fill="url(#kehrPassArm)" transform="rotate(45 37 50)"/>
+                <circle cx="37" cy="50" r="8" fill="#ffffff"/>
+                <circle cx="37" cy="50" r="6" fill="#E01E37"/>
+            </svg>
+            <span class="kehr-type"><span class="kehr-wordmark">Kehr</span><span class="kehr-endorse">by PaySick</span></span>
+        </a>
+        <a class="back-link" href="kehr.html">Back to Kehr</a>
+    </header>
+
+    <main>
+        <div class="intro">
+            <h1 id="page-title">Know before you book</h1>
+            <p id="page-sub">Get pre-approved before treatment, then show your pass to any provider.</p>
+        </div>
+
+        <div id="locked-card" class="card hidden" style="text-align:center;">
+            <p class="sub">Your pass is part of your PaySick account. Log in (or register) to continue.</p>
+            <a class="primary-btn" id="login-link" href="login.html">Log in to continue</a>
+        </div>
+
+        <!-- Step 1: the treatment. Figures come from the quote, never income. -->
+        <section id="step-treatment" class="card hidden">
+            <h2>What's the treatment?</h2>
+            <p class="sub">Use the figures on your quote. We'll ask your medical aid what it covers.</p>
+            <label class="field">Treatment
+                <input id="procedure" type="text" maxlength="100" placeholder="e.g. Knee arthroscopy" autocomplete="off">
+            </label>
+            <label class="field">Quoted amount (R)
+                <input id="estimate" type="number" min="1" step="0.01" inputmode="decimal">
+            </label>
+            <div class="chips" role="group" aria-label="When is it needed?">
+                <button type="button" class="chip" data-urgency="planned" aria-pressed="true">Planned</button>
+                <button type="button" class="chip" data-urgency="elective" aria-pressed="false">Elective</button>
+                <button type="button" class="chip" data-urgency="urgent" aria-pressed="false">Urgent</button>
+            </div>
+            <label class="field">Medical aid (optional)
+                <input id="scheme-name" type="text" maxlength="100" placeholder="Scheme, e.g. Discovery" autocomplete="off">
+            </label>
+            <label class="field">Plan option
+                <input id="scheme-option" type="text" maxlength="100" placeholder="e.g. Classic Priority" autocomplete="off">
+            </label>
+            <label class="field">Membership number
+                <input id="scheme-member" type="text" maxlength="40" autocomplete="off">
+            </label>
+            <div class="actions"><button class="primary-btn" id="treatment-next">Continue</button></div>
+        </section>
+
+        <!-- Step 2: one consent per source. Nothing is read without it. -->
+        <section id="step-consent" class="card hidden">
+            <h2>What we'll read</h2>
+            <p class="sub">Switch on what you're happy to share. You can switch anything off later.</p>
+            <div id="consent-list"></div>
+            <!-- Shown when "Uploaded documents" is on. The file is read into
+                 figures and not kept. -->
+            <div id="upload-box" class="hidden" style="margin-top:12px;">
+                <label class="secondary-btn" for="doc-input" id="doc-label">Add a payslip or bank statement<input id="doc-input" type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none"></label>
+                <p id="doc-status" class="done-line" style="margin-top:8px;"></p>
+            </div>
+            <p class="fine">Health information is special personal information under POPIA. We only read it with your go-ahead.</p>
+            <div class="actions"><button class="primary-btn" id="consent-next">Continue</button></div>
+        </section>
+
+        <!-- Step 3: identity, via the verification partner's liveness check. -->
+        <section id="step-identity" class="card hidden">
+            <h2>Confirm it's you</h2>
+            <p class="sub">A quick selfie, matched to your ID by our verification partner. We never keep the photo.</p>
+            <p id="identity-done" class="done-line hidden ok">Selfie taken</p>
+            <div class="actions">
+                <button class="secondary-btn" id="selfie-btn">Take a selfie</button>
+                <button class="primary-btn" id="check-btn" disabled>Check my pre-approval</button>
+            </div>
+        </section>
+
+        <!-- Outcome: statuses only. -->
+        <section id="result" class="card hidden" aria-live="polite">
+            <p class="status" id="result-status"></p>
+            <div class="actions" id="result-actions"></div>
+        </section>
+
+        <section id="pass-card" class="card pass hidden">
+            <div style="font-size:13px;opacity:0.9;">Your Kehr pass</div>
+            <div class="code" id="pass-code"></div>
+            <div class="row"><span>Pre-approved up to</span><strong id="pass-ceiling"></strong></div>
+            <div class="row"><span>Over up to</span><strong id="pass-term"></strong></div>
+            <div class="row"><span>From</span><strong id="pass-monthly"></strong></div>
+            <div class="row"><span>Valid until</span><strong id="pass-expiry"></strong></div>
+            <p class="note hidden" id="pass-cooling"></p>
+            <p class="note">Show this code to your provider. When the bill is ready, they'll send you a link to set up your plan.</p>
+        </section>
+
+        <!-- v1.22.0: offer a passkey so opening the plan link later is one tap. -->
+        <section id="passkey-card" class="card hidden">
+            <h2>Sign in faster next time</h2>
+            <p class="sub">Use your phone's fingerprint, face or screen lock instead of a password.</p>
+            <div class="actions"><button class="secondary-btn" id="passkey-add">Add a passkey</button></div>
+            <p class="done-line" id="passkey-status"></p>
+        </section>
+
+        <!-- Plan link from a provider: choose a term, then the plan is set up. -->
+        <section id="plan-card" class="card hidden">
+            <h2>Your plan</h2>
+            <p class="sub" id="plan-amount"></p>
+            <div id="term-list"></div>
+            <div class="actions"><button class="primary-btn" id="plan-confirm" disabled>Set up my plan</button></div>
+            <p class="fine">You'll approve the debit order for <strong>KEHR*PLAN</strong> (Tech &amp; Artery (Pty) Ltd) in your banking app.</p>
+        </section>
+    </main>
+
+    <script src="api-client.js"></script>
+    <script src="js/passkey.js"></script>
+    <script>
+        const state = { documentRead: false, preapprovalId: null, urgency: 'planned', consents: [], selfieToken: null, plan: null, selectedTerm: null };
+
+        // The sources shown, in order. Labels and purposes come from the
+        // server (GET /api/kehr/consents), so the text the patient reads is
+        // the text recorded with their consent.
+        const SOURCE_ORDER = ['bureau', 'bank_income_once', 'document_upload', 'scheme_cover', 'health_history'];
+        const REQUIRED = ['bureau'];
+        let SOURCE_DEFS = {};
+
+        function formatRands(cents) {
+            if (cents === null || cents === undefined) return '-';
+            const abs = Math.abs(Math.round(cents));
+            const rands = Math.floor(abs / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return `${cents < 0 ? '-' : ''}R${rands}.${String(abs % 100).padStart(2, '0')}`;
+        }
+        function formatDate(iso) {
+            if (!iso) return '-';
+            return new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        function el(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined) node.textContent = text;
+            return node;
+        }
+        function show(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hide(id) { document.getElementById(id).classList.add('hidden'); }
+        function hideSteps() { ['step-treatment', 'step-consent', 'step-identity', 'result', 'pass-card', 'passkey-card', 'plan-card'].forEach(hide); }
+
+        function isActive(source) {
+            return state.consents.some((c) => c.source === source && c.active);
+        }
+
+        function renderConsents() {
+            const list = document.getElementById('consent-list');
+            list.innerHTML = '';
+            const hasScheme = !!document.getElementById('scheme-name').value.trim();
+            SOURCE_ORDER.filter((source) => SOURCE_DEFS[source] && (source !== 'scheme_cover' || hasScheme)).forEach((source) => {
+                const def = SOURCE_DEFS[source];
+                const required = REQUIRED.includes(source);
+                const row = el('div', 'consent');
+                const text = el('div');
+                text.appendChild(el('div', 'label', def.label + (required ? ' (needed)' : '')));
+                text.appendChild(el('div', 'purpose', def.purpose));
+                if (def.specialPersonalInformation) text.appendChild(el('div', 'tag', 'Special personal information'));
+                const sw = el('button', 'switch');
+                sw.type = 'button';
+                sw.setAttribute('role', 'switch');
+                sw.setAttribute('aria-label', def.label);
+                sw.setAttribute('aria-checked', String(isActive(source)));
+                sw.addEventListener('click', () => toggleConsent(source, sw));
+                row.appendChild(text);
+                row.appendChild(sw);
+                list.appendChild(row);
+            });
+            document.getElementById('upload-box').classList.toggle('hidden', !isActive('document_upload'));
+            const ready = isActive('bureau') && (isActive('bank_income_once') || (isActive('document_upload') && state.documentRead));
+            document.getElementById('consent-next').disabled = !ready;
+        }
+
+        async function toggleConsent(source, sw) {
+            sw.disabled = true;
+            try {
+                const res = isActive(source)
+                    ? await PaySickAPI.kehr.withdrawConsent(source)
+                    : await PaySickAPI.kehr.grantConsent(source);
+                state.consents = res.consents || [];
+            } catch (e) {
+                alert(e.message || 'That did not save. Please try again.');
+            }
+            renderConsents();
+        }
+
+        function setResult(text, actions) {
+            hideSteps();
+            show('result');
+            document.getElementById('result-status').textContent = text;
+            const box = document.getElementById('result-actions');
+            box.innerHTML = '';
+            (actions || []).forEach((a) => box.appendChild(a));
+        }
+
+        function reviewButton() {
+            const b = el('button', 'secondary-btn', 'Ask a person to look at this');
+            b.addEventListener('click', async () => {
+                b.disabled = true;
+                try {
+                    const r = await PaySickAPI.kehr.requestReview(state.preapprovalId);
+                    setResult(r.message);
+                } catch (e) { b.disabled = false; alert(e.message); }
+            });
+            return b;
+        }
+
+        function renderPass(view) {
+            hideSteps();
+            document.getElementById('page-title').textContent = "You're pre-approved";
+            document.getElementById('page-sub').textContent = 'Take your pass to the provider you choose.';
+            document.getElementById('pass-code').textContent = view.code || '';
+            document.getElementById('pass-ceiling').textContent = formatRands(view.ceilingCents);
+            document.getElementById('pass-term').textContent = `${view.maxTermMonths} months`;
+            document.getElementById('pass-monthly').textContent = `${formatRands(view.indicativeMonthlyCents)} a month`;
+            document.getElementById('pass-expiry').textContent = formatDate(view.expiresAt);
+            const cooling = document.getElementById('pass-cooling');
+            if (view.coolingOffEndsAt) {
+                cooling.textContent = `Your plan can be set up from ${formatDate(view.coolingOffEndsAt)}, in case you change your mind.`;
+                cooling.classList.remove('hidden');
+            } else {
+                cooling.classList.add('hidden');
+            }
+            show('pass-card');
+            if (window.KehrPasskey && KehrPasskey.isSupported()) show('passkey-card');
+        }
+
+        document.getElementById('passkey-add').addEventListener('click', async (e) => {
+            const status = document.getElementById('passkey-status');
+            e.target.disabled = true;
+            try {
+                await KehrPasskey.register();
+                status.textContent = 'Passkey added.';
+                status.classList.add('ok');
+                e.target.classList.add('hidden');
+            } catch (err) {
+                status.textContent = err && err.name === 'NotAllowedError' ? '' : (err.message || 'That passkey could not be added.');
+                e.target.disabled = false;
+            }
+        });
+
+        function renderOutcome(view) {
+            switch (view.status) {
+                case 'pre_approved': return renderPass(view);
+                case 'needs_consent':
+                    hideSteps(); show('step-consent'); renderConsents(); return;
+                case 'needs_documents':
+                    hideSteps(); show('step-consent'); renderConsents();
+                    document.getElementById('consent-list').prepend(el('p', 'sub', view.message));
+                    return;
+                case 'not_available':
+                    return setResult(view.message, view.canRequestReview ? [reviewButton()] : []);
+                default:
+                    return setResult(view.message);
+            }
+        }
+
+        // ── Journey A ─────────────────────────────────────────────
+        document.querySelectorAll('[data-urgency]').forEach((chip) => {
+            chip.addEventListener('click', () => {
+                state.urgency = chip.dataset.urgency;
+                document.querySelectorAll('[data-urgency]').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+            });
+        });
+
+        document.getElementById('treatment-next').addEventListener('click', async (e) => {
+            const estimate = Math.round(parseFloat(document.getElementById('estimate').value) * 100);
+            if (!Number.isInteger(estimate) || estimate <= 0) { alert('Add the amount on your quote.'); return; }
+            const schemeName = document.getElementById('scheme-name').value.trim();
+            e.target.disabled = true;
+            try {
+                const res = await PaySickAPI.kehr.startPreapproval({
+                    procedureCode: document.getElementById('procedure').value.trim() || null,
+                    estimateCents: estimate,
+                    urgency: state.urgency,
+                    scheme: schemeName ? {
+                        name: schemeName,
+                        option: document.getElementById('scheme-option').value.trim(),
+                        membershipNumber: document.getElementById('scheme-member').value.trim()
+                    } : null
+                });
+                state.preapprovalId = res.preapprovalId;
+                hide('step-treatment');
+                show('step-consent');
+                renderConsents();
+            } catch (err) {
+                alert(err.message || 'That did not save. Please try again.');
+            } finally { e.target.disabled = false; }
+        });
+
+        const UPLOAD_TYPES = { 'application/pdf': true, 'image/jpeg': true, 'image/png': true };
+        document.getElementById('doc-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            e.target.value = '';
+            const status = document.getElementById('doc-status');
+            status.classList.remove('ok');
+            if (!file) return;
+            if (!UPLOAD_TYPES[file.type]) { status.textContent = 'Upload a PDF, JPG or PNG.'; return; }
+            if (file.size > 4 * 1024 * 1024) { status.textContent = 'The file must be under 4MB.'; return; }
+            status.textContent = 'Reading...';
+            const fr = new FileReader();
+            fr.onload = async () => {
+                try {
+                    const fileBase64 = String(fr.result).split(',')[1];
+                    const r = await PaySickAPI.kehr.uploadDocument(state.preapprovalId, { fileBase64, mediaType: file.type });
+                    status.textContent = r.message;
+                    if (r.status === 'document_read') { state.documentRead = true; status.classList.add('ok'); }
+                } catch (err) {
+                    status.textContent = err.message || 'That did not upload. Please try again.';
+                }
+                renderConsents();
+            };
+            fr.readAsDataURL(file);
+        });
+
+        document.getElementById('consent-next').addEventListener('click', () => {
+            hide('step-consent');
+            show('step-identity');
+        });
+
+        // Production: the verification partner's liveness SDK returns a
+        // short-lived token. Here a token stands in for it.
+        document.getElementById('selfie-btn').addEventListener('click', () => {
+            const bytes = new Uint8Array(12);
+            crypto.getRandomValues(bytes);
+            state.selfieToken = 'liveness-' + Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+            show('identity-done');
+            document.getElementById('check-btn').disabled = false;
+        });
+
+        document.getElementById('check-btn').addEventListener('click', async (e) => {
+            e.target.disabled = true;
+            e.target.textContent = 'Checking...';
+            try {
+                await PaySickAPI.kehr.submitDocuments(state.preapprovalId, { selfieToken: state.selfieToken });
+                renderOutcome(await PaySickAPI.kehr.assess(state.preapprovalId));
+            } catch (err) {
+                alert(err.message || 'That did not work. Please try again.');
+            } finally {
+                e.target.disabled = false;
+                e.target.textContent = 'Check my pre-approval';
+            }
+        });
+
+        // ── Plan link from a provider ─────────────────────────────
+        function renderPlan(view) {
+            hideSteps();
+            document.getElementById('page-title').textContent = 'Your bill is ready';
+            document.getElementById('page-sub').textContent = view.message;
+            document.getElementById('plan-amount').textContent = `Amount to pay: ${formatRands(view.amountCents)}, interest-free.`;
+            const list = document.getElementById('term-list');
+            list.innerHTML = '';
+            view.termOptions.forEach((t) => {
+                const b = el('button', 'term');
+                b.type = 'button';
+                b.setAttribute('aria-pressed', 'false');
+                b.appendChild(el('span', '', `${t.months} months`));
+                b.appendChild(el('strong', '', `${formatRands(t.monthlyCents)} a month`));
+                b.addEventListener('click', () => {
+                    state.selectedTerm = t.months;
+                    list.querySelectorAll('.term').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+                    document.getElementById('plan-confirm').disabled = false;
+                });
+                list.appendChild(b);
+            });
+            state.plan = view;
+            show('plan-card');
+        }
+
+        document.getElementById('plan-confirm').addEventListener('click', async (e) => {
+            e.target.disabled = true;
+            try {
+                await PaySickAPI.marketplace.submitApplication({
+                    ...state.plan.handoff.applicationPayload,
+                    requestedTerm: state.selectedTerm
+                });
+                setResult("Done. Approve the KEHR*PLAN debit order in your banking app and you're set.", [
+                    Object.assign(el('a', 'secondary-btn', 'Go to my dashboard'), { href: 'dashboard.html' })
+                ]);
+            } catch (err) {
+                e.target.disabled = false;
+                alert(err.message || 'That did not work. Please try again.');
+            }
+        });
+
+        async function landLink(token) {
+            const view = await PaySickAPI.kehr.redeemPlanLink(token);
+            // Keep the token out of the address bar and browser history.
+            history.replaceState(null, '', 'kehr-pass.html');
+            if (view.status === 'ready') return renderPlan(view);
+            if (view.status === 'needs_preapproval') {
+                hideSteps(); show('step-treatment');
+                document.getElementById('page-sub').textContent = view.message;
+                return;
+            }
+            return renderOutcome(view);
+        }
+
+        async function init() {
+            const link = new URLSearchParams(window.location.search).get('link');
+            if (!localStorage.getItem('paysick_auth_token')) {
+                if (link) {
+                    try { sessionStorage.setItem('kehr_pending_link', link); } catch (_) { /* private mode */ }
+                }
+                show('locked-card');
+                return;
+            }
+            let pending = link;
+            if (!pending) {
+                try { pending = sessionStorage.getItem('kehr_pending_link'); sessionStorage.removeItem('kehr_pending_link'); } catch (_) { pending = null; }
+            }
+            try {
+                const consentRes = await PaySickAPI.kehr.getConsents();
+                state.consents = consentRes.consents || [];
+                (consentRes.sources || []).forEach((d) => { SOURCE_DEFS[d.source] = d; });
+                if (pending) return await landLink(pending);
+                const passRes = await PaySickAPI.kehr.getPass();
+                if (passRes.pass) return renderPass(passRes.pass);
+                show('step-treatment');
+            } catch (err) {
+                setResult(err.message || 'Kehr is not available right now. Please try again shortly.');
+            }
+        }
+
+        init();
+    </script>
+
+    <noscript>
+        <p style="text-align:center;padding:40px;">Kehr needs JavaScript to run. Please enable it to see your pass.</p>
+    </noscript>
+
+    <!-- Honeypot trap (CLAUDE.md: Bot Crawling Prevention).
+         Invisible to real users, screen readers and keyboard nav. Any client that
+         follows it hits GET /api/hp-check and is blocked for the session. -->
+    <a href="/api/hp-check" style="display:none" aria-hidden="true" tabindex="-1" rel="nofollow">Directory</a>
+</body>
+</html>

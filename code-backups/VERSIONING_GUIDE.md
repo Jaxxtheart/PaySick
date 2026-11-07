@@ -28,6 +28,28 @@ Bug fix only      → v1.0.1
 Breaking change   → v2.0.0
 ```
 
+**Never reuse a number another branch has already cut.** Feature branches cut
+their own versions before they merge, so two branches can both claim the same
+number (this happened in 2026: `claude/inspiring-bardeen-b97kat` cut v1.12.0
+to v1.16.0 while the homepage work cut v1.12.0 to v1.13.0; see v1.17.0).
+Before choosing a number, list the archives on every remote branch:
+
+```bash
+git fetch origin
+for b in $(git branch -r | grep -v HEAD); do
+  git ls-tree --name-only "$b" code-backups/ | sed "s#code-backups/##" | grep '^v'
+done | sort -uV | tail -3
+```
+
+Pick the next number above the highest result.
+
+**Merging a branch whose archive numbers collide.** Keep `code-backups/vX.Y.Z/`
+exactly as it is on the target branch. Move the incoming branch's diverged
+archives, unchanged, to `code-backups/branch-<branch-name>/vX.Y.Z/`, together
+with that branch's `CHANGELOG.md`. Moving a folder is not editing it, and
+snapshots stay read-only. Record the mapping in the next version's
+`RELEASE_NOTES.md` and in `CHANGELOG.md`.
+
 ### Step 2 — Create the New Version Folder
 
 ```bash
@@ -132,7 +154,7 @@ When a feature is removed from the live platform:
 
 When cutting a new version, tick every item:
 
-- [ ] Version number decided (semver)
+- [ ] Version number decided (semver), higher than any archive on any remote branch
 - [ ] `code-backups/vX.Y.Z/snapshot/` created with full source copy
 - [ ] `RELEASE_NOTES.md` written
 - [ ] `REQUIREMENTS.md` updated (new features added, removed features marked deprecated)

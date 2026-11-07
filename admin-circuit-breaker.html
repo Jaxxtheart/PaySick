@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <title>Circuit Breaker Dashboard — PaySick Admin</title>
+  <title>Circuit Breaker Dashboard | PaySick Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #F4F6F9; color: #1B2A4A; }
@@ -228,19 +228,19 @@
   <!-- Stats -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="number" id="statTotal">—</div>
+      <div class="number" id="statTotal">-</div>
       <div class="label">Active Breakers</div>
     </div>
     <div class="stat-card warning">
-      <div class="number" id="statPending">—</div>
+      <div class="number" id="statPending">-</div>
       <div class="label">Pending Review Queue</div>
     </div>
     <div class="stat-card danger">
-      <div class="number" id="statInflation">—</div>
+      <div class="number" id="statInflation">-</div>
       <div class="label">Above-Threshold Invoices (30 days)</div>
     </div>
     <div class="stat-card">
-      <div class="number" id="statReconciled">—</div>
+      <div class="number" id="statReconciled">-</div>
       <div class="label">EOBs Pending Reconciliation</div>
     </div>
   </div>
@@ -253,7 +253,7 @@
     </div>
     <div class="section-body">
       <div class="threshold-line">
-        &#9888; Threshold: 30% — Applications with variance above this trigger a manual hold.
+        &#9888; Threshold: 30%. Applications with variance above this trigger a manual hold.
         Review the hold queue to clear or approve flagged applications.
       </div>
 
@@ -267,7 +267,7 @@
   <div class="section">
     <div class="section-header">
       <h2>Active Circuit Breaker Events</h2>
-      <span class="count-badge" id="breakerCount" style="background:#F4F6F9;color:#666;padding:4px 12px;border-radius:20px;font-size:13px">—</span>
+      <span class="count-badge" id="breakerCount" style="background:#F4F6F9;color:#666;padding:4px 12px;border-radius:20px;font-size:13px">-</span>
     </div>
     <div id="breakerTable">
       <div class="loading">Loading circuit breaker events...</div>
@@ -330,13 +330,13 @@
     const displayed = items.slice(0, 10);
 
     const rows = displayed.map(item => {
-      const barWidth = Math.min(maxWidth, maxWidth * 0.5); // simplified — show as proportional
+      const barWidth = Math.min(maxWidth, maxWidth * 0.5); // simplified - show as proportional
       const barClass = 'warning'; // above threshold
       return `
         <div class="chart-bar-row">
           <span class="chart-label">${(item.application_id || '').slice(0,8)}...</span>
           <div class="chart-bar ${barClass}" style="width:${barWidth}px"></div>
-          <span class="chart-value">${item.review_type.replace(/_/g, ' ')} — ${new Date(item.opened_at).toLocaleDateString('en-ZA')}</span>
+          <span class="chart-value">${item.review_type.replace(/_/g, ' ')} on ${new Date(item.opened_at).toLocaleDateString('en-ZA')}</span>
         </div>
       `;
     }).join('');

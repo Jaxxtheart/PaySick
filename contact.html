@@ -443,7 +443,7 @@
             const error = document.getElementById('formError');
             btn.disabled = true;
             btn.textContent = 'Sending…';
-            // POST to mailto fallback via fetch — replace with real API endpoint when available
+            // POST to mailto fallback via fetch - replace with real API endpoint when available
             fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -457,7 +457,7 @@
                 success.style.display = 'block';
                 this.reset();
             }).catch(() => {
-                // API not yet wired — show success anyway (email will go to hello@paysick.co.za)
+                // API not yet wired - show success anyway (email will go to hello@paysick.co.za)
                 success.style.display = 'block';
                 this.reset();
             }).finally(() => {

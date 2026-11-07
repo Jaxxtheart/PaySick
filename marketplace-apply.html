@@ -901,10 +901,10 @@
                     <label for="urgencyClassification">How urgent is this procedure?</label>
                     <select id="urgencyClassification">
                         <option value="">Select urgency</option>
-                        <option value="elective">Elective — convenience, no medical urgency (e.g. cosmetic, veneers)</option>
-                        <option value="planned">Planned — scheduled within the next 2–3 months</option>
-                        <option value="semi_urgent">Semi-urgent — needed within the next few weeks</option>
-                        <option value="urgent">Urgent — needed immediately or within days</option>
+                        <option value="elective">Elective: convenience, no medical urgency (e.g. cosmetic, veneers)</option>
+                        <option value="planned">Planned: scheduled within the next 2-3 months</option>
+                        <option value="semi_urgent">Semi-urgent: needed within the next few weeks</option>
+                        <option value="urgent">Urgent: needed immediately or within days</option>
                     </select>
                 </div>
 
@@ -1218,7 +1218,7 @@
                         disposable_income: income - applicationData.monthlyObligations - proposedRepayment
                     },
                     flags: [],
-                    rationale: ['Demo assessment — application passes all affordability checks.']
+                    rationale: ['Demo assessment - application passes all affordability checks.']
                 },
                 marketplaceStatus: { message: 'Your application has been received and is pending review by the PaySick team. Funds will be disbursed directly to your healthcare provider once approved.' },
                 paymentPlan: {
@@ -1335,7 +1335,7 @@
                         employmentDurationMonths: applicationData.employmentDurationMonths
                     });
 
-                // Shield declined — show decline card instead of success
+                // Shield declined - show decline card instead of success
                 if (response.shield_declined) {
                     showShieldDecline(response.shield);
                     return;

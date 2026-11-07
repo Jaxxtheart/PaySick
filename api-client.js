@@ -54,7 +54,7 @@ const PaySickAPI = {
               }
               return this.request(endpoint, options, true);
             } catch (_refreshError) {
-              // Refresh failed — clear session and surface the error
+              // Refresh failed - clear session and surface the error
               this.users.logout();
               throw new Error('Session expired. Please log in again.');
             }
@@ -72,7 +72,7 @@ const PaySickAPI = {
 
   /**
    * Exchange a refresh token for a new access token.
-   * Internal — callers should use request() which handles this automatically.
+   * Internal - callers should use request() which handles this automatically.
    */
   async _refreshAccessToken(refreshToken) {
     const url = `${this.baseURL}/users/refresh-token`;
@@ -121,14 +121,14 @@ const PaySickAPI = {
     },
 
     /**
-     * Logout user — revokes the session server-side then clears local storage.
+     * Logout user - revokes the session server-side then clears local storage.
      * Always clears storage even if the network call fails.
      */
     async logout() {
       try {
         await PaySickAPI.request('/users/logout', { method: 'POST' });
       } catch (_) {
-        // Ignore server-side errors — local cleanup always runs
+        // Ignore server-side errors - local cleanup always runs
       } finally {
         localStorage.removeItem('paysick_auth_token');
         localStorage.removeItem('paysick_refresh_token');
@@ -428,6 +428,224 @@ const PaySickAPI = {
      */
     async getLoanRepayments(loanId) {
       return PaySickAPI.request(`/marketplace/loans/${loanId}/repayments`);
+    }
+  },
+
+  // ─── Care Agent (PaySick Care Agent - AI-native alternative journey) ────
+  careAgent: {
+    /**
+     * Start a new Care Agent conversation
+     */
+    async startSession() {
+      return PaySickAPI.request('/care-agent/sessions', { method: 'POST' });
+    },
+
+    /**
+     * Resume an existing conversation
+     */
+    async getSession(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}`);
+    },
+
+    /**
+     * Send a free-text message; the agent extracts what it can and asks
+     * the next progressive question (Stage 1/2: Need, Understand)
+     */
+    async sendMessage(sessionId, message) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ message })
+      });
+    },
+
+    /**
+     * Upload a quote, invoice, or medical-scheme statement for automatic
+     * field extraction (Stage 2: Understand). The file must already be
+     * base64-encoded (without the data: URL prefix) and under 4MB.
+     */
+    async uploadDocument(sessionId, { fileBase64, mediaType, filename }) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/documents`, {
+        method: 'POST',
+        body: JSON.stringify({ fileBase64, mediaType, filename })
+      });
+    },
+
+    /**
+     * Confirm (optionally with edits) the extracted care summary and
+     * receive Stage 3 (Construct) payment-term options
+     */
+    async confirmSummary(sessionId, { summary = {}, monthlyIncome, monthlyObligations } = {}) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/confirm`, {
+        method: 'POST',
+        body: JSON.stringify({ summary, monthlyIncome, monthlyObligations })
+      });
+    },
+
+    /**
+     * Stage 4 (Approve): explicit approval + data-sharing consent.
+     * Returns the payload to submit to the existing marketplace endpoint.
+     */
+    async approve(sessionId, { selectedTermMonths, dataSharingAcknowledged }) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ selectedTermMonths, dataSharingAcknowledged })
+      });
+    },
+
+    /**
+     * Stage 5 (Execute): link the application id created via the existing
+     * marketplace endpoint back to this conversation's audit trail
+     */
+    async recordExecution(sessionId, applicationId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/execute`, {
+        method: 'POST',
+        body: JSON.stringify({ applicationId })
+      });
+    },
+
+    /**
+     * Stage 6 (Manage): "when is my next payment?"
+     */
+    async getManageStatus(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/manage`);
+    },
+
+    /**
+     * Stage 6 (Manage): request a payment-date change (logged for human review)
+     */
+    async requestPaymentDateChange(sessionId, reason) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/manage/payment-date-change`, {
+        method: 'POST',
+        body: JSON.stringify({ reason })
+      });
+    },
+
+    /**
+     * The patient's account as facts (what is owed and when, requests
+     * received) and the options open to them. Read-only.
+     */
+    async getAccount(sessionId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/account`);
+    },
+
+    /**
+     * Prepare an account action. Read-only actions come back done;
+     * everything else comes back as a proposal awaiting confirmAction.
+     */
+    async proposeAction(sessionId, actionType, params = {}) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions`, {
+        method: 'POST',
+        body: JSON.stringify({ actionType, params })
+      });
+    },
+
+    /**
+     * The patient's explicit go-ahead on a proposal. Only ever called from
+     * the patient's own tap on the proposal card.
+     */
+    async confirmAction(sessionId, proposalId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions/${proposalId}/confirm`, {
+        method: 'POST',
+        body: JSON.stringify({ consent: true })
+      });
+    },
+
+    async declineAction(sessionId, proposalId) {
+      return PaySickAPI.request(`/care-agent/sessions/${sessionId}/actions/${proposalId}/decline`, {
+        method: 'POST'
+      });
+    }
+  },
+
+  // ─── Kehr (Journey A: pre-approval, pass, plan links) ────────────────────
+  kehr: {
+    /**
+     * The patient's consents, one per data source, with status
+     */
+    async getConsents() {
+      return PaySickAPI.request('/kehr/consents');
+    },
+
+    async grantConsent(source) {
+      return PaySickAPI.request('/kehr/consents', {
+        method: 'POST',
+        body: JSON.stringify({ source })
+      });
+    },
+
+    async withdrawConsent(source) {
+      return PaySickAPI.request(`/kehr/consents/${encodeURIComponent(source)}`, { method: 'DELETE' });
+    },
+
+    /**
+     * Start a pre-approval: procedure, estimate (cents), urgency and,
+     * optionally, the medical aid to ask about cover
+     */
+    async startPreapproval({ procedureCode, estimateCents, urgency, scheme }) {
+      return PaySickAPI.request('/kehr/preapprovals', {
+        method: 'POST',
+        body: JSON.stringify({ procedureCode, estimateCents, urgency, scheme })
+      });
+    },
+
+    /**
+     * Figures read from documents and the liveness token; never files
+     */
+    async submitDocuments(preapprovalId, docs) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/documents`, {
+        method: 'POST',
+        body: JSON.stringify(docs || {})
+      });
+    },
+
+    /**
+     * Upload a payslip or bank statement (base64, no data: prefix, under
+     * 4MB) to be read into figures. The file itself is not kept.
+     */
+    async uploadDocument(preapprovalId, { fileBase64, mediaType }) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/documents/upload`, {
+        method: 'POST',
+        body: JSON.stringify({ fileBase64, mediaType })
+      });
+    },
+
+    async assess(preapprovalId) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/assess`, { method: 'POST' });
+    },
+
+    /**
+     * Ask a person to look at the outcome
+     */
+    async requestReview(preapprovalId) {
+      return PaySickAPI.request(`/kehr/preapprovals/${preapprovalId}/review`, { method: 'POST' });
+    },
+
+    async getPass() {
+      return PaySickAPI.request('/kehr/pass');
+    },
+
+    async redeemPlanLink(token) {
+      return PaySickAPI.request('/kehr/plan-links/redeem', {
+        method: 'POST',
+        body: JSON.stringify({ token })
+      });
+    },
+
+    /**
+     * Provider: send a patient a plan link for a bill (cents)
+     */
+    async createPlanLink({ patientPhone, amountCents, billTotalCents, procedureCode, deliver, patientAgreedToWhatsApp }) {
+      return PaySickAPI.request('/kehr/provider/plan-links', {
+        method: 'POST',
+        body: JSON.stringify({ patientPhone, amountCents, billTotalCents, procedureCode, deliver, patientAgreedToWhatsApp })
+      });
+    },
+
+    /**
+     * Provider: check a patient's pass code before booking
+     */
+    async checkPass(code) {
+      return PaySickAPI.request(`/kehr/provider/passes/${encodeURIComponent(code)}`);
     }
   },
 

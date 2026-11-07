@@ -46,6 +46,10 @@ const HONEYPOT_PAGES = [
   'register.html',
   'providers.html',
   'investor-deck.html',
+  // Kehr by PaySick: reachable from the homepage search bar.
+  'kehr.html',
+  // Old address, now a redirect stub to kehr.html (v1.20.0).
+  'care-agent.html',
 ];
 
 const HONEYPOT_PATH = '/api/hp-check';

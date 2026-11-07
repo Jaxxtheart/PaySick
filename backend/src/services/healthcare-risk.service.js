@@ -18,27 +18,18 @@
 
 const { query, transaction } = require('../config/database');
 const EventEmitter = require('events');
+// The PD / LGD maths itself lives in risk-model.js (v1.21.0), shared with the
+// Kehr pre-approval engine. This service keeps the data gathering and storage.
+const riskModel = require('./risk-model');
 
 class HealthcareRiskService extends EventEmitter {
   constructor() {
     super();
-    this.MODEL_VERSION = 'v1.0';
-
-    // Default weights for components (can be overridden from database)
-    this.PD_WEIGHTS = {
-      healthScore: 0.25,
-      procedureRisk: 0.20,
-      affordability: 0.25,
-      providerPerformance: 0.15,
-      behavioralSignals: 0.15
-    };
-
-    this.LGD_WEIGHTS = {
-      medicalAidRecovery: 0.30,
-      familySupport: 0.20,
-      procedureValue: 0.25,
-      providerRecovery: 0.25
-    };
+    // Form-based applications stay on model v1.0. The Kehr harness uses
+    // v1.1 through risk-model.assessRisk (see risk-model.js).
+    this.MODEL_VERSION = riskModel.MODEL_VERSIONS.LEGACY;
+    this.PD_WEIGHTS = riskModel.PD_WEIGHTS;
+    this.LGD_WEIGHTS = riskModel.LGD_WEIGHTS;
   }
 
   /**
@@ -577,37 +568,7 @@ class HealthcareRiskService extends EventEmitter {
    * Analyze behavioral signals from application process
    */
   analyzeBehavioralSignals(behavior = {}) {
-    const {
-      completionTimeSeconds = 180,
-      applicationHour = 12,
-      deviceType = 'desktop',
-      locationConsistent = true,
-      formEditsCount = 2
-    } = behavior;
-
-    let score = 60; // Base score
-
-    // Application completion time (too fast = suspicious, too slow = hesitant)
-    if (completionTimeSeconds < 60) score -= 15; // Too fast
-    else if (completionTimeSeconds > 600) score -= 10; // Too slow
-    else if (completionTimeSeconds >= 120 && completionTimeSeconds <= 300) score += 10;
-
-    // Application hour (business hours = more reliable)
-    if (applicationHour >= 9 && applicationHour <= 17) score += 5;
-    else if (applicationHour >= 0 && applicationHour <= 5) score -= 10; // Late night
-
-    // Device consistency
-    if (deviceType === 'mobile') score += 5; // Mobile users tend to be more genuine
-
-    // Location consistency
-    if (locationConsistent) score += 5;
-    else score -= 10;
-
-    // Form edits (some edits = careful, too many = uncertain)
-    if (formEditsCount >= 1 && formEditsCount <= 4) score += 5;
-    else if (formEditsCount > 10) score -= 10;
-
-    return Math.max(0, Math.min(100, score));
+    return riskModel.analyzeBehavioralSignals(behavior, { modelVersion: this.MODEL_VERSION });
   }
 
   /**
@@ -741,148 +702,28 @@ class HealthcareRiskService extends EventEmitter {
    * Calculate Probability of Default (PD)
    */
   calculatePD(scores) {
-    const {
-      healthScore = 50,
-      procedureRisk = 50,
-      affordabilityScore = 50,
-      providerScore = 50,
-      behavioralScore = 50
-    } = scores;
-
-    // Normalize scores to 0-1 range (inverted - higher score = lower risk)
-    const healthComponent = (100 - healthScore) / 100 * this.PD_WEIGHTS.healthScore;
-    const procedureComponent = procedureRisk / 100 * this.PD_WEIGHTS.procedureRisk;
-    const affordabilityComponent = (100 - affordabilityScore) / 100 * this.PD_WEIGHTS.affordability;
-    const providerComponent = (100 - providerScore) / 100 * this.PD_WEIGHTS.providerPerformance;
-    const behavioralComponent = (100 - behavioralScore) / 100 * this.PD_WEIGHTS.behavioralSignals;
-
-    // Sum components to get PD
-    const pdRaw = healthComponent + procedureComponent + affordabilityComponent +
-                  providerComponent + behavioralComponent;
-
-    // Apply calibration to get to target PD range (0.5% - 15%)
-    // Our target average is 3.2% based on investor deck
-    const pdScore = Math.max(0.005, Math.min(0.15, pdRaw * 0.15));
-
-    return {
-      pd_score: Math.round(pdScore * 10000) / 10000,
-      pd_band: this.getPDBand(pdScore),
-      components: {
-        healthScore: Math.round(healthComponent * 10000) / 10000,
-        procedureRisk: Math.round(procedureComponent * 10000) / 10000,
-        affordability: Math.round(affordabilityComponent * 10000) / 10000,
-        provider: Math.round(providerComponent * 10000) / 10000,
-        behavioral: Math.round(behavioralComponent * 10000) / 10000
-      }
-    };
+    return riskModel.calculatePD(scores);
   }
 
   /**
    * Calculate Loss Given Default (LGD)
    */
   calculateLGD(params) {
-    const {
-      hasMedicalAid = false,
-      medicalAidTier = 'none',
-      procedureNecessity = 0.5,
-      providerNetwork = false,
-      familySupportIndicator = 0.5
-    } = params;
-
-    // Medical Aid Recovery Potential (can recover from scheme)
-    let medicalAidRecovery;
-    if (!hasMedicalAid) {
-      medicalAidRecovery = 0.8; // 80% LGD component - no medical aid recovery
-    } else if (medicalAidTier === 'comprehensive') {
-      medicalAidRecovery = 0.2; // Strong recovery potential
-    } else if (medicalAidTier === 'classic') {
-      medicalAidRecovery = 0.35;
-    } else {
-      medicalAidRecovery = 0.5;
-    }
-
-    // Family Support (medical debt attracts family payment)
-    // Higher necessity = more family support
-    const familySupportLGD = 1 - (familySupportIndicator * procedureNecessity);
-
-    // Procedure Value Retention (essential procedures = better payment)
-    const procedureValueLGD = 1 - procedureNecessity;
-
-    // Provider Recovery (network partners assist with collections)
-    const providerRecoveryLGD = providerNetwork ? 0.3 : 0.6;
-
-    // Calculate weighted LGD
-    const lgdRaw =
-      medicalAidRecovery * this.LGD_WEIGHTS.medicalAidRecovery +
-      familySupportLGD * this.LGD_WEIGHTS.familySupport +
-      procedureValueLGD * this.LGD_WEIGHTS.procedureValue +
-      providerRecoveryLGD * this.LGD_WEIGHTS.providerRecovery;
-
-    // Calibrate to target range (20% - 70%)
-    // Target average is 45% based on investor deck
-    const lgdScore = Math.max(0.20, Math.min(0.70, lgdRaw));
-
-    return {
-      lgd_score: Math.round(lgdScore * 10000) / 10000,
-      lgd_band: this.getLGDBand(lgdScore),
-      components: {
-        medicalAidRecovery: Math.round(medicalAidRecovery * this.LGD_WEIGHTS.medicalAidRecovery * 10000) / 10000,
-        familySupport: Math.round(familySupportLGD * this.LGD_WEIGHTS.familySupport * 10000) / 10000,
-        procedureValue: Math.round(procedureValueLGD * this.LGD_WEIGHTS.procedureValue * 10000) / 10000,
-        providerRecovery: Math.round(providerRecoveryLGD * this.LGD_WEIGHTS.providerRecovery * 10000) / 10000
-      }
-    };
+    return riskModel.calculateLGD(params);
   }
 
   /**
    * Get medical aid tier from scheme and option
    */
   getMedicalAidTier(scheme, option) {
-    if (!scheme) return 'none';
-
-    const optionLower = (option || '').toLowerCase();
-
-    if (optionLower.includes('comprehensive') || optionLower.includes('executive')) {
-      return 'comprehensive';
-    } else if (optionLower.includes('classic') || optionLower.includes('priority')) {
-      return 'classic';
-    } else if (optionLower.includes('essential') || optionLower.includes('smart')) {
-      return 'essential';
-    }
-
-    return 'basic';
+    return riskModel.getMedicalAidTier(scheme, option);
   }
 
   /**
    * Make risk decision based on PD and LGD
    */
   makeRiskDecision(pdScore, lgdScore, expectedLossRate) {
-    // Decision thresholds
-    if (expectedLossRate <= 0.01) {
-      return {
-        decision: 'approve',
-        reason: 'Low expected loss rate',
-        confidence: 0.95
-      };
-    } else if (expectedLossRate <= 0.025) {
-      return {
-        decision: 'approve',
-        reason: 'Acceptable expected loss within risk appetite',
-        confidence: 0.85
-      };
-    } else if (expectedLossRate <= 0.05) {
-      return {
-        decision: 'review',
-        reason: 'Elevated risk - manual review recommended',
-        confidence: 0.70
-      };
-    } else {
-      return {
-        decision: 'decline',
-        reason: 'Expected loss exceeds risk appetite',
-        confidence: 0.90
-      };
-    }
+    return riskModel.makeRiskDecision(pdScore, lgdScore, expectedLossRate);
   }
 
   /**
@@ -912,36 +753,14 @@ class HealthcareRiskService extends EventEmitter {
    * Get recommended payment term based on risk
    */
   getRecommendedTerm(pdScore, loanAmount) {
-    // Lower risk = can offer longer terms
-    // Higher amounts = may need longer terms
-
-    if (pdScore <= 0.03) {
-      return loanAmount > 10000 ? 6 : 3;
-    } else if (pdScore <= 0.05) {
-      return loanAmount > 15000 ? 4 : 3;
-    } else {
-      return 3; // Minimum term for higher risk
-    }
+    return riskModel.getRecommendedTerm(pdScore, loanAmount);
   }
 
   /**
    * Calculate maximum approved amount based on affordability and risk
    */
   calculateMaxApprovedAmount(affordabilityMax, pdScore) {
-    // Reduce max amount based on risk
-    let riskMultiplier = 1;
-
-    if (pdScore <= 0.03) {
-      riskMultiplier = 1.0;
-    } else if (pdScore <= 0.05) {
-      riskMultiplier = 0.85;
-    } else if (pdScore <= 0.08) {
-      riskMultiplier = 0.70;
-    } else {
-      riskMultiplier = 0.50;
-    }
-
-    return Math.round(affordabilityMax * riskMultiplier);
+    return riskModel.calculateMaxApprovedAmount(affordabilityMax, pdScore);
   }
 
   /**
@@ -987,19 +806,11 @@ class HealthcareRiskService extends EventEmitter {
    * Band classification helpers
    */
   getPDBand(pdScore) {
-    if (pdScore <= 0.02) return 'very_low';
-    if (pdScore <= 0.05) return 'low';
-    if (pdScore <= 0.10) return 'medium';
-    if (pdScore <= 0.20) return 'high';
-    return 'very_high';
+    return riskModel.getPDBand(pdScore);
   }
 
   getLGDBand(lgdScore) {
-    if (lgdScore <= 0.20) return 'very_low';
-    if (lgdScore <= 0.35) return 'low';
-    if (lgdScore <= 0.50) return 'medium';
-    if (lgdScore <= 0.70) return 'high';
-    return 'very_high';
+    return riskModel.getLGDBand(lgdScore);
   }
 
   getHealthScoreBand(score) {

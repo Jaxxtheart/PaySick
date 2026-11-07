@@ -6,6 +6,343 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.22.2] — 2026-11-07
+
+**Type**: PATCH — remove the homepage hero heartbeat line
+
+### Removed
+- The heartbeat (pulse) line in the homepage hero, with its CSS, animation
+  and the mobile padding that made room for it.
+
+### Changed
+- `homepage-section-design.test.js` now checks the hero has no heartbeat
+  line; `homepage-hero-clean-background.test.js` gains two pulse tests
+  (written first).
+
+---
+
+## [v1.22.1] — 2026-11-07
+
+**Type**: PATCH — cleaner homepage hero background
+
+### Changed
+- Homepage hero (`.theme-blush`): removed the plus-sign pattern and the
+  blurred brand-red glows. The background is now a plain white-to-blush
+  wash that flows into the next section's divider. The heartbeat line stays.
+
+### Added
+- `tests/unit/homepage-hero-clean-background.test.js` (written first).
+
+---
+
+## [v1.22.0] — 2026-10-27
+
+**Type**: MINOR — Kehr document reader, WhatsApp plan links, passkey sign-in
+
+### Added
+- `kehr-document-reader.service.js` and the
+  `POST /api/kehr/preapprovals/:id/documents/upload` route: a payslip or
+  statement is read into figures and cross-checked. The file is not kept.
+- `whatsapp.adapter.js`: plan links sent through the Meta Cloud API
+  template `kehr_plan_link`, only with the patient's agreement, carrying
+  the provider name and the link only.
+- Passkeys:
+  - `utils/cbor.js`
+  - `webauthn.service.js` (ES256/RS256, no package)
+  - `passkey.service.js`
+  - `passkey-repository.js`
+  - migration `015_passkeys.sql`
+  - `/api/auth/passkeys`
+  - `js/passkey.js`
+  - buttons on `login.html` and the pass
+
+### Changed
+- `login.html` returns to a plan link opened while signed out.
+- Privacy policy v1.7.
+- Bot and rate-limit review: 6 UA patterns. Uploads use the tight bucket
+  and passkeys use `authLimiter`.
+
+### Fixed
+- `provider-kehr.html` result labels no longer break mid-word.
+
+---
+
+## [v1.21.0] — 2026-10-27
+
+**Type**: MINOR — Kehr harness, Journey A (pre-approval before treatment)
+
+### Added
+- Risk model v1.1 (`risk-model.js`). v1.0 is extracted unchanged (833
+  golden cases); v1.1 has a neutral behavioural component and term-aware
+  affordability.
+- `preapproval.service.js`: Shield Gates 5, 3 and 2 (`runPatientGates`),
+  the hard floors and PD/LGD, then the pass (code, ceiling, maximum term,
+  90 days) and the conversion rules.
+- `consent.service.js`, `document-crosscheck.service.js` and
+  `plan-link.service.js`.
+- `identity-verification.adapter.js` and `medical-scheme.adapter.js`
+  (mocks).
+- `kehr-preapproval-flow.service.js` and `kehr-repository.js`. They write
+  to the underwriting audit log (`RISK_v1.1`) and the manual review queue.
+- `/api/kehr/*` routes and migration `014_kehr_harness.sql`.
+- `kehr-pass.html` (patient) and `provider-kehr.html` (provider).
+- `KEHR_HARNESS.md`.
+
+### Changed
+- `debicheck.adapter.js`: the creditor is Tech & Artery (Pty) Ltd
+  (`KEHR*PLAN`, Standard Bank), with TT1 falling back to TT2.
+- Privacy policy v1.6, section 4B "Kehr pre-approval".
+- Bot blocklist and rate-limit review: 8 new UA patterns, plus
+  `kehrLimiter` and `kehrAssessLimiter`.
+
+### Fixed
+- Provider plan links pointed to `kehr.html`; they now point to
+  `kehr-pass.html`.
+
+---
+
+## [v1.20.0] — 2026-10-27
+
+**Type**: MINOR — Kehr brand identity for the harness (replaces "Care Agent")
+
+### Added
+- `KEHR_BRAND.md`: the Kehr by PaySick identity, built on the PaySick CI.
+  It covers the mark (the PaySick cross with its arms turned 45° into a K),
+  the wordmark and lockups, colour tokens (CI plus Kehr Wine `#7A1426`),
+  type and voice.
+- `kehr.html`: the harness page (moved from `care-agent.html`), with the
+  Kehr lockup and tokens.
+
+### Changed
+- `care-agent.html` is now a redirect stub to `kehr.html`, keeping `?q=`.
+- The homepage search bar is "Ask Kehr". Login and onboarding return to
+  `kehr.html`.
+- Privacy policy v1.5: section 4A is "Kehr by PaySick" (formerly the Care
+  Agent). Substance is unchanged.
+- The greeting, the LLM prompt and patient-visible errors speak as Kehr,
+  never "agent" or "assistant".
+- The plan doc is renamed `KEHR_WORKFLOW_PLAN.md`.
+
+### Not changed
+- Internal code names (`care-agent.*`, `/api/care-agent`, `care_agent_*`).
+
+---
+
+## [v1.19.0] — 2026-10-27
+
+**Type**: MINOR — Care Agent decisions moved to the backend; the patient sees outcomes only
+
+### Added
+- `care-agent-patient-view.service.js`: an allowlist filter for every
+  patient response.
+- `GET /api/care-agent/admin/sessions/:id/decisions` (staff only).
+- An LLM prompt section that keeps the process out of what the agent says.
+
+### Changed
+- Patient routes return facts, plain options, confirm cards and outcomes
+  only.
+- Patient-facing wording is rewritten as plain facts and outcomes, with no
+  agent narration.
+- The account card shows a status line, payments, balance, requests as
+  "Received", and offers.
+
+### Removed (patient-facing)
+- The journey bar, decision boxes, authority badges, "Lowest" offer marker
+  and "Will change" text.
+- The patient decision log route and `getDecisions`.
+- The affordability-pressure flag and the Shield note on plan options.
+
+---
+
+## [v1.18.0] — 2026-10-27
+
+**Type**: MINOR — Care Agent workflows across the whole patient value chain
+
+### Added
+- Governed action layer for the Care Agent after the first conversation:
+  choose a funder, pay an instalment, promise to pay, and send requests to
+  the team (date change, restructure, hardship, dispute, plan adjustment,
+  cancellation).
+- Four authority tiers, fixed in a frozen registry: Agent does it, You
+  approve, Team decides, Not in chat.
+- Decision rules with reason codes, using the Recovery Engine's thresholds,
+  written to the audit log and shown to the patient.
+- Proposals (`care_agent_action_proposals`, migration 013). Confirming needs
+  consent, makes an atomic claim, expires after 30 minutes and re-checks
+  live data, refusing if the amount changed.
+- Backend updates through existing services: `acceptOffer`, a new shared
+  `plan-payment.service.js` (moved from `routes/payments.js`),
+  `promise_to_pay`/`collection_actions`, `manual_review_queue`, and in-app
+  notifications.
+- LLM tools `get_account_overview` (read) and `propose_account_action`
+  (draft only).
+- Five new authenticated routes and matching `PaySickAPI.careAgent` methods.
+- `care-agent.html`:
+  - journey bar
+  - account home
+  - proposal cards
+  - detail forms (no more `window.prompt`)
+  - income fields
+  - "What the agent did" log
+- `CARE_AGENT_WORKFLOW_PLAN.md`.
+
+### Fixed
+- `/manage` queried columns `loan_repayments` does not have.
+- Income never reached Shield Gate 2 on Care Agent submissions.
+- A Shield decline was shown as a failed submission.
+
+### Security review
+- `careAgentActionLimiter`: 15 confirms per 15 minutes.
+- Blocklist: `Meta-ExternalFetcher`, `FirecrawlAgent`, `Google-NotebookLM`.
+
+---
+
+## [v1.17.1] — 2026-10-26
+
+**Type**: PATCH — homepage visual design
+
+### Changed
+- `index.html`: each section has its own theme, in a "pulse" design
+  language.
+  - Blush hero with an animated heartbeat line.
+  - White cards with accent bars and numerals.
+  - Dark "How it will work" with a glowing step track.
+  - Rose providers section with a decorative flow card.
+  - Wine/ink technology section with a node network and chips.
+  - Cream "About" with a logo watermark and pull quote.
+  - Red final call to action.
+- Curved dividers, eyebrow labels, and scroll-reveal (honours reduced
+  motion, works without JS).
+- Copy, links and behaviour unchanged; WCAG AA contrast verified.
+
+---
+
+## [v1.17.0] — 2026-10-26
+
+**Type**: MINOR — branch reconciliation, privacy policy, held Care Agent question
+
+### Version numbering
+- v1.17.0 is above every number used by this line (up to v1.13.0) and by
+  `claude/inspiring-bardeen-b97kat` (up to v1.16.0).
+- That branch's versions are archived, unchanged, in
+  `code-backups/branch-inspiring-bardeen/` with its own CHANGELOG. They were
+  never released on `main` under those numbers.
+
+### Merged
+- `claude/inspiring-bardeen-b97kat` is merged (real merge, history kept).
+- Taken from it: the entity rename (spelling normalised to "Tech & Artery
+  (Pty) Ltd"), registration number K2015/346764/07, the site-wide
+  payment-plan wording, and the em-dash cleanup.
+- The Care Agent and homepage keep this line's versions.
+
+### Changed
+- **`privacy-policy.html` v1.4**: Care Agent section 4A, health
+  information, Anthropic as an operator and cross-border recipient,
+  retention, and the registration number.
+- **`care-agent.html`**: privacy notice at the message box.
+- **`VERSIONING_GUIDE.md`**: new rule against version collisions across
+  branches.
+
+### Fixed
+- A question typed while signed out is no longer lost at login.
+  - It is held for up to 24 hours (`js/care-agent-pending.js`).
+  - `login.html` and `onboarding.html` return the patient to the Care
+    Agent.
+  - The held question is placed in the message box for review, never
+    auto-sent.
+
+---
+
+## [v1.13.0] — 2026-10-26
+
+**Type**: MINOR — PaySick Care Agent on the homepage
+
+### Added
+- An "Ask PaySick" search bar in the homepage hero, which goes to the new
+  `care-agent.html`.
+- The Care Agent backend: the `/api/care-agent/*` routes (authenticated,
+  60 requests per 15 minutes), the conversational, document and
+  deterministic-fallback services, migration `012_care_agent.sql`, and
+  `PaySickAPI.careAgent.*`.
+- Ported from the unmerged `claude/inspiring-bardeen-b97kat` branch (the
+  Care Agent subsystem only).
+
+### Changed (port review)
+- The default model is now `claude-opus-5-5`.
+- Document extraction no longer forces `tool_choice`.
+- Default `max_tokens` is now 16000.
+- A refusal or empty model reply now falls back to the deterministic
+  engine instead of showing a blank message.
+
+---
+
+## [v1.12.2] — 2026-10-26
+
+**Type**: PATCH — owner-directed homepage copy changes
+
+### Changed
+- **`index.html`**: removed the hero availability disclaimer.
+- **`index.html`**: reverted the provider section to its v1.11.0 wording
+  ("Are You a Healthcare Provider?", 24-hour settlements / grow your patient
+  base / zero collection burden, Join Our Network → `provider-apply.html`,
+  Browse Provider Directory → `providers.html`), and removed the
+  "In development / Proposed capabilities" panel.
+- Compliance checklist updated so the owner and counsel confirm the reversed
+  guardrails.
+
+---
+
+## [v1.12.1] — 2026-10-26
+
+**Type**: PATCH — homepage links restored (wording-only repositioning)
+
+### Fixed
+- **`index.html`**: restored every v1.11.0 link destination. That covers
+  Get Started → `login.html` (in the nav, hero and final CTA),
+  `provider-apply.html`, the `providers.html` directory, the `#features`
+  anchor, and the footer's Research, Licenses and Accessibility links. The
+  v1.12.0 wording and disclosures are kept.
+
+### Removed
+- The preview interest forms and `js/interest-forms.js`, which sent
+  nothing. The CTAs now go to the existing working pages.
+
+---
+
+## [v1.12.0] — 2026-10-26
+
+**Type**: MINOR — homepage repositioning + new `js/interest-forms.js` module
+
+### Summary
+Repositions the homepage from a live "Heal now, pay later" payments product
+to a healthcare financing platform **in development**, developed by Tech &
+Artery (Pty) Ltd. Uses the owner-approved copy, prelaunch disclosures, and
+non-credit interest forms. Detailed NCR / National Credit Act status lives
+only on the Terms of Service page. Built test-first.
+
+### Changed
+- **`index.html`**: new hero, value pillars, "How it will work", provider
+  capabilities (labelled In development), Technology, About and
+  final-conversion sections; new footer and copyright; new title,
+  description, Open Graph and JSON-LD.
+- **`terms-of-service.html`**: new dated "Credit services and regulatory
+  status" section (`#credit-status`). The operator is now Tech & Artery
+  (Pty) Ltd. Removed the "not regulated by the NCR" statement.
+- **`bot-blocker.js`**: MINOR-bump review. Added `Perplexity-User`,
+  `MistralAI-User`, `Claude-User` and `Webzio-Extended`. Rate limits are
+  unchanged because no routes were added.
+
+### Added
+- **`js/interest-forms.js`**: validation, honeypot, and honest no-backend
+  submission handling. Nothing is sent and no success message is shown.
+
+### Removed
+- Homepage "Heal now, pay later" proposition, the "Get Started" links into
+  login, the provider-apply link, and the unsupported claims (instant setup,
+  24-hour settlement, nationwide network, 3-month terms).
+
+---
+
 ## [v1.11.0] — 2026-09-19
 
 **Type**: MINOR — UX/trust fixes plus one new user-facing capability
