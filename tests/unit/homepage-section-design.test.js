@@ -72,9 +72,10 @@ describe('section labels and artwork', () => {
     }
   });
 
-  test('the hero has an animated heartbeat line, hidden from assistive technology', () => {
-    assert.match(sectionHtml('top'), /<svg class="pulse-line"[^>]*aria-hidden="true"/);
-    assert.match(css, /@keyframes pulse-draw/);
+  // v1.22.2: the heartbeat line was removed at the owner's request
+  // (see homepage-hero-clean-background.test.js).
+  test('the hero has no heartbeat line', () => {
+    assert.doesNotMatch(sectionHtml('top'), /pulse-line/);
   });
 
   test('sections after the hero open with a curved divider, hidden from assistive technology', () => {

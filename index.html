@@ -725,41 +725,9 @@
         .divider-rose { color: #FFF4F5; }
         .divider-cream { color: #FBF7F1; }
 
-        /* Hero: a clean white-to-blush wash with a heartbeat line */
+        /* Hero: a clean white-to-blush wash */
         .theme-blush {
             background: linear-gradient(180deg, #ffffff 0%, #FFF1F3 100%);
-        }
-
-        .hero > *:not(.pulse-line) {
-            position: relative;
-            z-index: 1;
-        }
-
-        .pulse-line {
-            position: absolute;
-            left: 0;
-            bottom: 28px;
-            width: 100%;
-            height: 80px;
-            pointer-events: none;
-        }
-
-        .pulse-line .pulse-base {
-            stroke: #E01E37;
-            stroke-opacity: 0.16;
-        }
-
-        .pulse-line .pulse-beat {
-            stroke: #E01E37;
-            stroke-opacity: 0.75;
-            stroke-dasharray: 140 2600;
-            stroke-dashoffset: 2740;
-            animation: pulse-draw 4.5s linear infinite;
-        }
-
-        @keyframes pulse-draw {
-            from { stroke-dashoffset: 2740; }
-            to { stroke-dashoffset: 0; }
         }
 
         /* Why PaySick: crisp white, cards with an accent bar and big numerals */
@@ -1112,15 +1080,6 @@
                 height: 36px;
             }
 
-            .hero {
-                padding-bottom: 120px;
-            }
-
-            .pulse-line {
-                bottom: 16px;
-                height: 60px;
-            }
-
             .theme-dark .steps {
                 grid-template-columns: 1fr;
             }
@@ -1163,7 +1122,6 @@
             .theme-light .feature-card:hover {
                 transform: none;
             }
-            .pulse-line .pulse-beat,
             .flow-connector line,
             .tech-network circle {
                 animation: none;
@@ -1235,10 +1193,6 @@
             <a href="#how-it-works" class="secondary-btn">Explore how it works</a>
             <a href="#providers" class="secondary-btn">Partner with PaySick</a>
         </div>
-        <svg class="pulse-line" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <path class="pulse-base" d="M0,40 H560 L590,40 L606,10 L624,72 L642,20 L658,40 H880 L900,40 L912,28 L926,54 L940,40 H1440" fill="none" stroke-width="2" stroke-linejoin="round"/>
-            <path class="pulse-beat" d="M0,40 H560 L590,40 L606,10 L624,72 L642,20 L658,40 H880 L900,40 L912,28 L926,54 L940,40 H1440" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
     </section>
 
     <!-- Value proposition -->

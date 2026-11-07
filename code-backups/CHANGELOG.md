@@ -6,6 +6,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.22.2] — 2026-11-07
+
+**Type**: PATCH — remove the homepage hero heartbeat line
+
+### Removed
+- The heartbeat (pulse) line in the homepage hero, with its CSS, animation
+  and the mobile padding that made room for it.
+
+### Changed
+- `homepage-section-design.test.js` now checks the hero has no heartbeat
+  line; `homepage-hero-clean-background.test.js` gains two pulse tests
+  (written first).
+
+---
+
 ## [v1.22.1] — 2026-11-07
 
 **Type**: PATCH — cleaner homepage hero background

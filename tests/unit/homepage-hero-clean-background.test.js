@@ -9,6 +9,7 @@
  * background, remove the pattern". The hero (theme-blush) must:
  *   - have no repeating plus-pattern image
  *   - have no blurred brand-red glow blobs (::before / ::after)
+ *   - have no heartbeat pulse line (v1.22.2)
  *   - still be a soft white → blush wash, so it flows into the
  *     blush divider that opens the next section
  *
@@ -48,5 +49,15 @@ describe('hero has a clean background', () => {
     const body = rule('.theme-blush');
     assert.match(body, /background:\s*linear-gradient\(180deg,\s*#ffffff\s+0%,\s*#FFF1F3\s+100%\)/i);
     assert.match(css, /\.divider-blush\s*\{\s*color:\s*#FFF1F3;/i);
+  });
+
+  // v1.22.2: owner asked to remove the heartbeat (pulse) line as well
+  test('no heartbeat pulse line in the hero markup', () => {
+    assert.doesNotMatch(html, /class="pulse-(line|base|beat)"/);
+  });
+
+  test('no leftover pulse-line CSS or animation', () => {
+    assert.doesNotMatch(css, /\.pulse-(line|base|beat)/);
+    assert.doesNotMatch(css, /pulse-draw/);
   });
 });
