@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and vers
 
 ---
 
+## [v1.22.1] — 2026-11-07
+
+**Type**: PATCH — cleaner homepage hero background
+
+### Changed
+- Homepage hero (`.theme-blush`): removed the plus-sign pattern and the
+  blurred brand-red glows. The background is now a plain white-to-blush
+  wash that flows into the next section's divider. The heartbeat line stays.
+
+### Added
+- `tests/unit/homepage-hero-clean-background.test.js` (written first).
+
+---
+
 ## [v1.22.0] — 2026-10-27
 
 **Type**: MINOR — Kehr document reader, WhatsApp plan links, passkey sign-in
